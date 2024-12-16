@@ -1,7 +1,7 @@
 from apolo_app_types.common import AppOutputs
 
 
-class OpenAICompatibleEmbeddingsAPI(AppOutputs):
+class OpenAICompatibleAPI(AppOutputs):
     model_name: str
     host: str
     port: str
@@ -10,13 +10,22 @@ class OpenAICompatibleEmbeddingsAPI(AppOutputs):
     api_key: str | None = None
 
 
-class OpenAICompatibleChatAPI(AppOutputs):
-    model_name: str
-    host: str
-    port: str
-    api_base: str
-    tokenizer_name: str | None = None
-    api_key: str | None = None
+class OpenAICompatibleEmbeddingsAPI(OpenAICompatibleAPI):
+    @property
+    def endpoint_url(self) -> str:
+        return self.api_base + "/embeddings"
+
+
+class OpenAICompatibleChatAPI(OpenAICompatibleAPI):
+    @property
+    def endpoint_url(self) -> str:
+        return self.api_base + "/chat"
+
+
+class OpenAICompatibleCompletionsAPI(OpenAICompatibleChatAPI):
+    @property
+    def endpoint_url(self) -> str:
+        return self.api_base + "/completions"
 
 
 class VLLMOutputs(AppOutputs):

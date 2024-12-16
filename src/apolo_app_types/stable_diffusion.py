@@ -6,6 +6,11 @@ class TextToImgAPI(AppOutputs):
     port: str | None
     api_base: str
 
+    @property
+    def endpoint_url(self) -> str:
+        return self.api_base + "/txt2img"
+
+
 class SDModel(AppOutputs):
     name: str
     files: str
