@@ -7,4 +7,3 @@ class DifyOutputs(AppOutputs):
     external_web_app_url: str | None
     external_api_url: str | None
     init_password: str
-

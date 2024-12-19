@@ -1,6 +1,6 @@
-from apolo_app_types.common import AppOutputs
-
 from pydantic import Field
+
+from apolo_app_types.common import AppOutputs
 
 
 class WeaviateAuth(AppOutputs):
