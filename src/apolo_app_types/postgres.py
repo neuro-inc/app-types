@@ -1,4 +1,12 @@
-from apolo_app_types.common import AppOutputs
+from apolo_app_types.common import AppInputs, AppOutputs
+
+
+class CrunchyPostgresInputs(AppInputs):
+    preset_name: str
+    postgres_version: str
+    instance_replicas: int
+    pg_bouncer_preset_name: str
+    pg_bouncer_replicas: int
 
 
 class CrunchyPostgresUserCredentials(AppOutputs):

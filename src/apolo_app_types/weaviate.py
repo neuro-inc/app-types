@@ -1,6 +1,32 @@
 from pydantic import BaseModel, Field
 
-from apolo_app_types.common import AppOutputs
+from apolo_app_types.common import AppInputs, AppOutputs, Ingress
+
+
+class Persistence(BaseModel):
+    size: str
+
+
+class WeaviateClusterApi(BaseModel):
+    username: str
+    password: str
+
+
+class WeaviateAuthentication(BaseModel):
+    enabled: bool
+
+
+class WeaviateBackups(BaseModel):
+    enabled: bool
+
+
+class WeaviateInputs(AppInputs):
+    preset_name: str
+    persistence: Persistence
+    ingress: Ingress
+    clusterApi: WeaviateClusterApi
+    authentication: WeaviateAuthentication
+    backups: WeaviateBackups
 
 
 class WeaviateAuth(BaseModel):

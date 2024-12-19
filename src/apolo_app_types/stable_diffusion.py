@@ -1,4 +1,24 @@
-from apolo_app_types.common import AppOutputs
+from apolo_app_types.common import AppInputs, AppOutputs, HuggingFaceModel
+
+
+class SDIngress(AppInputs):
+    enabled: bool
+
+
+class SDAPI(AppInputs):
+    replicaCount: int
+    ingress: AppInputs
+
+
+class StableStudio(AppInputs):
+    enabled: bool
+    preset_name: str
+
+
+class SDInputs(AppInputs):
+    api: SDAPI
+    stablestudio: AppInputs
+    model: HuggingFaceModel
 
 
 class TextToImgAPI(AppOutputs):
