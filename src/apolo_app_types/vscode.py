@@ -8,4 +8,3 @@ class VSCodeInputs(AppInputs):
 
 class VSCodeOutputs(AppOutputs):
     internal_web_app_url: str
-    external_web_app_url: str

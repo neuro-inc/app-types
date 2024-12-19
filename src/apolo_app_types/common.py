@@ -6,4 +6,4 @@ class AppInputs(BaseModel):
 
 
 class AppOutputs(BaseModel):
-    pass
+    external_web_app_url: str | None = None

@@ -24,7 +24,6 @@ class PrivateGPTOutputs(AppOutputs):
     internal_web_app_url: str
     internal_api_url: str
     internal_api_swagger_url: str
-    external_web_app_url: str
     external_api_url: str
     external_api_swagger_url: str
     external_authorization_required: bool
