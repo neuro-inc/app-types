@@ -8,4 +8,3 @@ class JupyterInputs(AppInputs):
 
 class JupyterOutputs(AppOutputs):
     internal_web_app_url: str
-    external_web_app_url: str

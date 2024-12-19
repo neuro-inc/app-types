@@ -20,5 +20,4 @@ class SDOutputs(AppOutputs):
     internal_api: TextToImgAPI
     external_api: TextToImgAPI
     model: SDModel
-    stablestudio_external_web_app_url: str | None = None
-    stablestudio_internal_web_app_url: str | None = None
+    internal_web_app_url: str | None = None
