@@ -7,3 +7,18 @@ class AppInputs(BaseModel):
 
 class AppOutputs(BaseModel):
     external_web_app_url: str | None = None
+
+
+class IngressGrpc(BaseModel):
+    enabled: bool
+
+
+class Ingress(BaseModel):
+    enabled: bool
+    cluster_name: str
+    grpc: IngressGrpc
+
+
+class HuggingFaceModel(AppInputs):
+    modelHFName: str  # noqa: N815
+    modelFiles: str | None  # noqa: N815
