@@ -6,7 +6,7 @@ class SDIngress(AppInputs):
 
 
 class SDAPI(AppInputs):
-    replicaCount: int
+    replica_count: int
     ingress: AppInputs
 
 

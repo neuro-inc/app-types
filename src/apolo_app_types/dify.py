@@ -40,8 +40,8 @@ class DifyInputs(AppInputs):
     proxy: Proxy
     web: Web
     redis: Redis
-    externalPostgres: ExternalPostgres
-    externalPGVector: ExternalPGVector
+    external_postgres: ExternalPostgres
+    external_pg_vector: ExternalPGVector
 
 
 class DifyOutputs(AppOutputs):

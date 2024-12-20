@@ -20,5 +20,5 @@ class Ingress(BaseModel):
 
 
 class HuggingFaceModel(AppInputs):
-    modelHFName: str
-    modelFiles: str | None
+    model_hf_name: str
+    model_files: str | None
