@@ -24,7 +24,7 @@ class WeaviateInputs(AppInputs):
     preset_name: str
     persistence: Persistence
     ingress: Ingress
-    cluster_api: WeaviateClusterApi
+    clusterApi: WeaviateClusterApi  # noqa: N815
     authentication: WeaviateAuthentication
     backups: WeaviateBackups
 

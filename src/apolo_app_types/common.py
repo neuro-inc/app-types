@@ -20,5 +20,5 @@ class Ingress(BaseModel):
 
 
 class HuggingFaceModel(AppInputs):
-    model_hf_name: str
-    model_files: str | None
+    modelHFName: str  # noqa: N815
+    modelFiles: str | None  # noqa: N815
