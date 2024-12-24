@@ -1,4 +1,4 @@
-SHELL := /bin/bash
+# checkmake: ignore=phony
 
 .PHONY: format fmt
 format fmt: ### Reformat source files and run linters
