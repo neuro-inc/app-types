@@ -1,5 +1,6 @@
 from apolo_app_types.common import AppInputs, AppOutputs
 
+
 class ShellInputs(AppInputs):
     preset_name: str
     http_auth: bool = True
