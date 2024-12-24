@@ -29,7 +29,7 @@ jobs:
     - name: Cache PyPI
       uses: actions/cache@v4
       with:
-        key: pip-lint-${{ hashFiles('requirements/*.txt') }}
+        key: pip-lint-${{ hashFiles('requirements*.txt') }}
         path: ~/.cache/pip
         restore-keys: |
           pip-lint-
