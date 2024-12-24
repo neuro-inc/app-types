@@ -3,33 +3,32 @@ from pydantic import BaseModel
 from apolo_app_types.common import AppInputs, AppOutputs, Ingress
 
 
+class LLMApi:
+    replicas: int | None
+    preset_name: str
+
+
 class LLMModel(BaseModel):
     model_hf_name: str
     tokenizer_hf_name: str
+    api: LLMApi
+
+
+class Worker(BaseModel):
+    replicas: int | None
+    preset_name: str
+
+
+class Proxy(BaseModel):
+    preset_name: str
+
+
+class Web(BaseModel):
+    replicas: int | None
+    preset_name: str
 
 
 class LLMInputs(AppInputs):
-    class Api:
-        replicas: int | None
-        preset_name: str
-
-    class Worker:
-        replicas: int | None
-        preset_name: str
-
-    class Proxy:
-        preset_name: str
-
-    class Web:
-        replicas: int | None
-        preset_name: str
-
-    class Redis:
-        class Master:
-            preset_name: str
-
-        master: Master
-
     preset_name: str
     ingress: Ingress
     model: LLMModel

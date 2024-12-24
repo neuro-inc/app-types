@@ -1,47 +1,42 @@
-from apolo_app_types.common import AppInputs, AppOutputs
+from pydantic import BaseModel
+
+from apolo_app_types.common import (
+    AppInputs,
+    AppOutputs,
+    Postgres,
+    PostgresWithPGVector,
+    Redis,
+)
 
 
-class ExternalPostgres:
-    platform_app_name: str
-    username: str | None
-    db_name: str | None
+class DifyApi(BaseModel):
+    replicas: int | None
+    preset_name: str
+    title: str
 
 
-class ExternalPGVector:
-    platform_app_name: str
-    username: str | None
-    db_name: str | None
+class DifyWorker(BaseModel):
+    replicas: int | None
+    preset_name: str
+
+
+class DifyProxy(BaseModel):
+    preset_name: str
+
+
+class DifyWeb(BaseModel):
+    replicas: int | None
+    preset_name: str
 
 
 class DifyInputs(AppInputs):
-    class Api:
-        replicas: int | None
-        preset_name: str
-
-    class Worker:
-        replicas: int | None
-        preset_name: str
-
-    class Proxy:
-        preset_name: str
-
-    class Web:
-        replicas: int | None
-        preset_name: str
-
-    class Redis:
-        class Master:
-            preset_name: str
-
-        master: Master
-
-    api: Api
-    worker: Worker
-    proxy: Proxy
-    web: Web
+    api: DifyApi
+    worker: DifyWorker
+    proxy: DifyProxy
+    web: DifyWeb
     redis: Redis
-    externalPostgres: ExternalPostgres  # noqa: N815
-    externalPGVector: ExternalPGVector  # noqa: N815
+    externalPostgres: Postgres  # noqa: N815
+    externalPGVector: PostgresWithPGVector  # noqa: N815
 
 
 class DifyOutputs(AppOutputs):
