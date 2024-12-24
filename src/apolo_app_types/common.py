@@ -24,7 +24,7 @@ class HuggingFaceModel(AppInputs):
     modelFiles: str | None  # noqa: N815
 
 
-class RedisMaster:
+class RedisMaster(BaseModel):
     preset_name: str
 
 
