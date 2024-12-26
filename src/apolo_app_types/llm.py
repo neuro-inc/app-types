@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from apolo_app_types.common import AppInputs, AppOutputs, Ingress
 
 
-class LLMApi:
+class LLMApi(BaseModel):
     replicas: int | None
     preset_name: str
 
