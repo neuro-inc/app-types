@@ -7,3 +7,38 @@ class AppInputs(BaseModel):
 
 class AppOutputs(BaseModel):
     external_web_app_url: str | None = None
+
+
+class IngressGrpc(BaseModel):
+    enabled: bool
+
+
+class Ingress(BaseModel):
+    enabled: bool
+    cluster_name: str
+    grpc: IngressGrpc
+
+
+class HuggingFaceModel(AppInputs):
+    modelHFName: str  # noqa: N815
+    modelFiles: str | None  # noqa: N815
+
+
+class RedisMaster(BaseModel):
+    preset_name: str
+
+
+class Redis(BaseModel):
+    master: RedisMaster
+
+
+class Postgres:
+    platform_app_name: str
+    username: str | None
+    db_name: str | None
+
+
+class PostgresWithPGVector(BaseModel):
+    platform_app_name: str
+    username: str | None
+    db_name: str | None

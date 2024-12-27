@@ -1,4 +1,37 @@
-from apolo_app_types.common import AppOutputs
+from pydantic import BaseModel
+
+from apolo_app_types.common import AppInputs, AppOutputs, Ingress
+
+
+class LLMApi(BaseModel):
+    replicas: int | None
+    preset_name: str
+
+
+class LLMModel(BaseModel):
+    model_hf_name: str
+    tokenizer_hf_name: str
+    api: LLMApi
+
+
+class Worker(BaseModel):
+    replicas: int | None
+    preset_name: str
+
+
+class Proxy(BaseModel):
+    preset_name: str
+
+
+class Web(BaseModel):
+    replicas: int | None
+    preset_name: str
+
+
+class LLMInputs(AppInputs):
+    preset_name: str
+    ingress: Ingress
+    model: LLMModel
 
 
 class OpenAICompatibleAPI(AppOutputs):
