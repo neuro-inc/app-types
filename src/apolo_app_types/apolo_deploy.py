@@ -15,4 +15,4 @@ class ApoloDeployInputs(AppInputs):
 
 class ApoloDeployOutputs(AppOutputs):
     internal_web_app_url: str
-    external_web_app_url: str # type: ignore
+    external_web_app_url: str | None = None
