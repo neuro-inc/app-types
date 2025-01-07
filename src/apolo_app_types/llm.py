@@ -9,8 +9,8 @@ class LLMApi(BaseModel):
 
 
 class LLMModel(BaseModel):
-    modelHFName: str
-    tokenizerHFName: str
+    modelHFName: str  # noqa: N815
+    tokenizerHFName: str  # noqa: N815
     api: LLMApi | None = None
 
 
