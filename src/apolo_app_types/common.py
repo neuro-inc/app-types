@@ -16,7 +16,7 @@ class IngressGrpc(BaseModel):
 class Ingress(BaseModel):
     enabled: bool
     cluster_name: str
-    grpc: IngressGrpc
+    grpc: IngressGrpc | None = None
 
 
 class HuggingFaceModel(AppInputs):
