@@ -1,19 +1,26 @@
-from common import AppInputs, AppOutputs
-from dify import DifyApi, DifyInputs, DifyOutputs, DifyProxy, DifyWeb, DifyWorker
-from fooocus import FooocusInputs, FooocusOutputs
-from jupyter import JupyterInputs, JupyterOutputs
-from llm import LLMInputs, VLLMOutputs
-from mlflow import MLFlowInputs, MLFlowOutputs
-from postgres import CrunchyPostgresInputs, CrunchyPostgresOutputs
-from pycharm import PycharmInputs, PycharmOutputs
-from shell import ShellInputs, ShellOutputs
-from stable_diffusion import SDInputs, SDOutputs
-from text_embeddings import (
+from apolo_app_types.common import AppInputs, AppOutputs
+from apolo_app_types.dify import (
+    DifyApi,
+    DifyInputs,
+    DifyOutputs,
+    DifyProxy,
+    DifyWeb,
+    DifyWorker,
+)
+from apolo_app_types.fooocus import FooocusInputs, FooocusOutputs
+from apolo_app_types.jupyter import JupyterInputs, JupyterOutputs
+from apolo_app_types.llm import LLMInputs, VLLMOutputs
+from apolo_app_types.mlflow import MLFlowInputs, MLFlowOutputs
+from apolo_app_types.postgres import CrunchyPostgresInputs, CrunchyPostgresOutputs
+from apolo_app_types.pycharm import PycharmInputs, PycharmOutputs
+from apolo_app_types.shell import ShellInputs, ShellOutputs
+from apolo_app_types.stable_diffusion import SDInputs, SDOutputs
+from apolo_app_types.text_embeddings import (
     TextEmbeddingsInferenceInputs,
     TextEmbeddingsInferenceOutputs,
 )
-from vscode import VSCodeInputs, VSCodeOutputs
-from weaviate import WeaviateInputs, WeaviateOutputs
+from apolo_app_types.vscode import VSCodeInputs, VSCodeOutputs
+from apolo_app_types.weaviate import WeaviateInputs, WeaviateOutputs
 
 
 __all__ = [
