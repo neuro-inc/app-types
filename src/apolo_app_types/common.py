@@ -14,8 +14,8 @@ class IngressGrpc(BaseModel):
 
 
 class Ingress(BaseModel):
-    enabled: bool
-    cluster_name: str
+    enabled: str
+    clusterName: str  # noqa: N815
     grpc: IngressGrpc | None = None
 
 
