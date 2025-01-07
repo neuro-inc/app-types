@@ -7,8 +7,11 @@ from mlflow import MLFlowInputs, MLFlowOutputs
 from postgres import CrunchyPostgresInputs, CrunchyPostgresOutputs
 from pycharm import PycharmInputs, PycharmOutputs
 from shell import ShellInputs, ShellOutputs
-from stable_diffusion import SDOutputs, SDInputs
-from text_embeddings import TextEmbeddingsInferenceInputs, TextEmbeddingsInferenceOutputs
+from stable_diffusion import SDInputs, SDOutputs
+from text_embeddings import (
+    TextEmbeddingsInferenceInputs,
+    TextEmbeddingsInferenceOutputs,
+)
 from vscode import VSCodeInputs, VSCodeOutputs
 from weaviate import WeaviateInputs, WeaviateOutputs
 
@@ -45,4 +48,3 @@ __all__ = [
     "WeaviateInputs",
     "WeaviateOutputs",
 ]
-
