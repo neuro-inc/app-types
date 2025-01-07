@@ -9,9 +9,9 @@ class LLMApi(BaseModel):
 
 
 class LLMModel(BaseModel):
-    model_hf_name: str
-    tokenizer_hf_name: str
-    api: LLMApi
+    modelHFName: str
+    tokenizerHFName: str
+    api: LLMApi | None = None
 
 
 class Worker(BaseModel):
@@ -31,7 +31,7 @@ class Web(BaseModel):
 class LLMInputs(AppInputs):
     preset_name: str
     ingress: Ingress
-    model: LLMModel
+    llm: LLMModel
 
 
 class OpenAICompatibleAPI(AppOutputs):
