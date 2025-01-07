@@ -1,6 +1,8 @@
-from apolo_app_types.common import AppInputs, AppOutputs
 from pydantic import field_validator
 from yarl import URL
+
+from apolo_app_types.common import AppInputs, AppOutputs
+
 
 class ApoloDeployInputs(AppInputs):
     preset_name: str
@@ -11,7 +13,7 @@ class ApoloDeployInputs(AppInputs):
     @classmethod
     def mlflow_tracking_uri_validator(cls, raw: str) -> URL:
         return URL(raw)
-    
+
 
 class ApoloDeployOutputs(AppOutputs):
     internal_web_app_url: str
