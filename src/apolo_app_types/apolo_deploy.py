@@ -1,24 +1,10 @@
-from pydantic import field_validator
-from yarl import URL
-
 from apolo_app_types.common import AppInputs, AppOutputs
 
 
 class ApoloDeployInputs(AppInputs):
     preset_name: str
     http_auth: bool = True
-    mlflow_tracking_uri: URL | None = None
-    mlflow_public_uri: URL | None = None
-
-    @field_validator("mlflow_tracking_uri", mode="before")
-    @classmethod
-    def mlflow_tracking_uri_validator(cls, raw: str) -> URL:
-        return URL(raw)
-
-    @field_validator("mlflow_public_uri", mode="before")
-    @classmethod
-    def mlflow_public_uri_validator(cls, raw: str) -> URL:
-        return URL(raw)
+    mlflow_app_name: str
 
 
 class ApoloDeployOutputs(AppOutputs):
