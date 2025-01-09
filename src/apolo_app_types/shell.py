@@ -8,4 +8,3 @@ class ShellInputs(AppInputs):
 
 class ShellOutputs(AppOutputs):
     internal_web_app_url: str
-    external_web_app_url: str

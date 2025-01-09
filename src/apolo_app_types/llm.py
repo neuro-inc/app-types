@@ -1,17 +1,37 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from apolo_app_types.common import AppInputs, AppOutputs, Ingress
 
 
 class LLMApi(BaseModel):
-    replicas: int | None
-    preset_name: str
+    replicas: int | None = Field(  # noqa: N815
+        default=None,  # Required field
+        description="Replicas count.",
+        title="API replicas count",
+    )
+    preset_name: str = Field(  # noqa: N815
+        ...,  # Required field
+        description="The name of the preset.",
+        title="Preset name",
+    )
 
 
 class LLMModel(BaseModel):
-    modelHFName: str  # noqa: N815
-    tokenizerHFName: str  # noqa: N815
-    api: LLMApi | None = None
+    modelHFName: str = Field(  # noqa: N815
+        ...,
+        description="The name of the Hugging Face model to use.",
+        title="Hugging Face Model Name",
+    )
+    tokenizerHFName: str = Field(  # noqa: N815
+        ...,  # Required field
+        description="The name of the tokenizer associated with the Hugging Face model.",
+        title="Hugging Face Tokenizer Name",
+    )
+    api: LLMApi | None = Field(
+        default=None,
+        description="An optional LLMApi object to use for connecting to the model.",
+        title="API Connection",
+    )
 
 
 class Worker(BaseModel):

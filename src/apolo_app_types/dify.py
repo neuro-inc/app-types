@@ -4,7 +4,6 @@ from apolo_app_types.common import (
     AppInputs,
     AppOutputs,
     Postgres,
-    PostgresWithPGVector,
     Redis,
 )
 
@@ -36,7 +35,7 @@ class DifyInputs(AppInputs):
     web: DifyWeb
     redis: Redis
     externalPostgres: Postgres  # noqa: N815
-    externalPGVector: PostgresWithPGVector  # noqa: N815
+    externalPGVector: Postgres  # noqa: N815
 
 
 class DifyOutputs(AppOutputs):
