@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from apolo_app_types.common import AppInputs, AppOutputs, Ingress, Preset
+from apolo_app_types.common import AppInputs, AppOutputs, Ingress
 
 
 class Persistence(BaseModel):
@@ -21,7 +21,7 @@ class WeaviateBackups(BaseModel):
 
 
 class WeaviateInputs(AppInputs):
-    preset: Preset
+    preset_name: str
     persistence: Persistence | None = None
     ingress: Ingress | None = None
     clusterApi: WeaviateClusterApi | None = None  # noqa: N815

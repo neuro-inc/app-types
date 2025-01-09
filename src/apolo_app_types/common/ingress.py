@@ -7,13 +7,13 @@ class IngressGrpc(BaseModel):
 
 class Ingress(BaseModel):
     enabled: str = Field(
-        ...,  # Required field
-        description="Indicates whether the ingress is enabled. Acceptable values are 'true' or 'false'.",
-        title="Ingress Enabled"
+        ...,
+        description="Indicates whether the ingress is enabled.",
+        title="Ingress Enabled",
     )
-    clusterName: str = Field(
-        ...,  # Required field
+    clusterName: str = Field(  # noqa: N815
+        ...,
         description="The name of the cluster where the ingress is deployed.",
-        title="Cluster Name"
+        title="Cluster Name",
     )
     grpc: IngressGrpc | None = None

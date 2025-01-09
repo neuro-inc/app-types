@@ -1,40 +1,37 @@
-from typing import Optional, Union, Any
-
 from pydantic import BaseModel, Field
 
-from apolo_app_types.common import AppInputs, AppOutputs, Ingress, Preset
+from apolo_app_types.common import AppInputs, AppOutputs, Ingress
 
 
 class LLMApi(BaseModel):
-    replicas: int = Field( # noqa: N815
+    replicas: int = Field(  # noqa: N815
         default=None,  # Required field
         description="Replicas count.",
-        title="API replicas count"
+        title="API replicas count",
     )
-    preset_name: str = Field( # noqa: N815
+    preset_name: str = Field(  # noqa: N815
         ...,  # Required field
         description="The name of the preset.",
-        title="Preset name"
+        title="Preset name",
     )
 
 
 class LLMModel(BaseModel):
-    modelHFName: str = Field( # noqa: N815
+    modelHFName: str = Field(  # noqa: N815
         ...,
         description="The name of the Hugging Face model to use.",
-        title="Hugging Face Model Name"
+        title="Hugging Face Model Name",
     )
-    tokenizerHFName: str = Field( # noqa: N815
+    tokenizerHFName: str = Field(  # noqa: N815
         ...,  # Required field
         description="The name of the tokenizer associated with the Hugging Face model.",
-        title="Hugging Face Tokenizer Name"
+        title="Hugging Face Tokenizer Name",
     )
-    api: Optional[LLMApi] = Field(
+    api: LLMApi | None = Field(
         default=None,
-        description="An optional LLMApi object to use for connecting to the model. If not provided, the default connection is used.",
-        title="API Connection"
+        description="An optional LLMApi object to use for connecting to the model.",
+        title="API Connection",
     )
-
 
 
 class Worker(BaseModel):
@@ -52,7 +49,7 @@ class Web(BaseModel):
 
 
 class LLMInputs(AppInputs):
-    preset: Preset
+    preset_name: str
     ingress: Ingress
     llm: LLMModel
 

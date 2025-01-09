@@ -1,9 +1,8 @@
 from pydantic import BaseModel
-from apolo_app_types.common.preset import Preset
 
 
 class RedisMaster(BaseModel):
-    preset: Preset
+    preset_name: str
 
 
 class Redis(BaseModel):
