@@ -7,6 +7,6 @@ class HuggingFaceModel(BaseModel):
         description="The name of the Hugging Face model.",
         title="Hugging Face Model Name",
     )
-    modelFiles: str = Field(  # noqa: N815
+    modelFiles: str | None = Field(  # noqa: N815
         None, description="The path to the model files.", title="Model Files"
     )

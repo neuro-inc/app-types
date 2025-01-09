@@ -4,7 +4,7 @@ from apolo_app_types.common import AppInputs, AppOutputs, Ingress
 
 
 class LLMApi(BaseModel):
-    replicas: int = Field(  # noqa: N815
+    replicas: int | None = Field(  # noqa: N815
         default=None,  # Required field
         description="Replicas count.",
         title="API replicas count",
