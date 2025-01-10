@@ -33,7 +33,8 @@ class WeaviateInputs(AppInputs):
     def validate_storage_size(cls, value: StorageGB):  # noqa: N805
         if value and isinstance(value.size, int):
             if value.size <= WEAVIATE_MIN_GB_STORAGE:
-                err_msg = f"Storage size must be greater than {WEAVIATE_MIN_GB_STORAGE}Gi for Weaviate."
+                err_msg = (f"Storage size must be greater than "
+                           f"{WEAVIATE_MIN_GB_STORAGE}Gi for Weaviate.")
                 raise ValueError(err_msg)
             err_msg = "Storage size must be specified as int."
             raise ValueError(err_msg)
