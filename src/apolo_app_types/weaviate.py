@@ -1,8 +1,8 @@
-from pydantic import BaseModel, Field, validator, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 from apolo_app_types.common import AppInputs, AppOutputs, Ingress, Preset
 from apolo_app_types.common.auth import BasicAuth
-from apolo_app_types.common.networking import GrpcAPI, RestAPI, GraphQLAPI
+from apolo_app_types.common.networking import GraphQLAPI, GrpcAPI, RestAPI
 from apolo_app_types.common.storage import StorageGB
 
 
@@ -27,13 +27,15 @@ class WeaviateInputs(AppInputs):
     weaviate_params: WeaviateParams | None = None
 
     @field_validator("persistence")
-    def validate_storage_size(cls, value):
+    def validate_storage_size(cls, value):  # noqa: N805
         if value and isinstance(value.size, int):
             if value.size <= 32:
-                raise ValueError("Storage size must be greater than 32Gi for Weaviate.")
-            else:
-                raise ValueError("Storage size must be specified as int.")
+                err_msg = "Storage size must be greater than 32Gi for Weaviate."
+                raise ValueError(err_msg)
+            err_msg = "Storage size must be specified as int."
+            raise ValueError(err_msg)
         return value
+
 
 class WeaviateEndpoints(BaseModel):
     graphql_endpoint: str | None = Field(default=None)

@@ -8,7 +8,7 @@ class StorageGB(BaseModel):
         title="Storage size",
     )
     # TODO: should be an enum
-    storageClassName: str | None = Field(
+    storageClassName: str | None = Field(  # noqa: N815
         default=None,
         description="The storage class name.",
         title="Storage class name",
