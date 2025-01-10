@@ -6,6 +6,9 @@ from apolo_app_types.common.networking import GraphQLAPI, GrpcAPI, RestAPI
 from apolo_app_types.common.storage import StorageGB
 
 
+WEAVIATE_MIN_GB_STORAGE = 32
+
+
 class WeaviateAuthentication(BaseModel):
     enabled: str = "false"
 
@@ -27,10 +30,10 @@ class WeaviateInputs(AppInputs):
     weaviate_params: WeaviateParams | None = None
 
     @field_validator("persistence")
-    def validate_storage_size(cls, value):  # noqa: N805
+    def validate_storage_size(cls, value: StorageGB):  # noqa: N805
         if value and isinstance(value.size, int):
-            if value.size <= 32:
-                err_msg = "Storage size must be greater than 32Gi for Weaviate."
+            if value.size <= WEAVIATE_MIN_GB_STORAGE:
+                err_msg = f"Storage size must be greater than {WEAVIATE_MIN_GB_STORAGE}Gi for Weaviate."
                 raise ValueError(err_msg)
             err_msg = "Storage size must be specified as int."
             raise ValueError(err_msg)
