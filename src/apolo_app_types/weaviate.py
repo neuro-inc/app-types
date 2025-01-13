@@ -24,7 +24,9 @@ class WeaviateParams(BaseModel):
 
 class WeaviateInputs(AppInputs):
     preset: Preset
-    persistence: StorageGB | None = None
+    persistence: StorageGB | None = Field(
+        default_factory=lambda: StorageGB(size=WEAVIATE_MIN_GB_STORAGE)
+    )
     ingress: Ingress | None = None
     clusterApi: BasicAuth | None = None  # noqa: N815
     weaviate_params: WeaviateParams | None = None
@@ -32,7 +34,7 @@ class WeaviateInputs(AppInputs):
     @field_validator("persistence")
     def validate_storage_size(cls, value: StorageGB):  # noqa: N805
         if value and isinstance(value.size, int):
-            if value.size <= WEAVIATE_MIN_GB_STORAGE:
+            if value.size < WEAVIATE_MIN_GB_STORAGE:
                 err_msg = (
                     f"Storage size must be greater than "
                     f"{WEAVIATE_MIN_GB_STORAGE}Gi for Weaviate."
