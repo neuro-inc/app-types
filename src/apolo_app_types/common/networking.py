@@ -1,9 +1,10 @@
 from pydantic import BaseModel, Field
+from typing_extensions import Literal
 
 
 class HttpApi(BaseModel):
     host: str = Field(..., description="The host of the HTTP endpoint.")
-    port: int = Field(..., description="The port of the HTTP endpoint.")
+    port: int = Field(default=80, description="The port of the HTTP endpoint.")
     protocol: str = Field(
         "http", description="The protocol to use, e.g., http or https."
     )
@@ -14,12 +15,12 @@ class HttpApi(BaseModel):
 
 
 class GraphQLAPI(HttpApi):
-    pass
+    api_type: Literal["graphql"] = "graphql"
 
 
 class RestAPI(HttpApi):
-    pass
+    api_type: Literal["rest"] = "rest"
 
 
 class GrpcAPI(HttpApi):
-    pass
+    api_type: Literal["grpc"] = "grpc"

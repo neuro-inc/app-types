@@ -29,7 +29,9 @@ class WeaviateInputs(AppInputs):
     )
     ingress: Ingress | None = None
     clusterApi: BasicAuth | None = None  # noqa: N815
-    weaviate_params: WeaviateParams | None = None
+    weaviate_params: WeaviateParams | None = Field(
+        default_factory=WeaviateParams
+    )
 
     @field_validator("persistence")
     def validate_storage_size(cls, value: StorageGB):  # noqa: N805
@@ -40,6 +42,7 @@ class WeaviateInputs(AppInputs):
                     f"{WEAVIATE_MIN_GB_STORAGE}Gi for Weaviate."
                 )
                 raise ValueError(err_msg)
+        else:
             err_msg = "Storage size must be specified as int."
             raise ValueError(err_msg)
         return value
@@ -51,7 +54,7 @@ class WeaviateEndpoints(BaseModel):
     grpc_endpoint: str | None = Field(default=None)
 
 
-class NewWeaviateOutputs(AppOutputs):
+class WeaviateOutputs(AppOutputs):
     external_graphql_endpoint: GraphQLAPI | None = Field(
         default=None,
         description="The external GraphQL endpoint.",
@@ -84,8 +87,3 @@ class NewWeaviateOutputs(AppOutputs):
     )
     auth: BasicAuth = Field(default_factory=BasicAuth)
 
-
-class WeaviateOutputs(AppOutputs):
-    internal: WeaviateEndpoints = Field(default_factory=WeaviateEndpoints)
-    external: WeaviateEndpoints | None = Field(default=None)
-    auth: BasicAuth = Field(default_factory=BasicAuth)
