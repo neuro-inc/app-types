@@ -32,7 +32,7 @@ class WeaviateInputs(AppInputs):
     weaviate_params: WeaviateParams | None = Field(default_factory=WeaviateParams)
 
     @field_validator("persistence")
-    def validate_storage_size(cls, value: StorageGB):  # noqa: N805
+    def validate_storage_size(cls, value: StorageGB) -> StorageGB:  # noqa: N805
         if value and isinstance(value.size, int):
             if value.size < WEAVIATE_MIN_GB_STORAGE:
                 err_msg = (
