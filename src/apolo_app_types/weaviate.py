@@ -29,9 +29,7 @@ class WeaviateInputs(AppInputs):
     )
     ingress: Ingress | None = None
     clusterApi: BasicAuth | None = None  # noqa: N815
-    weaviate_params: WeaviateParams | None = Field(
-        default_factory=WeaviateParams
-    )
+    weaviate_params: WeaviateParams | None = Field(default_factory=WeaviateParams)
 
     @field_validator("persistence")
     def validate_storage_size(cls, value: StorageGB):  # noqa: N805
@@ -86,4 +84,3 @@ class WeaviateOutputs(AppOutputs):
         title="Internal GRPC endpoint",
     )
     auth: BasicAuth = Field(default_factory=BasicAuth)
-
