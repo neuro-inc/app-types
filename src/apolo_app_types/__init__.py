@@ -11,7 +11,10 @@ from apolo_app_types.protocols.fooocus import FooocusInputs, FooocusOutputs
 from apolo_app_types.protocols.jupyter import JupyterInputs, JupyterOutputs
 from apolo_app_types.protocols.llm import LLMInputs, VLLMOutputs
 from apolo_app_types.protocols.mlflow import MLFlowInputs, MLFlowOutputs
-from apolo_app_types.protocols.postgres import CrunchyPostgresInputs, CrunchyPostgresOutputs
+from apolo_app_types.protocols.postgres import (
+    CrunchyPostgresInputs,
+    CrunchyPostgresOutputs,
+)
 from apolo_app_types.protocols.pycharm import PycharmInputs, PycharmOutputs
 from apolo_app_types.protocols.shell import ShellInputs, ShellOutputs
 from apolo_app_types.protocols.stable_diffusion import SDInputs, SDOutputs

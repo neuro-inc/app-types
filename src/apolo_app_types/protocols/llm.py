@@ -86,7 +86,3 @@ class VLLMOutputs(AppOutputs):
     chat_external_api: OpenAICompatibleChatAPI | None
     embeddings_internal_api: OpenAICompatibleEmbeddingsAPI | None
     embeddings_external_api: OpenAICompatibleEmbeddingsAPI | None
-
-
-if __name__ == '__main__':
-    LLMInputs
