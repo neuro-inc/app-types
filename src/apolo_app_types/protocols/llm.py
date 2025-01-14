@@ -1,6 +1,6 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, SecretStr
 
-from apolo_app_types.common import AppInputs, AppOutputs, Ingress, Preset
+from apolo_app_types.protocols.common import AppInputs, AppOutputs, Ingress, Preset
 
 
 class LLMApi(BaseModel):
@@ -26,6 +26,11 @@ class LLMModel(BaseModel):
         ...,  # Required field
         description="The name of the tokenizer associated with the Hugging Face model.",
         title="Hugging Face Tokenizer Name",
+    )
+    hfToken: SecretStr = Field(  # noqa: N815
+        ...,
+        description="The Hugging Face API token.",
+        title="Hugging Face Token",
     )
 
 
@@ -81,3 +86,7 @@ class VLLMOutputs(AppOutputs):
     chat_external_api: OpenAICompatibleChatAPI | None
     embeddings_internal_api: OpenAICompatibleEmbeddingsAPI | None
     embeddings_external_api: OpenAICompatibleEmbeddingsAPI | None
+
+
+if __name__ == '__main__':
+    LLMInputs

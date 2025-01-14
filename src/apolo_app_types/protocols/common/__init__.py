@@ -5,7 +5,9 @@ from .outputs import AppOutputs
 from .postgres import Postgres
 from .preset import Preset
 from .redis import Redis, RedisMaster
-
+from .auth import BasicAuth
+from .storage import StorageGB
+from .networking import GrpcAPI, RestAPI, GraphQLAPI
 
 __all__ = [
     "AppInputs",
@@ -17,4 +19,9 @@ __all__ = [
     "RedisMaster",
     "HuggingFaceModel",
     "Preset",
+    "BasicAuth",
+    "StorageGB",
+    "GrpcAPI",
+    "RestAPI",
+    "GraphQLAPI",
 ]

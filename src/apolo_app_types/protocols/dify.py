@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from apolo_app_types.common import (
+from apolo_app_types.protocols.common import (
     AppInputs,
     AppOutputs,
     Postgres,
