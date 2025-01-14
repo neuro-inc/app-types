@@ -45,14 +45,3 @@ class AppType(enum.StrEnum):
 
         error_message = f"Unsupported input type: {type(inputs).__name__}"
         raise ValueError(error_message)
-
-    def to_input_type(self):
-        input_type_map = {
-            AppType.LLMInference: LLMInputs,
-            AppType.Weaviate: WeaviateInputs,
-        }
-        if self in input_type_map:
-            return input_type_map[self]
-
-        err_msg = f"Unsupported app type: {self}"
-        raise ValueError(err_msg)
