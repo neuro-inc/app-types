@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from apolo_app_types.common import AppInputs, AppOutputs, Ingress
+from apolo_app_types.common import AppInputs, AppOutputs, Ingress, Preset
 
 
 class LLMApi(BaseModel):
@@ -27,11 +27,6 @@ class LLMModel(BaseModel):
         description="The name of the tokenizer associated with the Hugging Face model.",
         title="Hugging Face Tokenizer Name",
     )
-    api: LLMApi | None = Field(
-        default=None,
-        description="An optional LLMApi object to use for connecting to the model.",
-        title="API Connection",
-    )
 
 
 class Worker(BaseModel):
@@ -49,7 +44,7 @@ class Web(BaseModel):
 
 
 class LLMInputs(AppInputs):
-    preset_name: str
+    preset: Preset
     ingress: Ingress
     llm: LLMModel
 

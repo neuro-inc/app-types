@@ -1,15 +1,12 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
-from apolo_app_types.common import AppInputs, AppOutputs, Ingress
+from apolo_app_types.common import AppInputs, AppOutputs, Ingress, Preset
+from apolo_app_types.common.auth import BasicAuth
+from apolo_app_types.common.networking import GraphQLAPI, GrpcAPI, RestAPI
+from apolo_app_types.common.storage import StorageGB
 
 
-class Persistence(BaseModel):
-    size: str
-
-
-class WeaviateClusterApi(BaseModel):
-    username: str
-    password: str
+WEAVIATE_MIN_GB_STORAGE = 32
 
 
 class WeaviateAuthentication(BaseModel):
@@ -17,21 +14,36 @@ class WeaviateAuthentication(BaseModel):
 
 
 class WeaviateBackups(BaseModel):
-    enabled: bool
+    enabled: bool = False
+
+
+class WeaviateParams(BaseModel):
+    backups: WeaviateBackups = Field(default_factory=WeaviateBackups)
+    auth_enabled: bool = False
 
 
 class WeaviateInputs(AppInputs):
-    preset_name: str
-    persistence: Persistence | None = None
+    preset: Preset
+    persistence: StorageGB | None = Field(
+        default_factory=lambda: StorageGB(size=WEAVIATE_MIN_GB_STORAGE)
+    )
     ingress: Ingress | None = None
-    clusterApi: WeaviateClusterApi | None = None  # noqa: N815
-    authentication: WeaviateAuthentication | None = None
-    backups: WeaviateBackups | None = None
+    clusterApi: BasicAuth | None = None  # noqa: N815
+    weaviate_params: WeaviateParams | None = Field(default_factory=WeaviateParams)
 
-
-class WeaviateAuth(BaseModel):
-    username: str = ""
-    password: str = ""
+    @field_validator("persistence")
+    def validate_storage_size(cls, value: StorageGB) -> StorageGB:  # noqa: N805
+        if value and isinstance(value.size, int):
+            if value.size < WEAVIATE_MIN_GB_STORAGE:
+                err_msg = (
+                    f"Storage size must be greater than "
+                    f"{WEAVIATE_MIN_GB_STORAGE}Gi for Weaviate."
+                )
+                raise ValueError(err_msg)
+        else:
+            err_msg = "Storage size must be specified as int."
+            raise ValueError(err_msg)
+        return value
 
 
 class WeaviateEndpoints(BaseModel):
@@ -41,6 +53,34 @@ class WeaviateEndpoints(BaseModel):
 
 
 class WeaviateOutputs(AppOutputs):
-    internal: WeaviateEndpoints = Field(default_factory=WeaviateEndpoints)
-    external: WeaviateEndpoints | None = Field(default=None)
-    auth: WeaviateAuth = Field(default_factory=WeaviateAuth)
+    external_graphql_endpoint: GraphQLAPI | None = Field(
+        default=None,
+        description="The external GraphQL endpoint.",
+        title="External GraphQL endpoint",
+    )
+    external_rest_endpoint: RestAPI | None = Field(
+        default=None,
+        description="The external REST endpoint.",
+        title="External REST endpoint",
+    )
+    external_grpc_endpoint: GrpcAPI | None = Field(
+        default=None,
+        description="The external GRPC endpoint.",
+        title="External GRPC endpoint",
+    )
+    internal_graphql_endpoint: GraphQLAPI | None = Field(
+        default=None,
+        description="The internal GraphQL endpoint.",
+        title="Internal GraphQL endpoint",
+    )
+    internal_rest_endpoint: RestAPI | None = Field(
+        default=None,
+        description="The internal REST endpoint.",
+        title="Internal REST endpoint",
+    )
+    internal_grpc_endpoint: GrpcAPI | None = Field(
+        default=None,
+        description="The internal GRPC endpoint.",
+        title="Internal GRPC endpoint",
+    )
+    auth: BasicAuth = Field(default_factory=BasicAuth)
