@@ -27,10 +27,15 @@ class LLMModel(BaseModel):
         description="The name of the tokenizer associated with the Hugging Face model.",
         title="Hugging Face Tokenizer Name",
     )
-    hfToken: SecretStr = Field(  # noqa: N815
-        ...,
+    hfToken: SecretStr | None = Field(  # noqa: N815
+        default=None,
         description="The Hugging Face API token.",
         title="Hugging Face Token",
+    )
+    serverExtraArgs: list[str] = Field(  # noqa: N815
+        default_factory=list,
+        description="Extra arguments to pass to the server.",
+        title="Server Extra Arguments",
     )
 
 
