@@ -1,5 +1,10 @@
 from apolo_app_types.protocols.apolo_deploy import ApoloDeployInputs, ApoloDeployOutputs
-from apolo_app_types.protocols.common import AppInputs, AppOutputs, BasicAuth
+from apolo_app_types.protocols.common import (
+    AppInputs,
+    AppOutputs,
+    BasicAuth,
+    HuggingFaceToken,
+)
 from apolo_app_types.protocols.dify import (
     DifyApi,
     DifyInputs,
@@ -89,4 +94,5 @@ __all__ = [
     "JupyterTypes",
     "PrivateGPTInputs",
     "PrivateGPTOutputs",
+    "HuggingFaceToken",
 ]

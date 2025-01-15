@@ -1,5 +1,5 @@
 from .auth import BasicAuth
-from .hugging_face import HuggingFaceModel
+from .hugging_face import HuggingFaceModel, HuggingFaceToken
 from .ingress import Ingress, IngressGrpc
 from .inputs import AppInputs
 from .networking import GraphQLAPI, GrpcAPI, RestAPI
@@ -25,4 +25,5 @@ __all__ = [
     "GrpcAPI",
     "RestAPI",
     "GraphQLAPI",
+    "HuggingFaceToken",
 ]
