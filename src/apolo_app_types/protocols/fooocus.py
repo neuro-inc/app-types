@@ -1,8 +1,7 @@
 from pydantic import field_validator
 from yarl import URL
 
-from apolo_app_types.common import AppOutputs
-from apolo_app_types.private_gpt import AppInputs
+from apolo_app_types.protocols.common import AppInputs, AppOutputs
 
 
 class FooocusInputs(AppInputs):

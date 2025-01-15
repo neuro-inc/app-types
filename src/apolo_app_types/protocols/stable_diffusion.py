@@ -1,4 +1,4 @@
-from apolo_app_types.common import AppInputs, AppOutputs, HuggingFaceModel
+from apolo_app_types.protocols.common import AppInputs, AppOutputs, HuggingFaceModel
 
 
 class SDIngress(AppInputs):

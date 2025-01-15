@@ -1,7 +1,7 @@
 from pydantic import field_validator
 from yarl import URL
 
-from apolo_app_types.common import AppInputs, AppOutputs
+from apolo_app_types.protocols.common import AppInputs, AppOutputs
 
 
 class PrivateGPTInputs(AppInputs):

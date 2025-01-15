@@ -1,16 +1,17 @@
 from pydantic import BaseModel, Field
 
-from apolo_app_types.common import AppInputs, AppOutputs, Ingress, Preset
+from apolo_app_types.protocols.common import AppInputs, AppOutputs, Ingress, Preset
+from apolo_app_types.protocols.common.hugging_face import HuggingFaceToken
 
 
 class LLMApi(BaseModel):
     replicas: int | None = Field(  # noqa: N815
-        default=None,  # Required field
+        default=None,
         description="Replicas count.",
         title="API replicas count",
     )
     preset_name: str = Field(  # noqa: N815
-        ...,  # Required field
+        ...,
         description="The name of the preset.",
         title="Preset name",
     )
@@ -23,9 +24,19 @@ class LLMModel(BaseModel):
         title="Hugging Face Model Name",
     )
     tokenizerHFName: str = Field(  # noqa: N815
-        ...,  # Required field
+        ...,
         description="The name of the tokenizer associated with the Hugging Face model.",
         title="Hugging Face Tokenizer Name",
+    )
+    hfToken: HuggingFaceToken | None = Field(  # noqa: N815
+        default=None,
+        description="The Hugging Face API token.",
+        title="Hugging Face Token",
+    )
+    serverExtraArgs: list[str] = Field(  # noqa: N815
+        default_factory=list,
+        description="Extra arguments to pass to the server.",
+        title="Server Extra Arguments",
     )
 
 

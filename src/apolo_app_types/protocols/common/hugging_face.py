@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, SecretStr
 
 
 class HuggingFaceModel(BaseModel):
@@ -10,3 +10,7 @@ class HuggingFaceModel(BaseModel):
     modelFiles: str | None = Field(  # noqa: N815
         None, description="The path to the model files.", title="Model Files"
     )
+
+
+class HuggingFaceToken(BaseModel):
+    value: SecretStr

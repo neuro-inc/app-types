@@ -1,9 +1,16 @@
 from pydantic import BaseModel, Field, field_validator
 
-from apolo_app_types.common import AppInputs, AppOutputs, Ingress, Preset
-from apolo_app_types.common.auth import BasicAuth
-from apolo_app_types.common.networking import GraphQLAPI, GrpcAPI, RestAPI
-from apolo_app_types.common.storage import StorageGB
+from apolo_app_types.protocols.common import (
+    AppInputs,
+    AppOutputs,
+    BasicAuth,
+    GraphQLAPI,
+    GrpcAPI,
+    Ingress,
+    Preset,
+    RestAPI,
+    StorageGB,
+)
 
 
 WEAVIATE_MIN_GB_STORAGE = 32

@@ -1,10 +1,13 @@
-from .hugging_face import HuggingFaceModel
+from .auth import BasicAuth
+from .hugging_face import HuggingFaceModel, HuggingFaceToken
 from .ingress import Ingress, IngressGrpc
 from .inputs import AppInputs
+from .networking import GraphQLAPI, GrpcAPI, RestAPI
 from .outputs import AppOutputs
 from .postgres import Postgres
 from .preset import Preset
 from .redis import Redis, RedisMaster
+from .storage import StorageGB
 
 
 __all__ = [
@@ -17,4 +20,10 @@ __all__ = [
     "RedisMaster",
     "HuggingFaceModel",
     "Preset",
+    "BasicAuth",
+    "StorageGB",
+    "GrpcAPI",
+    "RestAPI",
+    "GraphQLAPI",
+    "HuggingFaceToken",
 ]
