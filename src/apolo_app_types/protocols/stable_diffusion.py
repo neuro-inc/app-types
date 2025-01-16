@@ -25,10 +25,10 @@ class StableDiffusionParams(BaseModel):
         description="Stable Studio configuration.",
         title="Stable Studio",
     )
-    model: HuggingFaceModel = Field(
+    hugging_face_model: HuggingFaceModel = Field(  # noqa: N815
         ...,
-        description="Hugging Face model configuration.",
-        title="Hugging Face Model",
+        description="The name of the Hugging Face model.",
+        title="Hugging Face Model Name",
     )
 
 
