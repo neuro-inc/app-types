@@ -4,8 +4,8 @@ from pydantic import BaseModel, Field, SecretStr
 
 
 class CredentialsType(str, enum.Enum):
-    READ_ONLY = 'READ_ONLY'
-    READ_WRITE = 'READ_WRITE'
+    READ_ONLY = "READ_ONLY"
+    READ_WRITE = "READ_WRITE"
 
 
 class BucketCredentials(BaseModel):
@@ -41,13 +41,12 @@ class BucketCredentials(BaseModel):
     )
 
 
-
 class BucketProvider(str, enum.Enum):
-    AWS = 'AWS'
-    MINIO = 'MINIO'
-    GCP = 'GCP'
-    AZURE = 'AZURE'
-    OPEN_STACK = 'OPEN_STACK'
+    AWS = "AWS"
+    MINIO = "MINIO"
+    GCP = "GCP"
+    AZURE = "AZURE"
+    OPEN_STACK = "OPEN_STACK"
 
 
 class Bucket(BaseModel):
