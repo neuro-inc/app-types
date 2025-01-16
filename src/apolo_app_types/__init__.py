@@ -5,6 +5,7 @@ from apolo_app_types.protocols.common import (
     BasicAuth,
     HuggingFaceToken,
 )
+from apolo_app_types.protocols.common.buckets import Bucket
 from apolo_app_types.protocols.dify import (
     DifyApi,
     DifyInputs,
@@ -37,9 +38,9 @@ from apolo_app_types.protocols.private_gpt import PrivateGPTInputs, PrivateGPTOu
 from apolo_app_types.protocols.pycharm import PycharmInputs, PycharmOutputs
 from apolo_app_types.protocols.shell import ShellInputs, ShellOutputs
 from apolo_app_types.protocols.stable_diffusion import (
-    SDInputs,
     SDModel,
     SDOutputs,
+    StableDiffusionInputs,
     TextToImgAPI,
 )
 from apolo_app_types.protocols.text_embeddings import (
@@ -95,4 +96,6 @@ __all__ = [
     "PrivateGPTInputs",
     "PrivateGPTOutputs",
     "HuggingFaceToken",
+    "Bucket",
+    "StableDiffusionInputs",
 ]

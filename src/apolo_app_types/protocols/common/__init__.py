@@ -1,4 +1,5 @@
 from .auth import BasicAuth
+from .buckets import Bucket
 from .hugging_face import HuggingFaceModel, HuggingFaceToken
 from .ingress import Ingress, IngressGrpc
 from .inputs import AppInputs
@@ -26,4 +27,5 @@ __all__ = [
     "RestAPI",
     "GraphQLAPI",
     "HuggingFaceToken",
+    "Bucket",
 ]
