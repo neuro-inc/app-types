@@ -20,6 +20,7 @@ class AppType(enum.StrEnum):
     MLFlow = "mlflow"
     Shell = "shell"
     ApoloDeploy = "apolo-deploy"
+    CustomApp = "custom-app"
 
     def __repr__(self) -> str:
         return str(self)
