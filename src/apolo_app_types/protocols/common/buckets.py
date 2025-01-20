@@ -19,6 +19,9 @@ class BucketCredentials(BaseModel):
         description="The type of the bucket.",
         title="Bucket type",
     )
+
+
+class S3BucketCredentials(BucketCredentials):
     access_key_id: SecretStr = Field(
         ...,
         description="The access key ID of the bucket.",
@@ -64,11 +67,6 @@ class Bucket(BaseModel):
         default_factory=dict,
         description="The details of the bucket.",
         title="Bucket details",
-    )
-    uri: str = Field(
-        ...,
-        description="The URI of the bucket.",
-        title="Bucket URI",
     )
     credentials: list[BucketCredentials] = Field(
         default_factory=list,

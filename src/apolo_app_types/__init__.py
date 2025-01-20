@@ -3,6 +3,7 @@ from apolo_app_types.protocols.common import (
     AppInputs,
     AppOutputs,
     BasicAuth,
+    HuggingFaceModel,
     HuggingFaceToken,
 )
 from apolo_app_types.protocols.common.buckets import Bucket
@@ -98,4 +99,5 @@ __all__ = [
     "HuggingFaceToken",
     "Bucket",
     "StableDiffusionInputs",
+    "HuggingFaceModel",
 ]
