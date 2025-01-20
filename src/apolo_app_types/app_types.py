@@ -1,5 +1,6 @@
 import enum
 
+from apolo_app_types import StableDiffusionInputs
 from apolo_app_types.protocols.common import AppInputs
 from apolo_app_types.protocols.llm import LLMInputs
 from apolo_app_types.protocols.weaviate import WeaviateInputs
@@ -42,6 +43,8 @@ class AppType(enum.StrEnum):
             return AppType.LLMInference
         if isinstance(inputs, WeaviateInputs):
             return AppType.Weaviate
+        if isinstance(inputs, StableDiffusionInputs):
+            return AppType.StableDiffusion
 
         error_message = f"Unsupported input type: {type(inputs).__name__}"
         raise ValueError(error_message)

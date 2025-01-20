@@ -3,4 +3,7 @@ include CHANGELOG.md
 include README.md
 include setup.cfg
 include src/apolo_app_types/py.typed
+include src/apolo_app_types/protocols/py.typed
+include src/apolo_app_types/protocols/py.typed
+include src/apolo_app_types/protocols/common/py.typed
 graft tests

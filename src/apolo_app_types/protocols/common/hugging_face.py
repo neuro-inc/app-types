@@ -1,6 +1,10 @@
 from pydantic import BaseModel, Field, SecretStr
 
 
+class HuggingFaceToken(BaseModel):
+    value: SecretStr
+
+
 class HuggingFaceModel(BaseModel):
     modelHFName: str = Field(  # noqa: N815
         ...,
@@ -10,7 +14,8 @@ class HuggingFaceModel(BaseModel):
     modelFiles: str | None = Field(  # noqa: N815
         None, description="The path to the model files.", title="Model Files"
     )
-
-
-class HuggingFaceToken(BaseModel):
-    value: SecretStr
+    hfToken: HuggingFaceToken | None = Field(  # noqa: N815
+        default=None,
+        description="The Hugging Face API token.",
+        title="Hugging Face Token",
+    )
