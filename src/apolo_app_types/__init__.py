@@ -78,7 +78,7 @@ __all__ = [
     "ShellInputs",
     "ShellOutputs",
     "SDOutputs",
-    "SDInputs",
+    "StableDiffusionInputs",
     "TextEmbeddingsInferenceInputs",
     "TextEmbeddingsInferenceOutputs",
     "WeaviateInputs",
