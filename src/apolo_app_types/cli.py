@@ -3,7 +3,8 @@ import json
 
 import click
 
-from apolo_app_types.outputs.llm import get_llm_inference_outputs, logger
+from apolo_app_types.outputs.llm import logger
+from apolo_app_types.outputs.update_outputs import update_app_outputs
 
 
 @click.group()
@@ -19,7 +20,7 @@ def update_outputs(
     try:
         helm_outputs_dict = json.loads(helm_outputs_json)
         logger.debug("Helm outputs:", helm_outputs_dict)
-        asyncio.run(get_llm_inference_outputs(helm_outputs_dict))
+        asyncio.run(update_app_outputs(helm_outputs_dict))
     except json.JSONDecodeError as e:
         logger.error(f"Failed to parse JSON input: {e}")
     except Exception as e:

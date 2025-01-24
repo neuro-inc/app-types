@@ -1,4 +1,5 @@
 import logging
+import typing
 from pathlib import Path
 
 from kubernetes import client, config
@@ -7,15 +8,15 @@ from kubernetes.client.rest import ApiException
 
 logger = logging.getLogger(__name__)
 
+SERVICE_ACC_NAMESPACE_FILE = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
+
 
 def get_current_namespace() -> str:
     """
     Retrieve the current namespace from the Kubernetes service account namespace file.
     """
     try:
-        with Path.open(
-            Path("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
-        ) as f:
+        with Path.open(Path(SERVICE_ACC_NAMESPACE_FILE)) as f:
             return f.read().strip()
     except FileNotFoundError:
         logger.error("Namespace file not found. Are you running in a Kubernetes pod?")
@@ -26,7 +27,7 @@ def get_current_namespace() -> str:
         raise
 
 
-async def get_ingresses_as_dict(label_selectors) -> dict | None:
+async def get_ingresses_as_dict(label_selectors: str) -> dict[str, typing.Any] | None:
     try:
         config.load_incluster_config()
 
@@ -46,7 +47,7 @@ async def get_ingresses_as_dict(label_selectors) -> dict | None:
         raise e
 
 
-async def get_services_by_label(label_selectors) -> dict | None:
+async def get_services_by_label(label_selectors: str) -> dict[str, typing.Any] | None:
     try:
         config.load_incluster_config()
 

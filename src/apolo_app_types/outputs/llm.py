@@ -13,7 +13,7 @@ from apolo_app_types.protocols.common.networking import RestAPI
 logger = logging.getLogger()
 
 
-async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> VLLMOutputsV2:
+async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> dict:
     internal_host, internal_port = await get_service_host_port(
         match_labels={"application": "llm-inference"}
     )
@@ -28,13 +28,13 @@ async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> VLLMOutput
 
     chat_internal_api = RestAPI(
         host=internal_host,
-        port=internal_port,
+        port=int(internal_port),
         base_path="/v1/chat",
         protocol="http",
     )
     embeddings_internal_api = RestAPI(
         host=internal_host,
-        port=internal_port,
+        port=int(internal_port),
         base_path="/v1/embeddings",
         protocol="http",
     )
@@ -47,13 +47,13 @@ async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> VLLMOutput
     if ingress_host_port:
         chat_external_api = RestAPI(
             host=ingress_host_port[0],
-            port=ingress_host_port[1],
+            port=int(ingress_host_port[1]),
             base_path="/v1/chat",
             protocol="https",
         )
         embeddings_external_api = RestAPI(
             host=ingress_host_port[0],
-            port=ingress_host_port[1],
+            port=int(ingress_host_port[1]),
             base_path="/v1/embeddings",
             protocol="https",
         )
@@ -63,11 +63,9 @@ async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> VLLMOutput
         chat_external_api=chat_external_api,
         embeddings_internal_api=embeddings_internal_api,
         embeddings_external_api=embeddings_external_api,
-        hf_model=HuggingFaceModel(
-            modelHFName=model_name,
-        ),
+        hf_model=HuggingFaceModel(modelHFName=model_name, modelFiles=None),
         tokenizer_name=tokenizer_name,
         api_key=api_key,
     )
     logger.debug("Outputs %s", vllm_outputs.model_dump())
-    return vllm_outputs
+    return vllm_outputs.model_dump()
