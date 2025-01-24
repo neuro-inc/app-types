@@ -1,5 +1,6 @@
 import logging
 import typing as t
+
 import httpx
 
 from apolo_app_types.outputs.llm import get_llm_inference_outputs
@@ -15,8 +16,7 @@ async def update_api(api_url: str, api_token: str, outputs: dict) -> None:
             headers={"Authorization": f"Bearer {api_token}"},
             json=outputs,
         )
-        logger.info(f"API response: {response.status_code}")
-
+        logger.info("API response: %s", response.status_code)
 
 
 async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> None:
@@ -30,4 +30,4 @@ async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> None:
             conv_outputs,
         )
     except Exception as e:
-        logger.error(f"An error occurred: {e}")
+        logger.error("An error occurred: %s", e)

@@ -22,9 +22,9 @@ def update_outputs(
         logger.debug("Helm outputs:", helm_outputs_dict)
         asyncio.run(update_app_outputs(helm_outputs_dict))
     except json.JSONDecodeError as e:
-        logger.error(f"Failed to parse JSON input: {e}")
+        logger.error("Failed to parse JSON input: %s", e)
     except Exception as e:
-        logger.error(f"An error occurred: {e}")
+        logger.error("An error occurred: %s", e)
 
 
 if __name__ == "__main__":
