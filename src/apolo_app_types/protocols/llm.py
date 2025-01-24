@@ -7,7 +7,7 @@ from apolo_app_types.protocols.common import (
     Ingress,
     Preset,
 )
-from apolo_app_types.protocols.common.networking import HttpApi, RestAPI
+from apolo_app_types.protocols.common.networking import RestAPI
 
 
 class LLMApi(BaseModel):
@@ -102,3 +102,4 @@ class VLLMOutputsV2(AppOutputs):
     embeddings_external_api: RestAPI | None = None
     hf_model: HuggingFaceModel | None = None
     tokenizer_name: str | None = None
+    api_key: str | None = None

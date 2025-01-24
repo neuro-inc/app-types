@@ -101,5 +101,5 @@ __all__ = [
     "Bucket",
     "StableDiffusionInputs",
     "HuggingFaceModel",
-    "VLLMOutputsV2"
+    "VLLMOutputsV2",
 ]
