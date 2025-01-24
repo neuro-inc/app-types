@@ -2,8 +2,8 @@ import logging
 import typing
 from pathlib import Path
 
-from kubernetes import client, config # type: ignore
-from kubernetes.client.rest import ApiException # type: ignore
+from kubernetes import client, config  # type: ignore
+from kubernetes.client.rest import ApiException  # type: ignore
 
 
 logger = logging.getLogger(__name__)
