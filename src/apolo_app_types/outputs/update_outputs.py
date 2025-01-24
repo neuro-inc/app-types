@@ -9,7 +9,7 @@ from apolo_app_types.outputs.llm import get_llm_inference_outputs
 logger = logging.getLogger()
 
 
-async def update_api(api_url: str, api_token: str, outputs: dict) -> None:
+async def update_api(api_url: str, api_token: str, outputs: dict[str, t.Any]) -> None:
     async with httpx.AsyncClient() as client:
         response = await client.post(
             api_url,

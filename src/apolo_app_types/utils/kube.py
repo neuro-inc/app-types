@@ -2,8 +2,8 @@ import logging
 import typing
 from pathlib import Path
 
-from kubernetes import client, config
-from kubernetes.client.rest import ApiException
+from kubernetes import client, config # type: ignore
+from kubernetes.client.rest import ApiException # type: ignore
 
 
 logger = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ def get_current_namespace() -> str:
         raise
 
 
-async def get_ingresses_as_dict(label_selectors: str) -> dict[str, typing.Any] | None:
+async def get_ingresses_as_dict(label_selectors: str) -> dict[str, typing.Any]:
     try:
         config.load_incluster_config()
 
@@ -47,7 +47,7 @@ async def get_ingresses_as_dict(label_selectors: str) -> dict[str, typing.Any] |
         raise e
 
 
-async def get_services_by_label(label_selectors: str) -> dict[str, typing.Any] | None:
+async def get_services_by_label(label_selectors: str) -> dict[str, typing.Any]:
     try:
         config.load_incluster_config()
 

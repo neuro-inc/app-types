@@ -13,7 +13,7 @@ from apolo_app_types.protocols.common.networking import RestAPI
 logger = logging.getLogger()
 
 
-async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> dict:
+async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any]:
     internal_host, internal_port = await get_service_host_port(
         match_labels={"application": "llm-inference"}
     )
