@@ -1,12 +1,12 @@
 import typing as t
 
-from apolo_app_types import VLLMOutputs, OpenAICompatibleChatAPI, OpenAICompatibleEmbeddingsAPI
+from apolo_app_types import VLLMOutputsV2, OpenAICompatibleChatAPI, OpenAICompatibleEmbeddingsAPI, HuggingFaceModel
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
 from apolo_app_types.outputs.utils.parsing import parse_cli_args, get_service_host_port
+from apolo_app_types.protocols.common.networking import HttpApi, RestAPI
 
 
-
-async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> VLLMOutputs:
+async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> VLLMOutputsV2:
     internal_host, internal_port = await get_service_host_port(
         match_labels={"application": "llm-inference"}
     )
@@ -19,16 +19,17 @@ async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> VLLMOutput
     model_name = helm_values["model"]["modelHFName"]
     tokenizer_name = helm_values["model"].get("tokenizerHFName", "")
 
-    chat_internal_api = OpenAICompatibleChatAPI(
-        model_name=model_name,
-        tokenizer_name=tokenizer_name,
+    chat_internal_api = RestAPI(
         host=internal_host,
         port=internal_port,
-        api_base=f"http://{internal_host}:{internal_port}/v1",
-        api_key=api_key,
+        base_path=f"/v1/chat",
+        protocol="http",
     )
-    embeddings_internal_api = OpenAICompatibleEmbeddingsAPI(
-        **chat_internal_api.model_dump()
+    embeddings_internal_api = RestAPI(
+        host=internal_host,
+        port=internal_port,
+        base_path=f"/v1/embeddings",
+        protocol="http",
     )
 
     ingress_host_port = await get_ingress_host_port(
@@ -37,22 +38,28 @@ async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> VLLMOutput
     chat_external_api = None
     embeddings_external_api = None
     if ingress_host_port:
-        chat_external_api = OpenAICompatibleChatAPI(
-            model_name=model_name,
+        chat_external_api = RestAPI(
             host=ingress_host_port[0],
             port=ingress_host_port[1],
-            api_base=f"https://{ingress_host_port[0]}/v1",
-            api_key=api_key,
+            base_path=f"/v1/chat",
+            protocol="https",
         )
-        embeddings_external_api = OpenAICompatibleEmbeddingsAPI(
-            **chat_external_api.model_dump()
+        embeddings_external_api = RestAPI(
+            host=ingress_host_port[0],
+            port=ingress_host_port[1],
+            base_path=f"/v1/embeddings",
+            protocol="https",
         )
 
-    vllm_outputs = VLLMOutputs(
+    vllm_outputs = VLLMOutputsV2(
         chat_internal_api=chat_internal_api,
         chat_external_api=chat_external_api,
         embeddings_internal_api=embeddings_internal_api,
         embeddings_external_api=embeddings_external_api,
+        hf_model=HuggingFaceModel(
+            modelHFName=model_name,
+        ),
+        tokenizer_name=tokenizer_name,
     )
     print("Outputs")
     print(vllm_outputs.model_dump())
