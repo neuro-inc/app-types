@@ -1,6 +1,6 @@
 import click
 
-from apolo_app_types.utils.kube import get_ingresses_as_dict
+from apolo_app_types.clients.kube import get_ingresses_as_dict
 
 
 async def get_ingress_host_port(

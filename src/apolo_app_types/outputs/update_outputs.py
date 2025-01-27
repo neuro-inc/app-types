@@ -9,22 +9,27 @@ from apolo_app_types.outputs.llm import get_llm_inference_outputs
 logger = logging.getLogger()
 
 
-async def update_api(api_url: str, api_token: str, outputs: dict[str, t.Any]) -> None:
+async def post_outputs(api_url: str, api_token: str, outputs: dict[str, t.Any]) -> None:
     async with httpx.AsyncClient() as client:
         response = await client.post(
             api_url,
             headers={"Authorization": f"Bearer {api_token}"},
             json=outputs,
         )
-        logger.info("API response: %s", response.status_code)
+        logger.info("API response status code: %s", response.status_code)
 
 
 async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> None:
-    platform_apps_url = helm_outputs["platform_apps_url"]
-    platform_apps_token = helm_outputs["platform_apps_token"]
+    app_type = helm_outputs["PLATFORM_APPS_APP_TYPE"]
+    platform_apps_url = helm_outputs["PLATFORM_APPS_URL"]
+    platform_apps_token = helm_outputs["PLATFORM_APPS_TOKEN"]
     try:
-        conv_outputs = await get_llm_inference_outputs(helm_outputs)
-        await update_api(
+        if app_type == "llm":
+            conv_outputs = await get_llm_inference_outputs(helm_outputs)
+        else:
+            err_msg = f"Unsupported app type: {app_type} for posting outputs"
+            raise ValueError(err_msg)
+        await post_outputs(
             platform_apps_url,
             platform_apps_token,
             conv_outputs,

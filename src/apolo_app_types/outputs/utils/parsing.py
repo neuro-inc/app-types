@@ -2,7 +2,7 @@ import typing as t
 
 import click
 
-from apolo_app_types.utils.kube import get_services_by_label
+from apolo_app_types.clients.kube import get_services_by_label
 
 
 def parse_cli_args(args: list[str]) -> dict[str, t.Any]:
