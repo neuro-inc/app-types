@@ -7,6 +7,7 @@ from apolo_app_types.protocols.common import (
     Ingress,
     Preset,
 )
+from apolo_app_types.protocols.common.networking import RestAPI
 
 
 class LLMApi(BaseModel):
@@ -92,3 +93,13 @@ class VLLMOutputs(AppOutputs):
     chat_external_api: OpenAICompatibleChatAPI | None
     embeddings_internal_api: OpenAICompatibleEmbeddingsAPI | None
     embeddings_external_api: OpenAICompatibleEmbeddingsAPI | None
+
+
+class VLLMOutputsV2(AppOutputs):
+    chat_internal_api: RestAPI | None = None
+    chat_external_api: RestAPI | None = None
+    embeddings_internal_api: RestAPI | None = None
+    embeddings_external_api: RestAPI | None = None
+    hf_model: HuggingFaceModel | None = None
+    tokenizer_name: str | None = None
+    api_key: str | None = None
