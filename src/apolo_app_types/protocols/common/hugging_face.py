@@ -14,7 +14,7 @@ class HuggingFaceModel(BaseModel):
     modelFiles: str | None = Field(  # noqa: N815
         None, description="The path to the model files.", title="Model Files"
     )
-    hfToken: HuggingFaceToken | None = Field(  # noqa: N815
+    hfToken: str = Field(  # noqa: N815
         default=None,
         description="The Hugging Face API token.",
         title="Hugging Face Token",
