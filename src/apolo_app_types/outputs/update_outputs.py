@@ -29,6 +29,7 @@ async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> None:
         else:
             err_msg = f"Unsupported app type: {app_type} for posting outputs"
             raise ValueError(err_msg)
+        logger.info("Outputs: %s", conv_outputs)
         await post_outputs(
             platform_apps_url,
             platform_apps_token,
