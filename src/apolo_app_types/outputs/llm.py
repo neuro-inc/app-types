@@ -4,6 +4,7 @@ import typing as t
 from apolo_app_types import (
     HuggingFaceModel,
     VLLMOutputsV2,
+    LLMSpecific,
 )
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
 from apolo_app_types.outputs.utils.parsing import get_service_host_port, parse_cli_args
@@ -64,8 +65,7 @@ async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> dict[str, 
         embeddings_internal_api=embeddings_internal_api,
         embeddings_external_api=embeddings_external_api,
         hf_model=HuggingFaceModel(modelHFName=model_name, modelFiles=None),
-        tokenizer_name=tokenizer_name,
-        api_key=api_key,
+        llm_specific=LLMSpecific(tokenizer_name=tokenizer_name, api_key=api_key),
     )
     logger.debug("Outputs %s", vllm_outputs.model_dump())
     return vllm_outputs.model_dump()

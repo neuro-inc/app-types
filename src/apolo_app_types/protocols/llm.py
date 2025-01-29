@@ -95,11 +95,15 @@ class VLLMOutputs(AppOutputs):
     embeddings_external_api: OpenAICompatibleEmbeddingsAPI | None
 
 
+class LLMSpecific(BaseModel):
+    tokenizer_name: str | None = None
+    api_key: str | None = None
+
+
 class VLLMOutputsV2(AppOutputs):
     chat_internal_api: RestAPI | None = None
     chat_external_api: RestAPI | None = None
     embeddings_internal_api: RestAPI | None = None
     embeddings_external_api: RestAPI | None = None
     hf_model: HuggingFaceModel | None = None
-    tokenizer_name: str | None = None
-    api_key: str | None = None
+    llm_specific: LLMSpecific | None = None
