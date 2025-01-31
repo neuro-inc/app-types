@@ -3,9 +3,9 @@ import typing as t
 
 import httpx
 
+from apolo_app_types.app_types import AppType
 from apolo_app_types.outputs.llm import get_llm_inference_outputs
 
-from apolo_app_types.app_types import AppType
 
 logger = logging.getLogger()
 
@@ -17,9 +17,11 @@ async def post_outputs(api_url: str, api_token: str, outputs: dict[str, t.Any]) 
             headers={"Authorization": f"Bearer {api_token}"},
             json={"output": outputs},
         )
-        logger.info("API response status code: %s, body: %s",
-                    response.status_code,
-                    response.text)
+        logger.info(
+            "API response status code: %s, body: %s",
+            response.status_code,
+            response.text,
+        )
 
 
 async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> None:
