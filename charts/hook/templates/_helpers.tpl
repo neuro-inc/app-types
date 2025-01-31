@@ -63,7 +63,7 @@ platform.apolo.us/component: app
 {{- define "filterNonEmptyAndConvertToJson" -}}
   {{- $filtered := dict -}}
   {{- range $key, $value := . -}}
-    {{- if and (ne $value "") (ne $value nil) -}}
+    {{- if ne $value nil -}}
       {{- $_ := set $filtered $key $value -}}
     {{- end -}}
   {{- end -}}
