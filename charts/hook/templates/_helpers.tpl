@@ -34,7 +34,7 @@ Create chart name and version as used by the chart label.
 Common labels
 */}}
 {{- define "app.labels" -}}
-application: llm-inference
+application: hook
 helm.sh/chart: {{ include "app.chart" . }}
 {{ include "app.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
@@ -58,3 +58,14 @@ Pod-specific labels
 platform.apolo.us/preset: {{ .Values.preset_name }}
 platform.apolo.us/component: app
 {{- end }}
+
+
+{{- define "filterNonEmptyAndConvertToJson" -}}
+  {{- $filtered := dict -}}
+  {{- range $key, $value := . -}}
+    {{- if $value -}}
+      {{- $_ := set $filtered $key $value -}}
+    {{- end -}}
+  {{- end -}}
+  {{- toJson $filtered -}}
+{{- end -}}
