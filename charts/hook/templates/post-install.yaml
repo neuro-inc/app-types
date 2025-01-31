@@ -4,6 +4,7 @@ metadata:
   name: {{ include "app.fullname" . }}
   labels:
     {{- include "app.labels" . | nindent 4 }}
+    helm.sh/debug-values: "{{ .Values }}"
   annotations:
     argocd.argoproj.io/hook: PostSync
     argocd.argoproj.io/sync-wave: "1"
@@ -20,4 +21,4 @@ spec:
         image: ghcr.io/neuro-inc/post-install-hook-kostia:latest
         args:
         - "update-outputs"
-        - "{{ .Values | toJson }}"
+        - "{{ .Values }}"
