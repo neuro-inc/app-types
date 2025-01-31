@@ -17,7 +17,7 @@ spec:
       serviceAccountName: {{ .Release.Name }}-sa
       containers:
       - name: post-upgrade-hook
-        image: ghcr.io/neuro-inc/app-post-install:latest
+        image: ghcr.io/neuro-inc/post-install-hook-kostia:latest
         args:
         - "update-outputs"
-        - "{{ include "filterNonEmptyAndConvertToJson" .Values | quote }}"
+        - {{ include "filterNonEmptyAndConvertToJson" .Values | squote }}

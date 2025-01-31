@@ -63,7 +63,7 @@ platform.apolo.us/component: app
 {{- define "filterNonEmptyAndConvertToJson" -}}
   {{- $filtered := dict -}}
   {{- range $key, $value := . -}}
-    {{- if $value -}}
+    {{- if and (ne $value "") (ne $value nil) -}}  # Ensures empty strings and nil values are skipped
       {{- $_ := set $filtered $key $value -}}
     {{- end -}}
   {{- end -}}
