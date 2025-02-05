@@ -30,7 +30,7 @@ class LLMModel(BaseModel):
         title="Hugging Face Model Name",
     )
     tokenizerHFName: str = Field(  # noqa: N815
-        ...,
+        "",
         description="The name of the tokenizer associated with the Hugging Face model.",
         title="Hugging Face Tokenizer Name",
     )
