@@ -17,7 +17,7 @@ DEFAULT_NAMESPACE = "default"
 async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
     from apolo_app_types.inputs.args import app_type_to_vals
 
-    HF_TOKEN = "test3"
+    hf_token = "test3"
     apolo_client = setup_clients
     helm_args, helm_params = await app_type_to_vals(
         input_=LLMInputs(
@@ -30,7 +30,7 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
             ),
             llm=LLMModel(
                 hugging_face_model=HuggingFaceModel(
-                    modelHFName="test", hfToken=HF_TOKEN
+                    modelHFName="test", hfToken=hf_token
                 ),
                 tokenizerHFName="test_tokenizer",
                 serverExtraArgs=["--flag1.1 --flag1.2", "--flag2", "--flag3"],
@@ -80,14 +80,14 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
         },
     ]
     assert "HUGGING_FACE_HUB_TOKEN" in helm_params["env"]
-    assert helm_params["env"]["HUGGING_FACE_HUB_TOKEN"] == HF_TOKEN
+    assert helm_params["env"]["HUGGING_FACE_HUB_TOKEN"] == hf_token
 
 
 @pytest.mark.asyncio
 async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
     from apolo_app_types.inputs.args import app_type_to_vals
 
-    HF_TOKEN = "test3"
+    hf_token = "test3"
     apolo_client = setup_clients
     helm_args, helm_params = await app_type_to_vals(
         input_=LLMInputs(
@@ -100,7 +100,7 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
             ),
             llm=LLMModel(
                 hugging_face_model=HuggingFaceModel(
-                    modelHFName="test", hfToken=HF_TOKEN
+                    modelHFName="test", hfToken=hf_token
                 ),
                 tokenizerHFName="test_tokenizer",
                 serverExtraArgs=["--flag1.1 --flag1.2", "--flag2", "--flag3"],
@@ -151,15 +151,5 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
         {"effect": "NoSchedule", "key": "nvidia.com/gpu", "operator": "Exists"},
     ]
     assert "HUGGING_FACE_HUB_TOKEN" in helm_params["env"]
-    assert helm_params["env"]["HUGGING_FACE_HUB_TOKEN"] == HF_TOKEN
+    assert helm_params["env"]["HUGGING_FACE_HUB_TOKEN"] == hf_token
     assert helm_params["gpuProvider"] == "nvidia"
-
-    # assert {
-    #            "effect": "NoSchedule",
-    #            "key": "nvidia.com/gpu",
-    #            "operator": "Exists",
-    #        } in tolerations
-    # match_expressions = data["api"]["affinity"]["nodeAffinity"][
-    #     "requiredDuringSchedulingIgnoredDuringExecution"
-    # ]["nodeSelectorTerms"][0]["matchExpressions"]
-    # assert match_expressions == _get_match_expressions(["gpu_pool"])

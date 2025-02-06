@@ -194,12 +194,10 @@ async def gen_extra_values(
         apolo_client, ingress, namespace
     )
 
-    values = {
+    return {
         "preset_name": preset_name,
         "resources": resources_vals,
         "tolerations": tolerations_vals,
         "affinity": affinity_vals,
         "ingress": ingress_vals.get("ingress", {}),
     }
-
-    return values
