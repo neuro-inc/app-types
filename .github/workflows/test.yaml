@@ -57,6 +57,6 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: |
-          pip install -e .
+          pip install -e ".[test]"
       - name: Run unit tests
         run: make test-unit
