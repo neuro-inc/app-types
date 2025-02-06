@@ -49,7 +49,7 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
     ]
     assert helm_params["affinity"]["nodeAffinity"][
         "requiredDuringSchedulingIgnoredDuringExecution"
-    ]["nodeSelectorTerms"][0]["matchExpressions"] == _get_match_expressions([GPU_POOL])
+    ]["nodeSelectorTerms"][0]["matchExpressions"] == _get_match_expressions([CPU_POOL])
     assert helm_params["ingress"] == {
         "className": "traefik",
         "enabled": True,
