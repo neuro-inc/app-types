@@ -3,7 +3,9 @@ import typing as t
 
 import apolo_sdk
 import click
+
 from apolo_app_types.protocols.common import Ingress
+
 
 DOMAIN_SECTION_MAX_LENGTH = 63
 

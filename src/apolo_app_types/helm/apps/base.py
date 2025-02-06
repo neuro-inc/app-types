@@ -3,13 +3,16 @@ import logging
 import typing as t
 
 import apolo_sdk
+
 from apolo_app_types import AppInputs
 
 
 logger = logging.getLogger()
 
+AppInputT = t.TypeVar("AppInputT", bound="AppInputs")
 
-class BaseChartValueProcessor(abc.ABC):
+
+class BaseChartValueProcessor(abc.ABC, t.Generic[AppInputT]):
     def __init__(self, client: apolo_sdk.Client):
         self.client = client
 
@@ -19,7 +22,7 @@ class BaseChartValueProcessor(abc.ABC):
     @abc.abstractmethod
     async def gen_extra_values(
         self,
-        input_: AppInputs,
+        input_: AppInputT,
         app_name: str,
         namespace: str,
         *args: t.Any,

@@ -7,9 +7,11 @@ from copy import deepcopy
 import apolo_sdk
 import click
 import yaml
+from apolo_sdk import Preset
+
 from apolo_app_types.helm.apps.ingress import get_ingress_values
 from apolo_app_types.protocols.common import Ingress, Preset as PresetType
-from apolo_sdk import Preset
+
 
 logger = logging.getLogger(__name__)
 
@@ -175,36 +177,27 @@ def sanitize_dict_string(
 
 async def gen_extra_values(
     apolo_client: apolo_sdk.Client,
-    preset: PresetType,
+    preset_type: PresetType,
     ingress: Ingress,
     namespace: str,
 ) -> dict[str, t.Any]:
-    preset_name = preset.name
+    preset_name = preset_type.name
     if not preset_name:
         logger.warning("No preset_name found in helm args.")
         return {}
 
     preset = get_preset(apolo_client, preset_name)
-    tolerations = preset_to_tolerations(preset)
-    affinity = preset_to_affinity(preset)
-    resources = preset_to_resources(preset)
-    ingress = await get_ingress_values(apolo_client, ingress, namespace)
-
-    # TODO replace this hack with input models for each helm app
-    extra_env_vars, secret_strings = get_extra_env_vars_from_job()
+    tolerations_vals = preset_to_tolerations(preset)
+    affinity_vals = preset_to_affinity(preset)
+    resources_vals = preset_to_resources(preset)
+    ingress_vals: dict[str, t.Any] = await get_ingress_values(apolo_client, ingress, namespace)
 
     values = {
         "preset_name": preset_name,
-        "resources": resources,
-        "tolerations": tolerations,
-        "affinity": affinity,
-        "env": extra_env_vars,
-        "ingress": ingress.get("ingress", {}),
+        "resources": resources_vals,
+        "tolerations": tolerations_vals,
+        "affinity": affinity_vals,
+        "ingress": ingress_vals.get("ingress", {}),
     }
-
-    logger.debug(
-        "Generated extra values: \n %s",
-        sanitize_dict_string(values, secret_strings),
-    )
 
     return values

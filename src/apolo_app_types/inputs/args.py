@@ -1,12 +1,11 @@
 import typing as t
 
 import apolo_sdk
-from apolo_app_types import LLMInputs, AppInputs
-from apolo_app_types.app_types import AppType
 
+from apolo_app_types import AppInputs, LLMInputs
+from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps import LLMChartValueProcessor
-from apolo_app_types.helm.apps.base import BaseChartValueProcessor
-from apolo_app_types.inputs.utils.serialize import pydantic_to_serialized_dict, replace_secrets
+from apolo_app_types.helm.apps.base import BaseChartValueProcessor, AppInputT
 
 
 def bool_to_string(value: bool) -> str:  # noqa: FBT001
@@ -93,7 +92,7 @@ async def app_type_to_vals(
     namespace: str,
 ) -> tuple[list[str], dict[str, t.Any]]:
     # Mapping AppType to their respective processor classes
-    processor_map: dict[AppType, type[BaseChartValueProcessor]] = {
+    processor_map: dict[AppType, type[BaseChartValueProcessor[t.Any]]] = {
         AppType.LLMInference: LLMChartValueProcessor,
     }
 
@@ -106,9 +105,7 @@ async def app_type_to_vals(
     chart_processor = processor_class(apolo_client)
     extra_helm_args = await chart_processor.gen_extra_helm_args()
     extra_vals = await chart_processor.gen_extra_values(
-        input_=input_,
-        app_name=app_name,
-        namespace=namespace
+        input_=input_, app_name=app_name, namespace=namespace
     )
     return extra_helm_args, extra_vals
 
@@ -138,4 +135,3 @@ async def get_installation_vals(
     )
 
     return extra_vals
-

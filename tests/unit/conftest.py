@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from apolo_sdk import AppsConfig
-from httpx import AsyncClient
+
 
 # from mlops_deployer._kube_config import read_kube_config as original_read_kube_config
 #
@@ -50,6 +50,7 @@ from httpx import AsyncClient
 #
 #     return temp_file
 #
+
 
 @pytest.fixture
 async def setup_clients():
@@ -100,6 +101,7 @@ async def setup_clients():
             apolo_client = await stack.enter_async_context(mock_get())
             yield apolo_client
             await stack.aclose()
+
 
 #
 # @pytest.fixture
@@ -179,88 +181,25 @@ def mock_get_preset_cpu():
         mock_llm.side_effect = return_preset
 
         yield mock
-#
-#
-# @pytest.fixture
-# def mock_get_preset_gpu():
-#     with (
-#         patch("mlops_deployer.helm.apps.common.get_preset") as mock,
-#         patch("mlops_deployer.helm.apps.base.get_preset") as mock_init,
-#         patch("mlops_deployer.helm.apps.stable_diffusion.get_preset") as mock_sd,
-#         patch("mlops_deployer.helm.apps.dify.get_preset") as mock_dify,
-#         patch("mlops_deployer.helm.apps.weaviate.get_preset") as mock_weaviate,
-#         patch("mlops_deployer.helm.apps.llm.get_preset") as mock_llm,
-#     ):
-#         from apolo_sdk import Preset
-#
-#         def return_preset(_, preset_name):
-#             return Preset(
-#                 credits_per_hour=Decimal("1.0"),
-#                 cpu=1.0,
-#                 memory=100,
-#                 nvidia_gpu=1,
-#                 available_resource_pool_names=("gpu_pool",),
-#             )
-#
-#         mock.side_effect = return_preset
-#         mock_init.side_effect = return_preset
-#         mock_sd.side_effect = return_preset
-#         mock_dify.side_effect = return_preset
-#         mock_weaviate.side_effect = return_preset
-#         mock_llm.side_effect = return_preset
-#         yield mock
-#
-#
-# @pytest.fixture
-# def mock_buckets():
-#     # Helper functions to create mock bucket and credentials
-#     def create_mock_bucket(bucket_name):
-#         return MagicMock(
-#             id="test-bucket-id",
-#             bucket=bucket_name,
-#             endpoint="storage.test-cluster.org.neu.ro",
-#             region="us-east-1",
-#             access_key_id="test-access-key",
-#             secret_access_key="test-secret-key",
-#         )
-#
-#     def create_mock_credentials(bucket_name):
-#         return MagicMock(
-#             credentials=[
-#                 MagicMock(
-#                     credentials={
-#                         "bucket_name": bucket_name,
-#                         "endpoint_url": "storage.test-cluster.org.neu.ro",
-#                         "access_key_id": "test-access-key",
-#                         "secret_access_key": "test-secret-key",
-#                         "region_name": "us-east-1",
-#                     }
-#                 )
-#             ]
-#         )
-#
-#     # Define the mocked methods
-#     async def mock_get(bucket_name):
-#         return create_mock_bucket(bucket_name)
-#
-#     async def mock_create(bucket_name):
-#         return create_mock_bucket(bucket_name)
-#
-#     async def mock_persistent_credentials_get(bucket_name):
-#         return create_mock_credentials(bucket_name)
-#
-#     async def mock_persistent_credentials_create(bucket_ids, name, read_only):
-#         return create_mock_credentials(name)
-#
-#     # Create the mock_buckets object
-#     mock_buckets = MagicMock()
-#     mock_buckets.get = AsyncMock(side_effect=mock_get)
-#     mock_buckets.create = AsyncMock(side_effect=mock_create)
-#     mock_buckets.persistent_credentials_get = AsyncMock(
-#         side_effect=mock_persistent_credentials_get
-#     )
-#     mock_buckets.persistent_credentials_create = AsyncMock(
-#         side_effect=mock_persistent_credentials_create
-#     )
-#
-#     return mock_buckets
+
+
+@pytest.fixture
+def mock_get_preset_gpu():
+    with (
+        patch("apolo_app_types.helm.apps.common.get_preset") as mock,
+        patch("apolo_app_types.helm.apps.llm.get_preset") as mock_llm,
+    ):
+        from apolo_sdk import Preset
+
+        def return_preset(_, preset_name):
+            return Preset(
+                credits_per_hour=Decimal("1.0"),
+                cpu=1.0,
+                memory=100,
+                nvidia_gpu=1,
+                available_resource_pool_names=("gpu_pool",),
+            )
+
+        mock.side_effect = return_preset
+        mock_llm.side_effect = return_preset
+        yield mock

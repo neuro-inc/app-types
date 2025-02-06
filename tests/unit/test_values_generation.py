@@ -1,50 +1,23 @@
-import typing as t
-from unittest.mock import AsyncMock
-
-import aiofiles
 import pytest
-import yaml
+
 from apolo_app_types import HuggingFaceModel
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import _get_match_expressions
-from apolo_app_types.protocols.common import Preset, Ingress
-
+from apolo_app_types.protocols.common import Ingress, Preset
 from apolo_app_types.protocols.llm import LLMInputs, LLMModel
 
+
 CPU_POOL = "cpu_pool"
+GPU_POOL = "gpu_pool"
 DEFAULT_POOL = "default"
 DEFAULT_NAMESPACE = "default"
 
 
-# @pytest.mark.asyncio
-# async def test_values_llm_generation(setup_clients, mock_get_preset_cpu):
-#     from mlops_deployer.args import _generate_extra_installation_values
-#     from mlops_deployer.helm.apps.common import _get_match_expressions
-#
-#     async for apolo_client, apps_client in setup_clients:
-#         result = await _generate_extra_installation_values(
-#             helm_args=[
-#                 "--set preset_name=cpu-large",
-#             ],
-#             apolo_client=apolo_client,
-#             apps_client=apps_client,
-#             app_type=AppType.LLMInference,
-#             app_name="llm",
-#         )
-#         yaml_path = result[-1]
-#
-#         data = await _read_yaml(yaml_path)
-#         assert data["affinity"]["nodeAffinity"][
-#             "requiredDuringSchedulingIgnoredDuringExecution"
-#         ]["nodeSelectorTerms"][0]["matchExpressions"] == _get_match_expressions(
-#             [CPU_POOL]
-#         )
-#
-
 @pytest.mark.asyncio
-async def test_values_llm_generation_without_preset(setup_clients, mock_get_preset_cpu):
+async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
     from apolo_app_types.inputs.args import app_type_to_vals
 
+    HF_TOKEN = "test3"
     apolo_client = setup_clients
     helm_args, helm_params = await app_type_to_vals(
         input_=LLMInputs(
@@ -57,12 +30,11 @@ async def test_values_llm_generation_without_preset(setup_clients, mock_get_pres
             ),
             llm=LLMModel(
                 hugging_face_model=HuggingFaceModel(
-                    modelHFName="test",
-                    hfToken="test3"
+                    modelHFName="test", hfToken=HF_TOKEN
                 ),
                 tokenizerHFName="test_tokenizer",
-                serverExtraArgs=["--flag1.1 --flag1.2", "--flag2", "--flag3"]
-            )
+                serverExtraArgs=["--flag1.1 --flag1.2", "--flag2", "--flag3"],
+            ),
         ),
         apolo_client=apolo_client,
         app_type=AppType.LLMInference,
@@ -70,19 +42,124 @@ async def test_values_llm_generation_without_preset(setup_clients, mock_get_pres
         namespace=DEFAULT_NAMESPACE,
     )
     assert helm_params["serverExtraArgs"] == [
-        "--flag1.1 --flag1.2", "--flag2", "--flag3", "--tensor-parallel-size=0"
+        "--flag1.1 --flag1.2",
+        "--flag2",
+        "--flag3",
+        "--tensor-parallel-size=0",
     ]
     assert helm_params["affinity"]["nodeAffinity"][
-               "requiredDuringSchedulingIgnoredDuringExecution"
-           ]["nodeSelectorTerms"][0]["matchExpressions"] == _get_match_expressions(
-        [CPU_POOL]
-    )
+        "requiredDuringSchedulingIgnoredDuringExecution"
+    ]["nodeSelectorTerms"][0]["matchExpressions"] == _get_match_expressions([GPU_POOL])
     assert helm_params["ingress"] == {
-        'className': 'traefik', 'enabled': True,
-        'hosts': [{'host': 'default.apps.some.org.neu.ro', 'paths': [{'path': '/', 'pathType': 'Prefix'}]}]
+        "className": "traefik",
+        "enabled": True,
+        "hosts": [
+            {
+                "host": "default.apps.some.org.neu.ro",
+                "paths": [{"path": "/", "pathType": "Prefix"}],
+            }
+        ],
     }
     assert helm_params["tolerations"] == [
-        {'effect': 'NoSchedule', 'key': 'platform.neuromation.io/job', 'operator': 'Exists'},
-        {'effect': 'NoExecute', 'key': 'node.kubernetes.io/not-ready', 'operator': 'Exists', 'tolerationSeconds': 300},
-        {'effect': 'NoExecute', 'key': 'node.kubernetes.io/unreachable', 'operator': 'Exists', 'tolerationSeconds': 300}
+        {
+            "effect": "NoSchedule",
+            "key": "platform.neuromation.io/job",
+            "operator": "Exists",
+        },
+        {
+            "effect": "NoExecute",
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "tolerationSeconds": 300,
+        },
+        {
+            "effect": "NoExecute",
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "tolerationSeconds": 300,
+        },
     ]
+    assert "HUGGING_FACE_HUB_TOKEN" in helm_params["env"]
+    assert helm_params["env"]["HUGGING_FACE_HUB_TOKEN"] == HF_TOKEN
+
+
+@pytest.mark.asyncio
+async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
+    from apolo_app_types.inputs.args import app_type_to_vals
+
+    HF_TOKEN = "test3"
+    apolo_client = setup_clients
+    helm_args, helm_params = await app_type_to_vals(
+        input_=LLMInputs(
+            preset=Preset(
+                name="gpu-large",
+            ),
+            ingress=Ingress(
+                enabled="true",
+                clusterName="test",
+            ),
+            llm=LLMModel(
+                hugging_face_model=HuggingFaceModel(
+                    modelHFName="test", hfToken=HF_TOKEN
+                ),
+                tokenizerHFName="test_tokenizer",
+                serverExtraArgs=["--flag1.1 --flag1.2", "--flag2", "--flag3"],
+            ),
+        ),
+        apolo_client=apolo_client,
+        app_type=AppType.LLMInference,
+        app_name="llm",
+        namespace=DEFAULT_NAMESPACE,
+    )
+    assert helm_params["serverExtraArgs"] == [
+        "--flag1.1 --flag1.2",
+        "--flag2",
+        "--flag3",
+        "--tensor-parallel-size=1",
+    ]
+    assert helm_params["affinity"]["nodeAffinity"][
+        "requiredDuringSchedulingIgnoredDuringExecution"
+    ]["nodeSelectorTerms"][0]["matchExpressions"] == _get_match_expressions([GPU_POOL])
+    assert helm_params["ingress"] == {
+        "className": "traefik",
+        "enabled": True,
+        "hosts": [
+            {
+                "host": "default.apps.some.org.neu.ro",
+                "paths": [{"path": "/", "pathType": "Prefix"}],
+            }
+        ],
+    }
+    assert helm_params["tolerations"] == [
+        {
+            "effect": "NoSchedule",
+            "key": "platform.neuromation.io/job",
+            "operator": "Exists",
+        },
+        {
+            "effect": "NoExecute",
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "tolerationSeconds": 300,
+        },
+        {
+            "effect": "NoExecute",
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "tolerationSeconds": 300,
+        },
+        {"effect": "NoSchedule", "key": "nvidia.com/gpu", "operator": "Exists"},
+    ]
+    assert "HUGGING_FACE_HUB_TOKEN" in helm_params["env"]
+    assert helm_params["env"]["HUGGING_FACE_HUB_TOKEN"] == HF_TOKEN
+    assert helm_params["gpuProvider"] == "nvidia"
+
+    # assert {
+    #            "effect": "NoSchedule",
+    #            "key": "nvidia.com/gpu",
+    #            "operator": "Exists",
+    #        } in tolerations
+    # match_expressions = data["api"]["affinity"]["nodeAffinity"][
+    #     "requiredDuringSchedulingIgnoredDuringExecution"
+    # ]["nodeSelectorTerms"][0]["matchExpressions"]
+    # assert match_expressions == _get_match_expressions(["gpu_pool"])
