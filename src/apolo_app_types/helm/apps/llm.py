@@ -39,13 +39,13 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
         self, server_extra_args: list[str], gpu_count: int
     ) -> list[str]:
         """Configure parallel processing arguments."""
-        parallel_server_args: list[str] = server_extra_args or []
+        parallel_server_args: list[str] = []
 
         has_tensor_parallel = any(
-            "tensor-parallel-size" in arg for arg in parallel_server_args
+            "tensor-parallel-size" in arg for arg in server_extra_args
         )
         has_pipeline_parallel = any(
-            "pipeline-parallel-size" in arg for arg in parallel_server_args
+            "pipeline-parallel-size" in arg for arg in server_extra_args
         )
 
         if not has_tensor_parallel and not has_pipeline_parallel:
