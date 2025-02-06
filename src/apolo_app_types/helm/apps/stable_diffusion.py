@@ -1,23 +1,24 @@
 import typing as t
 
-from apolo_app_types import StableDiffusionInputs
-from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
 from apolo_sdk import Preset
 
+from apolo_app_types import StableDiffusionInputs
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
+    gen_extra_values,
     get_component_values,
     get_preset,
-    gen_extra_values
 )
 from apolo_app_types.helm.apps.ingress import (
     _generate_ingress_config,
     get_ingress_values,
 )
+from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
 
 
-class StableDiffusionChartValueProcessor(BaseChartValueProcessor[StableDiffusionInputs]):
-
+class StableDiffusionChartValueProcessor(
+    BaseChartValueProcessor[StableDiffusionInputs]
+):
     def _get_env_vars(self, preset: Preset) -> dict[str, t.Any]:
         basic_cmd_args = (
             "--api --no-download-sd-model --cors-allow-origins=* "
@@ -60,7 +61,10 @@ class StableDiffusionChartValueProcessor(BaseChartValueProcessor[StableDiffusion
         api_vars = self._get_env_vars(preset)
 
         stablestudio = {}
-        if input_.stable_diffusion.stablestudio and input_.stable_diffusion.stablestudio.enabled:
+        if (
+            input_.stable_diffusion.stablestudio
+            and input_.stable_diffusion.stablestudio.enabled
+        ):
             stable_studio_domain_suffix = "-ss"
             stable_studio_ingress = await _generate_ingress_config(
                 self.client, namespace, stable_studio_domain_suffix
@@ -74,7 +78,11 @@ class StableDiffusionChartValueProcessor(BaseChartValueProcessor[StableDiffusion
             stablestudio["ingress"] = stable_studio_ingress
             stablestudio.update(stablestudio_component)
 
-        return merge_list_of_dicts([generic_vals, stablestudio, {
+        return merge_list_of_dicts(
+            [
+                generic_vals,
+                stablestudio,
+                {
                     "api": {
                         **ingress_api,
                         **component_vals,

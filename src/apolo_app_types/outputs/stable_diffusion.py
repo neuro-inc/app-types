@@ -8,10 +8,13 @@ from apolo_app_types.outputs.utils.parsing import get_service_host_port
 from apolo_app_types.protocols.common.networking import RestAPI
 from apolo_app_types.protocols.stable_diffusion import SDOutputsV2
 
+
 logger = logging.getLogger()
 
 
-async def get_stable_diffusion_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any]:
+async def get_stable_diffusion_outputs(
+    helm_values: dict[str, t.Any],
+) -> dict[str, t.Any]:
     internal_host, internal_port = await get_service_host_port(
         match_labels={"application": "stable-diffusion"}
     )
@@ -40,9 +43,7 @@ async def get_stable_diffusion_outputs(helm_values: dict[str, t.Any]) -> dict[st
         modelFiles=helm_values["model"].get("modelFiles"),
     )
     stable_diffusion_output = SDOutputsV2(
-        internal_api=internal_api,
-        external_api=external_api,
-        hf_model=model
+        internal_api=internal_api, external_api=external_api, hf_model=model
     )
 
     return stable_diffusion_output.model_dump()
