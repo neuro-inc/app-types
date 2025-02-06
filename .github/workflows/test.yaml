@@ -43,3 +43,20 @@ jobs:
         make lint
       env:
         CI_LINT_RUN: 1
+
+  test-unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout commit
+        uses: actions/checkout@v3
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version-file: .python-version
+          cache: pip
+      - name: Install dependencies
+        run: |
+          pip install -e ".[test]"
+      - name: Run unit tests
+        run: make test-unit

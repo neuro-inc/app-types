@@ -27,3 +27,7 @@ build-hook-image:
 push-hook-image:
 	docker tag $(IMAGE_NAME):latest $(IMAGE_REF)
 	docker push $(IMAGE_REF)
+
+.PHONY: test-unit
+test-unit:
+	pytest -vv tests/unit --disable-pytest-warnings
