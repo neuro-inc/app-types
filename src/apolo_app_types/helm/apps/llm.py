@@ -35,9 +35,11 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
 
         return gpu_env
 
-    def _configure_parallel_args(self, gpu_count: int) -> list[str]:
+    def _configure_parallel_args(
+        self, server_extra_args: list[str], gpu_count: int
+    ) -> list[str]:
         """Configure parallel processing arguments."""
-        parallel_server_args: list[str] = []
+        parallel_server_args: list[str] = server_extra_args or []
 
         has_tensor_parallel = any(
             "tensor-parallel-size" in arg for arg in parallel_server_args
@@ -97,7 +99,9 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
         values["gpuProvider"] = gpu_provider
 
         gpu_env = self._configure_gpu_env(gpu_provider, gpu_count)
-        parallel_args = self._configure_parallel_args(gpu_count)
+        parallel_args = self._configure_parallel_args(
+            input_.llm.serverExtraArgs, gpu_count
+        )
         server_extra_args = [
             *input_.llm.serverExtraArgs,
             *parallel_args,
