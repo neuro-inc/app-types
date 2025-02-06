@@ -5,7 +5,7 @@ import apolo_sdk
 from apolo_app_types import AppInputs, LLMInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps import LLMChartValueProcessor
-from apolo_app_types.helm.apps.base import BaseChartValueProcessor, AppInputT
+from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 
 
 def bool_to_string(value: bool) -> str:  # noqa: FBT001

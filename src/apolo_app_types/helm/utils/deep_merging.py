@@ -1,5 +1,5 @@
-import typing as t
 import copy
+import typing as t
 from functools import reduce
 
 

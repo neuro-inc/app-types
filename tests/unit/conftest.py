@@ -8,50 +8,6 @@ import pytest
 from apolo_sdk import AppsConfig
 
 
-# from mlops_deployer._kube_config import read_kube_config as original_read_kube_config
-#
-#
-# encoded_certificate_data = base64.b64encode(b"dummy cert data").decode("utf-8")
-#
-#
-# MOCK_KUBECONFIG_CONTENT = f"""
-# apiVersion: v1
-# kind: Config
-# clusters:
-# - cluster:
-#     certificate-authority-data: {encoded_certificate_data}
-#     server: https://mock-cluster.example.com
-#   name: mock-cluster
-# contexts:
-# - context:
-#     cluster: mock-cluster
-#     namespace: default
-#     user: mock-user
-#   name: mock-context
-# current-context: mock-context
-# preferences: {{}}
-# users:
-# - name: mock-user
-#   user:
-#     token: mock-token
-# """
-#
-#
-# @pytest.fixture(scope="session", autouse=True)
-# def mock_read_kube_config(tmp_path_factory):
-#     temp_file = tmp_path_factory.mktemp("kube") / "mock_kubeconfig.yaml"
-#     temp_file.write_text(MOCK_KUBECONFIG_CONTENT)
-#
-#     import mlops_deployer._kube_config
-#
-#     mlops_deployer._kube_config.read_kube_config = (
-#         lambda path=temp_file: original_read_kube_config(path=path)
-#     )
-#
-#     return temp_file
-#
-
-
 @pytest.fixture
 async def setup_clients():
     from apolo_sdk import Bucket, BucketCredentials, PersistentBucketCredentials
@@ -103,56 +59,6 @@ async def setup_clients():
             await stack.aclose()
 
 
-#
-# @pytest.fixture
-# def mock_get_dify_pg_values():
-#     with patch(
-#         "mlops_deployer.helm.apps.dify._get_dify_pg_values",
-#         new_callable=AsyncMock,
-#     ) as mock:
-#         # Set the return value to a mock CrunchyPostgresOutputs instance
-#         mock.return_value = {
-#             "externalPostgres": {
-#                 "user": "user1",
-#                 "password": "password1",
-#                 "host": "host1",
-#                 "port": "5555",
-#                 "pgbouncer_host": "pgbouncer_host1",
-#                 "pgbouncer_port": "5555",
-#                 "dbname": "dbname1",
-#             },
-#             "externalPgvector": {
-#                 "user": "user1",
-#                 "password": "password1",
-#                 "host": "host1",
-#                 "port": "5555",
-#                 "pgbouncer_host": "pgbouncer_host1",
-#                 "pgbouncer_port": "5555",
-#                 "dbname": "dbname1",
-#             },
-#         }
-#         yield mock
-#
-#
-# @pytest.fixture
-# def mock_get_or_create_dify_blob_storage_values():
-#     with patch(
-#         "mlops_deployer.helm.apps.dify._get_or_create_dify_blob_storage_values",
-#         new_callable=AsyncMock,
-#     ) as mock:
-#         # Set the return value to a mock DifyBlobStorageOutputs instance
-#         mock.return_value = {
-#             "externalS3": {
-#                 "enabled": True,
-#                 "endpoint": "endpoint_url",
-#                 "accessKey": "AccessKey",
-#                 "secretKey": "secret_access_key",
-#                 "bucketName": "bucket_name",
-#             }
-#         }
-#         yield mock
-#
-#
 @pytest.fixture
 def mock_get_preset_cpu():
     with (

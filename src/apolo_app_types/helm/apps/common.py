@@ -190,7 +190,9 @@ async def gen_extra_values(
     tolerations_vals = preset_to_tolerations(preset)
     affinity_vals = preset_to_affinity(preset)
     resources_vals = preset_to_resources(preset)
-    ingress_vals: dict[str, t.Any] = await get_ingress_values(apolo_client, ingress, namespace)
+    ingress_vals: dict[str, t.Any] = await get_ingress_values(
+        apolo_client, ingress, namespace
+    )
 
     values = {
         "preset_name": preset_name,
