@@ -67,5 +67,4 @@ async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> dict[str, 
         hf_model=HuggingFaceModel(modelHFName=model_name, modelFiles=None),
         llm_specific=LLMSpecific(tokenizer_name=tokenizer_name, api_key=api_key),
     )
-    logger.debug("Outputs %s", vllm_outputs.model_dump())
     return vllm_outputs.model_dump()

@@ -6,6 +6,7 @@ from apolo_app_types.protocols.common import (
     HuggingFaceModel,
     Ingress,
     Preset,
+    RestAPI,
 )
 
 
@@ -16,7 +17,7 @@ class StableStudio(AppInputs):
 
 class StableDiffusionParams(BaseModel):
     replicaCount: int = Field(  # noqa: N815
-        ...,
+        default=1,
         description="The number of replicas to deploy.",
         title="Replica Count",
     )
@@ -58,3 +59,9 @@ class SDOutputs(AppOutputs):
     external_api: TextToImgAPI
     model: SDModel
     internal_web_app_url: str | None = None
+
+
+class SDOutputsV2(AppOutputs):
+    internal_api: RestAPI | None = None
+    external_api: RestAPI | None = None
+    hf_model: HuggingFaceModel | None = None
