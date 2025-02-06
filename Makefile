@@ -30,4 +30,4 @@ push-hook-image:
 
 .PHONY: test-unit
 test-unit:
-	pytest -vv tests/unit
+	pytest -vv tests/unit --disable-pytest-warnings
