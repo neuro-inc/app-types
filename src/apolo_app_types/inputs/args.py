@@ -2,9 +2,12 @@ import typing as t
 
 import apolo_sdk
 
-from apolo_app_types import AppInputs, LLMInputs
+from apolo_app_types import AppInputs, LLMInputs, StableDiffusionInputs
 from apolo_app_types.app_types import AppType
-from apolo_app_types.helm.apps import LLMChartValueProcessor
+from apolo_app_types.helm.apps import (
+    LLMChartValueProcessor,
+    StableDiffusionChartValueProcessor,
+)
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 
 
@@ -18,6 +21,7 @@ async def app_type_to_vals(
     # Mapping AppType to their respective processor classes
     processor_map: dict[AppType, type[BaseChartValueProcessor[t.Any]]] = {
         AppType.LLMInference: LLMChartValueProcessor,
+        AppType.StableDiffusion: StableDiffusionChartValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)
@@ -43,6 +47,7 @@ async def get_installation_vals(
 ) -> dict[str, t.Any]:
     input_type_map = {
         AppType.LLMInference: LLMInputs,
+        AppType.StableDiffusion: StableDiffusionInputs,
     }
 
     if app_type not in input_type_map:

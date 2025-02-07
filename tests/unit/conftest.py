@@ -64,6 +64,7 @@ def mock_get_preset_cpu():
     with (
         patch("apolo_app_types.helm.apps.common.get_preset") as mock,
         patch("apolo_app_types.helm.apps.llm.get_preset") as mock_llm,
+        patch("apolo_app_types.helm.apps.stable_diffusion.get_preset") as mock_sd,
     ):
         from apolo_sdk import Preset
 
@@ -85,6 +86,7 @@ def mock_get_preset_cpu():
 
         mock.side_effect = return_preset
         mock_llm.side_effect = return_preset
+        mock_sd.side_effect = return_preset
 
         yield mock
 
@@ -94,6 +96,7 @@ def mock_get_preset_gpu():
     with (
         patch("apolo_app_types.helm.apps.common.get_preset") as mock,
         patch("apolo_app_types.helm.apps.llm.get_preset") as mock_llm,
+        patch("apolo_app_types.helm.apps.stable_diffusion.get_preset") as mock_sd,
     ):
         from apolo_sdk import Preset
 
@@ -108,4 +111,5 @@ def mock_get_preset_gpu():
 
         mock.side_effect = return_preset
         mock_llm.side_effect = return_preset
+        mock_sd.side_effect = return_preset
         yield mock
