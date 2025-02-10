@@ -19,7 +19,9 @@ from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
 class StableDiffusionChartValueProcessor(
     BaseChartValueProcessor[StableDiffusionInputs]
 ):
-    def _get_env_vars(self, preset: Preset) -> dict[str, t.Any]:
+    def _get_env_vars(
+        self, input_: StableDiffusionInputs, preset: Preset
+    ) -> dict[str, t.Any]:
         basic_cmd_args = (
             "--api --no-download-sd-model --cors-allow-origins=* "
             "--skip-version-check --skip-torch-cuda-test "
@@ -34,7 +36,14 @@ class StableDiffusionChartValueProcessor(
                 f"--lowvram --use-cpu all --no-half --precision full"
             )
 
-        return {"COMMANDLINE_ARGS": commandline_args}
+        env_vars = {"COMMANDLINE_ARGS": commandline_args}
+
+        if input_.stable_diffusion.hugging_face_model.hfToken:
+            env_vars["HUGGING_FACE_HUB_TOKEN"] = (
+                input_.stable_diffusion.hugging_face_model.hfToken
+            )
+
+        return env_vars
 
     async def gen_extra_values(
         self,
@@ -58,7 +67,7 @@ class StableDiffusionChartValueProcessor(
         )
 
         component_vals = get_component_values(preset, preset_name)
-        api_vars = self._get_env_vars(preset)
+        api_vars = self._get_env_vars(input_, preset)
 
         stablestudio = {}
         if (
@@ -77,11 +86,17 @@ class StableDiffusionChartValueProcessor(
             stablestudio_component = get_component_values(ss_preset, ss_preset_name)
             stablestudio["ingress"] = stable_studio_ingress
             stablestudio.update(stablestudio_component)
-
+        model_vals = {
+            "model": {
+                "modelHFName": input_.stable_diffusion.hugging_face_model.modelHFName,
+                "modelFiles": input_.stable_diffusion.hugging_face_model.modelFiles,
+            }
+        }
         return merge_list_of_dicts(
             [
                 generic_vals,
                 stablestudio,
+                model_vals,
                 {
                     "api": {
                         **ingress_api,
