@@ -73,3 +73,8 @@ class Bucket(BaseModel):
         description="The credentials of the bucket.",
         title="Bucket credentials",
     )
+    bucket_provider: BucketProvider = Field(
+        ...,
+        description="The provider of the bucket.",
+        title="Bucket provider",
+    )

@@ -21,10 +21,6 @@ class WeaviateAuthentication(BaseModel):
     enabled: str = "false"
 
 
-class WeaviateParams(BaseModel):
-    auth_enabled: bool = False
-
-
 class WeaviateInputs(AppInputs):
     preset: Preset
     persistence: StorageGB | None = Field(
@@ -37,7 +33,6 @@ class WeaviateInputs(AppInputs):
     )
     ingress: Ingress | None = None
     clusterApi: BasicAuth | None = None  # noqa: N815
-    weaviate_params: WeaviateParams | None = Field(default_factory=WeaviateParams)
 
     @field_validator("persistence")
     def validate_storage_size(cls, value: StorageGB) -> StorageGB:  # noqa: N805
