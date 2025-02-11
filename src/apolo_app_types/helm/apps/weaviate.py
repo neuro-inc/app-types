@@ -1,22 +1,20 @@
+import logging
 import typing as t
 
-import apolo_sdk
 import click
 from apolo_app_types import WeaviateInputs, BasicAuth, Bucket
 
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
-from apolo_app_types.helm.apps.common import (
-    get_preset,
-    preset_to_affinity,
-    preset_to_resources,
-    preset_to_tolerations, gen_extra_values, logger,
-)
+from apolo_app_types.helm.apps.common import gen_extra_values
 from apolo_app_types.helm.apps.ingress import _generate_ingress_config
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
 from apolo_app_types.protocols.common import Ingress
 from apolo_app_types.protocols.common.buckets import S3BucketCredentials, BucketProvider
 
 WEAVIATE_BUCKET_NAME = "weaviate-backup"
+
+
+logger = logging.getLogger(__name__)
 
 
 class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):

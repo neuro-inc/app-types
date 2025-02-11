@@ -301,7 +301,7 @@ async def test_values_weaviate_generation_basic(setup_clients, mock_get_preset_c
                 name="cpu_preset",
             ),
             persistence=StorageGB(
-                size=32
+                size=64
             ),
             backup_bucket=Bucket(
                 id="weaviate-backup",
