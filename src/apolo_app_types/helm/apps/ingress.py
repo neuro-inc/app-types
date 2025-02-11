@@ -50,6 +50,7 @@ async def _generate_ingress_config(
             f"If your app name is long, consider using shorter app name."
         )
         raise click.ClickException(msg)
+
     return {
         "enabled": True,
         "className": "traefik",
@@ -67,10 +68,24 @@ async def get_ingress_values(
     ingress: Ingress,
     namespace: str,
 ) -> dict[str, t.Any]:
-    ingress_vals: dict[str, t.Any] = {"ingress": {}}
-    if ingress.enabled != "true":
+    ingress_vals: dict[str, t.Any] = {"ingress": {"grpc": {"enabled": False}}}
+    if not ingress.enabled:
         ingress_vals["ingress"]["enabled"] = False
         return ingress_vals
 
-    ingress_vals["ingress"] = await _generate_ingress_config(apolo_client, namespace)
+    res = await _generate_ingress_config(apolo_client, namespace)
+    ingress_vals["ingress"].update(res)
+    if ingress.grpc and ingress.grpc.enabled:
+        grpc_ingress_config = await _generate_ingress_config(
+            apolo_client, namespace, namespace_suffix="-grpc"
+        )
+        ingress_vals["ingress"]["grpc"] = {
+            "enabled": True,
+            "className": "traefik",
+            "hosts": grpc_ingress_config["hosts"],
+            "annotations": {
+                "traefik.ingress.kubernetes.io/router.entrypoints": "websecure",
+                "traefik.ingress.kubernetes.io/service.serversscheme": "h2c",
+            },
+        }
     return ingress_vals

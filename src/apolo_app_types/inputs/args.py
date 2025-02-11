@@ -2,13 +2,14 @@ import typing as t
 
 import apolo_sdk
 
-from apolo_app_types import AppInputs, LLMInputs, StableDiffusionInputs
+from apolo_app_types import AppInputs, LLMInputs, StableDiffusionInputs, WeaviateInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps import (
     LLMChartValueProcessor,
     StableDiffusionChartValueProcessor,
 )
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
+from apolo_app_types.helm.apps.weaviate import WeaviateChartValueProcessor
 
 
 async def app_type_to_vals(
@@ -22,6 +23,7 @@ async def app_type_to_vals(
     processor_map: dict[AppType, type[BaseChartValueProcessor[t.Any]]] = {
         AppType.LLMInference: LLMChartValueProcessor,
         AppType.StableDiffusion: StableDiffusionChartValueProcessor,
+        AppType.Weaviate: WeaviateChartValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)
@@ -48,6 +50,7 @@ async def get_installation_vals(
     input_type_map = {
         AppType.LLMInference: LLMInputs,
         AppType.StableDiffusion: StableDiffusionInputs,
+        AppType.Weaviate: WeaviateInputs,
     }
 
     if app_type not in input_type_map:

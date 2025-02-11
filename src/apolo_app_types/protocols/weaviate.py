@@ -21,13 +21,9 @@ class WeaviateAuthentication(BaseModel):
     enabled: str = "false"
 
 
-class WeaviateParams(BaseModel):
-    auth_enabled: bool = False
-
-
 class WeaviateInputs(AppInputs):
     preset: Preset
-    persistence: StorageGB | None = Field(
+    persistence: StorageGB = Field(
         default_factory=lambda: StorageGB(size=WEAVIATE_MIN_GB_STORAGE)
     )
     backup_bucket: Bucket | None = Field(
@@ -35,9 +31,12 @@ class WeaviateInputs(AppInputs):
         description="The bucket to use for backups.",
         title="Backup bucket",
     )
-    ingress: Ingress | None = None
+    ingress: Ingress = Field(
+        ...,
+        description="The ingress configuration.",
+        title="Ingress",
+    )
     clusterApi: BasicAuth | None = None  # noqa: N815
-    weaviate_params: WeaviateParams | None = Field(default_factory=WeaviateParams)
 
     @field_validator("persistence")
     def validate_storage_size(cls, value: StorageGB) -> StorageGB:  # noqa: N805

@@ -199,5 +199,5 @@ async def gen_extra_values(
         "resources": resources_vals,
         "tolerations": tolerations_vals,
         "affinity": affinity_vals,
-        "ingress": ingress_vals.get("ingress", {}),
+        **ingress_vals,
     }
