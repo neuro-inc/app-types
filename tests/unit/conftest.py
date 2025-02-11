@@ -82,7 +82,7 @@ def mock_get_preset_cpu():
                 credits_per_hour=Decimal("1.0"),
                 cpu=1.0,
                 memory=100,
-                available_resource_pool_names=("default",),
+                available_resource_pool_names=("cpu_pool",),
             )
 
         mock.side_effect = return_preset
