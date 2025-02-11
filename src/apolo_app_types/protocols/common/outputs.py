@@ -9,3 +9,7 @@ class AppOutputs(BaseModel):
         description="The URL of the external web app.",
         title="External web app URL",
     )
+
+
+class AppOutputsV2(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())

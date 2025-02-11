@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 from apolo_app_types.protocols.common import (
     AppInputs,
     AppOutputs,
+    AppOutputsV2,
     HuggingFaceModel,
     Ingress,
     Preset,
@@ -61,7 +62,7 @@ class SDOutputs(AppOutputs):
     internal_web_app_url: str | None = None
 
 
-class SDOutputsV2(AppOutputs):
+class SDOutputsV2(AppOutputsV2):
     internal_api: RestAPI | None = None
     external_api: RestAPI | None = None
     hf_model: HuggingFaceModel | None = None

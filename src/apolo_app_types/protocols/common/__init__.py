@@ -4,7 +4,7 @@ from .hugging_face import HuggingFaceModel, HuggingFaceToken
 from .ingress import Ingress, IngressGrpc
 from .inputs import AppInputs
 from .networking import GraphQLAPI, GrpcAPI, RestAPI
-from .outputs import AppOutputs
+from .outputs import AppOutputs, AppOutputsV2
 from .postgres import Postgres
 from .preset import Preset
 from .redis import Redis, RedisMaster
@@ -28,4 +28,5 @@ __all__ = [
     "GraphQLAPI",
     "HuggingFaceToken",
     "Bucket",
+    "AppOutputsV2",
 ]
