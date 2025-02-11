@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 from apolo_app_types.protocols.common import (
     AppInputs,
     AppOutputs,
+    AppOutputsV2,
     HuggingFaceModel,
     Ingress,
     Preset,
@@ -100,7 +101,7 @@ class LLMSpecific(BaseModel):
     api_key: str | None = None
 
 
-class VLLMOutputsV2(AppOutputs):
+class VLLMOutputsV2(AppOutputsV2):
     chat_internal_api: RestAPI | None = None
     chat_external_api: RestAPI | None = None
     embeddings_internal_api: RestAPI | None = None
