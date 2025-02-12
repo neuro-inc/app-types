@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from apolo_app_types import BasicAuth, Bucket, HuggingFaceModel, WeaviateInputs
@@ -175,7 +177,6 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
 async def test_values_llm_generation_cpu_k8s_secret(setup_clients, mock_get_preset_cpu):
     from apolo_app_types.inputs.args import app_type_to_vals
 
-    hf_token = "test3"
     apolo_client = setup_clients
     helm_args, helm_params = await app_type_to_vals(
         input_=LLMInputs(
@@ -247,7 +248,9 @@ async def test_values_llm_generation_cpu_k8s_secret(setup_clients, mock_get_pres
         },
     ]
     assert "HUGGING_FACE_HUB_TOKEN" in helm_params["env"]
-    assert helm_params["env"]["HUGGING_FACE_HUB_TOKEN"] == hf_token
+    assert helm_params["env"]["HUGGING_FACE_HUB_TOKEN"] == json.dumps(
+        {"valueFrom": {"name": "test-secret", "key": "hf_token"}}
+    )
 
 
 @pytest.mark.asyncio

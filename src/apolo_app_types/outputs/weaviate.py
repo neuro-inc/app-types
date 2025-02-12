@@ -5,8 +5,8 @@ from apolo_app_types import (
     BasicAuth,
     WeaviateOutputs,
 )
+from apolo_app_types.clients.kube import get_services
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
-from apolo_app_types.outputs.utils.parsing import get_service_host_port
 from apolo_app_types.protocols.common.networking import GraphQLAPI, GrpcAPI, RestAPI
 
 
@@ -16,26 +16,24 @@ logger = logging.getLogger()
 async def _get_service_endpoints(
     release_name: str,
 ) -> tuple[tuple[str, int], tuple[str, int]]:
-    services = await get_service_host_port(
-        match_labels={"app.kubernetes.io/name": release_name}
-    )
-    host, grpc_host = "", ""
-    port, grpc_port = 0, 0
+    services = await get_services(match_labels={"application": release_name})
+    http_host, grpc_host = "", ""
+    http_port, grpc_port = 0, 0
     for service in services:
         service_name = service["metadata"]["name"]
         host = f'{service_name}.{service["metadata"]["namespace"]}'
         port = int(service["spec"]["ports"][0]["port"])  # Ensure port is int
 
         if service_name == "weaviate":
-            host, port = host, port
+            http_host, http_port = host, port
         elif service_name == "weaviate-grpc":
             grpc_host, grpc_port = host, port
 
-    if host == "" or grpc_host == "":
+    if http_host == "" or grpc_host == "":
         msg = "Could not find both weaviate and weaviate-grpc services."
         raise Exception(msg)
 
-    return (host, port), (grpc_host, grpc_port)
+    return (http_host, http_port), (grpc_host, grpc_port)
 
 
 async def get_weaviate_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any]:
@@ -62,22 +60,22 @@ async def get_weaviate_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any
     graphql_external = None
     if ingress_config.get("enabled"):
         ingress_host_port = await get_ingress_host_port(
-            match_labels={"application": "llm-inference"}
+            match_labels={"application": "weaviate"}
         )
 
-        if ingress_host_port[0]:
+        if ingress_host_port:
             base_external_host = ingress_host_port[0] if ingress_host_port[0] else ""
             graphql_external = GraphQLAPI(
                 host=base_external_host,
                 base_path="/v1/graphql",
                 protocol="https",
-                port=int(ingress_host_port[1]),
+                port=ingress_host_port[1],
             )
             rest_external = RestAPI(
                 host=base_external_host,
                 base_path="/v1",
                 protocol="https",
-                port=int(ingress_host_port[1]),
+                port=ingress_host_port[1],
             )
 
     auth = BasicAuth(

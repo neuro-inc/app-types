@@ -4,7 +4,8 @@ import typing as t
 from apolo_app_types import (
     HuggingFaceModel,
 )
-from apolo_app_types.outputs.utils.parsing import get_service_host_port
+from apolo_app_types.clients.kube import get_service_host_port
+from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
 from apolo_app_types.protocols.common.networking import RestAPI
 from apolo_app_types.protocols.stable_diffusion import SDOutputsV2
 
@@ -18,7 +19,7 @@ async def get_stable_diffusion_outputs(
     internal_host, internal_port = await get_service_host_port(
         match_labels={"application": "stable-diffusion"}
     )
-    ingress_host_port = await get_service_host_port(
+    ingress_host_port = await get_ingress_host_port(
         match_labels={"application": "stable-diffusion"}
     )
     if ingress_host_port:

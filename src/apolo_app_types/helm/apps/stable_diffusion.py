@@ -1,5 +1,6 @@
 import typing as t
 
+from apolo_app_types.protocols.common.hugging_face import serialize_hf_token
 from apolo_sdk import Preset
 
 from apolo_app_types import StableDiffusionInputs
@@ -40,7 +41,7 @@ class StableDiffusionChartValueProcessor(
 
         if input_.stable_diffusion.hugging_face_model.hfToken:
             env_vars["HUGGING_FACE_HUB_TOKEN"] = (
-                input_.stable_diffusion.hugging_face_model.hfToken
+                serialize_hf_token(input_.stable_diffusion.hugging_face_model.hfToken)
             )
 
         return env_vars
