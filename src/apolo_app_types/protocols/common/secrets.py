@@ -7,4 +7,4 @@ class SecretKeyRef(BaseModel):
 
 
 class K8sSecret(BaseModel):
-    valueFrom: SecretKeyRef
+    valueFrom: SecretKeyRef  # noqa: N815

@@ -2,16 +2,20 @@ import logging
 import typing as t
 
 from apolo_app_types import (
-    WeaviateOutputs, BasicAuth,
+    BasicAuth,
+    WeaviateOutputs,
 )
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
 from apolo_app_types.outputs.utils.parsing import get_service_host_port
-from apolo_app_types.protocols.common.networking import RestAPI, GrpcAPI, GraphQLAPI
+from apolo_app_types.protocols.common.networking import GraphQLAPI, GrpcAPI, RestAPI
+
 
 logger = logging.getLogger()
 
 
-async def _get_service_endpoints(release_name: str) -> tuple[tuple[str, int], tuple[str, int]]:
+async def _get_service_endpoints(
+    release_name: str,
+) -> tuple[tuple[str, int], tuple[str, int]]:
     services = await get_service_host_port(
         match_labels={"app.kubernetes.io/name": release_name}
     )
@@ -33,6 +37,7 @@ async def _get_service_endpoints(release_name: str) -> tuple[tuple[str, int], tu
 
     return (host, port), (grpc_host, grpc_port)
 
+
 async def get_weaviate_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any]:
     release_name = helm_values.get("nameOverride", "weaviate")
     cluster_api = helm_values.get("clusterApi", {})
@@ -43,7 +48,7 @@ async def get_weaviate_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any
         )
     except Exception as e:
         msg = f"Could not find Weaviate services: {e}"
-        raise Exception(msg)
+        raise Exception(msg) from e
 
     internal_http_host = http_host if http_host else ""
     graphql_internal = GraphQLAPI(
@@ -66,13 +71,13 @@ async def get_weaviate_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any
                 host=base_external_host,
                 base_path="/v1/graphql",
                 protocol="https",
-                port=int(ingress_host_port[1])
+                port=int(ingress_host_port[1]),
             )
             rest_external = RestAPI(
                 host=base_external_host,
                 base_path="/v1",
                 protocol="https",
-                port=int(ingress_host_port[1])
+                port=int(ingress_host_port[1]),
             )
 
     auth = BasicAuth(
