@@ -8,3 +8,7 @@ class SecretKeyRef(BaseModel):
 
 class K8sSecret(BaseModel):
     valueFrom: SecretKeyRef  # noqa: N815
+
+
+StrOrSecret = str | K8sSecret
+OptionalStrOrSecret = StrOrSecret | None

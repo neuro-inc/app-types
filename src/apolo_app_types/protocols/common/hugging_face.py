@@ -2,10 +2,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from apolo_app_types.protocols.common.secrets import K8sSecret
-
-
-HuggingFaceToken = str | K8sSecret | None
+from apolo_app_types.protocols.common.secrets import K8sSecret, OptionalStrOrSecret
 
 
 class HuggingFaceModel(BaseModel):
@@ -17,7 +14,7 @@ class HuggingFaceModel(BaseModel):
     modelFiles: str | None = Field(  # noqa: N815
         None, description="The path to the model files.", title="Model Files"
     )
-    hfToken: HuggingFaceToken = Field(  # noqa: N815
+    hfToken: OptionalStrOrSecret = Field(  # noqa: N815
         default=None,
         description="The Hugging Face API token.",
         title="Hugging Face Token",

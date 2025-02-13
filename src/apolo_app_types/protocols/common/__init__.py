@@ -1,6 +1,6 @@
 from .auth import BasicAuth
 from .buckets import Bucket
-from .hugging_face import HuggingFaceModel, HuggingFaceToken
+from .hugging_face import HuggingFaceModel
 from .ingress import Ingress, IngressGrpc
 from .inputs import AppInputs
 from .networking import GraphQLAPI, GrpcAPI, RestAPI
@@ -8,6 +8,7 @@ from .outputs import AppOutputs, AppOutputsV2
 from .postgres import Postgres
 from .preset import Preset
 from .redis import Redis, RedisMaster
+from .secrets import K8sSecret, OptionalStrOrSecret, StrOrSecret
 from .storage import StorageGB
 
 
@@ -26,7 +27,9 @@ __all__ = [
     "GrpcAPI",
     "RestAPI",
     "GraphQLAPI",
-    "HuggingFaceToken",
+    "K8sSecret",
+    "StrOrSecret",
+    "OptionalStrOrSecret",
     "Bucket",
     "AppOutputsV2",
 ]
