@@ -1,8 +1,6 @@
 import logging
 import typing
 
-import click
-
 from apolo_app_types.clients.kube import get_ingresses_as_dict
 
 
@@ -33,7 +31,7 @@ async def get_ingress_host_port(
     ingress = get_ing_stdout["items"][0]
     if len(ingress["spec"]["rules"]) > 1:
         msg = f"Multiple rules in ingress with labels {match_labels} found"
-        raise click.ClickException(msg)
+        raise Exception(msg)
 
     host = ingress["spec"]["rules"][0]["host"]
     return host, 80  # traefik is exposed on 80,443 ports
