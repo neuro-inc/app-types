@@ -1,4 +1,5 @@
 import pytest
+
 from apolo_app_types.outputs.stable_diffusion import get_stable_diffusion_outputs
 
 

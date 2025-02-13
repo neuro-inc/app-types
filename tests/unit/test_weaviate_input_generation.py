@@ -1,10 +1,14 @@
 import pytest
-from apolo_app_types import WeaviateInputs, Bucket, BasicAuth
+
+from apolo_app_types import BasicAuth, Bucket, WeaviateInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import _get_match_expressions
-from apolo_app_types.protocols.common import Preset, StorageGB, Ingress, IngressGrpc
-from apolo_app_types.protocols.common.buckets import S3BucketCredentials, CredentialsType, BucketProvider
-
+from apolo_app_types.protocols.common import Ingress, IngressGrpc, Preset, StorageGB
+from apolo_app_types.protocols.common.buckets import (
+    BucketProvider,
+    CredentialsType,
+    S3BucketCredentials,
+)
 from tests.unit.constants import DEFAULT_NAMESPACE
 
 

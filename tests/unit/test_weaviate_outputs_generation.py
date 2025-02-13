@@ -1,4 +1,5 @@
 import pytest
+
 from apolo_app_types.outputs.weaviate import get_weaviate_outputs
 
 

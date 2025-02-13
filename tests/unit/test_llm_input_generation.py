@@ -1,14 +1,14 @@
 import json
 
 import pytest
-from apolo_app_types import LLMInputs, HuggingFaceModel
+
+from apolo_app_types import HuggingFaceModel, LLMInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import _get_match_expressions
-from apolo_app_types.protocols.common import Preset, Ingress
+from apolo_app_types.protocols.common import Ingress, Preset
 from apolo_app_types.protocols.common.secrets import K8sSecret, SecretKeyRef
 from apolo_app_types.protocols.llm import LLMModel
-
-from tests.unit.constants import CPU_POOL, GPU_POOL, DEFAULT_NAMESPACE
+from tests.unit.constants import CPU_POOL, DEFAULT_NAMESPACE, GPU_POOL
 
 
 @pytest.mark.asyncio

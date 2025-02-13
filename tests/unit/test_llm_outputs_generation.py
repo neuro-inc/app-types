@@ -1,4 +1,5 @@
 import pytest
+
 from apolo_app_types.outputs.llm import get_llm_inference_outputs
 
 
