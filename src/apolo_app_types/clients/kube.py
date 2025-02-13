@@ -63,3 +63,26 @@ async def get_services_by_label(label_selectors: str) -> dict[str, typing.Any]:
         err_msg = f"Exception when calling CoreV1Api->list_namespaced_service: {e}"
         logger.error(err_msg)
         raise e
+
+
+async def get_services(match_labels: dict[str, str]) -> list[dict[str, typing.Any]]:
+    label_selectors = ",".join(f"{k}={v}" for k, v in match_labels.items())
+    get_svc_stdout = await get_services_by_label(label_selectors)
+
+    return get_svc_stdout["items"]
+
+
+async def get_service_host_port(match_labels: dict[str, str]) -> tuple[str, str]:
+    services = await get_services(match_labels)
+    if not services:
+        msg = f"Service with labels {match_labels} not found"
+        raise Exception(msg)
+    if len(services) > 1:
+        msg = f"Multiple services with labels {match_labels} found"
+        logger.warning(msg)
+
+    service = services[0]
+    host = f'{service["metadata"]["name"]}.{service["metadata"]["namespace"]}'
+    post = str(service["spec"]["ports"][0]["port"])
+
+    return host, post

@@ -5,8 +5,9 @@ from apolo_app_types import (
     HuggingFaceModel,
     VLLMOutputsV2,
 )
+from apolo_app_types.clients.kube import get_service_host_port
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
-from apolo_app_types.outputs.utils.parsing import get_service_host_port, parse_cli_args
+from apolo_app_types.outputs.utils.parsing import parse_cli_args
 from apolo_app_types.protocols.common.networking import RestAPI
 from apolo_app_types.protocols.llm import LLMSpecific
 

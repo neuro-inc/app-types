@@ -4,7 +4,9 @@ from apolo_app_types.protocols.common import (
     AppOutputs,
     BasicAuth,
     HuggingFaceModel,
-    HuggingFaceToken,
+    K8sSecret,
+    OptionalStrOrSecret,
+    StrOrSecret,
 )
 from apolo_app_types.protocols.common.buckets import Bucket
 from apolo_app_types.protocols.dify import (
@@ -97,7 +99,9 @@ __all__ = [
     "JupyterTypes",
     "PrivateGPTInputs",
     "PrivateGPTOutputs",
-    "HuggingFaceToken",
+    "K8sSecret",
+    "StrOrSecret",
+    "OptionalStrOrSecret",
     "Bucket",
     "StableDiffusionInputs",
     "HuggingFaceModel",

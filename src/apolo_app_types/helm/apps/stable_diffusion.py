@@ -14,6 +14,7 @@ from apolo_app_types.helm.apps.ingress import (
     get_ingress_values,
 )
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
+from apolo_app_types.protocols.common.hugging_face import serialize_hf_token
 
 
 class StableDiffusionChartValueProcessor(
@@ -36,10 +37,10 @@ class StableDiffusionChartValueProcessor(
                 f"--lowvram --use-cpu all --no-half --precision full"
             )
 
-        env_vars = {"COMMANDLINE_ARGS": commandline_args}
+        env_vars: dict[str, t.Any] = {"COMMANDLINE_ARGS": commandline_args}
 
         if input_.stable_diffusion.hugging_face_model.hfToken:
-            env_vars["HUGGING_FACE_HUB_TOKEN"] = (
+            env_vars["HUGGING_FACE_HUB_TOKEN"] = serialize_hf_token(
                 input_.stable_diffusion.hugging_face_model.hfToken
             )
 

@@ -6,6 +6,7 @@ from apolo_app_types import LLMInputs
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import gen_extra_values, get_preset
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
+from apolo_app_types.protocols.common.hugging_face import serialize_hf_token
 from apolo_app_types.protocols.llm import LLMModel
 
 
@@ -60,7 +61,11 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
         }
 
     def _configure_env(self, llm_model: LLMModel) -> dict[str, t.Any]:
-        return {"HUGGING_FACE_HUB_TOKEN": llm_model.hugging_face_model.hfToken}
+        return {
+            "HUGGING_FACE_HUB_TOKEN": serialize_hf_token(
+                llm_model.hugging_face_model.hfToken
+            )
+        }
 
     async def gen_extra_values(
         self,

@@ -113,3 +113,95 @@ def mock_get_preset_gpu():
         mock_llm.side_effect = return_preset
         mock_sd.side_effect = return_preset
         yield mock
+
+
+@pytest.fixture
+def mock_kubernetes_client():
+    with (
+        patch("kubernetes.config.load_config") as mock_load_config,
+        patch("kubernetes.config.load_incluster_config") as mock_load_incluster_config,
+        patch("kubernetes.client.CoreV1Api") as mock_core_v1_api,
+        patch("kubernetes.client.NetworkingV1Api") as mock_networking_v1_api,
+        patch(
+            "apolo_app_types.clients.kube.get_current_namespace"
+        ) as mock_get_curr_namespace,
+    ):
+        # Mock CoreV1Api instance for services
+        mock_v1_instance = MagicMock()
+        mock_core_v1_api.return_value = mock_v1_instance
+
+        # Mock NetworkingV1Api instance for ingresses
+        mock_networking_instance = MagicMock()
+        mock_networking_v1_api.return_value = mock_networking_instance
+        namespace = "default-namespace"
+        mock_get_curr_namespace.return_value = namespace
+        # Define the fake response for list_namespaced_service
+
+        # Define the fake response for list_namespaced_ingress
+        fake_ingresses = {
+            "items": [
+                {
+                    "metadata": {"name": "ingress-1"},
+                    "spec": {"rules": [{"host": "example.com"}]},
+                }
+            ]
+        }
+
+        def get_services_by_label(namespace, label_selector):
+            if label_selector == "application=weaviate":
+                return {
+                    "items": [
+                        {
+                            "metadata": {"name": "weaviate", "namespace": namespace},
+                            "spec": {"ports": [{"port": 80}]},
+                        },
+                        {
+                            "metadata": {
+                                "name": "weaviate-grpc",
+                                "namespace": namespace,
+                            },
+                            "spec": {"ports": [{"port": 443}]},
+                        },
+                    ]
+                }
+            if label_selector == "application=llm-inference":
+                return {
+                    "items": [
+                        {
+                            "metadata": {
+                                "name": "llm-inference",
+                                "namespace": namespace,
+                            },
+                            "spec": {"ports": [{"port": 80}]},
+                        }
+                    ]
+                }
+            return {
+                "items": [
+                    {
+                        "metadata": {
+                            "name": "app",
+                            "namespace": "default-namespace",
+                        },
+                        "spec": {"ports": [{"port": 80}]},
+                    },
+                ]
+            }
+
+        def list_namespace_ingress(namespace, label_selector):
+            return fake_ingresses
+
+        mock_v1_instance.list_namespaced_service.side_effect = get_services_by_label
+        mock_networking_instance.list_namespaced_ingress.side_effect = (
+            list_namespace_ingress
+        )
+
+        yield {
+            "mock_load_config": mock_load_config,
+            "mock_load_incluster_config": mock_load_incluster_config,
+            "mock_core_v1_api": mock_core_v1_api,
+            "mock_networking_v1_api": mock_networking_v1_api,
+            "mock_v1_instance": mock_v1_instance,
+            "mock_networking_instance": mock_networking_instance,
+            "fake_ingresses": fake_ingresses,
+        }
