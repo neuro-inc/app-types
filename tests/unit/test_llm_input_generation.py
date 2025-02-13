@@ -4,7 +4,7 @@ from apolo_app_types import HuggingFaceModel, LLMInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import _get_match_expressions
 from apolo_app_types.protocols.common import Ingress, Preset
-from apolo_app_types.protocols.common.secrets import K8sSecret, SecretKeyRef
+from apolo_app_types.protocols.common.secrets import K8sSecret, Secret, SecretKeyRef
 from apolo_app_types.protocols.llm import LLMModel
 from tests.unit.constants import CPU_POOL, DEFAULT_NAMESPACE, GPU_POOL
 
@@ -176,8 +176,10 @@ async def test_values_llm_generation_cpu_k8s_secret(setup_clients, mock_get_pres
                     modelHFName="test",
                     hfToken=K8sSecret(
                         valueFrom=SecretKeyRef(
-                            name="test-secret",
-                            key="hf_token",
+                            secretKeyRef=Secret(
+                                name="test-secret",
+                                key="hf_token",
+                            )
                         )
                     ),
                 ),
@@ -233,5 +235,5 @@ async def test_values_llm_generation_cpu_k8s_secret(setup_clients, mock_get_pres
     ]
     assert "HUGGING_FACE_HUB_TOKEN" in helm_params["env"]
     assert helm_params["env"]["HUGGING_FACE_HUB_TOKEN"] == {
-        "valueFrom": {"name": "test-secret", "key": "hf_token"}
+        "valueFrom": {"secretKeyRef": {"name": "test-secret", "key": "hf_token"}}
     }

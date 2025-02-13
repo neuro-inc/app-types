@@ -1,9 +1,13 @@
 from pydantic import BaseModel
 
 
-class SecretKeyRef(BaseModel):
+class Secret(BaseModel):
     name: str
     key: str
+
+
+class SecretKeyRef(BaseModel):
+    secretKeyRef: Secret  # noqa: N815
 
 
 class K8sSecret(BaseModel):
