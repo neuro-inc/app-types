@@ -1,5 +1,3 @@
-import json
-
 import pytest
 
 from apolo_app_types import HuggingFaceModel, LLMInputs
@@ -234,6 +232,6 @@ async def test_values_llm_generation_cpu_k8s_secret(setup_clients, mock_get_pres
         },
     ]
     assert "HUGGING_FACE_HUB_TOKEN" in helm_params["env"]
-    assert helm_params["env"]["HUGGING_FACE_HUB_TOKEN"] == json.dumps(
-        {"valueFrom": {"name": "test-secret", "key": "hf_token"}}
-    )
+    assert helm_params["env"]["HUGGING_FACE_HUB_TOKEN"] == {
+        "valueFrom": {"name": "test-secret", "key": "hf_token"}
+    }

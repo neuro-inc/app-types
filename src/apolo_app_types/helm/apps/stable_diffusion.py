@@ -37,7 +37,7 @@ class StableDiffusionChartValueProcessor(
                 f"--lowvram --use-cpu all --no-half --precision full"
             )
 
-        env_vars = {"COMMANDLINE_ARGS": commandline_args}
+        env_vars: dict[str, t.Any] = {"COMMANDLINE_ARGS": commandline_args}
 
         if input_.stable_diffusion.hugging_face_model.hfToken:
             env_vars["HUGGING_FACE_HUB_TOKEN"] = serialize_hf_token(
