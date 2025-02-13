@@ -2,7 +2,6 @@ import logging
 import typing
 from pathlib import Path
 
-import click
 from kubernetes import client, config  # type: ignore
 from kubernetes.client.rest import ApiException  # type: ignore
 
@@ -77,7 +76,7 @@ async def get_service_host_port(match_labels: dict[str, str]) -> tuple[str, str]
     services = await get_services(match_labels)
     if not services:
         msg = f"Service with labels {match_labels} not found"
-        raise click.ClickException(msg)
+        raise Exception(msg)
     if len(services) > 1:
         msg = f"Multiple services with labels {match_labels} found"
         logger.warning(msg)
