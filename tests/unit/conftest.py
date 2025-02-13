@@ -164,21 +164,26 @@ def mock_kubernetes_client():
                         },
                     ]
                 }
+            if label_selector == "application=llm-inference":
+                return {
+                    "items": [
+                        {
+                            "metadata": {
+                                "name": "llm-inference",
+                                "namespace": namespace,
+                            },
+                            "spec": {"ports": [{"port": 80}]},
+                        }
+                    ]
+                }
             return {
                 "items": [
                     {
                         "metadata": {
-                            "name": "weaviate",
+                            "name": "app",
                             "namespace": "default-namespace",
                         },
                         "spec": {"ports": [{"port": 80}]},
-                    },
-                    {
-                        "metadata": {
-                            "name": "weaviate-grpc",
-                            "namespace": "default-namespace",
-                        },
-                        "spec": {"ports": [{"port": 443}]},
                     },
                 ]
             }
