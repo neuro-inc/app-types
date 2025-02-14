@@ -91,7 +91,7 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
     helm_args, helm_params = await app_type_to_vals(
         input_=LLMInputs(
             preset=Preset(
-                name="gpu-large",
+                name="gpu-small",
             ),
             ingress=Ingress(
                 enabled=True,
@@ -237,3 +237,90 @@ async def test_values_llm_generation_cpu_k8s_secret(setup_clients, mock_get_pres
     assert helm_params["env"]["HUGGING_FACE_HUB_TOKEN"] == {
         "valueFrom": {"secretKeyRef": {"name": "test-secret", "key": "hf_token"}}
     }
+
+@pytest.mark.asyncio
+async def test_values_llm_generation_gpu_4x(setup_clients, mock_get_preset_gpu):
+    from apolo_app_types.inputs.args import app_type_to_vals
+
+    apolo_client = setup_clients
+    _, helm_params = await app_type_to_vals(
+        input_=LLMInputs(
+            preset=Preset(name="gpu-large"),  # triggers nvidia_gpu=4 in conftest
+            ingress=Ingress(enabled=True, clusterName="test"),
+            llm=LLMModel(
+                hugging_face_model=HuggingFaceModel(modelHFName="test", hfToken="xxx"),
+                serverExtraArgs=["--foo"],
+            ),
+        ),
+        apolo_client=apolo_client,
+        app_type=AppType.LLMInference,
+        app_name="llm",
+        namespace=DEFAULT_NAMESPACE,
+    )
+    # Make sure --tensor-parallel-size=4
+    assert helm_params["serverExtraArgs"] == ["--foo", "--tensor-parallel-size=4"]
+
+@pytest.mark.asyncio
+async def test_values_llm_generation_gpu_8x(setup_clients, mock_get_preset_gpu):
+    from apolo_app_types.inputs.args import app_type_to_vals
+
+    apolo_client = setup_clients
+    _, helm_params = await app_type_to_vals(
+        input_=LLMInputs(
+            preset=Preset(name="gpu-xlarge"),  # triggers nvidia_gpu=8 in conftest
+            ingress=Ingress(enabled=True, clusterName="test"),
+            llm=LLMModel(
+                hugging_face_model=HuggingFaceModel(modelHFName="test2", hfToken="yyy"),
+                serverExtraArgs=["--bar"],
+            ),
+        ),
+        apolo_client=apolo_client,
+        app_type=AppType.LLMInference,
+        app_name="llm",
+        namespace=DEFAULT_NAMESPACE,
+    )
+    # Make sure --tensor-parallel-size=8
+    assert helm_params["serverExtraArgs"] == ["--bar", "--tensor-parallel-size=8"]
+
+
+@pytest.mark.asyncio
+async def test_values_llm_generation_gpu_8x_pps(setup_clients, mock_get_preset_gpu):
+    from apolo_app_types.inputs.args import app_type_to_vals
+
+    apolo_client = setup_clients
+    _, helm_params = await app_type_to_vals(
+        input_=LLMInputs(
+            preset=Preset(name="gpu-xlarge"),  # triggers nvidia_gpu=8 in conftest
+            ingress=Ingress(enabled=True, clusterName="test"),
+            llm=LLMModel(
+                hugging_face_model=HuggingFaceModel(modelHFName="test2", hfToken="yyy"),
+                serverExtraArgs=["--bar", "--pipeline-parallel-size=8"],
+            ),
+        ),
+        apolo_client=apolo_client,
+        app_type=AppType.LLMInference,
+        app_name="llm",
+        namespace=DEFAULT_NAMESPACE,
+    )
+    assert helm_params["serverExtraArgs"] == ["--bar", "--pipeline-parallel-size=8"]
+
+@pytest.mark.asyncio
+async def test_values_llm_generation_gpu_8x_pps_and_tps(setup_clients, mock_get_preset_gpu):
+    from apolo_app_types.inputs.args import app_type_to_vals
+
+    apolo_client = setup_clients
+    _, helm_params = await app_type_to_vals(
+        input_=LLMInputs(
+            preset=Preset(name="gpu-xlarge"),  # triggers nvidia_gpu=8 in conftest
+            ingress=Ingress(enabled=True, clusterName="test"),
+            llm=LLMModel(
+                hugging_face_model=HuggingFaceModel(modelHFName="test2", hfToken="yyy"),
+                serverExtraArgs=["--bar", "--pipeline-parallel-size=8", "--tensor-parallel-size=8"],
+            ),
+        ),
+        apolo_client=apolo_client,
+        app_type=AppType.LLMInference,
+        app_name="llm",
+        namespace=DEFAULT_NAMESPACE,
+    )
+    assert helm_params["serverExtraArgs"] == ["--bar", "--pipeline-parallel-size=8", "--tensor-parallel-size=8"]
