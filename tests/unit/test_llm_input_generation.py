@@ -40,8 +40,7 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
     assert helm_params["serverExtraArgs"] == [
         "--flag1.1 --flag1.2",
         "--flag2",
-        "--flag3",
-        "--tensor-parallel-size=0",
+        "--flag3"
     ]
     assert helm_params["affinity"]["nodeAffinity"][
         "requiredDuringSchedulingIgnoredDuringExecution"
@@ -114,7 +113,6 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
         "--flag1.1 --flag1.2",
         "--flag2",
         "--flag3",
-        "--tensor-parallel-size=1",
     ]
     assert helm_params["affinity"]["nodeAffinity"][
         "requiredDuringSchedulingIgnoredDuringExecution"
@@ -196,7 +194,6 @@ async def test_values_llm_generation_cpu_k8s_secret(setup_clients, mock_get_pres
         "--flag1.1 --flag1.2",
         "--flag2",
         "--flag3",
-        "--tensor-parallel-size=0",
     ]
     assert helm_params["affinity"]["nodeAffinity"][
         "requiredDuringSchedulingIgnoredDuringExecution"
