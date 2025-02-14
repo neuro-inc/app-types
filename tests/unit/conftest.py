@@ -109,7 +109,7 @@ def mock_get_preset_gpu():
                     nvidia_gpu=4,
                     available_resource_pool_names=("gpu_pool",),
                 )
-            elif preset_name == "gpu-xlarge":
+            if preset_name == "gpu-xlarge":
                 return Preset(
                     credits_per_hour=Decimal("1.0"),
                     cpu=1.0,
@@ -117,16 +117,14 @@ def mock_get_preset_gpu():
                     nvidia_gpu=8,
                     available_resource_pool_names=("gpu_pool",),
                 )
-            else:
-                # Fallback (e.g., "gpu-large" = 1 GPU)
-                return Preset(
-                    credits_per_hour=Decimal("1.0"),
-                    cpu=1.0,
-                    memory=100,
-                    nvidia_gpu=1,
-                    available_resource_pool_names=("gpu_pool",),
-                )
-
+            # Fallback (e.g., "gpu-large" = 1 GPU)
+            return Preset(
+                credits_per_hour=Decimal("1.0"),
+                cpu=1.0,
+                memory=100,
+                nvidia_gpu=1,
+                available_resource_pool_names=("gpu_pool",),
+            )
 
         mock.side_effect = return_preset
         mock_llm.side_effect = return_preset
