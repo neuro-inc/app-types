@@ -3,8 +3,12 @@ from apolo_app_types.protocols.common import (
     AppInputs,
     AppOutputs,
     BasicAuth,
-    HuggingFaceToken,
+    HuggingFaceModel,
+    K8sSecret,
+    OptionalStrOrSecret,
+    StrOrSecret,
 )
+from apolo_app_types.protocols.common.buckets import Bucket
 from apolo_app_types.protocols.custom_app import CustomAppInputs, CustomAppOutputs
 from apolo_app_types.protocols.dify import (
     DifyApi,
@@ -27,6 +31,7 @@ from apolo_app_types.protocols.llm import (
     OpenAICompatibleCompletionsAPI,
     OpenAICompatibleEmbeddingsAPI,
     VLLMOutputs,
+    VLLMOutputsV2,
 )
 from apolo_app_types.protocols.mlflow import MLFlowInputs, MLFlowOutputs
 from apolo_app_types.protocols.postgres import (
@@ -38,9 +43,9 @@ from apolo_app_types.protocols.private_gpt import PrivateGPTInputs, PrivateGPTOu
 from apolo_app_types.protocols.pycharm import PycharmInputs, PycharmOutputs
 from apolo_app_types.protocols.shell import ShellInputs, ShellOutputs
 from apolo_app_types.protocols.stable_diffusion import (
-    SDInputs,
     SDModel,
     SDOutputs,
+    StableDiffusionInputs,
     TextToImgAPI,
 )
 from apolo_app_types.protocols.text_embeddings import (
@@ -77,7 +82,7 @@ __all__ = [
     "ShellInputs",
     "ShellOutputs",
     "SDOutputs",
-    "SDInputs",
+    "StableDiffusionInputs",
     "TextEmbeddingsInferenceInputs",
     "TextEmbeddingsInferenceOutputs",
     "WeaviateInputs",
@@ -95,7 +100,13 @@ __all__ = [
     "JupyterTypes",
     "PrivateGPTInputs",
     "PrivateGPTOutputs",
-    "HuggingFaceToken",
     "CustomAppInputs",
     "CustomAppOutputs",
+    "K8sSecret",
+    "StrOrSecret",
+    "OptionalStrOrSecret",
+    "Bucket",
+    "StableDiffusionInputs",
+    "HuggingFaceModel",
+    "VLLMOutputsV2",
 ]

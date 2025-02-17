@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ .Release.Name }}-role
+  labels:
+    app: {{ .Chart.Name }}
+rules:
+  - apiGroups: [""]
+    resources: ["services", "pods", "endpoints"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch"]

@@ -1,7 +1,14 @@
 from pydantic import BaseModel, Field
 
-from apolo_app_types.protocols.common import AppInputs, AppOutputs, Ingress, Preset
-from apolo_app_types.protocols.common.hugging_face import HuggingFaceToken
+from apolo_app_types.protocols.common import (
+    AppInputs,
+    AppOutputs,
+    AppOutputsV2,
+    HuggingFaceModel,
+    Ingress,
+    Preset,
+)
+from apolo_app_types.protocols.common.networking import RestAPI
 
 
 class LLMApi(BaseModel):
@@ -18,20 +25,15 @@ class LLMApi(BaseModel):
 
 
 class LLMModel(BaseModel):
-    modelHFName: str = Field(  # noqa: N815
+    hugging_face_model: HuggingFaceModel = Field(  # noqa: N815
         ...,
-        description="The name of the Hugging Face model to use.",
+        description="The name of the Hugging Face model.",
         title="Hugging Face Model Name",
     )
     tokenizerHFName: str = Field(  # noqa: N815
-        ...,
+        "",
         description="The name of the tokenizer associated with the Hugging Face model.",
         title="Hugging Face Tokenizer Name",
-    )
-    hfToken: HuggingFaceToken | None = Field(  # noqa: N815
-        default=None,
-        description="The Hugging Face API token.",
-        title="Hugging Face Token",
     )
     serverExtraArgs: list[str] = Field(  # noqa: N815
         default_factory=list,
@@ -92,3 +94,17 @@ class VLLMOutputs(AppOutputs):
     chat_external_api: OpenAICompatibleChatAPI | None
     embeddings_internal_api: OpenAICompatibleEmbeddingsAPI | None
     embeddings_external_api: OpenAICompatibleEmbeddingsAPI | None
+
+
+class LLMSpecific(BaseModel):
+    tokenizer_name: str | None = None
+    api_key: str | None = None
+
+
+class VLLMOutputsV2(AppOutputsV2):
+    chat_internal_api: RestAPI | None = None
+    chat_external_api: RestAPI | None = None
+    embeddings_internal_api: RestAPI | None = None
+    embeddings_external_api: RestAPI | None = None
+    hf_model: HuggingFaceModel | None = None
+    llm_specific: LLMSpecific | None = None

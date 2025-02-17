@@ -4,6 +4,7 @@ from apolo_app_types.protocols.common import (
     AppInputs,
     AppOutputs,
     BasicAuth,
+    Bucket,
     GraphQLAPI,
     GrpcAPI,
     Ingress,
@@ -20,23 +21,22 @@ class WeaviateAuthentication(BaseModel):
     enabled: str = "false"
 
 
-class WeaviateBackups(BaseModel):
-    enabled: bool = False
-
-
-class WeaviateParams(BaseModel):
-    backups: WeaviateBackups = Field(default_factory=WeaviateBackups)
-    auth_enabled: bool = False
-
-
 class WeaviateInputs(AppInputs):
     preset: Preset
-    persistence: StorageGB | None = Field(
+    persistence: StorageGB = Field(
         default_factory=lambda: StorageGB(size=WEAVIATE_MIN_GB_STORAGE)
     )
-    ingress: Ingress | None = None
+    backup_bucket: Bucket | None = Field(
+        default=None,
+        description="The bucket to use for backups.",
+        title="Backup bucket",
+    )
+    ingress: Ingress = Field(
+        ...,
+        description="The ingress configuration.",
+        title="Ingress",
+    )
     clusterApi: BasicAuth | None = None  # noqa: N815
-    weaviate_params: WeaviateParams | None = Field(default_factory=WeaviateParams)
 
     @field_validator("persistence")
     def validate_storage_size(cls, value: StorageGB) -> StorageGB:  # noqa: N805

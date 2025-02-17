@@ -6,7 +6,7 @@ class IngressGrpc(BaseModel):
 
 
 class Ingress(BaseModel):
-    enabled: str = Field(
+    enabled: bool = Field(
         ...,
         description="Indicates whether the ingress is enabled.",
         title="Ingress Enabled",
