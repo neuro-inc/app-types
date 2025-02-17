@@ -9,7 +9,10 @@ from apolo_app_types.protocols.common import (
     StrOrSecret,
 )
 from apolo_app_types.protocols.common.buckets import Bucket
-from apolo_app_types.protocols.custom_app import CustomAppInputs, CustomAppOutputs
+from apolo_app_types.protocols.custom_deployment import (
+    CustomDeploymentInputs,
+    CustomDeploymentOutputs,
+)
 from apolo_app_types.protocols.dify import (
     DifyApi,
     DifyInputs,
@@ -100,8 +103,8 @@ __all__ = [
     "JupyterTypes",
     "PrivateGPTInputs",
     "PrivateGPTOutputs",
-    "CustomAppInputs",
-    "CustomAppOutputs",
+    "CustomDeploymentInputs",
+    "CustomDeploymentOutputs",
     "K8sSecret",
     "StrOrSecret",
     "OptionalStrOrSecret",

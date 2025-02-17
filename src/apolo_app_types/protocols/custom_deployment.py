@@ -26,7 +26,7 @@ class Container(BaseModel):
     env: list[Env] | None = None
 
 
-class CustomAppInputs(AppInputs):
+class CustomDeploymentInputs(AppInputs):
     preset_name: str
     http_auth: bool = True
     name_override: str
@@ -35,5 +35,5 @@ class CustomAppInputs(AppInputs):
     container: Container | None = None
 
 
-class CustomAppOutputs(AppOutputs):
+class CustomDeploymentOutputs(AppOutputs):
     internal_web_app_url: str
