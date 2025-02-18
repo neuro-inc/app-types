@@ -37,3 +37,12 @@ class CustomDeploymentInputs(AppInputs):
 
 class CustomDeploymentOutputs(AppOutputs):
     internal_web_app_url: str
+
+
+class CustomDeployment(BaseModel):
+    preset_name: str
+    http_auth: bool = True
+    name_override: str
+    image: Image | None = None
+    autoscaling: Autoscaling | None = None
+    container: Container | None = None
