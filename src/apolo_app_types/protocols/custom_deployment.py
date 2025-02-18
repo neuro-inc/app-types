@@ -30,7 +30,7 @@ class CustomDeploymentInputs(AppInputs):
     preset_name: str
     http_auth: bool = True
     name_override: str
-    images: Image | None = None
+    image: Image | None = None
     autoscaling: Autoscaling | None = None
     container: Container | None = None
 

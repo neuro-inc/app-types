@@ -5,6 +5,7 @@ import apolo_sdk
 from apolo_app_types import AppInputs, LLMInputs, StableDiffusionInputs, WeaviateInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps import (
+    CustomDeploymentChartValueProcessor,
     LLMChartValueProcessor,
     StableDiffusionChartValueProcessor,
 )
@@ -24,6 +25,7 @@ async def app_type_to_vals(
         AppType.LLMInference: LLMChartValueProcessor,
         AppType.StableDiffusion: StableDiffusionChartValueProcessor,
         AppType.Weaviate: WeaviateChartValueProcessor,
+        AppType.CustomApp: CustomDeploymentChartValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)
