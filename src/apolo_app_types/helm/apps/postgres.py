@@ -1,21 +1,17 @@
 import base64
 import typing as t
-import re
 
-from apolo_app_types.protocols.common.buckets import S3BucketCredentials, MinioBucketCredentials, GCPBucketCredentials
-from apolo_app_types.protocols.postgres import PostgresInputs, PostgresDBUser
-from apolo_sdk import Preset
-from apolo_app_types import BasicAuth, Bucket
-from apolo_app_types import LLMInputs
+from apolo_app_types import Bucket
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
-from apolo_app_types.helm.apps.common import gen_extra_values, get_preset, preset_to_resources, preset_to_tolerations, \
+from apolo_app_types.helm.apps.common import get_preset, preset_to_resources, preset_to_tolerations, \
     preset_to_affinity
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
-
 from apolo_app_types.protocols.common.buckets import BucketProvider
+from apolo_app_types.protocols.common.buckets import S3BucketCredentials, MinioBucketCredentials, GCPBucketCredentials
+from apolo_app_types.protocols.postgres import CrunchyPostgresInputs, PostgresDBUser
 
 
-class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
+class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
     def __init__(self, *args: t.Any, **kwargs: t.Any):
         super().__init__(*args, **kwargs)
 
@@ -69,7 +65,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
             "replicas": int(instance_replicas),
             "dataVolumeClaimSpec": {
                 "accessModes": ["ReadWriteOnce"],
-                "resources": {"requests": {"storage": instances_size}},
+                "resources": {"requests": {"storage": f"{instances_size}Gi"}},
             },
             "resources": resources,
             "tolerations": tolerations,
@@ -82,7 +78,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
     ) -> list[dict[str, t.Any]]:
         # Set user[].password to "AlphaNumeric" since often non-alphanumberic
         # characters break client libs :(
-        users_config = [{
+        users_config: list[dict[str, t.Any]] = [{
             "name": "postgres"
         }]
         for db_user in db_users:
@@ -144,7 +140,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
             "tolerations": tolerations,
         }
 
-    def _get_backup_config(self, bucket: Bucket):
+    def _get_backup_config(self, bucket: Bucket) -> dict[str, t.Any]:
         if bucket.bucket_provider in (
             BucketProvider.MINIO,
             BucketProvider.AWS,
@@ -153,16 +149,16 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
             backup_config = {
                 "bucket": bucket.id,
                 "endpoint": bucket_creds.endpoint_url,
-                "region": bucket_creds,
+                "region": bucket_creds.region_name,
                 "key": bucket_creds.access_key_id,
                 "keySecret": bucket_creds.secret_access_key,
             }
             return {"s3": backup_config}
-        if bucket.bucket_provider == BucketProvider.GCP:
+        elif bucket.bucket_provider == BucketProvider.GCP:
             bucket_creds: GCPBucketCredentials = bucket.credentials[0]
             backup_config = {
                 "bucket": bucket.id,
-                "key": base64.b64decode(bucket_creds.key_data),
+                "key": base64.b64decode(bucket_creds.key_data).decode(),
             }
             return {"gcs": backup_config}
         # For Azure, we need to return a bit more data from API
@@ -171,7 +167,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
 
     async def gen_extra_values(
         self,
-        input_: PostgresInputs,
+        input_: CrunchyPostgresInputs,
         app_name: str,
         namespace: str,
         *_: t.Any,

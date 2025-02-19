@@ -1,7 +1,7 @@
 import enum
 
 from apolo_app_types import Bucket
-from apolo_app_types.protocols.common import AppInputs, AppOutputs, Preset
+from apolo_app_types.protocols.common import AppInputs, AppOutputs, Preset, AppOutputsV2
 from pydantic import BaseModel, Field
 
 
@@ -100,4 +100,8 @@ class CrunchyPostgresUserCredentials(AppOutputs):
 
 
 class CrunchyPostgresOutputs(AppOutputs):
+    users: list[CrunchyPostgresUserCredentials]
+
+
+class PostgresOutputsV2(AppOutputsV2):
     users: list[CrunchyPostgresUserCredentials]
