@@ -153,26 +153,27 @@ class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
             BucketProvider.MINIO,
             BucketProvider.AWS,
         ):
-            bucket_creds: S3BucketCredentials | MinioBucketCredentials = \
-                bucket.credentials[0]
+            s3_like_bucket_creds: S3BucketCredentials | MinioBucketCredentials = (
+                bucket.credentials[0]  # type: ignore
+            )
 
             backup_config = {
                 "bucket": bucket.id,
-                "endpoint": bucket_creds.endpoint_url,
-                "region": bucket_creds.region_name,
-                "key": bucket_creds.access_key_id,
-                "keySecret": bucket_creds.secret_access_key,
+                "endpoint": s3_like_bucket_creds.endpoint_url,
+                "region": s3_like_bucket_creds.region_name,
+                "key": s3_like_bucket_creds.access_key_id,
+                "keySecret": s3_like_bucket_creds.secret_access_key,
             }
             return {"s3": backup_config}
-        if bucket.bucket_provider == BucketProvider.GCP:
-            bucket_creds: GCPBucketCredentials = bucket.credentials[0]
+        elif bucket.bucket_provider == BucketProvider.GCP:
+            bucket_creds: GCPBucketCredentials = bucket.credentials[0] # type: ignore
             backup_config = {
                 "bucket": bucket.id,
                 "key": base64.b64decode(bucket_creds.key_data).decode(),
             }
             return {"gcs": backup_config}
         # For Azure, we need to return a bit more data from API
-        exception_description = f"Unsupported bucket provider: {bucket.provider}"
+        exception_description = f"Unsupported bucket provider: {bucket.bucket_provider}"
         raise ValueError(exception_description)
 
     async def gen_extra_values(

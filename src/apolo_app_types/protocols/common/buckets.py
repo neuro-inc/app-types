@@ -124,7 +124,8 @@ class Bucket(BaseModel):
                 BucketProvider.GCP: GCPBucketCredentials,
             }
             expected_model = provider_mapping_creds.get(provider)
-            creds = value.get("credentials")
+            creds: list[typing.Any] = value["credentials"]
+
             if expected_model and not all(isinstance(_, expected_model) for _ in creds):
                 err_msg = (
                     f"Credentials must be of type "
