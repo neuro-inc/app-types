@@ -115,7 +115,7 @@ class Bucket(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def validate_credentials(cls, value: dict[str, typing.Any], _: typing.Any):
+    def validate_credentials(cls, value: dict[str, typing.Any], _: typing.Any) -> dict[str, typing.Any]:
         provider = value.get("bucket_provider")
         if provider:
             provider_mapping_creds = {

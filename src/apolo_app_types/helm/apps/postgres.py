@@ -153,9 +153,9 @@ class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
             BucketProvider.MINIO,
             BucketProvider.AWS,
         ):
-            bucket_creds: S3BucketCredentials | MinioBucketCredentials = (
+            bucket_creds: S3BucketCredentials | MinioBucketCredentials = \
                 bucket.credentials[0]
-            )
+
             backup_config = {
                 "bucket": bucket.id,
                 "endpoint": bucket_creds.endpoint_url,
