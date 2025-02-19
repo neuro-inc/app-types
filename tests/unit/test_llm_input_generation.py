@@ -231,7 +231,7 @@ async def test_values_llm_generation_cpu_k8s_secret(setup_clients, mock_get_pres
     ]
     assert "HUGGING_FACE_HUB_TOKEN" in helm_params["env"]
     assert helm_params["env"]["HUGGING_FACE_HUB_TOKEN"] == {
-        "valueFrom": {"secretKeyRef": {"name": "test-secret", "key": "hf_token"}}
+        "valueFrom": {"secretKeyRef": {"name": "apps-secrets", "key": "hf_token"}}
     }
 
 
