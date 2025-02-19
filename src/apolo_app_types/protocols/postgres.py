@@ -85,7 +85,7 @@ class CrunchyPostgresInputs(AppInputs):
     )
 
 
-class CrunchyPostgresUserCredentials(AppOutputs):
+class CrunchyPostgresUserCredentials(BaseModel):
     user: str
     password: str
     host: str
