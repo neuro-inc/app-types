@@ -175,7 +175,6 @@ async def test_values_llm_generation_cpu_k8s_secret(setup_clients, mock_get_pres
                     hfToken=K8sSecret(
                         valueFrom=SecretKeyRef(
                             secretKeyRef=Secret(
-                                name="test-secret",
                                 key="hf_token",
                             )
                         )
