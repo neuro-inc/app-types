@@ -3,11 +3,19 @@ import typing as t
 
 from apolo_app_types import Bucket
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
-from apolo_app_types.helm.apps.common import get_preset, preset_to_resources, preset_to_tolerations, \
-    preset_to_affinity
+from apolo_app_types.helm.apps.common import (
+    get_preset,
+    preset_to_affinity,
+    preset_to_resources,
+    preset_to_tolerations,
+)
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
-from apolo_app_types.protocols.common.buckets import BucketProvider
-from apolo_app_types.protocols.common.buckets import S3BucketCredentials, MinioBucketCredentials, GCPBucketCredentials
+from apolo_app_types.protocols.common.buckets import (
+    BucketProvider,
+    GCPBucketCredentials,
+    MinioBucketCredentials,
+    S3BucketCredentials,
+)
 from apolo_app_types.protocols.postgres import CrunchyPostgresInputs, PostgresDBUser
 
 
@@ -18,10 +26,12 @@ class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
     async def gen_extra_helm_args(self, *_: t.Any) -> list[str]:
         return ["--timeout", "30m"]
 
-    def _gen_instances_config(self,
-                              instance_preset_name: str,
-                              instance_replicas: int,
-                              instances_size: int,) -> list[dict[str, t.Any]]:
+    def _gen_instances_config(
+        self,
+        instance_preset_name: str,
+        instance_replicas: int,
+        instances_size: int,
+    ) -> list[dict[str, t.Any]]:
         preset = get_preset(self.client, instance_preset_name)
         resources = preset_to_resources(preset)
         tolerations = preset_to_tolerations(preset)
@@ -74,13 +84,11 @@ class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
         return [instance]
 
     def _create_users_config(
-            self, db_users: list[PostgresDBUser]
+        self, db_users: list[PostgresDBUser]
     ) -> list[dict[str, t.Any]]:
         # Set user[].password to "AlphaNumeric" since often non-alphanumberic
         # characters break client libs :(
-        users_config: list[dict[str, t.Any]] = [{
-            "name": "postgres"
-        }]
+        users_config: list[dict[str, t.Any]] = [{"name": "postgres"}]
         for db_user in db_users:
             users_config.append(
                 {
@@ -91,9 +99,9 @@ class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
         return users_config
 
     def _get_bouncer_config(
-            self,
-            bouncer_preset_name: str,
-            bouncer_repicas: int,
+        self,
+        bouncer_preset_name: str,
+        bouncer_repicas: int,
     ) -> dict[str, t.Any]:
         preset = get_preset(self.client, bouncer_preset_name)
         resources = preset_to_resources(preset)
@@ -145,7 +153,9 @@ class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
             BucketProvider.MINIO,
             BucketProvider.AWS,
         ):
-            bucket_creds: S3BucketCredentials | MinioBucketCredentials = bucket.credentials[0]
+            bucket_creds: S3BucketCredentials | MinioBucketCredentials = (
+                bucket.credentials[0]
+            )
             backup_config = {
                 "bucket": bucket.id,
                 "endpoint": bucket_creds.endpoint_url,
@@ -154,7 +164,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
                 "keySecret": bucket_creds.secret_access_key,
             }
             return {"s3": backup_config}
-        elif bucket.bucket_provider == BucketProvider.GCP:
+        if bucket.bucket_provider == BucketProvider.GCP:
             bucket_creds: GCPBucketCredentials = bucket.credentials[0]
             backup_config = {
                 "bucket": bucket.id,
@@ -205,13 +215,6 @@ class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
         if users_config:
             values["users"] = users_config
 
-        backup_config = self._get_backup_config(
-            input_.backup_bucket
-        )
+        backup_config = self._get_backup_config(input_.backup_bucket)
 
-        return merge_list_of_dicts(
-            [
-                backup_config,
-                values
-            ]
-        )
+        return merge_list_of_dicts([backup_config, values])

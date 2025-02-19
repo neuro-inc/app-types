@@ -2,13 +2,22 @@ import base64
 
 import pydantic
 import pytest
-from apolo_app_types import CrunchyPostgresInputs, Bucket
-from apolo_app_types.app_types import AppType
-from apolo_app_types.protocols.common.buckets import S3BucketCredentials, BucketProvider, GCPBucketCredentials, \
-    MinioBucketCredentials
-from apolo_app_types.protocols.postgres import Postgres, PGBouncer, PostgresSupportedVersions, PostgresDBUser
 
+from apolo_app_types import Bucket, CrunchyPostgresInputs
+from apolo_app_types.app_types import AppType
 from apolo_app_types.protocols.common import Preset
+from apolo_app_types.protocols.common.buckets import (
+    BucketProvider,
+    GCPBucketCredentials,
+    MinioBucketCredentials,
+    S3BucketCredentials,
+)
+from apolo_app_types.protocols.postgres import (
+    PGBouncer,
+    Postgres,
+    PostgresDBUser,
+    PostgresSupportedVersions,
+)
 from tests.unit.constants import DEFAULT_NAMESPACE
 
 
@@ -26,10 +35,7 @@ async def test_values_postgresql_generation(setup_clients, mock_get_preset_cpu):
                 postgres_version=PostgresSupportedVersions.v16,
                 instance_replicas=3,
                 instance_size=1,
-                db_users=[PostgresDBUser(
-                    name="some_name",
-                    db_names=["some_db"]
-                )]
+                db_users=[PostgresDBUser(name="some_name", db_names=["some_db"])],
             ),
             pg_bouncer=PGBouncer(
                 preset=Preset(
@@ -40,15 +46,17 @@ async def test_values_postgresql_generation(setup_clients, mock_get_preset_cpu):
                 id="some_id",
                 owner="some_owner",
                 details={},
-                credentials=[S3BucketCredentials(
-                    name="some_name",
-                    access_key_id="some_access_key",
-                    secret_access_key="some_secret_key",
-                    endpoint_url="some_endpoint",
-                    region_name="some_region",
-                )],
-                bucket_provider=BucketProvider.AWS
-            )
+                credentials=[
+                    S3BucketCredentials(
+                        name="some_name",
+                        access_key_id="some_access_key",
+                        secret_access_key="some_secret_key",
+                        endpoint_url="some_endpoint",
+                        region_name="some_region",
+                    )
+                ],
+                bucket_provider=BucketProvider.AWS,
+            ),
         ),
         apolo_client=apolo_client,
         app_type=AppType.PostgreSQL,
@@ -72,12 +80,14 @@ async def test_values_postgresql_generation(setup_clients, mock_get_preset_cpu):
     assert "podAntiAffinity" in helm_params["instances"][0]["affinity"]
     assert helm_params["users"] == [
         {"name": "postgres"},
-        {"name": "some_name", "password": { "type": "AlphaNumeric"}}
+        {"name": "some_name", "password": {"type": "AlphaNumeric"}},
     ]
 
 
 @pytest.mark.asyncio
-async def test_values_postgresql_generation_without_user(setup_clients, mock_get_preset_cpu):
+async def test_values_postgresql_generation_without_user(
+    setup_clients, mock_get_preset_cpu
+):
     from apolo_app_types.inputs.args import app_type_to_vals
 
     apolo_client = setup_clients
@@ -90,7 +100,7 @@ async def test_values_postgresql_generation_without_user(setup_clients, mock_get
                 postgres_version=PostgresSupportedVersions.v16,
                 instance_replicas=3,
                 instance_size=1,
-                db_users=[]
+                db_users=[],
             ),
             pg_bouncer=PGBouncer(
                 preset=Preset(
@@ -101,15 +111,17 @@ async def test_values_postgresql_generation_without_user(setup_clients, mock_get
                 id="some_id",
                 owner="some_owner",
                 details={},
-                credentials=[S3BucketCredentials(
-                    name="some_name",
-                    access_key_id="some_access_key",
-                    secret_access_key="some_secret_key",
-                    endpoint_url="some_endpoint",
-                    region_name="some_region",
-                )],
-                bucket_provider=BucketProvider.AWS
-            )
+                credentials=[
+                    S3BucketCredentials(
+                        name="some_name",
+                        access_key_id="some_access_key",
+                        secret_access_key="some_secret_key",
+                        endpoint_url="some_endpoint",
+                        region_name="some_region",
+                    )
+                ],
+                bucket_provider=BucketProvider.AWS,
+            ),
         ),
         apolo_client=apolo_client,
         app_type=AppType.PostgreSQL,
@@ -135,18 +147,20 @@ async def test_values_postgresql_generation_without_user(setup_clients, mock_get
         {"name": "postgres"},
     ]
     assert helm_params["s3"] == {
-        'bucket': 'some_id', 'endpoint': 'some_endpoint',
-        'key': 'some_access_key',
-        'keySecret': 'some_secret_key',
-        'region': 'some_region'
+        "bucket": "some_id",
+        "endpoint": "some_endpoint",
+        "key": "some_access_key",
+        "keySecret": "some_secret_key",
+        "region": "some_region",
     }
 
 
-
-
 @pytest.mark.asyncio
-async def test_values_postgresql_generation_with_gcp_bucket(setup_clients, mock_get_preset_cpu):
+async def test_values_postgresql_generation_with_gcp_bucket(
+    setup_clients, mock_get_preset_cpu
+):
     from apolo_app_types.inputs.args import app_type_to_vals
+
     key_data = "Some string"
     apolo_client = setup_clients
     _, helm_params = await app_type_to_vals(
@@ -158,7 +172,7 @@ async def test_values_postgresql_generation_with_gcp_bucket(setup_clients, mock_
                 postgres_version=PostgresSupportedVersions.v16,
                 instance_replicas=3,
                 instance_size=1,
-                db_users=[]
+                db_users=[],
             ),
             pg_bouncer=PGBouncer(
                 preset=Preset(
@@ -169,12 +183,14 @@ async def test_values_postgresql_generation_with_gcp_bucket(setup_clients, mock_
                 id="some_id",
                 owner="some_owner",
                 details={},
-                credentials=[GCPBucketCredentials(
-                    name="some_name",
-                    key_data=base64.b64encode(key_data.encode()),
-                )],
-                bucket_provider=BucketProvider.GCP
-            )
+                credentials=[
+                    GCPBucketCredentials(
+                        name="some_name",
+                        key_data=base64.b64encode(key_data.encode()),
+                    )
+                ],
+                bucket_provider=BucketProvider.GCP,
+            ),
         ),
         apolo_client=apolo_client,
         app_type=AppType.PostgreSQL,
@@ -199,15 +215,13 @@ async def test_values_postgresql_generation_with_gcp_bucket(setup_clients, mock_
     assert helm_params["users"] == [
         {"name": "postgres"},
     ]
-    assert helm_params["gcp"] == {
-        "bucket": "some_id",
-        "key": key_data
-    }
-
+    assert helm_params["gcp"] == {"bucket": "some_id", "key": key_data}
 
 
 @pytest.mark.asyncio
-async def test_values_postgresql_generation_with_minio(setup_clients, mock_get_preset_cpu):
+async def test_values_postgresql_generation_with_minio(
+    setup_clients, mock_get_preset_cpu
+):
     from apolo_app_types.inputs.args import app_type_to_vals
 
     apolo_client = setup_clients
@@ -220,7 +234,7 @@ async def test_values_postgresql_generation_with_minio(setup_clients, mock_get_p
                 postgres_version=PostgresSupportedVersions.v16,
                 instance_replicas=3,
                 instance_size=1,
-                db_users=[]
+                db_users=[],
             ),
             pg_bouncer=PGBouncer(
                 preset=Preset(
@@ -231,15 +245,17 @@ async def test_values_postgresql_generation_with_minio(setup_clients, mock_get_p
                 id="some_id",
                 owner="some_owner",
                 details={},
-                credentials=[MinioBucketCredentials(
-                    name="some_name",
-                    access_key_id="some_access_key",
-                    secret_access_key="some_secret_key",
-                    endpoint_url="some_endpoint",
-                    region_name="some_region",
-                )],
-                bucket_provider=BucketProvider.MINIO
-            )
+                credentials=[
+                    MinioBucketCredentials(
+                        name="some_name",
+                        access_key_id="some_access_key",
+                        secret_access_key="some_secret_key",
+                        endpoint_url="some_endpoint",
+                        region_name="some_region",
+                    )
+                ],
+                bucket_provider=BucketProvider.MINIO,
+            ),
         ),
         apolo_client=apolo_client,
         app_type=AppType.PostgreSQL,
@@ -265,20 +281,22 @@ async def test_values_postgresql_generation_with_minio(setup_clients, mock_get_p
         {"name": "postgres"},
     ]
     assert helm_params["s3"] == {
-        'bucket': 'some_id', 'endpoint': 'some_endpoint',
-        'key': 'some_access_key',
-        'keySecret': 'some_secret_key',
-        'region': 'some_region'
+        "bucket": "some_id",
+        "endpoint": "some_endpoint",
+        "key": "some_access_key",
+        "keySecret": "some_secret_key",
+        "region": "some_region",
     }
 
 
 @pytest.mark.asyncio
-async def test_values_postgresql_generation_without_matching_bucket_and_creds(setup_clients, mock_get_preset_cpu):
+async def test_values_postgresql_generation_without_matching_bucket_and_creds(
+    setup_clients, mock_get_preset_cpu
+):
     from apolo_app_types.inputs.args import app_type_to_vals
-    with pytest.raises(pydantic.ValidationError) as exc_info:
 
-
-        apolo_client = setup_clients
+    apolo_client = setup_clients
+    with pytest.raises(pydantic.ValidationError):
         _, helm_params = await app_type_to_vals(
             input_=CrunchyPostgresInputs(
                 preset=Preset(
@@ -288,7 +306,7 @@ async def test_values_postgresql_generation_without_matching_bucket_and_creds(se
                     postgres_version=PostgresSupportedVersions.v16,
                     instance_replicas=3,
                     instance_size=1,
-                    db_users=[]
+                    db_users=[],
                 ),
                 pg_bouncer=PGBouncer(
                     preset=Preset(
@@ -299,12 +317,14 @@ async def test_values_postgresql_generation_without_matching_bucket_and_creds(se
                     id="some_id",
                     owner="some_owner",
                     details={},
-                    credentials=[GCPBucketCredentials(
-                        name="some_name",
-                        key_data="U29tZSB0ZXh0",
-                    )],
-                    bucket_provider=BucketProvider.AWS
-                )
+                    credentials=[
+                        GCPBucketCredentials(
+                            name="some_name",
+                            key_data="U29tZSB0ZXh0",
+                        )
+                    ],
+                    bucket_provider=BucketProvider.AWS,
+                ),
             ),
             apolo_client=apolo_client,
             app_type=AppType.PostgreSQL,

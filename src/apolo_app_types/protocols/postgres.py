@@ -1,8 +1,9 @@
 import enum
 
-from apolo_app_types import Bucket
-from apolo_app_types.protocols.common import AppInputs, AppOutputs, Preset, AppOutputsV2
 from pydantic import BaseModel, Field
+
+from apolo_app_types import Bucket
+from apolo_app_types.protocols.common import AppInputs, AppOutputs, AppOutputsV2, Preset
 
 
 class PGBouncer(BaseModel):

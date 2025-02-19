@@ -95,12 +95,10 @@ async def get_secret(label: str) -> dict[str, typing.Any]:
         v1 = client.CoreV1Api()
         namespace = get_current_namespace()
 
-        secrets = v1.list_namespaced_secret(
+        return v1.list_namespaced_secret(
             namespace=namespace,
             label_selector=label,
         )
-
-        return secrets
 
     except ApiException as e:
         err_msg = f"Exception when calling CoreV1Api->read_namespaced_secret: {e}"

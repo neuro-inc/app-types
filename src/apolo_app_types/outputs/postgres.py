@@ -4,13 +4,10 @@ import logging
 import typing as t
 
 from apolo_app_types import (
-    HuggingFaceModel, CrunchyPostgresUserCredentials, CrunchyPostgresOutputs,
+    CrunchyPostgresUserCredentials,
 )
-from apolo_app_types.clients.kube import get_service_host_port, get_secret
-from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
-from apolo_app_types.protocols.common.networking import RestAPI
+from apolo_app_types.clients.kube import get_secret
 from apolo_app_types.protocols.postgres import PostgresOutputsV2
-from apolo_app_types.protocols.stable_diffusion import SDOutputsV2
 
 
 logger = logging.getLogger()
@@ -39,6 +36,7 @@ def postgres_creds_from_kube_secret_data(
         pgbouncer_uri=_b64decode(secret_data.get("pgbouncer-uri")),
         uri=_b64decode(secret_data.get("uri")),
     )
+
 
 async def get_postgres_outputs(
     helm_values: dict[str, t.Any],
