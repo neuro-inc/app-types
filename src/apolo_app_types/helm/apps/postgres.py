@@ -165,8 +165,8 @@ class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
                 "keySecret": s3_like_bucket_creds.secret_access_key,
             }
             return {"s3": backup_config}
-        elif bucket.bucket_provider == BucketProvider.GCP:
-            bucket_creds: GCPBucketCredentials = bucket.credentials[0] # type: ignore
+        if bucket.bucket_provider == BucketProvider.GCP:
+            bucket_creds: GCPBucketCredentials = bucket.credentials[0]  # type: ignore
             backup_config = {
                 "bucket": bucket.id,
                 "key": base64.b64decode(bucket_creds.key_data).decode(),
