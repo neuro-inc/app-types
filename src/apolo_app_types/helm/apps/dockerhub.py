@@ -1,14 +1,12 @@
 import typing as t
 
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
-from apolo_app_types.protocols.dockerhub import (
-    DockerHubInputs,
-    DockerHubModel,
-)
+from apolo_app_types.protocols.dockerhub import DockerHubInputs
 
 
 class DockerHubModelChartValueProcessor(BaseChartValueProcessor[DockerHubInputs]):
     _DOCKERHUB_API_URL = "https://hub.docker.com"
+    _REGISTRY_PROVIDER_HOST = "https://index.docker.io/v1/"
 
     def __init__(self, *args: t.Any, **kwargs: t.Any):
         super().__init__(*args, **kwargs)
@@ -38,7 +36,7 @@ class DockerHubModelChartValueProcessor(BaseChartValueProcessor[DockerHubInputs]
                     "project": self.client.config.project_name,
                     "user": self.client.username,
                     "registry_name": "DockerHub",
-                    "registry_provider_host": DockerHubModel.registry_url,
+                    "registry_provider_host": self._REGISTRY_PROVIDER_HOST,
                     "registry_api_url": self._DOCKERHUB_API_URL,
                     "registry_user": input_.username,
                     "registry_secret": input_.password,

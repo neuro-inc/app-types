@@ -27,4 +27,4 @@ class DockerHubInputs(AppInputs):
 
 
 class DockerHubOutputs(AppOutputsV2):
-    dockerconfigjson: str
+    dockerconfigjson: str = Field(..., title="Docker config JSON")
