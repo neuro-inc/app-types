@@ -38,8 +38,8 @@ class DockerHubModelChartValueProcessor(BaseChartValueProcessor[DockerHubInputs]
                     "registry_name": "DockerHub",
                     "registry_provider_host": self._REGISTRY_PROVIDER_HOST,
                     "registry_api_url": self._DOCKERHUB_API_URL,
-                    "registry_user": input_.username,
-                    "registry_secret": input_.password,
+                    "registry_user": input_.dockerhub.username,
+                    "registry_secret": input_.dockerhub.password,
                 }
             }
         }
