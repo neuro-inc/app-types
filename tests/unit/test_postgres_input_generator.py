@@ -215,7 +215,7 @@ async def test_values_postgresql_generation_with_gcp_bucket(
     assert helm_params["users"] == [
         {"name": "postgres"},
     ]
-    assert helm_params["gcp"] == {"bucket": "some_id", "key": key_data}
+    assert helm_params["gcs"] == {"bucket": "some_id", "key": key_data}
 
 
 @pytest.mark.asyncio
