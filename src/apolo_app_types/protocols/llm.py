@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 
 from apolo_app_types.protocols.common import (
-    AppInputs,
+    AppInputsV2,
     AppOutputs,
     AppOutputsV2,
     HuggingFaceModel,
@@ -56,7 +56,7 @@ class Web(BaseModel):
     preset_name: str
 
 
-class LLMInputs(AppInputs):
+class LLMInputs(AppInputsV2):
     preset: Preset
     ingress: Ingress
     llm: LLMModel
