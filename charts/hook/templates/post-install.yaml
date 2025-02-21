@@ -17,7 +17,8 @@ spec:
       serviceAccountName: {{ .Release.Name }}-sa
       containers:
       - name: post-upgrade-hook
-        image: ghcr.io/neuro-inc/post-deployment-app-hook:development
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         args:
         - "update-outputs"
         - {{ include "filterNonEmptyAndConvertToJson" .Values | squote }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
