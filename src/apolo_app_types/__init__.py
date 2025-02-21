@@ -19,6 +19,7 @@ from apolo_app_types.protocols.dify import (
     DifyWorker,
 )
 from apolo_app_types.protocols.dockerhub import (
+    DockerConfigModel,
     DockerHubInputs,
     DockerHubOutputs,
 )
@@ -114,4 +115,5 @@ __all__ = [
     "AppInputsV2",
     "DockerHubInputs",
     "DockerHubOutputs",
+    "DockerConfigModel",
 ]

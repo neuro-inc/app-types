@@ -32,4 +32,4 @@ async def test_dockerhub_outputs(setup_clients, mock_kubernetes_client):
             {"auths": {"https://index.docker.io/v1/": {"auth": auth64.decode()}}}
         ).encode()
     ).decode()
-    assert res["dockerconfigjson"] == dockerconfigjson
+    assert res["dockerconfigjson"]["filecontents"] == dockerconfigjson

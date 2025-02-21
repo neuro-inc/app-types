@@ -25,5 +25,13 @@ class DockerHubInputs(AppInputsV2):
     dockerhub: DockerHubModel
 
 
+class DockerConfigModel(BaseModel):
+    filecontents: str = Field(
+        ...,
+        title="Docker config file contents",
+        description="The contents of the Docker config file.",
+    )
+
+
 class DockerHubOutputs(AppOutputsV2):
-    dockerconfigjson: str = Field(..., title="Docker config JSON")
+    dockerconfigjson: DockerConfigModel = Field(..., title="Docker config JSON")
