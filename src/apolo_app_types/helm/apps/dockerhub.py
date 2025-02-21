@@ -8,9 +8,6 @@ class DockerHubModelChartValueProcessor(BaseChartValueProcessor[DockerHubInputs]
     _DOCKERHUB_API_URL = "https://hub.docker.com"
     _REGISTRY_PROVIDER_HOST = "https://index.docker.io/v1/"
 
-    def __init__(self, *args: t.Any, **kwargs: t.Any):
-        super().__init__(*args, **kwargs)
-
     async def gen_extra_helm_args(self, *_: t.Any) -> list[str]:
         return ["--timeout", "30m"]
 
