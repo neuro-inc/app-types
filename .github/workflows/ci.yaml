@@ -39,3 +39,36 @@ jobs:
         run: |
           export IMAGE_TAG=development
           make push-hook-image
+  release-hook-image-pr:
+    name: Release hook image from PR
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout commit
+        uses: actions/checkout@v4
+      - name: Purge old artifacts
+        uses: kolpav/purge-artifacts-action@v1
+        with:
+          token: ${{ github.token }}
+          expire-in: 30mins
+      - name: Login to ghcr.io
+        uses: docker/login-action@v3.1.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+            images: ghcr.io/neuro-inc/post-deployment-app-hook
+            tags: |
+              type=ref,event=pr
+      - name: Build Docker image
+        run: make build-hook-image
+      - name: Push release for testing
+        run: |
+          FULL_IMAGE_NAME=${{ steps.meta.outputs.tags }}
+          export IMAGE_TAG=${FULL_IMAGE_NAME##*:}
+          make push-hook-image
