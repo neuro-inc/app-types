@@ -1,8 +1,10 @@
+from typing import Literal
+
 from pydantic import BaseModel
 
 
 class Secret(BaseModel):
-    name: str
+    name: Literal["apps-secrets"] = "apps-secrets"
     key: str
 
 

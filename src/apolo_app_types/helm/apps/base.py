@@ -4,12 +4,12 @@ import typing as t
 
 import apolo_sdk
 
-from apolo_app_types import AppInputs
+from apolo_app_types import AppInputsV2
 
 
 logger = logging.getLogger()
 
-AppInputT = t.TypeVar("AppInputT", bound="AppInputs")
+AppInputT = t.TypeVar("AppInputT", bound="AppInputsV2")
 
 
 class BaseChartValueProcessor(abc.ABC, t.Generic[AppInputT]):

@@ -49,7 +49,7 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
             "pipeline-parallel-size" in arg for arg in server_extra_args
         )
 
-        if not has_tensor_parallel and not has_pipeline_parallel:
+        if gpu_count > 1 and not has_tensor_parallel and not has_pipeline_parallel:
             parallel_server_args.append(f"--tensor-parallel-size={gpu_count}")
 
         return parallel_server_args

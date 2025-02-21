@@ -1,6 +1,7 @@
 from apolo_app_types.protocols.apolo_deploy import ApoloDeployInputs, ApoloDeployOutputs
 from apolo_app_types.protocols.common import (
     AppInputs,
+    AppInputsV2,
     AppOutputs,
     BasicAuth,
     HuggingFaceModel,
@@ -110,6 +111,7 @@ __all__ = [
     "StableDiffusionInputs",
     "HuggingFaceModel",
     "VLLMOutputsV2",
+    "AppInputsV2",
     "DockerHubInputs",
     "DockerHubOutputs",
 ]

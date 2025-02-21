@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, field_validator
 
 from apolo_app_types.protocols.common import (
-    AppInputs,
+    AppInputsV2,
     AppOutputs,
     BasicAuth,
     Bucket,
@@ -21,7 +21,7 @@ class WeaviateAuthentication(BaseModel):
     enabled: str = "false"
 
 
-class WeaviateInputs(AppInputs):
+class WeaviateInputs(AppInputsV2):
     preset: Preset
     persistence: StorageGB = Field(
         default_factory=lambda: StorageGB(size=WEAVIATE_MIN_GB_STORAGE)
