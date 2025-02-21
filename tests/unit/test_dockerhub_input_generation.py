@@ -2,6 +2,7 @@ import pytest
 
 from apolo_app_types import DockerHubInputs
 from apolo_app_types.app_types import AppType
+from apolo_app_types.protocols.dockerhub import DockerHubModel
 from tests.unit.constants import DEFAULT_NAMESPACE
 
 
@@ -12,8 +13,7 @@ async def test_values_dockerhub_generation_(setup_clients, mock_get_preset_cpu):
     apolo_client = setup_clients
     helm_args, helm_params = await app_type_to_vals(
         input_=DockerHubInputs(
-            username="test",
-            password="test",
+            dockerhub=DockerHubModel(username="test", password="test")
         ),
         apolo_client=apolo_client,
         app_type=AppType.DockerHub,
