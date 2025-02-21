@@ -21,4 +21,4 @@ spec:
         args:
         - "update-outputs"
         - {{ include "filterNonEmptyAndConvertToJson" .Values | squote }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        imagePullPolicy: {{ .Values.appTypesImage.pullPolicy }}
