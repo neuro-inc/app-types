@@ -41,6 +41,7 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
         "--flag1.1 --flag1.2",
         "--flag2",
         "--flag3",
+        "--tensor-parallel-size=0",
     ]
     assert helm_params["affinity"]["nodeAffinity"][
         "requiredDuringSchedulingIgnoredDuringExecution"
@@ -113,6 +114,7 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
         "--flag1.1 --flag1.2",
         "--flag2",
         "--flag3",
+        "--tensor-parallel-size=1",
     ]
     assert helm_params["affinity"]["nodeAffinity"][
         "requiredDuringSchedulingIgnoredDuringExecution"
@@ -172,9 +174,11 @@ async def test_values_llm_generation_cpu_k8s_secret(setup_clients, mock_get_pres
             llm=LLMModel(
                 hugging_face_model=HuggingFaceModel(
                     modelHFName="test",
+                    modelFiles="test",
                     hfToken=K8sSecret(
                         valueFrom=SecretKeyRef(
                             secretKeyRef=Secret(
+                                name="apps-secrets",
                                 key="hf_token",
                             )
                         )
@@ -193,6 +197,7 @@ async def test_values_llm_generation_cpu_k8s_secret(setup_clients, mock_get_pres
         "--flag1.1 --flag1.2",
         "--flag2",
         "--flag3",
+        "--tensor-parallel-size=0",
     ]
     assert helm_params["affinity"]["nodeAffinity"][
         "requiredDuringSchedulingIgnoredDuringExecution"

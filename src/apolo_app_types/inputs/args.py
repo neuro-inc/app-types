@@ -10,10 +10,11 @@ from apolo_app_types.helm.apps import (
 )
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.weaviate import WeaviateChartValueProcessor
+from apolo_app_types.protocols.common import AppInputsV2
 
 
 async def app_type_to_vals(
-    input_: AppInputs,
+    input_: AppInputs | AppInputsV2,
     apolo_client: apolo_sdk.Client,
     app_type: AppType,
     app_name: str,
