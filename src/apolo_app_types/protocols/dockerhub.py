@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from apolo_app_types.protocols.common import AppInputs, AppOutputsV2
+from apolo_app_types.protocols.common import AppInputsV2, AppOutputsV2
 
 
 class DockerHubModel(BaseModel):
@@ -21,7 +21,7 @@ class DockerHubModel(BaseModel):
     )
 
 
-class DockerHubInputs(AppInputs):
+class DockerHubInputs(AppInputsV2):
     dockerhub: DockerHubModel
 
 
