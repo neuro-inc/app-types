@@ -40,7 +40,7 @@ class PostgresDBUser(BaseModel):
     )
 
 
-class Postgres(BaseModel):
+class PostgresConfig(BaseModel):
     postgres_version: PostgresSupportedVersions = Field(
         default=PostgresSupportedVersions.v16,
         description="Postgres version to use.",
@@ -69,7 +69,7 @@ class CrunchyPostgresInputs(AppInputs):
         description="Preset to use for the Postgres instance.",
         title="Preset",
     )
-    postgres: Postgres = Field(
+    postgres_config: PostgresConfig = Field(
         ...,
         description="Postgres configuration.",
         title="Postgres",

@@ -14,7 +14,7 @@ from apolo_app_types.protocols.common.buckets import (
 )
 from apolo_app_types.protocols.postgres import (
     PGBouncer,
-    Postgres,
+    PostgresConfig,
     PostgresDBUser,
     PostgresSupportedVersions,
 )
@@ -31,7 +31,7 @@ async def test_values_postgresql_generation(setup_clients, mock_get_preset_cpu):
             preset=Preset(
                 name="cpu-large",
             ),
-            postgres=Postgres(
+            postgres_config=PostgresConfig(
                 postgres_version=PostgresSupportedVersions.v16,
                 instance_replicas=3,
                 instance_size=1,
@@ -96,7 +96,7 @@ async def test_values_postgresql_generation_without_user(
             preset=Preset(
                 name="cpu-large",
             ),
-            postgres=Postgres(
+            postgres_config=PostgresConfig(
                 postgres_version=PostgresSupportedVersions.v16,
                 instance_replicas=3,
                 instance_size=1,
@@ -168,7 +168,7 @@ async def test_values_postgresql_generation_with_gcp_bucket(
             preset=Preset(
                 name="cpu-large",
             ),
-            postgres=Postgres(
+            postgres_config=PostgresConfig(
                 postgres_version=PostgresSupportedVersions.v16,
                 instance_replicas=3,
                 instance_size=1,
@@ -230,7 +230,7 @@ async def test_values_postgresql_generation_with_minio(
             preset=Preset(
                 name="cpu-large",
             ),
-            postgres=Postgres(
+            postgres_config=PostgresConfig(
                 postgres_version=PostgresSupportedVersions.v16,
                 instance_replicas=3,
                 instance_size=1,
@@ -302,7 +302,7 @@ async def test_values_postgresql_generation_without_matching_bucket_and_creds(
                 preset=Preset(
                     name="cpu-large",
                 ),
-                postgres=Postgres(
+                postgres=PostgresConfig(
                     postgres_version=PostgresSupportedVersions.v16,
                     instance_replicas=3,
                     instance_size=1,

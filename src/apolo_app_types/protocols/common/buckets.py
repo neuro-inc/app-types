@@ -1,7 +1,6 @@
 import enum
-import typing
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field
 
 
 class CredentialsType(str, enum.Enum):
@@ -112,26 +111,3 @@ class Bucket(BaseModel):
         description="The provider of the bucket.",
         title="Bucket provider",
     )
-
-    @model_validator(mode="before")
-    @classmethod
-    def validate_credentials(
-        cls, value: dict[str, typing.Any], _: typing.Any
-    ) -> dict[str, typing.Any]:
-        provider = value.get("bucket_provider")
-        if provider:
-            provider_mapping_creds = {
-                BucketProvider.AWS: S3BucketCredentials,
-                BucketProvider.MINIO: MinioBucketCredentials,
-                BucketProvider.GCP: GCPBucketCredentials,
-            }
-            expected_model = provider_mapping_creds.get(provider)
-            creds: list[typing.Any] = value["credentials"]
-
-            if expected_model and not all(isinstance(_, expected_model) for _ in creds):
-                err_msg = (
-                    f"Credentials must be of type "
-                    f"{expected_model.__name__} for provider {provider}"
-                )
-                raise ValueError(err_msg)
-        return value

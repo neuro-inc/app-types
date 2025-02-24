@@ -189,8 +189,8 @@ class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
         """
         instances = self._gen_instances_config(
             instance_preset_name=input_.preset.name,
-            instance_replicas=input_.postgres.instance_replicas,
-            instances_size=input_.postgres.instance_size,
+            instance_replicas=input_.postgres_config.instance_replicas,
+            instances_size=input_.postgres_config.instance_size,
         )
 
         bouncer_preset_name = input_.pg_bouncer.preset.name
@@ -207,7 +207,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
                 "AutoCreateUserSchema": "true",
             },
         }
-        users_config = self._create_users_config(input_.postgres.db_users)
+        users_config = self._create_users_config(input_.postgres_config.db_users)
 
         if instances:
             values["instances"] = instances
