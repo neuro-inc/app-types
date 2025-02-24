@@ -12,6 +12,8 @@ from apolo_app_types.protocols.postgres import PostgresOutputsV2
 
 logger = logging.getLogger()
 
+MAX_SLEEP_SEC = 10
+
 
 def postgres_creds_from_kube_secret_data(
     secret_data: dict[str, str],
@@ -39,17 +41,17 @@ def postgres_creds_from_kube_secret_data(
 
 
 async def get_postgres_outputs(
-    helm_values: dict[str, t.Any],
+    _: dict[str, t.Any],
 ) -> dict[str, t.Any]:
-    for trial in range(1, 10):
-        print("Trying to get postgres outputs")  # noqa: T201
+    for trial in range(1, MAX_SLEEP_SEC):
+        logger.info("Trying to get postgres outputs")  # noqa: T201
         secrets = await get_secret(
             label="postgres-operator.crunchydata.com/role=pguser"
         )
         if secrets:
             break
-        print(  # noqa: T201
-            f"Failed to get postgres outputs, retrying in {trial} seconds"
+        logger.info(  # noqa: T201
+            "Failed to get postgres outputs, retrying in %s seconds", trial
         )
         await asyncio.sleep(trial)
     else:
