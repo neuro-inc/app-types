@@ -104,5 +104,9 @@ class CrunchyPostgresOutputs(AppOutputs):
     users: list[CrunchyPostgresUserCredentials]
 
 
-class PostgresOutputsV2(AppOutputsV2):
+class PostgresUsers(BaseModel):
     users: list[CrunchyPostgresUserCredentials]
+
+
+class PostgresOutputsV2(AppOutputsV2):
+    postgres_users: PostgresUsers | None = None

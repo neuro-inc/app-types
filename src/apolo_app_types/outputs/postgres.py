@@ -7,7 +7,7 @@ from apolo_app_types import (
     CrunchyPostgresUserCredentials,
 )
 from apolo_app_types.clients.kube import get_secret
-from apolo_app_types.protocols.postgres import PostgresOutputsV2
+from apolo_app_types.protocols.postgres import PostgresOutputsV2, PostgresUsers
 
 
 logger = logging.getLogger()
@@ -41,7 +41,7 @@ def postgres_creds_from_kube_secret_data(
 
 
 async def get_postgres_outputs(
-    _: dict[str, t.Any],
+    helm_values: dict[str, t.Any],
 ) -> dict[str, t.Any]:
     for trial in range(1, MAX_SLEEP_SEC):
         logger.info("Trying to get postgres outputs")  # noqa: T201
@@ -61,4 +61,4 @@ async def get_postgres_outputs(
 
     for item in secrets["items"]:
         users.append(postgres_creds_from_kube_secret_data(item["data"]))
-    return PostgresOutputsV2(users=users).model_dump()
+    return PostgresOutputsV2(postgres_users=PostgresUsers(users=users)).model_dump()
