@@ -53,8 +53,8 @@ class PostgresConfig(BaseModel):
     )
     instance_size: int = Field(
         default=1,
-        description="Size of the Postgres instance.",
-        title="Postgres instance size",
+        description="Size of the Postgres instance disk.",
+        title="Postgres instance disk size",
     )
     db_users: list[PostgresDBUser] = Field(
         default_factory=list,
