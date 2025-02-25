@@ -1,6 +1,6 @@
 import enum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, SecretStr
 
 
 class CredentialsType(str, enum.Enum):
@@ -35,7 +35,7 @@ class MinioBucketCredentials(BucketCredentials):
         description="The access key ID of the bucket.",
         title="Bucket access key ID",
     )
-    secret_access_key: str = Field(
+    secret_access_key: SecretStr = Field(
         ...,
         description="The secret access key of the bucket.",
         title="Bucket secret access key",
@@ -58,7 +58,7 @@ class S3BucketCredentials(BucketCredentials):
         description="The access key ID of the bucket.",
         title="Bucket access key ID",
     )
-    secret_access_key: str = Field(
+    secret_access_key: SecretStr = Field(
         ...,
         description="The secret access key of the bucket.",
         title="Bucket secret access key",

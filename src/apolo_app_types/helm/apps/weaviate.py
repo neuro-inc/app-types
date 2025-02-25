@@ -66,7 +66,7 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
             [
                 bucket_credentials.name,
                 bucket_credentials.access_key_id,
-                bucket_credentials.secret_access_key,
+                bucket_credentials.secret_access_key.get_secret_value(),
                 s3_endpoint,
                 bucket_credentials.region_name,
             ]
@@ -84,7 +84,7 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
                 },
                 "secrets": {
                     "AWS_ACCESS_KEY_ID": bucket_credentials.access_key_id,
-                    "AWS_SECRET_ACCESS_KEY": bucket_credentials.secret_access_key,
+                    "AWS_SECRET_ACCESS_KEY": bucket_credentials.secret_access_key.get_secret_value(),
                 },
             }
         }
