@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, SecretStr
 
 from apolo_app_types.protocols.common import AppInputsV2, AppOutputsV2
 
@@ -14,7 +14,7 @@ class DockerHubModel(BaseModel):
         description="The username to access the registry.",
         title="Username",
     )
-    password: str = Field(  # noqa: N815
+    password: SecretStr = Field(  # noqa: N815
         ...,
         description="The password to access the registry.",
         title="Password",

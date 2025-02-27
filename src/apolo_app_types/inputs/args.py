@@ -2,7 +2,7 @@ import typing as t
 
 import apolo_sdk
 
-from apolo_app_types import AppInputs, LLMInputs, StableDiffusionInputs, WeaviateInputs
+from apolo_app_types import LLMInputs, StableDiffusionInputs, WeaviateInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps import (
     LLMChartValueProcessor,
@@ -16,7 +16,7 @@ from apolo_app_types.protocols.dockerhub import DockerHubInputs
 
 
 async def app_type_to_vals(
-    input_: AppInputs | AppInputsV2,
+    input_: AppInputsV2,
     apolo_client: apolo_sdk.Client,
     app_type: AppType,
     app_name: str,
