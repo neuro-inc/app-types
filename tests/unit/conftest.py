@@ -2,7 +2,7 @@ import base64
 from contextlib import AsyncExitStack
 from datetime import datetime
 from decimal import Decimal
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 
 import pytest
 from apolo_sdk import AppsConfig
@@ -20,6 +20,7 @@ async def setup_clients():
                 hostname_templates=["{app_names}.apps.some.org.neu.ro"]
             )
             mock_apolo_client.config.get_cluster = MagicMock(return_value=mock_cluster)
+            mock_apolo_client.username = PropertyMock(return_value="test-user")
             mock_bucket = Bucket(
                 id="bucket-id",
                 owner="owner",

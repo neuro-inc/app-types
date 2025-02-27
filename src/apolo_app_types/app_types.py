@@ -2,6 +2,7 @@ import enum
 
 from apolo_app_types import StableDiffusionInputs
 from apolo_app_types.protocols.common import AppInputs
+from apolo_app_types.protocols.dockerhub import DockerHubInputs
 from apolo_app_types.protocols.llm import LLMInputs
 from apolo_app_types.protocols.weaviate import WeaviateInputs
 
@@ -21,6 +22,7 @@ class AppType(enum.StrEnum):
     MLFlow = "mlflow"
     Shell = "shell"
     ApoloDeploy = "apolo-deploy"
+    DockerHub = "dockerhub"
 
     def __repr__(self) -> str:
         return str(self)
@@ -45,6 +47,8 @@ class AppType(enum.StrEnum):
             return AppType.Weaviate
         if isinstance(inputs, StableDiffusionInputs):
             return AppType.StableDiffusion
+        if isinstance(inputs, DockerHubInputs):
+            return AppType.DockerHub
 
         error_message = f"Unsupported input type: {type(inputs).__name__}"
         raise ValueError(error_message)
