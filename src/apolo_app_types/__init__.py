@@ -1,6 +1,7 @@
 from apolo_app_types.protocols.apolo_deploy import ApoloDeployInputs, ApoloDeployOutputs
 from apolo_app_types.protocols.common import (
     AppInputs,
+    AppInputsV2,
     AppOutputs,
     BasicAuth,
     HuggingFaceModel,
@@ -20,6 +21,11 @@ from apolo_app_types.protocols.dify import (
     DifyProxy,
     DifyWeb,
     DifyWorker,
+)
+from apolo_app_types.protocols.dockerhub import (
+    DockerConfigModel,
+    DockerHubInputs,
+    DockerHubOutputs,
 )
 from apolo_app_types.protocols.fooocus import FooocusInputs, FooocusOutputs
 from apolo_app_types.protocols.jupyter import (
@@ -112,4 +118,8 @@ __all__ = [
     "StableDiffusionInputs",
     "HuggingFaceModel",
     "VLLMOutputsV2",
+    "AppInputsV2",
+    "DockerHubInputs",
+    "DockerHubOutputs",
+    "DockerConfigModel",
 ]

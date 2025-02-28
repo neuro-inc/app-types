@@ -2,7 +2,7 @@ import typing as t
 
 import apolo_sdk
 
-from apolo_app_types import AppInputs, LLMInputs, StableDiffusionInputs, WeaviateInputs
+from apolo_app_types import LLMInputs, StableDiffusionInputs, WeaviateInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps import (
     CustomDeploymentChartValueProcessor,
@@ -10,11 +10,14 @@ from apolo_app_types.helm.apps import (
     StableDiffusionChartValueProcessor,
 )
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
+from apolo_app_types.helm.apps.dockerhub import DockerHubModelChartValueProcessor
 from apolo_app_types.helm.apps.weaviate import WeaviateChartValueProcessor
+from apolo_app_types.protocols.common import AppInputsV2
+from apolo_app_types.protocols.dockerhub import DockerHubInputs
 
 
 async def app_type_to_vals(
-    input_: AppInputs,
+    input_: AppInputsV2,
     apolo_client: apolo_sdk.Client,
     app_type: AppType,
     app_name: str,
@@ -25,7 +28,8 @@ async def app_type_to_vals(
         AppType.LLMInference: LLMChartValueProcessor,
         AppType.StableDiffusion: StableDiffusionChartValueProcessor,
         AppType.Weaviate: WeaviateChartValueProcessor,
-        AppType.CustomApp: CustomDeploymentChartValueProcessor,
+        AppType.DockerHub: DockerHubModelChartValueProcessor,
+        AppType.CustomDeployment: CustomDeploymentChartValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)
@@ -53,6 +57,7 @@ async def get_installation_vals(
         AppType.LLMInference: LLMInputs,
         AppType.StableDiffusion: StableDiffusionInputs,
         AppType.Weaviate: WeaviateInputs,
+        AppType.DockerHub: DockerHubInputs,
     }
 
     if app_type not in input_type_map:

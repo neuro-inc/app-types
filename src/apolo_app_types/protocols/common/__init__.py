@@ -2,7 +2,7 @@ from .auth import BasicAuth
 from .buckets import Bucket
 from .hugging_face import HuggingFaceModel
 from .ingress import Ingress, IngressGrpc
-from .inputs import AppInputs
+from .inputs import AppInputs, AppInputsV2
 from .networking import GraphQLAPI, GrpcAPI, RestAPI
 from .outputs import AppOutputs, AppOutputsV2
 from .postgres import Postgres
@@ -32,4 +32,5 @@ __all__ = [
     "OptionalStrOrSecret",
     "Bucket",
     "AppOutputsV2",
+    "AppInputsV2",
 ]

@@ -4,6 +4,7 @@ import typing as t
 import httpx
 
 from apolo_app_types.app_types import AppType
+from apolo_app_types.outputs.dockerhub import get_dockerhub_outputs
 from apolo_app_types.outputs.llm import get_llm_inference_outputs
 from apolo_app_types.outputs.stable_diffusion import get_stable_diffusion_outputs
 from apolo_app_types.outputs.weaviate import get_weaviate_outputs
@@ -37,6 +38,8 @@ async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> None:
             conv_outputs = await get_stable_diffusion_outputs(helm_outputs)
         elif app_type == AppType.Weaviate:
             conv_outputs = await get_weaviate_outputs(helm_outputs)
+        elif app_type == AppType.DockerHub:
+            conv_outputs = await get_dockerhub_outputs(helm_outputs)
         else:
             err_msg = f"Unsupported app type: {app_type} for posting outputs"
             raise ValueError(err_msg)

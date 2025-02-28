@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 
 from apolo_app_types.protocols.common import (
     AppInputs,
+    AppInputsV2,
     AppOutputs,
     AppOutputsV2,
     HuggingFaceModel,
@@ -34,7 +35,7 @@ class StableDiffusionParams(BaseModel):
     )
 
 
-class StableDiffusionInputs(AppInputs):
+class StableDiffusionInputs(AppInputsV2):
     ingress: Ingress
     preset: Preset
     stable_diffusion: StableDiffusionParams  # noqa: N815

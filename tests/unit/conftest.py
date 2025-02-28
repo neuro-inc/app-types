@@ -2,7 +2,7 @@ import base64
 from contextlib import AsyncExitStack
 from datetime import datetime
 from decimal import Decimal
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 
 import pytest
 from apolo_sdk import AppsConfig
@@ -20,6 +20,7 @@ async def setup_clients():
                 hostname_templates=["{app_names}.apps.some.org.neu.ro"]
             )
             mock_apolo_client.config.get_cluster = MagicMock(return_value=mock_cluster)
+            mock_apolo_client.username = PropertyMock(return_value="test-user")
             mock_bucket = Bucket(
                 id="bucket-id",
                 owner="owner",
@@ -101,6 +102,23 @@ def mock_get_preset_gpu():
         from apolo_sdk import Preset
 
         def return_preset(_, preset_name):
+            if preset_name == "gpu-large":
+                return Preset(
+                    credits_per_hour=Decimal("1.0"),
+                    cpu=1.0,
+                    memory=100,
+                    nvidia_gpu=4,
+                    available_resource_pool_names=("gpu_pool",),
+                )
+            if preset_name == "gpu-xlarge":
+                return Preset(
+                    credits_per_hour=Decimal("1.0"),
+                    cpu=1.0,
+                    memory=100,
+                    nvidia_gpu=8,
+                    available_resource_pool_names=("gpu_pool",),
+                )
+            # Fallback (e.g., "gpu-large" = 1 GPU)
             return Preset(
                 credits_per_hour=Decimal("1.0"),
                 cpu=1.0,

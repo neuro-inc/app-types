@@ -1,2 +1,7 @@
 nameOverride: ""
 fullnameOverride: ""
+
+appTypesImage:
+  repository: "ghcr.io/neuro-inc/post-deployment-app-hook"
+  tag: "development"
+  pullPolicy: "IfNotPresent"
