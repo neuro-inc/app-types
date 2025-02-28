@@ -86,3 +86,21 @@ async def get_service_host_port(match_labels: dict[str, str]) -> tuple[str, str]
     post = str(service["spec"]["ports"][0]["port"])
 
     return host, post
+
+
+async def get_secret(label: str) -> dict[str, typing.Any]:
+    try:
+        config.load_incluster_config()
+
+        v1 = client.CoreV1Api()
+        namespace = get_current_namespace()
+
+        return v1.list_namespaced_secret(
+            namespace=namespace,
+            label_selector=label,
+        )
+
+    except ApiException as e:
+        err_msg = f"Exception when calling CoreV1Api->read_namespaced_secret: {e}"
+        logger.error(err_msg)
+        raise e
