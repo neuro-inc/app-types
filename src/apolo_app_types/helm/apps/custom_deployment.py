@@ -25,7 +25,7 @@ class CustomDeploymentChartValueProcessor(
         # preset: Preset = get_preset(self.client, preset_name)
         return {
             "image": {
-                "repository": input_.image.repository,  # type: ignore
-                "tag": input_.image.tag or "latest",  # type: ignore
+                "repository": input_.custom_deployment.image.repository,
+                "tag": input_.custom_deployment.image.tag or "latest",
             }
         }

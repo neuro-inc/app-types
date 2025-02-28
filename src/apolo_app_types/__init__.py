@@ -11,6 +11,7 @@ from apolo_app_types.protocols.common import (
 )
 from apolo_app_types.protocols.common.buckets import Bucket
 from apolo_app_types.protocols.custom_deployment import (
+    ContainerImage,
     CustomDeploymentInputs,
     CustomDeploymentOutputs,
 )
@@ -122,4 +123,5 @@ __all__ = [
     "DockerHubInputs",
     "DockerHubOutputs",
     "DockerConfigModel",
+    "ContainerImage",
 ]

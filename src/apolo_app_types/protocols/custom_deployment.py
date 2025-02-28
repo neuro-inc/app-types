@@ -1,9 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from apolo_app_types.protocols.common import AppInputs, AppOutputs
+from apolo_app_types.protocols.common import AppInputsV2, AppOutputsV2, RestAPI
 
 
-class Image(BaseModel):
+class ContainerImage(BaseModel):
     repository: str
     tag: str | None = None
 
@@ -26,23 +26,24 @@ class Container(BaseModel):
     env: list[Env] | None = None
 
 
-class CustomDeploymentInputs(AppInputs):
-    preset_name: str
-    http_auth: bool = True
-    name_override: str
-    image: Image | None = None
-    autoscaling: Autoscaling | None = None
-    container: Container | None = None
+class CustomDeploymentModel(BaseModel):
+    preset_name: str = Field(description="Name of the preset configuration to use")
+    http_auth: bool = Field(
+        default=True, description="Enable/disable HTTP authentication"
+    )
+    name_override: str = Field(description="Override name for the deployment")
+    image: ContainerImage = Field(..., description="Container image configuration")
+    autoscaling: Autoscaling | None = Field(
+        default=None, description="Autoscaling configuration. Currently not used"
+    )
+    container: Container | None = Field(
+        default=None, description="Container configuration settings"
+    )
 
 
-class CustomDeploymentOutputs(AppOutputs):
-    internal_web_app_url: str
+class CustomDeploymentInputs(AppInputsV2):
+    custom_deployment: CustomDeploymentModel
 
 
-class CustomDeployment(BaseModel):
-    preset_name: str
-    http_auth: bool = True
-    name_override: str
-    image: Image | None = None
-    autoscaling: Autoscaling | None = None
-    container: Container | None = None
+class CustomDeploymentOutputs(AppOutputsV2):
+    internal_web_app_url: RestAPI
