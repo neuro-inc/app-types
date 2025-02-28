@@ -2,8 +2,8 @@ import enum
 
 from pydantic import BaseModel, Field
 
-from apolo_app_types import Bucket
-from apolo_app_types.protocols.common import AppInputs, AppOutputs, AppOutputsV2, Preset
+from apolo_app_types import AppInputsV2, Bucket
+from apolo_app_types.protocols.common import AppOutputs, AppOutputsV2, Preset
 
 
 class PGBouncer(BaseModel):
@@ -63,7 +63,7 @@ class PostgresConfig(BaseModel):
     )
 
 
-class CrunchyPostgresInputs(AppInputs):
+class CrunchyPostgresInputs(AppInputsV2):
     preset: Preset = Field(
         ...,
         description="Preset to use for the Postgres instance.",
