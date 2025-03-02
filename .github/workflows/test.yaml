@@ -27,8 +27,7 @@ jobs:
           path: ~/.cache/pre-commit
           key: pre-commit|py3.11|${{ hashFiles('.pre-commit-config.yaml') }}
       - name: Install Poetry
-        run: |
-          pip install poetry
+        run: pip install poetry
       - name: Setup Python dependencies cache
         uses: actions/cache@v4
         with:
@@ -55,6 +54,8 @@ jobs:
         with:
           python-version-file: .python-version
           cache: pip
+      - name: Install Poetry
+        run: pip install poetry
       - name: Setup Python dependencies cache
         uses: actions/cache@v4
         with:
