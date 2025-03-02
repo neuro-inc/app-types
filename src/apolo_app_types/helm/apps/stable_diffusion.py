@@ -33,8 +33,7 @@ class StableDiffusionChartValueProcessor(
             commandline_args = basic_cmd_args
         else:
             commandline_args = (
-                f"{basic_cmd_args} "
-                f"--lowvram --use-cpu all --no-half --precision full"
+                f"{basic_cmd_args} --lowvram --use-cpu all --no-half --precision full"
             )
 
         env_vars: dict[str, t.Any] = {"COMMANDLINE_ARGS": commandline_args}

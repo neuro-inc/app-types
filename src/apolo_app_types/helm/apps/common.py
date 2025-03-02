@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import re
@@ -10,7 +11,11 @@ import yaml
 from apolo_sdk import Preset
 
 from apolo_app_types.helm.apps.ingress import get_ingress_values
-from apolo_app_types.protocols.common import Ingress, Preset as PresetType
+from apolo_app_types.protocols.common import (
+    ApoloStorageMount,
+    Ingress,
+    Preset as PresetType,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -173,6 +178,30 @@ def sanitize_dict_string(
         sec_re = re.compile(f"({'|'.join(secrets)})")  # noqa: arg-type
         return sec_re.sub("****", dict_str)
     return dict_str
+
+
+def gen_apolo_storage_integration_annotations(
+    storage_mounts: t.Sequence[ApoloStorageMount],
+) -> dict[str, str]:
+    storage_mount_annotations = []
+    for storage_mount in storage_mounts:
+        storage_mount_annotations.append(
+            {
+                "storage_path": storage_mount.storage_path.path,
+                "mount_path": storage_mount.mount_path.path,
+                "mount_mode": storage_mount.mode.mode.value,
+            }
+        )
+    return {"platform.apolo.us/inject-storage": json.dumps(storage_mount_annotations)}
+
+
+def gen_apolo_storage_integration_labels(
+    *,
+    inject_storage: bool = False,
+) -> dict[str, str]:
+    if inject_storage:
+        return {"platform.apolo.us/inject-storage": "true"}
+    return {}
 
 
 async def gen_extra_values(

@@ -82,7 +82,7 @@ async def get_service_host_port(match_labels: dict[str, str]) -> tuple[str, str]
         logger.warning(msg)
 
     service = services[0]
-    host = f'{service["metadata"]["name"]}.{service["metadata"]["namespace"]}'
+    host = f"{service['metadata']['name']}.{service['metadata']['namespace']}"
     post = str(service["spec"]["ports"][0]["port"])
 
     return host, post

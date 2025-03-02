@@ -21,9 +21,9 @@ async def _get_ingress_name_template(client: apolo_sdk.Client) -> str:
     if apps_config.hostname_templates:
         # multi-domain clusters are not supported on the backend yet
         template = apps_config.hostname_templates[0]
-        assert (
-            len(re.findall(F_STRING_EXPRESSION_RE, template)) == 1
-        ), "Invalid template"
+        assert len(re.findall(F_STRING_EXPRESSION_RE, template)) == 1, (
+            "Invalid template"
+        )
 
         return re.sub(F_STRING_EXPRESSION_RE, APP_NAME_F_STRING_EXPRESSION, template)
 

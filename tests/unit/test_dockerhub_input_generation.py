@@ -3,6 +3,7 @@ import pytest
 from apolo_app_types import DockerHubInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.protocols.dockerhub import DockerHubModel
+
 from tests.unit.constants import DEFAULT_NAMESPACE
 
 

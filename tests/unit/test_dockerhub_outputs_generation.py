@@ -4,6 +4,7 @@ import json
 import pytest
 
 from apolo_app_types.outputs.dockerhub import get_dockerhub_outputs
+
 from tests.unit.constants import DEFAULT_NAMESPACE
 
 
