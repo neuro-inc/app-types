@@ -12,6 +12,10 @@ else
 	pre-commit run --all-files
 endif
 
+.PHONY: setup
+setup:
+	poetry install --with dev
+	poetry run pre-commit install;
 
 .PHONY: lint
 lint: fmt ### Reformat files, run linters and mypy checks
