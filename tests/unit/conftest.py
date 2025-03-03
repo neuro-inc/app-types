@@ -8,6 +8,11 @@ import pytest
 from apolo_sdk import AppsConfig
 
 
+def encode_b64(value: str) -> str:
+    """Helper function to encode a string in Base64."""
+    return base64.b64encode(value.encode()).decode()
+
+
 @pytest.fixture
 async def setup_clients():
     from apolo_sdk import Bucket, BucketCredentials, PersistentBucketCredentials
@@ -213,6 +218,41 @@ def mock_kubernetes_client():
         mock_networking_instance.list_namespaced_ingress.side_effect = (
             list_namespace_ingress
         )
+
+        def list_namespace_secret(namespace: str, label_selector: str):
+            return {
+                "items": [
+                    {
+                        "metadata": {
+                            "name": "llm-inference",
+                            "namespace": namespace,
+                        },
+                        "data": {
+                            "user": encode_b64("admin"),
+                            "password": encode_b64("supersecret"),
+                            "host": encode_b64("db.example.com"),
+                            "port": encode_b64("5432"),
+                            "pgbouncer-host": encode_b64("pgbouncer.example.com"),
+                            "pgbouncer-port": encode_b64("6432"),
+                            "dbname": encode_b64("mydatabase"),
+                            "jdbc-uri": encode_b64(
+                                "jdbc:postgresql://db.example.com:5432/mydatabase"
+                            ),
+                            "pgbouncer-jdbc-uri": encode_b64(
+                                "jdbc:postgresql://pgbouncer.example.com:6432/mydatabase"
+                            ),
+                            "pgbouncer-uri": encode_b64(
+                                "postgres://pgbouncer.example.com:6432/mydatabase"
+                            ),
+                            "uri": encode_b64(
+                                "postgres://db.example.com:5432/mydatabase"
+                            ),
+                        },
+                    }
+                ]
+            }
+
+        mock_v1_instance.list_namespaced_secret.side_effect = list_namespace_secret
 
         yield {
             "mock_load_config": mock_load_config,
