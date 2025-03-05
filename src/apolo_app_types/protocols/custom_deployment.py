@@ -20,6 +20,7 @@ class AutoscalingHPA(AutoscalingBase):
     target_cpu_utilization_percentage: int | None = None
     target_memory_utilization_percentage: int | None = None
 
+
 class Env(BaseModel):
     name: str
     value: str
