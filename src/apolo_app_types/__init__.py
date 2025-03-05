@@ -112,8 +112,6 @@ __all__ = [
     "JupyterTypes",
     "PrivateGPTInputs",
     "PrivateGPTOutputs",
-    "CustomDeploymentInputs",
-    "CustomDeploymentOutputs",
     "K8sSecret",
     "StrOrSecret",
     "OptionalStrOrSecret",
@@ -127,5 +125,7 @@ __all__ = [
     "DockerHubInputs",
     "DockerHubOutputs",
     "DockerConfigModel",
+    "CustomDeploymentInputs",
+    "CustomDeploymentOutputs",
     "ContainerImage",
 ]

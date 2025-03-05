@@ -8,12 +8,17 @@ class ContainerImage(BaseModel):
     tag: str | None = None
 
 
-class Autoscaling(BaseModel):
+class AutoscalingBase(BaseModel):
+    type: str
     enabled: bool | None = None
     min_replicas: int | None = None
     max_replicas: int | None = None
-    target_cpu_utilization_percentage: int | None = None
 
+
+class AutoscalingHPA(AutoscalingBase):
+    type: str = "HPA"
+    target_cpu_utilization_percentage: int | None = None
+    target_memory_utilization_percentage: int | None = None
 
 class Env(BaseModel):
     name: str
@@ -33,7 +38,7 @@ class CustomDeploymentModel(BaseModel):
     )
     name_override: str = Field(description="Override name for the deployment")
     image: ContainerImage = Field(..., description="Container image configuration")
-    autoscaling: Autoscaling | None = Field(
+    autoscaling: AutoscalingHPA | None = Field(
         default=None, description="Autoscaling configuration. Currently not used"
     )
     container: Container | None = Field(
