@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 
-from apolo_app_types.protocols.common import AppInputsV2, AppOutputsV2, RestAPI
+from apolo_app_types.protocols.common import AppInputsV2, AppOutputsV2, Preset, RestAPI
+from apolo_app_types.protocols.common.ingress import Ingress
 
 
 class ContainerImage(BaseModel):
@@ -38,7 +39,7 @@ class Service(BaseModel):
 
 
 class CustomDeploymentModel(BaseModel):
-    preset_name: str = Field(description="Name of the preset configuration to use")
+    preset: Preset = Field(description="Name of the preset configuration to use")
     http_auth: bool = Field(
         default=True, description="Enable/disable HTTP authentication"
     )
@@ -52,6 +53,9 @@ class CustomDeploymentModel(BaseModel):
     )
     service: Service | None = Field(
         default=None, description="Service configuration settings"
+    )
+    ingress: Ingress | None = Field(
+        default=None, description="Ingress configuration settings"
     )
 
 

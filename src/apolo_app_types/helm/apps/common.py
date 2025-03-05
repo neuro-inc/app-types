@@ -187,8 +187,8 @@ def sanitize_dict_string(
 async def gen_extra_values(
     apolo_client: apolo_sdk.Client,
     preset_type: PresetType,
-    ingress: Ingress,
-    namespace: str,
+    ingress: Ingress | None = None,
+    namespace: str | None = None,
 ) -> dict[str, t.Any]:
     preset_name = preset_type.name
     if not preset_name:
@@ -199,9 +199,12 @@ async def gen_extra_values(
     tolerations_vals = preset_to_tolerations(preset)
     affinity_vals = preset_to_affinity(preset)
     resources_vals = preset_to_resources(preset)
-    ingress_vals: dict[str, t.Any] = await get_ingress_values(
-        apolo_client, ingress, namespace
-    )
+    ingress_vals: dict[str, t.Any] = {}
+    if ingress:
+        if not namespace:
+            exception_msg = "Namespace is required when ingress is provided."
+            raise ValueError(exception_msg)
+        ingress_vals = await get_ingress_values(apolo_client, ingress, namespace)
 
     return {
         "preset_name": preset_name,

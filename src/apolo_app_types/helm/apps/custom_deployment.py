@@ -3,11 +3,7 @@ import typing as t
 from apolo_app_types import CustomDeploymentInputs
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
-    Preset,
-    get_preset,
-    preset_to_affinity,
-    preset_to_resources,
-    preset_to_tolerations,
+    gen_extra_values,
 )
 
 
@@ -28,19 +24,18 @@ class CustomDeploymentChartValueProcessor(
         """
         Generate extra Helm values for Custom Deployment.
         """
-        preset_name = input_.custom_deployment.preset_name
-        preset: Preset = get_preset(self.client, preset_name)
-        resources = preset_to_resources(preset)
-        tolerations = preset_to_tolerations(preset)
-        affinity = preset_to_affinity(preset)
+        extra_values = await gen_extra_values(
+            apolo_client=self.client,
+            preset_type=input_.custom_deployment.preset,
+            namespace=namespace,
+            ingress=input_.custom_deployment.ingress,
+        )
         values: dict[str, t.Any] = {
             "image": {
                 "repository": input_.custom_deployment.image.repository,
                 "tag": input_.custom_deployment.image.tag or "latest",
             },
-            "resources": resources,
-            "affinity": affinity,
-            "tolerations": tolerations,
+            **extra_values,
         }
 
         if input_.custom_deployment.container:
