@@ -2,6 +2,13 @@ import typing as t
 
 from apolo_app_types import CustomDeploymentInputs
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
+from apolo_app_types.helm.apps.common import (
+    Preset,
+    get_preset,
+    preset_to_affinity,
+    preset_to_resources,
+    preset_to_tolerations,
+)
 
 
 class CustomDeploymentChartValueProcessor(
@@ -19,16 +26,23 @@ class CustomDeploymentChartValueProcessor(
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
         """
-        Generate extra Helm values for LLM configuration.
+        Generate extra Helm values for Custom Deployment.
         """
-        # preset_name = input_.preset_name
-        # preset: Preset = get_preset(self.client, preset_name)
+        preset_name = input_.custom_deployment.preset_name
+        preset: Preset = get_preset(self.client, preset_name)
+        resources = preset_to_resources(preset)
+        tolerations = preset_to_tolerations(preset)
+        affinity = preset_to_affinity(preset)
         values: dict[str, t.Any] = {
             "image": {
                 "repository": input_.custom_deployment.image.repository,
                 "tag": input_.custom_deployment.image.tag or "latest",
-            }
+            },
+            "resources": resources,
+            "affinity": affinity,
+            "tolerations": tolerations,
         }
+
         if input_.custom_deployment.container:
             values["container"] = {
                 "command": input_.custom_deployment.container.command,

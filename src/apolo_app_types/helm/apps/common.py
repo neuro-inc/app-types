@@ -3,6 +3,7 @@ import os
 import re
 import typing as t
 from copy import deepcopy
+from decimal import Decimal
 
 import apolo_sdk
 import click
@@ -17,6 +18,14 @@ logger = logging.getLogger(__name__)
 
 
 def get_preset(client: apolo_sdk.Client, preset_name: str) -> apolo_sdk.Preset:
+    if os.environ.get("ENV") == "local":
+        return Preset(
+            credits_per_hour=Decimal(1.0),
+            cpu=1,
+            memory=1024,
+            resource_pool_names=("platform.neuromation.io/nodepool=default",),
+            available_resource_pool_names=("platform.neuromation.io/nodepool=default",),
+        )
     preset = client.config.presets.get(preset_name)
     if not preset:
         msg = f"Preset {preset_name} not exist in cluster {client.config.cluster_name}"
