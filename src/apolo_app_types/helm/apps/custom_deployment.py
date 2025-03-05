@@ -23,7 +23,7 @@ class CustomDeploymentChartValueProcessor(
         """
         # preset_name = input_.preset_name
         # preset: Preset = get_preset(self.client, preset_name)
-        values = {
+        values: dict[str, t.Any] = {
             "image": {
                 "repository": input_.custom_deployment.image.repository,
                 "tag": input_.custom_deployment.image.tag or "latest",
@@ -38,13 +38,29 @@ class CustomDeploymentChartValueProcessor(
                     for env in input_.custom_deployment.container.env
                 ],
             }
-        if input_.custom_deployment.autoscaling and input_.custom_deployment.autoscaling.enabled:
+        if (
+            input_.custom_deployment.service
+            and input_.custom_deployment.service.enabled
+        ):
+            values["service"] = {
+                "enabled": True,
+                "port": input_.custom_deployment.service.port,
+            }
+
+        if (
+            input_.custom_deployment.autoscaling
+            and input_.custom_deployment.autoscaling.enabled
+        ):
             values["autoscaling"] = {
                 "enabled": True,
                 "type": input_.custom_deployment.autoscaling.type,
                 "min_replicas": input_.custom_deployment.autoscaling.min_replicas,
                 "max_replicas": input_.custom_deployment.autoscaling.max_replicas,
-                "target_cpu_utilization_percentage": input_.custom_deployment.autoscaling.target_cpu_utilization_percentage,
-                "target_memory_utilization_percentage": input_.custom_deployment.autoscaling.target_memory_utilization_percentage,
+                "target_cpu_utilization_percentage": (
+                    input_.custom_deployment.autoscaling.target_cpu_utilization_percentage
+                ),
+                "target_memory_utilization_percentage": (
+                    input_.custom_deployment.autoscaling.target_memory_utilization_percentage
+                ),
             }
         return values

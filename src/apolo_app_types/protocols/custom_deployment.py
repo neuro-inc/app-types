@@ -29,7 +29,12 @@ class Env(BaseModel):
 class Container(BaseModel):
     command: list[str] | None = None
     args: list[str] | None = None
-    env: list[Env] | None = None
+    env: list[Env] = Field(default_factory=list)
+
+
+class Service(BaseModel):
+    enabled: bool
+    port: int
 
 
 class CustomDeploymentModel(BaseModel):
@@ -44,6 +49,9 @@ class CustomDeploymentModel(BaseModel):
     )
     container: Container | None = Field(
         default=None, description="Container configuration settings"
+    )
+    service: Service | None = Field(
+        default=None, description="Service configuration settings"
     )
 
 
