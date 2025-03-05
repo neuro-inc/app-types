@@ -23,8 +23,8 @@ def get_preset(client: apolo_sdk.Client, preset_name: str) -> apolo_sdk.Preset:
             credits_per_hour=Decimal(1.0),
             cpu=1,
             memory=1024,
-            resource_pool_names=("platform.neuromation.io/nodepool=default",),
-            available_resource_pool_names=("platform.neuromation.io/nodepool=default",),
+            resource_pool_names=("default",),
+            available_resource_pool_names=("default",),
         )
     preset = client.config.presets.get(preset_name)
     if not preset:
