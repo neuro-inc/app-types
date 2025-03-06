@@ -11,9 +11,12 @@ from apolo_app_types.protocols.common import (
 )
 from apolo_app_types.protocols.common.buckets import Bucket
 from apolo_app_types.protocols.custom_deployment import (
+    Container,
     ContainerImage,
     CustomDeploymentInputs,
     CustomDeploymentOutputs,
+    Env,
+    Service,
 )
 from apolo_app_types.protocols.dify import (
     DifyApi,
@@ -128,4 +131,7 @@ __all__ = [
     "CustomDeploymentInputs",
     "CustomDeploymentOutputs",
     "ContainerImage",
+    "Container",
+    "Service",
+    "Env",
 ]

@@ -56,6 +56,9 @@ class CustomDeploymentChartValueProcessor(
                 "port": input_.custom_deployment.service.port,
             }
 
+        if input_.custom_deployment.name_override:
+            values["nameOverride"] = input_.custom_deployment.name_override
+
         if (
             input_.custom_deployment.autoscaling
             and input_.custom_deployment.autoscaling.enabled

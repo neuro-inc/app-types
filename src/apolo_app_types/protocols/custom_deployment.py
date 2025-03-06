@@ -43,7 +43,9 @@ class CustomDeploymentModel(BaseModel):
     http_auth: bool = Field(
         default=True, description="Enable/disable HTTP authentication"
     )
-    name_override: str = Field(description="Override name for the deployment")
+    name_override: str | None = Field(
+        default=None, description="Override name for the deployment"
+    )
     image: ContainerImage = Field(..., description="Container image configuration")
     autoscaling: AutoscalingHPA | None = Field(
         default=None, description="Autoscaling configuration. Currently not used"
