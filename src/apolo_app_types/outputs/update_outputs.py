@@ -9,6 +9,7 @@ from apolo_app_types.outputs.llm import get_llm_inference_outputs
 from apolo_app_types.outputs.postgres import get_postgres_outputs
 from apolo_app_types.outputs.stable_diffusion import get_stable_diffusion_outputs
 from apolo_app_types.outputs.weaviate import get_weaviate_outputs
+from apolo_app_types.outputs.custom_deployment import get_custom_deployment_outputs
 
 
 logger = logging.getLogger()
@@ -43,6 +44,8 @@ async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> None:
             conv_outputs = await get_dockerhub_outputs(helm_outputs)
         elif app_type == AppType.PostgreSQL:
             conv_outputs = await get_postgres_outputs(helm_outputs)
+        elif app_type == AppType.CustomDeployment:
+            conv_outputs = await get_custom_deployment_outputs(helm_outputs)
         else:
             err_msg = f"Unsupported app type: {app_type} for posting outputs"
             raise ValueError(err_msg)
