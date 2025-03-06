@@ -43,6 +43,11 @@ class AppType(enum.StrEnum):
             AppType.ApoloDeploy,
         }
 
+    def is_appless(self) -> bool:
+        return self in {
+            AppType.HuggingFaceStorageCache,
+        }
+
     @classmethod
     def from_app_inputs(cls, inputs: AppInputs) -> "AppType":
         if isinstance(inputs, LLMInputs):
