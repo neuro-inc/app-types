@@ -75,4 +75,9 @@ class CustomDeploymentChartValueProcessor(
                     input_.custom_deployment.autoscaling.target_memory_utilization_percentage
                 ),
             }
+
+        if input_.custom_deployment.dockerconfigjson:
+            values["dockerconfigjson"] = (
+                input_.custom_deployment.dockerconfigjson.dockerconfigjson
+            )
         return values
