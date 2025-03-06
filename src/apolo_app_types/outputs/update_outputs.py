@@ -4,12 +4,12 @@ import typing as t
 import httpx
 
 from apolo_app_types.app_types import AppType
+from apolo_app_types.outputs.custom_deployment import get_custom_deployment_outputs
 from apolo_app_types.outputs.dockerhub import get_dockerhub_outputs
 from apolo_app_types.outputs.llm import get_llm_inference_outputs
 from apolo_app_types.outputs.postgres import get_postgres_outputs
 from apolo_app_types.outputs.stable_diffusion import get_stable_diffusion_outputs
 from apolo_app_types.outputs.weaviate import get_weaviate_outputs
-from apolo_app_types.outputs.custom_deployment import get_custom_deployment_outputs
 
 
 logger = logging.getLogger()
