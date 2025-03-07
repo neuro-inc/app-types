@@ -60,13 +60,13 @@ class CustomDeploymentModel(BaseModel):
     ingress: Ingress | None = Field(
         default=None, description="Ingress configuration settings"
     )
-    dockerconfigjson: DockerHubOutputs | None = Field(
-        default=None, description="Docker config JSON"
-    )
 
 
 class CustomDeploymentInputs(AppInputsV2):
     custom_deployment: CustomDeploymentModel
+    dockerconfigjson: DockerHubOutputs | None = Field(
+        default=None, description="Docker config JSON"
+    )
 
 
 class CustomDeploymentOutputs(AppOutputsV2):

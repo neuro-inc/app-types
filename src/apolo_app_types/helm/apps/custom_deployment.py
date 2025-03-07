@@ -76,8 +76,6 @@ class CustomDeploymentChartValueProcessor(
                 ),
             }
 
-        if input_.custom_deployment.dockerconfigjson:
-            values["dockerconfigjson"] = (
-                input_.custom_deployment.dockerconfigjson.dockerconfigjson
-            )
+        if input_.dockerconfigjson:
+            values["dockerconfigjson"] = input_.dockerconfigjson.dockerconfigjson
         return values
