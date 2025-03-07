@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 
 from apolo_app_types.protocols.common import AppInputsV2, AppOutputsV2, Preset, RestAPI
 from apolo_app_types.protocols.common.ingress import Ingress
-from apolo_app_types.protocols.dockerhub import DockerHubOutputs
+from apolo_app_types.protocols.dockerhub import DockerConfigModel
 
 
 class ContainerImage(BaseModel):
@@ -64,7 +64,7 @@ class CustomDeploymentModel(BaseModel):
 
 class CustomDeploymentInputs(AppInputsV2):
     custom_deployment: CustomDeploymentModel
-    dockerconfigjson: DockerHubOutputs | None = Field(
+    dockerconfigjson: DockerConfigModel | None = Field(
         default=None, description="Docker config JSON"
     )
 

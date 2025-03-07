@@ -77,5 +77,5 @@ class CustomDeploymentChartValueProcessor(
             }
 
         if input_.dockerconfigjson:
-            values["dockerconfigjson"] = input_.dockerconfigjson.dockerconfigjson
+            values["dockerconfigjson"] = input_.dockerconfigjson.filecontents
         return values
