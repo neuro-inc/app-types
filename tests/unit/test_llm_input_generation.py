@@ -170,7 +170,7 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
             ],
         },
         "podAnnotations": {},
-        "labels": {},
+        "podExtraLabels": {},
         "modelDownload": {"hookEnabled": False, "initEnabled": True},
         "cache": {"enabled": True},
         "gpuProvider": "nvidia",
@@ -435,7 +435,7 @@ async def test_values_llm_generation__storage_integrated(
         "podAnnotations": {
             "platform.apolo.us/inject-storage": '[{"storage_path": "storage://some-cluster/some-org/some-proj/some-folder", "mount_path": "/root/.cache/huggingface", "mount_mode": "rw"}]'  # noqa: E501
         },
-        "labels": {
+        "podExtraLabels": {
             "platform.apolo.us/inject-storage": "true",
         },
         "modelDownload": {"hookEnabled": True, "initEnabled": False},

@@ -140,7 +140,7 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
             namespace,
         )
         values["podAnnotations"] = self._configure_extra_annotations(input_)
-        values["labels"] = self._configure_extra_labels(input_)
+        values["podExtraLabels"] = self._configure_extra_labels(input_)
         values.update(self._configure_model_download(input_))
 
         preset_name = input_.preset.name
