@@ -20,7 +20,7 @@ class StableDiffusionChartValueProcessor(
     BaseChartValueProcessor[StableDiffusionInputs]
 ):
     def _get_env_vars(self, preset: Preset) -> dict[str, t.Any]:
-        default_cmd_args = "--docs"
+        default_cmd_args = "--docs --cors-allow-origins=*"
         if preset.nvidia_gpu:
             commandline_args = "--use-cuda"
         elif preset.amd_gpu:
@@ -64,33 +64,15 @@ class StableDiffusionChartValueProcessor(
         component_vals = get_component_values(preset, preset_name)
         api_vars = self._get_env_vars(preset)
         img_repository = self._get_image_repository(preset)
-        stablestudio = {}
-        if (
-            input_.stable_diffusion.stablestudio
-            and input_.stable_diffusion.stablestudio.enabled
-        ):
-            stable_studio_domain_suffix = "-ss"
-            stable_studio_ingress = await _generate_ingress_config(
-                self.client, namespace, stable_studio_domain_suffix
-            )
-            ss_preset_name = input_.stable_diffusion.stablestudio.preset.name
-            if not ss_preset_name:
-                msg = "Missing required key preset_name for stablestudio in helm args."
-                raise Exception(msg)
-            ss_preset = get_preset(self.client, ss_preset_name)
-            stablestudio_component = get_component_values(ss_preset, ss_preset_name)
-            stablestudio["ingress"] = stable_studio_ingress
-            stablestudio.update(stablestudio_component)
+
         model_vals = {
             "model": {
                 "modelHFName": input_.stable_diffusion.hugging_face_model.modelHFName,
-                "modelFiles": input_.stable_diffusion.hugging_face_model.modelFiles,
             }
         }
         return merge_list_of_dicts(
             [
                 generic_vals,
-                stablestudio,
                 model_vals,
                 {
                     "api": {

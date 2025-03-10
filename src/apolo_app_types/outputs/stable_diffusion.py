@@ -40,8 +40,7 @@ async def get_stable_diffusion_outputs(
         protocol="https",
     )
     model = HuggingFaceModel(
-        modelHFName=helm_values["model"]["modelHFName"],
-        modelFiles=helm_values["model"].get("modelFiles"),
+        modelHFName=helm_values["model"]["modelHFName"]
     )
     stable_diffusion_output = SDOutputsV2(
         internal_api=internal_api, external_api=external_api, hf_model=model
