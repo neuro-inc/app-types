@@ -10,7 +10,6 @@ from apolo_app_types.helm.apps.common import (
     get_preset,
 )
 from apolo_app_types.helm.apps.ingress import (
-    _generate_ingress_config,
     get_ingress_values,
 )
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
