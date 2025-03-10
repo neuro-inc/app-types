@@ -3,6 +3,9 @@ import enum
 from apolo_app_types import StableDiffusionInputs
 from apolo_app_types.protocols.common import AppInputs
 from apolo_app_types.protocols.dockerhub import DockerHubInputs
+from apolo_app_types.protocols.huggingface_storage_cache import (
+    HuggingFaceStorageCacheInputs,
+)
 from apolo_app_types.protocols.llm import LLMInputs
 from apolo_app_types.protocols.weaviate import WeaviateInputs
 
@@ -23,6 +26,7 @@ class AppType(enum.StrEnum):
     Shell = "shell"
     ApoloDeploy = "apolo-deploy"
     DockerHub = "dockerhub"
+    HuggingFaceStorageCache = "huggingface-storage-cache"
 
     def __repr__(self) -> str:
         return str(self)
@@ -39,6 +43,11 @@ class AppType(enum.StrEnum):
             AppType.ApoloDeploy,
         }
 
+    def is_appless(self) -> bool:
+        return self in {
+            AppType.HuggingFaceStorageCache,
+        }
+
     @classmethod
     def from_app_inputs(cls, inputs: AppInputs) -> "AppType":
         if isinstance(inputs, LLMInputs):
@@ -49,6 +58,8 @@ class AppType(enum.StrEnum):
             return AppType.StableDiffusion
         if isinstance(inputs, DockerHubInputs):
             return AppType.DockerHub
+        if isinstance(inputs, HuggingFaceStorageCacheInputs):
+            return AppType.HuggingFaceStorageCache
 
         error_message = f"Unsupported input type: {type(inputs).__name__}"
         raise ValueError(error_message)

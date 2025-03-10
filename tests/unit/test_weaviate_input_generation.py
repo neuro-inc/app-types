@@ -9,6 +9,7 @@ from apolo_app_types.protocols.common.buckets import (
     CredentialsType,
     S3BucketCredentials,
 )
+
 from tests.unit.constants import DEFAULT_NAMESPACE
 
 

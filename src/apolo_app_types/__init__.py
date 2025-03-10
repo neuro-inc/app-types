@@ -1,5 +1,6 @@
 from apolo_app_types.protocols.apolo_deploy import ApoloDeployInputs, ApoloDeployOutputs
 from apolo_app_types.protocols.common import (
+    ApoloStorageMount,
     AppInputs,
     AppInputsV2,
     AppOutputs,
@@ -24,6 +25,10 @@ from apolo_app_types.protocols.dockerhub import (
     DockerHubOutputs,
 )
 from apolo_app_types.protocols.fooocus import FooocusInputs, FooocusOutputs
+from apolo_app_types.protocols.huggingface_storage_cache import (
+    HuggingFaceStorageCacheInputs,
+    HuggingFaceStorageCacheOutputs,
+)
 from apolo_app_types.protocols.jupyter import (
     JupyterInputs,
     JupyterOutputs,
@@ -120,4 +125,7 @@ __all__ = [
     "DockerHubInputs",
     "DockerHubOutputs",
     "DockerConfigModel",
+    "ApoloStorageMount",
+    "HuggingFaceStorageCacheInputs",
+    "HuggingFaceStorageCacheOutputs",
 ]
