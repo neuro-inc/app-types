@@ -14,36 +14,31 @@ from apolo_app_types.helm.apps.ingress import (
     get_ingress_values,
 )
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
-from apolo_app_types.protocols.common.hugging_face import serialize_hf_token
 
 
 class StableDiffusionChartValueProcessor(
     BaseChartValueProcessor[StableDiffusionInputs]
 ):
-    def _get_env_vars(
-        self, input_: StableDiffusionInputs, preset: Preset
-    ) -> dict[str, t.Any]:
-        basic_cmd_args = (
-            "--api --no-download-sd-model --cors-allow-origins=* "
-            "--skip-version-check --skip-torch-cuda-test "
-            "--allow-code --enable-insecure-extension-access"
-        )
-
-        if any([preset.nvidia_gpu, preset.amd_gpu]):
-            commandline_args = basic_cmd_args
+    def _get_env_vars(self, preset: Preset) -> dict[str, t.Any]:
+        default_cmd_args = "--docs"
+        if preset.nvidia_gpu:
+            commandline_args = "--use-cuda"
+        elif preset.amd_gpu:
+            commandline_args = "--use-rocm"
         else:
-            commandline_args = (
-                f"{basic_cmd_args} --lowvram --use-cpu all --no-half --precision full"
-            )
+            commandline_args = "--lowvram"
 
-        env_vars: dict[str, t.Any] = {"COMMANDLINE_ARGS": commandline_args}
+        return {"COMMANDLINE_ARGS": " ".join([default_cmd_args, commandline_args])}
 
-        if input_.stable_diffusion.hugging_face_model.hfToken:
-            env_vars["HUGGING_FACE_HUB_TOKEN"] = serialize_hf_token(
-                input_.stable_diffusion.hugging_face_model.hfToken
-            )
+    def _get_image_repository(self, preset: Preset) -> str:
+        if preset.nvidia_gpu:
+            img_repo = "vladmandic/sdnext-cuda"
+        elif preset.amd_gpu:
+            img_repo = "disty0/sdnext-rocm:latest"
+        else:
+            img_repo = "disty0/sdnext-ipex:latest"
 
-        return env_vars
+        return img_repo
 
     async def gen_extra_values(
         self,
@@ -67,8 +62,8 @@ class StableDiffusionChartValueProcessor(
         )
 
         component_vals = get_component_values(preset, preset_name)
-        api_vars = self._get_env_vars(input_, preset)
-
+        api_vars = self._get_env_vars(preset)
+        img_repository = self._get_image_repository(preset)
         stablestudio = {}
         if (
             input_.stable_diffusion.stablestudio
@@ -102,6 +97,9 @@ class StableDiffusionChartValueProcessor(
                         **ingress_api,
                         **component_vals,
                         "env": api_vars,
+                        "image": {
+                            "repository": img_repository,
+                        },
                     },
                 },
             ]

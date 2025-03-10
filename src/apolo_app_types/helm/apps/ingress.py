@@ -2,7 +2,6 @@ import re
 import typing as t
 
 import apolo_sdk
-import click
 
 from apolo_app_types.protocols.common import Ingress
 
@@ -49,7 +48,7 @@ async def _generate_ingress_config(
             f"Generated hostname {hostname} is too long. "
             f"If your app name is long, consider using shorter app name."
         )
-        raise click.ClickException(msg)
+        raise Exception(msg)
 
     return {
         "enabled": True,
