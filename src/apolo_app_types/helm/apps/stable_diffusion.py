@@ -19,7 +19,7 @@ class StableDiffusionChartValueProcessor(
     BaseChartValueProcessor[StableDiffusionInputs]
 ):
     def _get_env_vars(self, preset: Preset) -> dict[str, t.Any]:
-        default_cmd_args = "--docs --cors-allow-origins=*"
+        default_cmd_args = "--docs --cors-origins=*"
         if preset.nvidia_gpu:
             commandline_args = "--use-cuda"
         elif preset.amd_gpu:
