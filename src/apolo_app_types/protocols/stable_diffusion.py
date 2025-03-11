@@ -23,11 +23,6 @@ class StableDiffusionParams(BaseModel):
         description="The number of replicas to deploy.",
         title="Replica Count",
     )
-    stablestudio: StableStudio | None = Field(
-        default=None,
-        description="Stable Studio configuration.",
-        title="Stable Studio",
-    )
     hugging_face_model: HuggingFaceModel = Field(  # noqa: N815
         ...,
         description="The name of the Hugging Face model.",
