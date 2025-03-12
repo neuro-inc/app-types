@@ -19,7 +19,7 @@ async def get_custom_deployment_outputs(
         logger.info("No ingress found for custom deployment")
         return {}
     host, port = host_port
-    dockerhub_outputs = CustomDeploymentOutputs(
+    outputs = CustomDeploymentOutputs(
         internal_web_app_url=RestAPI(
             host=host,
             port=int(port),
@@ -27,4 +27,4 @@ async def get_custom_deployment_outputs(
             protocol="https",
         )
     )
-    return dockerhub_outputs.model_dump()
+    return outputs.model_dump()
