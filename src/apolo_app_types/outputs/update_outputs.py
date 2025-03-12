@@ -4,6 +4,7 @@ import typing as t
 import httpx
 
 from apolo_app_types.app_types import AppType
+from apolo_app_types.outputs.custom_deployment import get_custom_deployment_outputs
 from apolo_app_types.outputs.dockerhub import get_dockerhub_outputs
 from apolo_app_types.outputs.huggingface_storage_cache import (
     get_app_outputs as get_huggingface_storage_cache_outputs,
@@ -48,6 +49,8 @@ async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> None:
             conv_outputs = await get_postgres_outputs(helm_outputs)
         elif app_type == AppType.HuggingFaceStorageCache:
             conv_outputs = await get_huggingface_storage_cache_outputs(helm_outputs)
+        elif app_type == AppType.CustomDeployment:
+            conv_outputs = await get_custom_deployment_outputs(helm_outputs)
         else:
             err_msg = f"Unsupported app type: {app_type} for posting outputs"
             raise ValueError(err_msg)

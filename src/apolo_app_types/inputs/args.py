@@ -10,6 +10,7 @@ from apolo_app_types import (
 )
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps import (
+    CustomDeploymentChartValueProcessor,
     LLMChartValueProcessor,
     StableDiffusionChartValueProcessor,
 )
@@ -18,6 +19,7 @@ from apolo_app_types.helm.apps.dockerhub import DockerHubModelChartValueProcesso
 from apolo_app_types.helm.apps.postgres import PostgresValueProcessor
 from apolo_app_types.helm.apps.weaviate import WeaviateChartValueProcessor
 from apolo_app_types.protocols.common import AppInputsV2
+from apolo_app_types.protocols.custom_deployment import CustomDeploymentInputs
 from apolo_app_types.protocols.dockerhub import DockerHubInputs
 
 
@@ -35,6 +37,7 @@ async def app_type_to_vals(
         AppType.Weaviate: WeaviateChartValueProcessor,
         AppType.DockerHub: DockerHubModelChartValueProcessor,
         AppType.PostgreSQL: PostgresValueProcessor,
+        AppType.CustomDeployment: CustomDeploymentChartValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)
@@ -64,6 +67,7 @@ async def get_installation_vals(
         AppType.Weaviate: WeaviateInputs,
         AppType.DockerHub: DockerHubInputs,
         AppType.PostgreSQL: CrunchyPostgresInputs,
+        AppType.CustomDeployment: CustomDeploymentInputs,
     }
 
     if app_type not in input_type_map:

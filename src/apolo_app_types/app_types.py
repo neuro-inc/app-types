@@ -27,6 +27,7 @@ class AppType(enum.StrEnum):
     ApoloDeploy = "apolo-deploy"
     DockerHub = "dockerhub"
     HuggingFaceStorageCache = "huggingface-storage-cache"
+    CustomDeployment = "custom-deployment"
 
     def __repr__(self) -> str:
         return str(self)

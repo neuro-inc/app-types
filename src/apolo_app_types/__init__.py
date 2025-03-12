@@ -11,6 +11,14 @@ from apolo_app_types.protocols.common import (
     StrOrSecret,
 )
 from apolo_app_types.protocols.common.buckets import Bucket
+from apolo_app_types.protocols.custom_deployment import (
+    Container,
+    ContainerImage,
+    CustomDeploymentInputs,
+    CustomDeploymentOutputs,
+    Env,
+    Service,
+)
 from apolo_app_types.protocols.dify import (
     DifyApi,
     DifyInputs,
@@ -128,4 +136,10 @@ __all__ = [
     "ApoloStorageMount",
     "HuggingFaceStorageCacheInputs",
     "HuggingFaceStorageCacheOutputs",
+    "CustomDeploymentInputs",
+    "CustomDeploymentOutputs",
+    "ContainerImage",
+    "Container",
+    "Service",
+    "Env",
 ]
