@@ -81,7 +81,7 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
         extra_annotations: dict[str, str] = {}
         if input_.storage_cache:
             storage_mount = ApoloStorageMount(
-                storage_path=input_.storage_cache.storage_path,
+                storage_path=input_.storage_cache.storage_cache.storage_path,
                 mount_path=MountPath(path="/root/.cache/huggingface"),
                 mode=ApoloMountMode(mode="rw"),
             )
