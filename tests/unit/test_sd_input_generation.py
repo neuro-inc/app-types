@@ -63,7 +63,7 @@ async def test_values_sd_generation(setup_clients, mock_get_preset_cpu):
     ]["nodeSelectorTerms"][0]["matchExpressions"]
     assert match_expressions == _get_match_expressions([CPU_POOL])
     assert (
-        "--docs --cors-allow-origins=* --lowvram"
+        "--docs --cors-origins=* --lowvram"
         in helm_params["api"]["env"]["COMMANDLINE_ARGS"]
     )
     assert helm_params["api"]["resources"]["requests"].get("nvidia.com/gpu") is None
