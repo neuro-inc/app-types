@@ -7,7 +7,7 @@ from apolo_app_types.outputs.stable_diffusion import get_stable_diffusion_output
 async def test_sd(setup_clients, mock_kubernetes_client):
     res = await get_stable_diffusion_outputs(
         helm_values={
-            "model": {"modelHFName": "SD-Model", "modelFiles": "some_file"},
+            "model": {"modelHFName": "SD-Model"},
             "env": {"VLLM_API_KEY": "dummy-api-key"},
         }
     )
@@ -19,7 +19,7 @@ async def test_sd(setup_clients, mock_kubernetes_client):
     assert res["internal_api"]["base_path"] == "/sdapi/v1"
     assert res["hf_model"] == {
         "modelHFName": "SD-Model",
-        "modelFiles": "some_file",
+        "modelFiles": None,
         "hfToken": None,
     }
 

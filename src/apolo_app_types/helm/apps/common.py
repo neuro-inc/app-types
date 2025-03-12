@@ -6,7 +6,6 @@ import typing as t
 from copy import deepcopy
 
 import apolo_sdk
-import click
 import yaml
 from apolo_sdk import Preset
 
@@ -25,7 +24,7 @@ def get_preset(client: apolo_sdk.Client, preset_name: str) -> apolo_sdk.Preset:
     preset = client.config.presets.get(preset_name)
     if not preset:
         msg = f"Preset {preset_name} not exist in cluster {client.config.cluster_name}"
-        raise click.ClickException(msg)
+        raise Exception(msg)
     return preset
 
 
