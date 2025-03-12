@@ -1,8 +1,6 @@
 import logging
 import typing as t
 
-import click
-
 from apolo_app_types import BasicAuth, Bucket, WeaviateInputs
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import gen_extra_values
@@ -72,7 +70,7 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
             ]
         ):
             msg = "Missing required args for setting up Apolo Blob Storage"
-            raise click.ClickException(msg)
+            raise Exception(msg)
 
         return {
             "s3": {

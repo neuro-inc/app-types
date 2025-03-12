@@ -1,7 +1,9 @@
 FROM python:3.11-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    POETRY_NO_INTERACTION=1 \
+    POETRY_VIRTUALENVS_CREATE=0
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
@@ -9,13 +11,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-COPY README.md ./
-COPY setup.cfg ./
-COPY setup.py ./
+COPY README.md poetry.lock pyproject.toml ./
+RUN pip --no-cache-dir install poetry && poetry install --no-root --no-cache
+
 COPY src ./src
-RUN pip install --no-cache-dir .
+RUN poetry install --only-root --no-cache
 
-WORKDIR /app/src/apolo_app_types
-RUN chmod +x cli.py
-
-ENTRYPOINT ["python", "-m", "cli"]
+ENTRYPOINT ["app-types"]

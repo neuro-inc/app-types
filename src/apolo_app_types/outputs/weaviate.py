@@ -21,7 +21,7 @@ async def _get_service_endpoints(
     http_port, grpc_port = 0, 0
     for service in services:
         service_name = service["metadata"]["name"]
-        host = f'{service_name}.{service["metadata"]["namespace"]}'
+        host = f"{service_name}.{service['metadata']['namespace']}"
         port = int(service["spec"]["ports"][0]["port"])  # Ensure port is int
 
         if service_name == "weaviate":

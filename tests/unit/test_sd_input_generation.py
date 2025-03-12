@@ -5,6 +5,7 @@ from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import _get_match_expressions
 from apolo_app_types.protocols.common import Ingress, Preset
 from apolo_app_types.protocols.stable_diffusion import StableDiffusionParams
+
 from tests.unit.constants import CPU_POOL, DEFAULT_NAMESPACE
 
 
@@ -61,10 +62,8 @@ async def test_values_sd_generation(setup_clients, mock_get_preset_cpu):
         "requiredDuringSchedulingIgnoredDuringExecution"
     ]["nodeSelectorTerms"][0]["matchExpressions"]
     assert match_expressions == _get_match_expressions([CPU_POOL])
-    assert "--api" in helm_params["api"]["env"]["COMMANDLINE_ARGS"]
-    assert "--no-download-sd-model" in helm_params["api"]["env"]["COMMANDLINE_ARGS"]
     assert (
-        "--lowvram --use-cpu all --no-half --precision full"
+        "--docs --cors-origins=* --lowvram"
         in helm_params["api"]["env"]["COMMANDLINE_ARGS"]
     )
     assert helm_params["api"]["resources"]["requests"].get("nvidia.com/gpu") is None
@@ -129,9 +128,3 @@ async def test_values_sd_generation_with_gpu(setup_clients, mock_get_preset_gpu)
         "requiredDuringSchedulingIgnoredDuringExecution"
     ]["nodeSelectorTerms"][0]["matchExpressions"]
     assert match_expressions == _get_match_expressions(["gpu_pool"])
-    assert "--api" in helm_params["api"]["env"]["COMMANDLINE_ARGS"]
-    assert "--no-download-sd-model" in helm_params["api"]["env"]["COMMANDLINE_ARGS"]
-    assert (
-        "--lowvram --use-cpu all --no-half --precision full"
-        not in helm_params["api"]["env"]["COMMANDLINE_ARGS"]
-    )

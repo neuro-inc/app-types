@@ -65,7 +65,7 @@ async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> dict[str, 
         chat_external_api=chat_external_api,
         embeddings_internal_api=embeddings_internal_api,
         embeddings_external_api=embeddings_external_api,
-        hf_model=HuggingFaceModel(modelHFName=model_name, modelFiles=None),
+        hf_model=HuggingFaceModel(modelHFName=model_name),
         llm_specific=LLMSpecific(tokenizer_name=tokenizer_name, api_key=api_key),
     )
     return vllm_outputs.model_dump()
