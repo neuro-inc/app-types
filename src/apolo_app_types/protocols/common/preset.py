@@ -4,7 +4,7 @@ from apolo_app_types.protocols.common.input_type import InputType
 
 
 class Preset(InputType):
-    model_config = ConfigDict(
+    model_config = InputType.model_config | ConfigDict(
         json_schema_extra={
             "x-title": "Presets Configuration",
             "x-description": "Configuration for Apolo presets.",

@@ -19,7 +19,7 @@ class StableStudio(AppInputs):
 
 
 class StableDiffusionParams(InputType):
-    model_config = ConfigDict(
+    model_config = InputType.model_config | ConfigDict(
         json_schema_extra={
             "x-title": "LLM Configuration",
             "x-description": "Configuration for LLM.",

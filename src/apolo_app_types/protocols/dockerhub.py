@@ -9,7 +9,7 @@ from apolo_app_types.protocols.common import (
 
 
 class DockerHubModel(InputType):
-    model_config = ConfigDict(
+    model_config = InputType.model_config | ConfigDict(
         json_schema_extra={
             "x-title": "DockerHub Configuration",
             "x-description": "Configuration for DockerHub.",
