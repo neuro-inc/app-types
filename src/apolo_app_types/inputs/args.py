@@ -61,7 +61,7 @@ async def get_installation_vals(
     app_type: AppType,
     namespace: str = "default",
 ) -> dict[str, t.Any]:
-    input_type_map = {
+    input_type_map: dict[AppType, type[AppInputsV2]] = {
         AppType.LLMInference: LLMInputs,
         AppType.StableDiffusion: StableDiffusionInputs,
         AppType.Weaviate: WeaviateInputs,
@@ -73,7 +73,7 @@ async def get_installation_vals(
     if app_type not in input_type_map:
         err_msg = f"App type {app_type} is not supported"
         raise NotImplementedError(err_msg)
-    input_ = input_type_map[app_type](**input_dict)
+    input_ = input_type_map[app_type].model_validate(input_dict)
 
     _, extra_vals = await app_type_to_vals(
         input_,

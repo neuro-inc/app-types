@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, Field
 
 from apolo_app_types.protocols.common import (
     AppInputs,
@@ -7,6 +7,7 @@ from apolo_app_types.protocols.common import (
     AppOutputsV2,
     HuggingFaceModel,
     Ingress,
+    InputType,
     Preset,
     RestAPI,
 )
@@ -17,13 +18,20 @@ class StableStudio(AppInputs):
     preset: Preset
 
 
-class StableDiffusionParams(BaseModel):
-    replicaCount: int = Field(  # noqa: N815
+class StableDiffusionParams(InputType):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "x-title": "LLM Configuration",
+            "x-description": "Configuration for LLM.",
+            "x-logo-url": "https://example.com/logo",
+        }
+    )
+    replica_count: int = Field(
         default=1,
         description="The number of replicas to deploy.",
         title="Replica Count",
     )
-    hugging_face_model: HuggingFaceModel = Field(  # noqa: N815
+    hugging_face_model: HuggingFaceModel = Field(
         ...,
         description="The name of the Hugging Face model.",
         title="Hugging Face Model Name",
@@ -33,7 +41,7 @@ class StableDiffusionParams(BaseModel):
 class StableDiffusionInputs(AppInputsV2):
     ingress: Ingress
     preset: Preset
-    stable_diffusion: StableDiffusionParams  # noqa: N815
+    stable_diffusion: StableDiffusionParams
 
 
 class TextToImgAPI(AppOutputs):

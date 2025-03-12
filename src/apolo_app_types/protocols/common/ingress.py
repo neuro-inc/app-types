@@ -1,11 +1,20 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+from apolo_app_types.protocols.common.input_type import InputType
 
 
 class IngressGrpc(BaseModel):
     enabled: bool
 
 
-class Ingress(BaseModel):
+class Ingress(InputType):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "x-title": "Ingress Configuration",
+            "x-description": "Configuration for Ingress.",
+            "x-logo-url": "https://example.com/logo",
+        }
+    )
     enabled: bool = Field(
         ...,
         description="Indicates whether the ingress is enabled.",

@@ -6,15 +6,15 @@ from apolo_app_types.protocols.common.secrets_ import K8sSecret, OptionalStrOrSe
 
 
 class HuggingFaceModel(BaseModel):
-    modelHFName: str = Field(  # noqa: N815
+    model_hf_name: str = Field(  # noqa: N815
         ...,
         description="The name of the Hugging Face model.",
         title="Hugging Face Model Name",
     )
-    modelFiles: str | None = Field(  # noqa: N815
+    model_files: str | None = Field(  # noqa: N815
         None, description="The path to the model files.", title="Model Files"
     )
-    hfToken: OptionalStrOrSecret = Field(  # noqa: N815
+    hf_token: OptionalStrOrSecret = Field(  # noqa: N815
         default=None,
         description="The Hugging Face API token.",
         title="Hugging Face Token",

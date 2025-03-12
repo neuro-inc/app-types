@@ -66,14 +66,14 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
 
     def _configure_model(self, llm_model: LLMModel) -> dict[str, str]:
         return {
-            "modelHFName": llm_model.hugging_face_model.modelHFName,
-            "tokenizerHFName": llm_model.tokenizerHFName,
+            "modelHFName": llm_model.hugging_face_model.model_hf_name,
+            "tokenizerHFName": llm_model.tokenizer_hf_name,
         }
 
     def _configure_env(self, llm_model: LLMModel) -> dict[str, t.Any]:
         return {
             "HUGGING_FACE_HUB_TOKEN": serialize_hf_token(
-                llm_model.hugging_face_model.hfToken
+                llm_model.hugging_face_model.hf_token
             )
         }
 
@@ -160,10 +160,10 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
 
         gpu_env = self._configure_gpu_env(gpu_provider, gpu_count)
         parallel_args = self._configure_parallel_args(
-            input_.llm.serverExtraArgs, gpu_count
+            input_.llm.server_extra_args, gpu_count
         )
         server_extra_args = [
-            *input_.llm.serverExtraArgs,
+            *input_.llm.server_extra_args,
             *parallel_args,
         ]
         model = self._configure_model(input_.llm)

@@ -2,6 +2,7 @@ from .auth import BasicAuth
 from .buckets import Bucket
 from .hugging_face import HuggingFaceModel
 from .ingress import Ingress, IngressGrpc
+from .input_type import InputType
 from .inputs import AppInputs, AppInputsV2
 from .networking import GraphQLAPI, GrpcAPI, RestAPI
 from .outputs import AppOutputs, AppOutputsV2
@@ -43,4 +44,5 @@ __all__ = [
     "Bucket",
     "AppOutputsV2",
     "AppInputsV2",
+    "InputType",
 ]

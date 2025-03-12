@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from apolo_app_types.protocols.common import (
     AppInputsV2,
@@ -6,6 +6,7 @@ from apolo_app_types.protocols.common import (
     AppOutputsV2,
     HuggingFaceModel,
     Ingress,
+    InputType,
     Preset,
 )
 from apolo_app_types.protocols.common.networking import RestAPI
@@ -27,18 +28,25 @@ class LLMApi(BaseModel):
     )
 
 
-class LLMModel(BaseModel):
+class LLMModel(InputType):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "x-title": "LLM Configuration",
+            "x-description": "Configuration for LLM.",
+            "x-logo-url": "https://example.com/logo",
+        }
+    )
     hugging_face_model: HuggingFaceModel = Field(  # noqa: N815
         ...,
         description="The name of the Hugging Face model.",
         title="Hugging Face Model Name",
     )
-    tokenizerHFName: str = Field(  # noqa: N815
+    tokenizer_hf_name: str = Field(  # noqa: N815
         "",
         description="The name of the tokenizer associated with the Hugging Face model.",
         title="Hugging Face Tokenizer Name",
     )
-    serverExtraArgs: list[str] = Field(  # noqa: N815
+    server_extra_args: list[str] = Field(  # noqa: N815
         default_factory=list,
         description="Extra arguments to pass to the server.",
         title="Server Extra Arguments",
