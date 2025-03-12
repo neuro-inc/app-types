@@ -16,7 +16,7 @@ async def get_custom_deployment_outputs(
         match_labels={"application": "custom-deployment"}
     )
     if not host_port:
-        logger.error("No ingress found for custom deployment")
+        logger.info("No ingress found for custom deployment")
         return {}
     host, port = host_port
     dockerhub_outputs = CustomDeploymentOutputs(
