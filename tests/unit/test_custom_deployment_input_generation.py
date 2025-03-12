@@ -43,13 +43,19 @@ async def test_custom_deployment_values_generation(setup_clients):
         app_name="custom-app",
         namespace="default-namespace",
     )
-    assert helm_params["image"]["repository"] == "myrepo/custom-deployment"
-    assert helm_params["image"]["tag"] == "v1.2.3"
-    assert helm_params["container"]["command"] == ["python", "app.py"]
-    assert helm_params["container"]["args"] == ["--port", "8080"]
-    assert helm_params["container"]["env"] == [{"name": "ENV_VAR", "value": "value"}]
-    assert helm_params["service"]["enabled"] == True  # noqa: E712
-    assert helm_params["service"]["port"] == 8080
+    assert helm_params["image"] == {
+        "repository": "myrepo/custom-deployment",
+        "tag": "v1.2.3",
+    }
+    assert helm_params["container"] == {
+        "command": ["python", "app.py"],
+        "args": ["--port", "8080"],
+        "env": [{"name": "ENV_VAR", "value": "value"}],
+    }
+    assert helm_params["service"] == {
+        "enabled": True,
+        "port": 8080,
+    }
     assert helm_params["ingress"]["enabled"] == True  # noqa: E712
     assert helm_params["ingress"]["className"] == "traefik"
     assert helm_params["preset_name"] == "cpu-small"
