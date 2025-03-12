@@ -6,6 +6,7 @@ from apolo_app_types.protocols.common import ApoloStoragePath, Ingress, Preset
 from apolo_app_types.protocols.common.secrets_ import K8sSecret, Secret, SecretKeyRef
 from apolo_app_types.protocols.huggingface_storage_cache import (
     HuggingFaceStorageCacheModel,
+    HuggingFaceStorageCacheOutputs,
 )
 from apolo_app_types.protocols.llm import LLMModel
 
@@ -365,10 +366,12 @@ async def test_values_llm_generation__storage_integrated(
                     modelHFName="test", hfToken=hf_token
                 ),
             ),
-            storage_cache=HuggingFaceStorageCacheModel(
-                storage_path=ApoloStoragePath(
-                    path="storage://some-cluster/some-org/some-proj/some-folder"
-                )
+            storage_cache=HuggingFaceStorageCacheOutputs(
+                storage_cache=HuggingFaceStorageCacheModel(
+                    storage_path=ApoloStoragePath(
+                        path="storage://some-cluster/some-org/some-proj/some-folder"
+                    ),
+                ),
             ),
         ),
         apolo_client=apolo_client,
