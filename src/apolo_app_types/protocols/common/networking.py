@@ -1,9 +1,10 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from apolo_app_types.protocols.common import Protocol
+from pydantic import Field
 
 
-class HttpApi(BaseModel):
+class HttpApi(Protocol):
     host: str = Field(..., description="The host of the HTTP endpoint.")
     port: int = Field(default=80, description="The port of the HTTP endpoint.")
     protocol: str = Field(
