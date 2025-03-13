@@ -10,7 +10,7 @@ from apolo_app_types.protocols.common import (
 )
 from apolo_app_types.protocols.common.networking import RestAPI
 from apolo_app_types.protocols.huggingface_storage_cache import (
-    HuggingFaceStorageCacheOutputs,
+    HuggingFaceStorageCacheModel,
 )
 
 
@@ -63,7 +63,7 @@ class LLMInputs(AppInputsV2):
     preset: Preset
     ingress: Ingress
     llm: LLMModel
-    storage_cache: HuggingFaceStorageCacheOutputs | None = None
+    storage_cache: HuggingFaceStorageCacheModel | None = None
 
 
 class OpenAICompatibleAPI(AppOutputs):
