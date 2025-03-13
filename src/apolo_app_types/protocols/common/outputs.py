@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from apolo_app_types.protocols.common.validator import validate_complex_type_prop
 
 
-class AppOutputs(BaseModel):
+class AppOutputsDeployer(BaseModel):
     model_config = ConfigDict(protected_namespaces=())
 
     external_web_app_url: str | None = Field(
@@ -15,11 +15,11 @@ class AppOutputs(BaseModel):
     )
 
 
-class AppOutputsV2(BaseModel):
+class AppOutputs(BaseModel):
     model_config = ConfigDict(protected_namespaces=())
 
     def __init_subclass__(
-        cls: type["AppOutputsV2"], **kwargs: Unpack[ConfigDict]
+        cls: type["AppOutputs"], **kwargs: Unpack[ConfigDict]
     ) -> None:
         """Validate field types at class definition time."""
         super().__init_subclass__()

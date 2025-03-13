@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 
 from apolo_app_types.protocols.common import (
-    AppInputs,
-    AppOutputs,
+    AppInputsDeployer,
+    AppOutputsDeployer,
     HuggingFaceModel,
     Ingress,
 )
@@ -13,13 +13,13 @@ class Image(BaseModel):
     tag: str
 
 
-class TextEmbeddingsInferenceInputs(AppInputs):
+class TextEmbeddingsInferenceInputs(AppInputsDeployer):
     preset_name: str
     ingress: Ingress
     model: HuggingFaceModel
     image: Image
 
 
-class TextEmbeddingsInferenceOutputs(AppOutputs):
+class TextEmbeddingsInferenceOutputs(AppOutputsDeployer):
     internal_api: OpenAICompatibleEmbeddingsAPI
     external_api: OpenAICompatibleEmbeddingsAPI | None = None

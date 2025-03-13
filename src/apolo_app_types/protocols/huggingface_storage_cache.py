@@ -2,14 +2,14 @@ from pydantic import ConfigDict, Field
 
 from apolo_app_types.protocols.common import (
     ApoloStoragePath,
-    AppInputsV2,
-    AppOutputsV2,
-    InputType,
+    AppInputs,
+    AppOutputs,
+    Protocol,
 )
 
 
-class HuggingFaceStorageCacheModel(InputType):
-    model_config = ConfigDict(
+class HuggingFaceStorageCacheModel(Protocol):
+    model_config = Protocol.model_config | ConfigDict(
         json_schema_extra={
             "x-title": "HuggingFace Storage Cache Configuration",
             "x-description": "Configuration HF storage.",
@@ -23,9 +23,9 @@ class HuggingFaceStorageCacheModel(InputType):
     )
 
 
-class HuggingFaceStorageCacheInputs(AppInputsV2):
+class HuggingFaceStorageCacheInputs(AppInputs):
     storage_cache: HuggingFaceStorageCacheModel
 
 
-class HuggingFaceStorageCacheOutputs(AppOutputsV2):
+class HuggingFaceStorageCacheOutputs(AppOutputs):
     storage_cache: HuggingFaceStorageCacheModel

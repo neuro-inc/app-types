@@ -1,13 +1,13 @@
 from pydantic import BaseModel, ConfigDict, Field
 
 from apolo_app_types.protocols.common import (
-    AppInputsV2,
+    AppInputs,
     AppOutputs,
-    AppOutputsV2,
+    AppOutputsDeployer,
     HuggingFaceModel,
     Ingress,
-    InputType,
     Preset,
+    Protocol,
 )
 from apolo_app_types.protocols.common.networking import RestAPI
 from apolo_app_types.protocols.huggingface_storage_cache import (
@@ -28,8 +28,8 @@ class LLMApi(BaseModel):
     )
 
 
-class LLMModel(InputType):
-    model_config = InputType.model_config | ConfigDict(
+class LLMModel(Protocol):
+    model_config = Protocol.model_config | ConfigDict(
         json_schema_extra={
             "x-title": "LLM Configuration",
             "x-description": "Configuration for LLM.",
@@ -67,14 +67,14 @@ class Web(BaseModel):
     preset_name: str
 
 
-class LLMInputs(AppInputsV2):
+class LLMInputs(AppInputs):
     preset: Preset
     ingress: Ingress
     llm: LLMModel
     storage_cache: HuggingFaceStorageCacheModel | None = None
 
 
-class OpenAICompatibleAPI(AppOutputs):
+class OpenAICompatibleAPI(AppOutputsDeployer):
     model_name: str
     host: str
     port: str
@@ -101,19 +101,19 @@ class OpenAICompatibleCompletionsAPI(OpenAICompatibleChatAPI):
         return self.api_base + "/completions"
 
 
-class VLLMOutputs(AppOutputs):
+class VLLMOutputs(AppOutputsDeployer):
     chat_internal_api: OpenAICompatibleChatAPI | None
     chat_external_api: OpenAICompatibleChatAPI | None
     embeddings_internal_api: OpenAICompatibleEmbeddingsAPI | None
     embeddings_external_api: OpenAICompatibleEmbeddingsAPI | None
 
 
-class LLMSpecific(BaseModel):
+class LLMSpecific(Protocol):
     tokenizer_name: str | None = None
     api_key: str | None = None
 
 
-class VLLMOutputsV2(AppOutputsV2):
+class VLLMOutputsV2(AppOutputs):
     chat_internal_api: RestAPI | None = None
     chat_external_api: RestAPI | None = None
     embeddings_internal_api: RestAPI | None = None

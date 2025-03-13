@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 
 from apolo_app_types.protocols.common import (
-    AppInputs,
-    AppOutputs,
+    AppInputsDeployer,
+    AppOutputsDeployer,
     Postgres,
     Redis,
 )
@@ -28,7 +28,7 @@ class DifyWeb(BaseModel):
     preset_name: str
 
 
-class DifyInputs(AppInputs):
+class DifyInputs(AppInputsDeployer):
     api: DifyApi
     worker: DifyWorker
     proxy: DifyProxy
@@ -38,7 +38,7 @@ class DifyInputs(AppInputs):
     externalPGVector: Postgres  # noqa: N815
 
 
-class DifyOutputs(AppOutputs):
+class DifyOutputs(AppOutputsDeployer):
     internal_web_app_url: str
     internal_api_url: str
     external_api_url: str | None

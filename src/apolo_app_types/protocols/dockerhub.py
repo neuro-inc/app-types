@@ -1,15 +1,15 @@
 from pydantic import BaseModel, ConfigDict, Field
 
 from apolo_app_types.protocols.common import (
-    AppInputsV2,
-    AppOutputsV2,
-    InputType,
+    AppInputs,
+    AppOutputs,
+    Protocol,
     StrOrSecret,
 )
 
 
-class DockerHubModel(InputType):
-    model_config = InputType.model_config | ConfigDict(
+class DockerHubModel(Protocol):
+    model_config = Protocol.model_config | ConfigDict(
         json_schema_extra={
             "x-title": "DockerHub Configuration",
             "x-description": "Configuration for DockerHub.",
@@ -33,7 +33,7 @@ class DockerHubModel(InputType):
     )
 
 
-class DockerHubInputs(AppInputsV2):
+class DockerHubInputs(AppInputs):
     dockerhub: DockerHubModel
 
 
@@ -45,5 +45,5 @@ class DockerConfigModel(BaseModel):
     )
 
 
-class DockerHubOutputs(AppOutputsV2):
+class DockerHubOutputs(AppOutputs):
     dockerconfigjson: DockerConfigModel = Field(..., title="Docker config JSON")

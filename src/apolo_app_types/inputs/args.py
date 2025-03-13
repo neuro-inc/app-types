@@ -18,13 +18,13 @@ from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.dockerhub import DockerHubModelChartValueProcessor
 from apolo_app_types.helm.apps.postgres import PostgresValueProcessor
 from apolo_app_types.helm.apps.weaviate import WeaviateChartValueProcessor
-from apolo_app_types.protocols.common import AppInputsV2
+from apolo_app_types.protocols.common import AppInputs
 from apolo_app_types.protocols.custom_deployment import CustomDeploymentInputs
 from apolo_app_types.protocols.dockerhub import DockerHubInputs
 
 
 async def app_type_to_vals(
-    input_: AppInputsV2,
+    input_: AppInputs,
     apolo_client: apolo_sdk.Client,
     app_type: AppType,
     app_name: str,
@@ -61,7 +61,7 @@ async def get_installation_vals(
     app_type: AppType,
     namespace: str = "default",
 ) -> dict[str, t.Any]:
-    input_type_map: dict[AppType, type[AppInputsV2]] = {
+    input_type_map: dict[AppType, type[AppInputs]] = {
         AppType.LLMInference: LLMInputs,
         AppType.StableDiffusion: StableDiffusionInputs,
         AppType.Weaviate: WeaviateInputs,

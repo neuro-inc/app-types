@@ -1,10 +1,10 @@
 from pydantic import field_validator
 from yarl import URL
 
-from apolo_app_types.protocols.common import AppInputs, AppOutputs
+from apolo_app_types.protocols.common import AppInputsDeployer, AppOutputsDeployer
 
 
-class FooocusInputs(AppInputs):
+class FooocusInputs(AppInputsDeployer):
     preset_name: str
     http_auth: bool = True
     huggingface_token_secret: URL | None = None
@@ -15,6 +15,6 @@ class FooocusInputs(AppInputs):
         return URL(raw)
 
 
-class FooocusOutputs(AppOutputs):
+class FooocusOutputs(AppOutputsDeployer):
     internal_web_app_url: str
     external_web_app_url: str

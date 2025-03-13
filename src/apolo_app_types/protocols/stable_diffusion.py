@@ -1,25 +1,25 @@
-from pydantic import ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from apolo_app_types.protocols.common import (
     AppInputs,
-    AppInputsV2,
+    AppInputsDeployer,
     AppOutputs,
-    AppOutputsV2,
+    AppOutputsDeployer,
     HuggingFaceModel,
     Ingress,
-    InputType,
     Preset,
+    Protocol,
     RestAPI,
 )
 
 
-class StableStudio(AppInputs):
+class StableStudio(AppInputsDeployer):
     enabled: bool = False
     preset: Preset
 
 
-class StableDiffusionParams(InputType):
-    model_config = InputType.model_config | ConfigDict(
+class StableDiffusionParams(Protocol):
+    model_config = Protocol.model_config | ConfigDict(
         json_schema_extra={
             "x-title": "LLM Configuration",
             "x-description": "Configuration for LLM.",
@@ -38,13 +38,13 @@ class StableDiffusionParams(InputType):
     )
 
 
-class StableDiffusionInputs(AppInputsV2):
+class StableDiffusionInputs(AppInputs):
     ingress: Ingress
     preset: Preset
     stable_diffusion: StableDiffusionParams
 
 
-class TextToImgAPI(AppOutputs):
+class TextToImgAPI(AppOutputsDeployer):
     host: str
     port: str | None
     api_base: str
@@ -54,19 +54,18 @@ class TextToImgAPI(AppOutputs):
         return self.api_base + "/txt2img"
 
 
-class SDModel(AppOutputs):
+class SDModel(BaseModel):
     name: str
     files: str
 
 
-class SDOutputs(AppOutputs):
+class SDOutputs(AppOutputsDeployer):
     internal_api: TextToImgAPI
     external_api: TextToImgAPI
     model: SDModel
-    internal_web_app_url: str | None = None
 
 
-class SDOutputsV2(AppOutputsV2):
+class SDOutputsV2(AppOutputs):
     internal_api: RestAPI | None = None
     external_api: RestAPI | None = None
     hf_model: HuggingFaceModel | None = None
