@@ -1,8 +1,7 @@
-from apolo_app_types import AppInputs
 from pydantic import BaseModel, Field, field_validator
 
+from apolo_app_types import AppInputs
 from apolo_app_types.protocols.common import (
-    AppInputsDeployer,
     AppOutputs,
     BasicAuth,
     Bucket,
