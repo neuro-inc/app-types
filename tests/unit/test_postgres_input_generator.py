@@ -18,6 +18,7 @@ from apolo_app_types.protocols.postgres import (
     PostgresDBUser,
     PostgresSupportedVersions,
 )
+
 from tests.unit.constants import DEFAULT_NAMESPACE
 
 

@@ -1,3 +1,63 @@
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[project]
+name = "app-types"
+version = "0.0.0"
+description = "Apolo Platform App Types."
+readme = "README.md"
+license = "Apache 2"
+authors = [{name = "Apolo.us"}]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development",
+    "Topic :: Utilities"
+]
+dynamic = ["version"]
+requires-python = ">=3.9.0,<4.0"
+
+[project.scripts]
+app-types = "apolo_app_types.cli:cli"
+
+[tool.poetry]
+packages = [
+  { include = "apolo_app_types", from = "src" },
+]
+
+[tool.poetry.dependencies]
+apolo-sdk = "^24.12.3"
+click = "^8.0.3"
+httpx = "^0.28.0"
+kubernetes = "^31.0.0"
+pydantic = "^2.9.2"
+pyyaml = "^6.0.2"
+types-PyYAML = "^6.0.12.20241230"
+yarl = "^1.18.3"
+
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^4.0.1"
+pytest = "^8.3.4"
+pytest-asyncio = "^0.25.3"
+pytest-cov = "^6.0.0"
+mypy = "^1.15.0"
+
 [tool.ruff]
 target-version = "py311"
 lint.select = [
@@ -9,9 +69,16 @@ lint.ignore = [
   "N818"
 ]
 
+[tool.ruff.lint.isort.sections]
+ApoloSDK = ["apolo-sdk"]
+
 [tool.ruff.lint.isort]
 combine-as-imports = true
 lines-after-imports = 2
+#profile = "black"
+section-order = ["future", "standard-library", "third-party", "ApoloSDK", "first-party", "local-folder"]
+known-first-party = ["apolo_app_types"]
+known-local-folder = ["tests"]
 
 [tool.mypy]
 check_untyped_defs = true
@@ -21,3 +88,75 @@ follow_imports = "silent"
 strict_optional = true
 warn_redundant_casts = true
 warn_unused_ignores = true
+warn_unused_configs = true
+plugins = ['pydantic.mypy']
+
+[[tool.mypy.overrides]]
+module = "pytest"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "aiodocker.*"
+ignore_missing_imports = true
+
+[tool.flake8]
+extend-exclude = [
+  ".git",
+  ".env",
+  "__pycache__",
+  ".eggs",
+]
+max-line-length = 88
+extend-ignore = [
+  "N801",
+  "N802",
+  "N803",
+  "E252",
+  "W503", # line break before binary operator (conflicts with Black)
+  "E133",
+  "E203", # whitespace before ':' (conflicts with Black)
+  "F541",
+]
+
+[tool.coverage.report]
+fail_under = 0
+skip_empty = true
+sort = "-cover"
+omit = [
+    "build-tools/*",
+    "tests/*",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+log_cli = false
+log_level = "INFO"
+junit_family = "xunit2"
+testpaths = [
+  "tests/",
+]
+markers = [
+    "e2e",
+    "e2e_job",
+    "require_admin",
+    "xdist_group",
+]
+filterwarnings = [
+    "error",
+    "ignore:.*PROTOCOL_TLS is deprecated:DeprecationWarning:apolo_sdk",
+    "ignore:.*PROTOCOL_TLS is deprecated:DeprecationWarning:tests",
+    "ignore:.*PROTOCOL_TLS is deprecated:DeprecationWarning:aiohttp",
+    "ignore:Inheritance class AuthorizedSession from ClientSession is discouraged:DeprecationWarning:google",
+    "ignore:returning HTTPException object is deprecated.+:DeprecationWarning:aiodocker",
+    "ignore:ssl_context is deprecated.+:DeprecationWarning:aiodocker",
+    "ignore:the imp module is deprecated.+:DeprecationWarning:past",
+    "ignore:Flags not at the start of the expression.+:DeprecationWarning:cookiecutter",
+    "ignore:Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated, and in 3.8 it will stop working:DeprecationWarning:jinja2",
+    "ignore:(rm_rf) error removing.+:UserWarning:pytest",
+    "ignore::ResourceWarning:asyncio",
+    "ignore::UserWarning:_pytest",
+    "ignore:The loop argument is deprecated*:DeprecationWarning:asyncio",
+    "ignore:'autocompletion' is renamed to 'shell_complete'.+:DeprecationWarning:click",
+    "ignore:.*pkg_resources.declare_namespace.*:DeprecationWarning:pkg_resources",
+]

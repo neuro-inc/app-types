@@ -4,8 +4,18 @@ from apolo_sdk import Preset
 
 from apolo_app_types import LLMInputs
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
-from apolo_app_types.helm.apps.common import gen_extra_values, get_preset
+from apolo_app_types.helm.apps.common import (
+    gen_apolo_storage_integration_annotations,
+    gen_apolo_storage_integration_labels,
+    gen_extra_values,
+    get_preset,
+)
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
+from apolo_app_types.protocols.common import (
+    ApoloMountMode,
+    ApoloStorageMount,
+    MountPath,
+)
 from apolo_app_types.protocols.common.hugging_face import serialize_hf_token
 from apolo_app_types.protocols.llm import LLMModel
 
@@ -67,6 +77,48 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
             )
         }
 
+    def _configure_extra_annotations(self, input_: LLMInputs) -> dict[str, str]:
+        extra_annotations: dict[str, str] = {}
+        if input_.storage_cache:
+            storage_mount = ApoloStorageMount(
+                storage_path=input_.storage_cache.storage_path,
+                mount_path=MountPath(path="/root/.cache/huggingface"),
+                mode=ApoloMountMode(mode="rw"),
+            )
+            extra_annotations.update(
+                **gen_apolo_storage_integration_annotations([storage_mount])
+            )
+        return extra_annotations
+
+    def _configure_extra_labels(self, input_: LLMInputs) -> dict[str, str]:
+        extra_labels: dict[str, str] = {}
+        if input_.storage_cache:
+            extra_labels.update(
+                **gen_apolo_storage_integration_labels(inject_storage=True)
+            )
+        return extra_labels
+
+    def _configure_model_download(self, input_: LLMInputs) -> dict[str, t.Any]:
+        if input_.storage_cache:
+            return {
+                "modelDownload": {
+                    "hookEnabled": True,
+                    "initEnabled": False,
+                },
+                "cache": {
+                    "enabled": False,
+                },
+            }
+        return {
+            "modelDownload": {
+                "hookEnabled": False,
+                "initEnabled": True,
+            },
+            "cache": {
+                "enabled": True,
+            },
+        }
+
     async def gen_extra_values(
         self,
         input_: LLMInputs,
@@ -87,6 +139,9 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
             input_.ingress,
             namespace,
         )
+        values["podAnnotations"] = self._configure_extra_annotations(input_)
+        values["podExtraLabels"] = self._configure_extra_labels(input_)
+        values.update(self._configure_model_download(input_))
 
         preset_name = input_.preset.name
         preset: Preset = get_preset(self.client, preset_name)

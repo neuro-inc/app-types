@@ -2,7 +2,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from apolo_app_types.protocols.common.secrets import K8sSecret, OptionalStrOrSecret
+from apolo_app_types.protocols.common.secrets_ import K8sSecret, OptionalStrOrSecret
 
 
 class HuggingFaceModel(BaseModel):

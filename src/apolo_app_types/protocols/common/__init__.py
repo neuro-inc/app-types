@@ -8,8 +8,14 @@ from .outputs import AppOutputs, AppOutputsV2
 from .postgres import Postgres
 from .preset import Preset
 from .redis import Redis, RedisMaster
-from .secrets import K8sSecret, OptionalStrOrSecret, StrOrSecret
-from .storage import StorageGB
+from .secrets_ import K8sSecret, OptionalStrOrSecret, StrOrSecret
+from .storage import (
+    ApoloMountMode,
+    ApoloStorageMount,
+    ApoloStoragePath,
+    MountPath,
+    StorageGB,
+)
 
 
 __all__ = [
@@ -24,6 +30,10 @@ __all__ = [
     "Preset",
     "BasicAuth",
     "StorageGB",
+    "ApoloStorageMount",
+    "ApoloStoragePath",
+    "ApoloMountMode",
+    "MountPath",
     "GrpcAPI",
     "RestAPI",
     "GraphQLAPI",

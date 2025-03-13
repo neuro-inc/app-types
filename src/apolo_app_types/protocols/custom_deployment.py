@@ -70,4 +70,5 @@ class CustomDeploymentInputs(AppInputsV2):
 
 
 class CustomDeploymentOutputs(AppOutputsV2):
-    internal_web_app_url: RestAPI
+    internal_web_app_url: RestAPI | None = None
+    external_web_app_url: RestAPI | None = None
