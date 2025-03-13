@@ -7,7 +7,6 @@ from .networking import GraphQLAPI, GrpcAPI, RestAPI
 from .outputs import AppOutputs, AppOutputsDeployer
 from .postgres import Postgres
 from .preset import Preset
-from .protocol import Protocol
 from .redis import Redis, RedisMaster
 from .secrets_ import K8sSecret, OptionalStrOrSecret, StrOrSecret
 from .storage import (
@@ -44,5 +43,4 @@ __all__ = [
     "Bucket",
     "AppOutputsDeployer",
     "AppInputs",
-    "Protocol",
 ]

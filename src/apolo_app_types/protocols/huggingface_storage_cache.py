@@ -1,15 +1,14 @@
-from pydantic import ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from apolo_app_types.protocols.common import (
     ApoloStoragePath,
     AppInputs,
     AppOutputs,
-    Protocol,
 )
 
 
-class HuggingFaceStorageCacheModel(Protocol):
-    model_config = Protocol.model_config | ConfigDict(
+class HuggingFaceStorageCacheModel(BaseModel):
+    model_config = ConfigDict(
         json_schema_extra={
             "x-title": "HuggingFace Storage Cache Configuration",
             "x-description": "Configuration HF storage.",

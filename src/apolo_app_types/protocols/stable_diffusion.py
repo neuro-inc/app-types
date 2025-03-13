@@ -8,7 +8,6 @@ from apolo_app_types.protocols.common import (
     HuggingFaceModel,
     Ingress,
     Preset,
-    Protocol,
     RestAPI,
 )
 
@@ -18,8 +17,8 @@ class StableStudio(AppInputsDeployer):
     preset: Preset
 
 
-class StableDiffusionParams(Protocol):
-    model_config = Protocol.model_config | ConfigDict(
+class StableDiffusionParams(BaseModel):
+    model_config = ConfigDict(
         json_schema_extra={
             "x-title": "LLM Configuration",
             "x-description": "Configuration for LLM.",

@@ -3,13 +3,12 @@ from pydantic import BaseModel, ConfigDict, Field
 from apolo_app_types.protocols.common import (
     AppInputs,
     AppOutputs,
-    Protocol,
     StrOrSecret,
 )
 
 
-class DockerHubModel(Protocol):
-    model_config = Protocol.model_config | ConfigDict(
+class DockerHubModel(BaseModel):
+    model_config = ConfigDict(
         json_schema_extra={
             "x-title": "DockerHub Configuration",
             "x-description": "Configuration for DockerHub.",

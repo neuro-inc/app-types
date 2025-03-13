@@ -1,13 +1,11 @@
 from pydantic import BaseModel, ConfigDict, Field
 
-from apolo_app_types.protocols.common.protocol import Protocol
-
 
 class IngressGrpc(BaseModel):
     enabled: bool
 
 
-class Ingress(Protocol):
+class Ingress(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
             "x-title": "Ingress Configuration",

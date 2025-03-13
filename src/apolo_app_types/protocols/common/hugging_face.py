@@ -1,12 +1,11 @@
 from typing import Any
 
-from apolo_app_types.protocols.common import Protocol
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from apolo_app_types.protocols.common.secrets_ import K8sSecret, OptionalStrOrSecret
 
 
-class HuggingFaceModel(Protocol):
+class HuggingFaceModel(BaseModel):
     model_hf_name: str = Field(  # noqa: N815
         ...,
         description="The name of the Hugging Face model.",

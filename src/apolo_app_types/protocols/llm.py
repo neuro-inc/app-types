@@ -7,7 +7,6 @@ from apolo_app_types.protocols.common import (
     HuggingFaceModel,
     Ingress,
     Preset,
-    Protocol,
 )
 from apolo_app_types.protocols.common.networking import RestAPI
 from apolo_app_types.protocols.huggingface_storage_cache import (
@@ -28,8 +27,8 @@ class LLMApi(BaseModel):
     )
 
 
-class LLMModel(Protocol):
-    model_config = Protocol.model_config | ConfigDict(
+class LLMModel(BaseModel):
+    model_config = ConfigDict(
         json_schema_extra={
             "x-title": "LLM Configuration",
             "x-description": "Configuration for LLM.",
@@ -108,7 +107,7 @@ class VLLMOutputs(AppOutputsDeployer):
     embeddings_external_api: OpenAICompatibleEmbeddingsAPI | None
 
 
-class LLMSpecific(Protocol):
+class LLMSpecific(BaseModel):
     tokenizer_name: str | None = None
     api_key: str | None = None
 
