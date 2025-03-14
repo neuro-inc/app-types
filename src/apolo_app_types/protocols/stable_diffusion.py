@@ -65,7 +65,7 @@ class SDOutputs(AppOutputsDeployer):
     model: SDModel
 
 
-class SDOutputsV2(AppOutputs):
+class StableDiffusionOutputs(AppOutputs):
     internal_api: RestAPI | None = None
     external_api: RestAPI | None = None
     hf_model: HuggingFaceModel | None = None

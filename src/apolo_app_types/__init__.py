@@ -67,6 +67,7 @@ from apolo_app_types.protocols.stable_diffusion import (
     SDModel,
     SDOutputs,
     StableDiffusionInputs,
+    StableDiffusionOutputs,
     TextToImgAPI,
 )
 from apolo_app_types.protocols.text_embeddings import (
@@ -125,7 +126,7 @@ __all__ = [
     "StrOrSecret",
     "OptionalStrOrSecret",
     "Bucket",
-    "StableDiffusionInputs",
+    "StableDiffusionOutputs",
     "HuggingFaceModel",
     "VLLMOutputsV2",
     "AppInputsDeployer",
