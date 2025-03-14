@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from apolo_app_types.protocols.common import AppInputs, AppOutputs, Preset, RestAPI
 from apolo_app_types.protocols.common.ingress import Ingress
@@ -40,6 +40,14 @@ class Service(BaseModel):
 
 
 class CustomDeploymentModel(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra={
+            "x-title": "Custom Deployment Configuration",
+            "x-description": "Configuration for Custom Deployment",
+            "x-logo-url": "https://example.com/logo",
+        },
+    )
     preset: Preset = Field(description="Name of the preset configuration to use")
     http_auth: bool = Field(
         default=True, description="Enable/disable HTTP authentication"
