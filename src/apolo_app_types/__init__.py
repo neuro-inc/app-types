@@ -4,6 +4,7 @@ from apolo_app_types.protocols.common import (
     AppInputs,
     AppInputsDeployer,
     AppOutputs,
+    AppOutputsDeployer,
     BasicAuth,
     HuggingFaceModel,
     K8sSecret,
@@ -142,4 +143,5 @@ __all__ = [
     "Container",
     "Service",
     "Env",
+    "AppOutputsDeployer",
 ]
