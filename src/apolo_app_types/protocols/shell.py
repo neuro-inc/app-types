@@ -1,10 +1,10 @@
-from apolo_app_types.protocols.common import AppInputs, AppOutputs
+from apolo_app_types.protocols.common import AppInputsDeployer, AppOutputsDeployer
 
 
-class ShellInputs(AppInputs):
+class ShellInputs(AppInputsDeployer):
     preset_name: str
     http_auth: bool = True
 
 
-class ShellOutputs(AppOutputs):
+class ShellOutputs(AppOutputsDeployer):
     internal_web_app_url: str

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from apolo_app_types.protocols.common import AppInputsV2, AppOutputsV2, Preset, RestAPI
+from apolo_app_types.protocols.common import AppInputs, AppOutputs, Preset, RestAPI
 from apolo_app_types.protocols.common.ingress import Ingress
 
 
@@ -61,10 +61,10 @@ class CustomDeploymentModel(BaseModel):
     )
 
 
-class CustomDeploymentInputs(AppInputsV2):
+class CustomDeploymentInputs(AppInputs):
     custom_deployment: CustomDeploymentModel
 
 
-class CustomDeploymentOutputs(AppOutputsV2):
+class CustomDeploymentOutputs(AppOutputs):
     internal_web_app_url: RestAPI | None = None
     external_web_app_url: RestAPI | None = None

@@ -1,9 +1,9 @@
 from pydantic import Field
 
-from apolo_app_types.protocols.common import AppInputs, AppOutputs
+from apolo_app_types.protocols.common import AppInputsDeployer, AppOutputsDeployer
 
 
-class MLFlowInputs(AppInputs):
+class MLFlowInputs(AppInputsDeployer):
     preset_name: str
     http_auth: bool = Field(
         default=True,
@@ -12,5 +12,5 @@ class MLFlowInputs(AppInputs):
     )
 
 
-class MLFlowOutputs(AppOutputs):
+class MLFlowOutputs(AppOutputsDeployer):
     internal_web_app_url: str
