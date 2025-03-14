@@ -4,8 +4,8 @@ from pydantic import BaseModel, ConfigDict, Field
 class Preset(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
-            "x-title": "Presets Configuration",
-            "x-description": "Configuration for Apolo presets.",
+            "title": "Presets Configuration",
+            "description": "Configuration for Apolo presets.",
             "x-logo-url": "https://example.com/logo",
         }
     )

@@ -8,8 +8,8 @@ class IngressGrpc(BaseModel):
 class Ingress(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
-            "x-title": "Ingress Configuration",
-            "x-description": "Configuration for Ingress.",
+            "title": "Ingress Configuration",
+            "description": "Configuration for Ingress.",
             "x-logo-url": "https://example.com/logo",
         }
     )

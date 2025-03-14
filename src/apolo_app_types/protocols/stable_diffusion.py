@@ -20,8 +20,8 @@ class StableStudio(AppInputsDeployer):
 class StableDiffusionParams(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
-            "x-title": "LLM Configuration",
-            "x-description": "Configuration for LLM.",
+            "title": "Stable Diffusion Configuration",
+            "description": "Configuration for Stable Diffusion.",
             "x-logo-url": "https://example.com/logo",
         }
     )
