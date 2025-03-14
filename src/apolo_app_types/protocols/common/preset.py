@@ -5,8 +5,8 @@ class Preset(BaseModel):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra={
-            "title": "Presets Configuration",
-            "description": "Configuration for Apolo presets.",
+            "x-title": "Presets Configuration",
+            "x-description": "Configuration for Apolo presets.",
             "x-logo-url": "https://example.com/logo",
         },
     )

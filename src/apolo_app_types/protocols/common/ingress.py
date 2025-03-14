@@ -9,8 +9,8 @@ class Ingress(BaseModel):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra={
-            "title": "Ingress Configuration",
-            "description": "Configuration for Ingress.",
+            "x-title": "Ingress Configuration",
+            "x-description": "Configuration for Ingress.",
             "x-logo-url": "https://example.com/logo",
         },
     )

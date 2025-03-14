@@ -21,8 +21,8 @@ class StableDiffusionParams(BaseModel):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra={
-            "title": "Stable Diffusion Configuration",
-            "description": "Configuration for Stable Diffusion.",
+            "x-title": "Stable Diffusion Configuration",
+            "x-description": "Configuration for Stable Diffusion.",
             "x-logo-url": "https://example.com/logo",
         },
     )
