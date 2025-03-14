@@ -7,11 +7,12 @@ class IngressGrpc(BaseModel):
 
 class Ingress(BaseModel):
     model_config = ConfigDict(
+        protected_namespaces=(),
         json_schema_extra={
             "title": "Ingress Configuration",
             "description": "Configuration for Ingress.",
             "x-logo-url": "https://example.com/logo",
-        }
+        },
     )
     enabled: bool = Field(
         ...,

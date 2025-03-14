@@ -9,11 +9,12 @@ from apolo_app_types.protocols.common import (
 
 class DockerHubModel(BaseModel):
     model_config = ConfigDict(
+        protected_namespaces=(),
         json_schema_extra={
             "x-title": "DockerHub Configuration",
             "x-description": "Configuration for DockerHub.",
             "x-logo-url": "https://example.com/logo",
-        }
+        },
     )
     registry_url: str = Field(  # noqa: N815
         default="https://index.docker.io/v1/",

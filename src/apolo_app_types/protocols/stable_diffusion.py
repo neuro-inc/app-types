@@ -19,11 +19,12 @@ class StableStudio(AppInputsDeployer):
 
 class StableDiffusionParams(BaseModel):
     model_config = ConfigDict(
+        protected_namespaces=(),
         json_schema_extra={
             "title": "Stable Diffusion Configuration",
             "description": "Configuration for Stable Diffusion.",
             "x-logo-url": "https://example.com/logo",
-        }
+        },
     )
     replica_count: int = Field(
         default=1,

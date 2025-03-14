@@ -9,11 +9,12 @@ from apolo_app_types.protocols.common import (
 
 class HuggingFaceStorageCacheModel(BaseModel):
     model_config = ConfigDict(
+        protected_namespaces=(),
         json_schema_extra={
             "x-title": "HuggingFace Storage Cache Configuration",
             "x-description": "Configuration HF storage.",
             "x-logo-url": "https://example.com/logo",
-        }
+        },
     )
     storage_path: ApoloStoragePath = Field(
         ...,

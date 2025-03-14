@@ -29,11 +29,12 @@ class LLMApi(BaseModel):
 
 class LLMModel(BaseModel):
     model_config = ConfigDict(
+        protected_namespaces=(),
         json_schema_extra={
             "x-title": "LLM Configuration",
             "x-description": "Configuration for LLM.",
             "x-logo-url": "https://example.com/logo",
-        }
+        },
     )
     hugging_face_model: HuggingFaceModel = Field(  # noqa: N815
         ...,
