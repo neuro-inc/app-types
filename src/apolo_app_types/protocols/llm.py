@@ -68,27 +68,10 @@ class Web(BaseModel):
 
 
 class LLMInputs(AppInputs):
-    preset: Preset = Field(
-        ...,
-        description="Preset to use for LLM instance. "
-        "Preferably a preset with GPU resources.",
-        title="Resource preset",
-    )
-    ingress: Ingress = Field(
-        ...,
-        description="Ingress configuration for the LLM instance.",
-        title="Ingress configuration",
-    )
-    llm: LLMModel = Field(
-        ...,
-        description="LLM model configuration.",
-        title="LLM model configuration",
-    )
-    storage_cache: HuggingFaceStorageCacheModel | None = Field(
-        None,
-        description="Configuration for Hugging Face storage cache.",
-        title="Hugging Face storage cache configuration",
-    )
+    preset: Preset
+    ingress: Ingress
+    llm: LLMModel
+    storage_cache: HuggingFaceStorageCacheModel
 
 
 class OpenAICompatibleAPI(AppOutputsDeployer):
