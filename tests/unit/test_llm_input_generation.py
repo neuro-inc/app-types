@@ -26,10 +26,10 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
             ),
             llm=LLMModel(
                 hugging_face_model=HuggingFaceModel(
-                    modelHFName="test", hfToken=hf_token
+                    model_hf_name="test", hf_token=hf_token
                 ),
-                tokenizerHFName="test_tokenizer",
-                serverExtraArgs=["--flag1.1 --flag1.2", "--flag2", "--flag3"],
+                tokenizer_hf_name="test_tokenizer",
+                server_extra_args=["--flag1.1 --flag1.2", "--flag2", "--flag3"],
             ),
         ),
         apolo_client=apolo_client,
@@ -95,10 +95,10 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
             ),
             llm=LLMModel(
                 hugging_face_model=HuggingFaceModel(
-                    modelHFName="test", hfToken=hf_token
+                    model_hf_name="test", hf_token=hf_token
                 ),
-                tokenizerHFName="test_tokenizer",
-                serverExtraArgs=["--flag1.1 --flag1.2", "--flag2", "--flag3"],
+                tokenizer_hf_name="test_tokenizer",
+                server_extra_args=["--flag1.1 --flag1.2", "--flag2", "--flag3"],
             ),
         ),
         apolo_client=apolo_client,
@@ -190,8 +190,8 @@ async def test_values_llm_generation_cpu_k8s_secret(setup_clients, mock_get_pres
             ),
             llm=LLMModel(
                 hugging_face_model=HuggingFaceModel(
-                    modelHFName="test",
-                    hfToken=K8sSecret(
+                    model_hf_name="test",
+                    hf_token=K8sSecret(
                         valueFrom=SecretKeyRef(
                             secretKeyRef=Secret(
                                 key="hf_token",
@@ -199,8 +199,8 @@ async def test_values_llm_generation_cpu_k8s_secret(setup_clients, mock_get_pres
                         )
                     ),
                 ),
-                tokenizerHFName="test_tokenizer",
-                serverExtraArgs=["--flag1.1 --flag1.2", "--flag2", "--flag3"],
+                tokenizer_hf_name="test_tokenizer",
+                server_extra_args=["--flag1.1 --flag1.2", "--flag2", "--flag3"],
             ),
         ),
         apolo_client=apolo_client,
@@ -261,8 +261,10 @@ async def test_values_llm_generation_gpu_4x(setup_clients, mock_get_preset_gpu):
             preset=Preset(name="gpu-large"),  # triggers nvidia_gpu=4 in conftest
             ingress=Ingress(enabled=True, clusterName="test"),
             llm=LLMModel(
-                hugging_face_model=HuggingFaceModel(modelHFName="test", hfToken="xxx"),
-                serverExtraArgs=["--foo"],
+                hugging_face_model=HuggingFaceModel(
+                    model_hf_name="test", hf_token="xxx"
+                ),
+                server_extra_args=["--foo"],
             ),
         ),
         apolo_client=apolo_client,
@@ -281,8 +283,10 @@ async def test_values_llm_generation_gpu_8x(setup_clients, mock_get_preset_gpu):
             preset=Preset(name="gpu-xlarge"),  # triggers nvidia_gpu=8 in conftest
             ingress=Ingress(enabled=True, clusterName="test"),
             llm=LLMModel(
-                hugging_face_model=HuggingFaceModel(modelHFName="test2", hfToken="yyy"),
-                serverExtraArgs=["--bar"],
+                hugging_face_model=HuggingFaceModel(
+                    model_hf_name="test2", hf_token="yyy"
+                ),
+                server_extra_args=["--bar"],
             ),
         ),
         apolo_client=apolo_client,
@@ -301,8 +305,10 @@ async def test_values_llm_generation_gpu_8x_pps(setup_clients, mock_get_preset_g
             preset=Preset(name="gpu-xlarge"),  # triggers nvidia_gpu=8 in conftest
             ingress=Ingress(enabled=True, clusterName="test"),
             llm=LLMModel(
-                hugging_face_model=HuggingFaceModel(modelHFName="test2", hfToken="yyy"),
-                serverExtraArgs=["--bar", "--pipeline-parallel-size=8"],
+                hugging_face_model=HuggingFaceModel(
+                    model_hf_name="test2", hf_token="yyy"
+                ),
+                server_extra_args=["--bar", "--pipeline-parallel-size=8"],
             ),
         ),
         apolo_client=apolo_client,
@@ -324,10 +330,10 @@ async def test_values_llm_generation_gpu_8x_pps_and_tps(
             ingress=Ingress(enabled=True, clusterName="test"),
             llm=LLMModel(
                 hugging_face_model=HuggingFaceModel(
-                    modelHFName="test2",
-                    hfToken="yyy",
+                    model_hf_name="test2",
+                    hf_token="yyy",
                 ),
-                serverExtraArgs=[
+                server_extra_args=[
                     "--bar",
                     "--pipeline-parallel-size=8",
                     "--tensor-parallel-size=8",
@@ -362,7 +368,7 @@ async def test_values_llm_generation__storage_integrated(
             ),
             llm=LLMModel(
                 hugging_face_model=HuggingFaceModel(
-                    modelHFName="test", hfToken=hf_token
+                    model_hf_name="test", hf_token=hf_token
                 ),
             ),
             storage_cache=HuggingFaceStorageCacheModel(

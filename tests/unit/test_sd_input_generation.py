@@ -24,10 +24,10 @@ async def test_values_sd_generation(setup_clients, mock_get_preset_cpu):
                 clusterName="test",
             ),
             stable_diffusion=StableDiffusionParams(
-                replicaCount=1,
+                replica_count=1,
                 stablestudio=None,
                 hugging_face_model=HuggingFaceModel(
-                    modelHFName="test", hfToken="test3"
+                    model_hf_name="test", hf_token="test3"
                 ),
             ),
         ),
@@ -88,7 +88,7 @@ async def test_values_sd_generation_with_gpu(setup_clients, mock_get_preset_gpu)
                 replicaCount=1,
                 stablestudio=None,
                 hugging_face_model=HuggingFaceModel(
-                    modelHFName="test", hfToken="test3"
+                    model_hf_name="test", hf_token="test3"
                 ),
             ),
         ),

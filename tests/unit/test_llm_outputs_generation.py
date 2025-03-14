@@ -16,9 +16,9 @@ async def test_llm(setup_clients, mock_kubernetes_client):
         }
     )
     assert res["hf_model"] == {
-        "modelHFName": "meta-llama/Llama-3.1-8B-Instruct",
-        "modelFiles": None,
-        "hfToken": None,
+        "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct",
+        "model_files": None,
+        "hf_token": None,
     }
     assert res["llm_specific"] == {
         "tokenizer_name": "meta-llama/Llama-3.1-8B-Instruct",
@@ -45,9 +45,9 @@ async def test_llm_without_server_args(setup_clients, mock_kubernetes_client):
     )
 
     assert res["hf_model"] == {
-        "modelHFName": "meta-llama/Llama-3.1-8B-Instruct",
-        "modelFiles": None,
-        "hfToken": None,
+        "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct",
+        "model_files": None,
+        "hf_token": None,
     }
     assert res["llm_specific"] == {
         "tokenizer_name": "meta-llama/Llama-3.1-8B-Instruct",

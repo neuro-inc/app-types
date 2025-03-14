@@ -1,20 +1,23 @@
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from apolo_app_types.protocols.common.secrets_ import K8sSecret, OptionalStrOrSecret
 
 
 class HuggingFaceModel(BaseModel):
-    modelHFName: str = Field(  # noqa: N815
+    model_config = ConfigDict(
+        protected_namespaces=(),
+    )
+    model_hf_name: str = Field(  # noqa: N815
         ...,
         description="The name of the Hugging Face model.",
         title="Hugging Face Model Name",
     )
-    modelFiles: str | None = Field(  # noqa: N815
+    model_files: str | None = Field(  # noqa: N815
         None, description="The path to the model files.", title="Model Files"
     )
-    hfToken: OptionalStrOrSecret = Field(  # noqa: N815
+    hf_token: OptionalStrOrSecret = Field(  # noqa: N815
         default=None,
         description="The Hugging Face API token.",
         title="Hugging Face Token",

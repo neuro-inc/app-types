@@ -66,7 +66,7 @@ class StableDiffusionChartValueProcessor(
 
         model_vals = {
             "model": {
-                "modelHFName": input_.stable_diffusion.hugging_face_model.modelHFName,
+                "modelHFName": input_.stable_diffusion.hugging_face_model.model_hf_name,
             }
         }
         return merge_list_of_dicts(
@@ -81,6 +81,7 @@ class StableDiffusionChartValueProcessor(
                         "image": {
                             "repository": img_repository,
                         },
+                        "replicaCount": input_.stable_diffusion.replica_count,
                     },
                 },
             ]

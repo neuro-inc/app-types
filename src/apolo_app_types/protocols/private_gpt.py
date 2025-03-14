@@ -1,10 +1,10 @@
 from pydantic import field_validator
 from yarl import URL
 
-from apolo_app_types.protocols.common import AppInputs, AppOutputs
+from apolo_app_types.protocols.common import AppInputsDeployer, AppOutputsDeployer
 
 
-class PrivateGPTInputs(AppInputs):
+class PrivateGPTInputs(AppInputsDeployer):
     preset_name: str
     llm_inference_app_name: str
     text_embeddings_app_name: str
@@ -20,7 +20,7 @@ class PrivateGPTInputs(AppInputs):
         return URL(raw)
 
 
-class PrivateGPTOutputs(AppOutputs):
+class PrivateGPTOutputs(AppOutputsDeployer):
     internal_web_app_url: str
     internal_api_url: str
     internal_api_swagger_url: str

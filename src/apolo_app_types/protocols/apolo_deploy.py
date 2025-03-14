@@ -1,11 +1,11 @@
-from apolo_app_types.protocols.common import AppInputs, AppOutputs
+from apolo_app_types.protocols.common import AppInputsDeployer, AppOutputsDeployer
 
 
-class ApoloDeployInputs(AppInputs):
+class ApoloDeployInputs(AppInputsDeployer):
     preset_name: str
     http_auth: bool = True
     mlflow_app_name: str
 
 
-class ApoloDeployOutputs(AppOutputs):
+class ApoloDeployOutputs(AppOutputsDeployer):
     internal_web_app_url: str

@@ -2,8 +2,9 @@ from apolo_app_types.protocols.apolo_deploy import ApoloDeployInputs, ApoloDeplo
 from apolo_app_types.protocols.common import (
     ApoloStorageMount,
     AppInputs,
-    AppInputsV2,
+    AppInputsDeployer,
     AppOutputs,
+    AppOutputsDeployer,
     BasicAuth,
     HuggingFaceModel,
     K8sSecret,
@@ -66,6 +67,7 @@ from apolo_app_types.protocols.stable_diffusion import (
     SDModel,
     SDOutputs,
     StableDiffusionInputs,
+    StableDiffusionOutputs,
     TextToImgAPI,
 )
 from apolo_app_types.protocols.text_embeddings import (
@@ -124,10 +126,10 @@ __all__ = [
     "StrOrSecret",
     "OptionalStrOrSecret",
     "Bucket",
-    "StableDiffusionInputs",
+    "StableDiffusionOutputs",
     "HuggingFaceModel",
     "VLLMOutputsV2",
-    "AppInputsV2",
+    "AppInputsDeployer",
     "PGBouncer",
     "PostgresConfig",
     "DockerHubInputs",
@@ -142,4 +144,5 @@ __all__ = [
     "Container",
     "Service",
     "Env",
+    "AppOutputsDeployer",
 ]

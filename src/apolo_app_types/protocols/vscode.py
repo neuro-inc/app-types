@@ -1,10 +1,10 @@
-from apolo_app_types.protocols.common import AppInputs, AppOutputs
+from apolo_app_types.protocols.common import AppInputsDeployer, AppOutputsDeployer
 
 
-class VSCodeInputs(AppInputs):
+class VSCodeInputs(AppInputsDeployer):
     preset_name: str
     http_auth: bool = True
 
 
-class VSCodeOutputs(AppOutputs):
+class VSCodeOutputs(AppOutputsDeployer):
     internal_web_app_url: str

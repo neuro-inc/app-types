@@ -1,9 +1,21 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
-from apolo_app_types.protocols.common import AppInputsV2, AppOutputsV2, StrOrSecret
+from apolo_app_types.protocols.common import (
+    AppInputs,
+    AppOutputs,
+    StrOrSecret,
+)
 
 
 class DockerHubModel(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra={
+            "x-title": "DockerHub Configuration",
+            "x-description": "Configuration for DockerHub.",
+            "x-logo-url": "https://example.com/logo",
+        },
+    )
     registry_url: str = Field(  # noqa: N815
         default="https://index.docker.io/v1/",
         description="The URL of the registry where the container images is stored.",
@@ -21,7 +33,7 @@ class DockerHubModel(BaseModel):
     )
 
 
-class DockerHubInputs(AppInputsV2):
+class DockerHubInputs(AppInputs):
     dockerhub: DockerHubModel
 
 
@@ -33,5 +45,5 @@ class DockerConfigModel(BaseModel):
     )
 
 
-class DockerHubOutputs(AppOutputsV2):
+class DockerHubOutputs(AppOutputs):
     dockerconfigjson: DockerConfigModel = Field(..., title="Docker config JSON")

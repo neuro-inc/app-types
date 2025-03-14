@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class IngressGrpc(BaseModel):
@@ -6,6 +6,14 @@ class IngressGrpc(BaseModel):
 
 
 class Ingress(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra={
+            "title": "Ingress Configuration",
+            "description": "Configuration for Ingress.",
+            "x-logo-url": "https://example.com/logo",
+        },
+    )
     enabled: bool = Field(
         ...,
         description="Indicates whether the ingress is enabled.",
