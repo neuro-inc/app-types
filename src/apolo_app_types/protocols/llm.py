@@ -71,7 +71,7 @@ class LLMInputs(AppInputs):
     preset: Preset
     ingress: Ingress
     llm: LLMModel
-    storage_cache: HuggingFaceStorageCacheModel
+    storage_cache: HuggingFaceStorageCacheModel | None = None
 
 
 class OpenAICompatibleAPI(AppOutputsDeployer):

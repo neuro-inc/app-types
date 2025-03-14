@@ -5,7 +5,7 @@ from apolo_app_types import HuggingFaceModel
 from apolo_app_types.clients.kube import get_service_host_port
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
 from apolo_app_types.protocols.common.networking import RestAPI
-from apolo_app_types.protocols.stable_diffusion import SDOutputsV2
+from apolo_app_types.protocols.stable_diffusion import StableDiffusionOutputs
 
 
 logger = logging.getLogger()
@@ -38,7 +38,7 @@ async def get_stable_diffusion_outputs(
         protocol="https",
     )
     model = HuggingFaceModel(model_hf_name=helm_values["model"]["modelHFName"])
-    stable_diffusion_output = SDOutputsV2(
+    stable_diffusion_output = StableDiffusionOutputs(
         internal_api=internal_api, external_api=external_api, hf_model=model
     )
 
