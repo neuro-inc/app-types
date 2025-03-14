@@ -1,12 +1,8 @@
 from pydantic import BaseModel, Field
 
 from apolo_app_types.protocols.common import AppInputsV2, AppOutputsV2, Preset, RestAPI
+from apolo_app_types.protocols.common.containers import ContainerImage
 from apolo_app_types.protocols.common.ingress import Ingress
-
-
-class ContainerImage(BaseModel):
-    repository: str
-    tag: str | None = None
 
 
 class AutoscalingBase(BaseModel):
