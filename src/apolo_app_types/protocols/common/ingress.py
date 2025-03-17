@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict, Field
 
-from apolo_app_types.protocols.common import SchemaExtraMetadata
+from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
 
 
 class IngressGrpc(BaseModel):
