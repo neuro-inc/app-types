@@ -4,17 +4,17 @@ from apolo_app_types.protocols.common import (
     ApoloStoragePath,
     AppInputs,
     AppOutputs,
+    SchemaExtraMetadata,
 )
 
 
 class HuggingFaceStorageCacheModel(BaseModel):
     model_config = ConfigDict(
         protected_namespaces=(),
-        json_schema_extra={
-            "x-title": "HuggingFace Storage Cache Configuration",
-            "x-description": "Configuration HF storage.",
-            "x-logo-url": "https://example.com/logo",
-        },
+        json_schema_extra=SchemaExtraMetadata(
+            title="HuggingFace Storage Cache",
+            description="Configuration for HuggingFace storage cache.",
+        ).as_json_schema_extra(),
     )
     storage_path: ApoloStoragePath = Field(
         ...,

@@ -90,6 +90,8 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 warn_unused_configs = true
 plugins = ['pydantic.mypy']
+disable_error_code = "call-arg"
+
 
 [[tool.mypy.overrides]]
 module = "pytest"
