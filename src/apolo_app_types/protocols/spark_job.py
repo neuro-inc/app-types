@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from apolo_app_types.protocols.common import AppInputsV2, AppOutputsV2
 from apolo_app_types.protocols.common.containers import ContainerImage
 from apolo_app_types.protocols.common.preset import Preset
+from apolo_app_types.protocols.common.storage import ApoloStorageFile, ApoloStorageMount
 
 
 class File:
@@ -42,22 +43,23 @@ class SparkDependencies(BaseModel):
 
 class SparkAutoScalingConfig(BaseModel):
     enabled: bool = False
-    initial_executor: int | None
-    min_executor: int
-    max_executor: int
+    initial_executors: int | None
+    min_executors: int
+    max_executors: int
     shuffle_tracking_timeout: int
 
 
 class SparkJobModel(BaseModel):
-    spark_application_type: SparkApplicationType
+    type: SparkApplicationType
     image: ContainerImage
-    main_application_file: str
+    main_application_file: ApoloStorageFile
     arguments: list[str] | None = None
     dependencies: SparkDependencies | None = None
     spark_application_config: PythonSpecificConfig | JavaSpecificConfig | None
     spark_auto_scaling_config: SparkAutoScalingConfig | None
     driver_preset: Preset
     executor_preset: Preset
+    volumes: list[ApoloStorageMount] | None = None
 
 
 class SparkJobInputs(AppInputsV2):

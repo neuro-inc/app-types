@@ -78,3 +78,6 @@ class ApoloStorageMount(BaseModel):
         description="The mode of the mount.",
         title="Mount mode",
     )
+
+
+class ApoloStorageFile(ApoloStoragePath): ...
