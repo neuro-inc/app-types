@@ -105,8 +105,8 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
         )
 
         # Add authentication values
-        if input_.clusterApi:
-            auth_vals = await self._get_auth_values(input_.clusterApi)
+        if input_.cluster_api:
+            auth_vals = await self._get_auth_values(input_.cluster_api)
         else:
             auth_vals = {}
 

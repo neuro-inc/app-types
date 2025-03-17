@@ -2,7 +2,7 @@ import enum
 
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
-from apolo_app_types.protocols.common import SchemaExtraMetadata
+from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
 
 
 class CredentialsType(str, enum.Enum):
