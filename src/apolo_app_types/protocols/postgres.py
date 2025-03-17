@@ -1,12 +1,24 @@
 import enum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from apolo_app_types import AppInputs, Bucket
-from apolo_app_types.protocols.common import AppOutputs, AppOutputsDeployer, Preset
+from apolo_app_types.protocols.common import (
+    AppOutputs,
+    AppOutputsDeployer,
+    Preset,
+    SchemaExtraMetadata,
+)
 
 
 class PGBouncer(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="PG Bouncer",
+            description="Configuration for PG Bouncer.",
+        ).as_json_schema_extra(),
+    )
     preset: Preset = Field(
         ...,
         description="Preset to use for the PGBouncer instance.",
@@ -41,6 +53,13 @@ class PostgresDBUser(BaseModel):
 
 
 class PostgresConfig(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Postgres",
+            description="Configuration for Postgres.",
+        ).as_json_schema_extra(),
+    )
     postgres_version: PostgresSupportedVersions = Field(
         default=PostgresSupportedVersions.v16,
         description="Postgres version to use.",
@@ -64,26 +83,10 @@ class PostgresConfig(BaseModel):
 
 
 class CrunchyPostgresInputs(AppInputs):
-    preset: Preset = Field(
-        ...,
-        description="Preset to use for the Postgres instance.",
-        title="Preset",
-    )
-    postgres_config: PostgresConfig = Field(
-        ...,
-        description="Postgres configuration.",
-        title="Postgres",
-    )
-    pg_bouncer: PGBouncer = Field(
-        ...,
-        description="PGBouncer configuration.",
-        title="PGBouncer",
-    )
-    backup_bucket: Bucket = Field(
-        ...,
-        description="Bucket to use for backups.",
-        title="Backup bucket",
-    )
+    preset: Preset
+    postgres_config: PostgresConfig
+    pg_bouncer: PGBouncer
+    backup_bucket: Bucket
 
 
 class CrunchyPostgresUserCredentials(BaseModel):

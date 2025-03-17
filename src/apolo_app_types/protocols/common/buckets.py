@@ -1,6 +1,8 @@
 import enum
 
-from pydantic import BaseModel, Field, SecretStr
+from pydantic import BaseModel, ConfigDict, Field, SecretStr
+
+from apolo_app_types.protocols.common import SchemaExtraMetadata
 
 
 class CredentialsType(str, enum.Enum):
@@ -84,6 +86,13 @@ class BucketProvider(str, enum.Enum):
 
 
 class Bucket(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Bucket",
+            description="Configuration for Bucket.",
+        ).as_json_schema_extra(),
+    )
     id: str = Field(
         ...,
         description="The bucket ID.",
