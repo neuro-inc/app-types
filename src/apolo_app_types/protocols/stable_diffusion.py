@@ -9,6 +9,7 @@ from apolo_app_types.protocols.common import (
     Ingress,
     Preset,
     RestAPI,
+    SchemaExtraMetadata,
 )
 
 
@@ -20,11 +21,9 @@ class StableStudio(AppInputsDeployer):
 class StableDiffusionParams(BaseModel):
     model_config = ConfigDict(
         protected_namespaces=(),
-        json_schema_extra={
-            "x-title": "Stable Diffusion Configuration",
-            "x-description": "Configuration for Stable Diffusion.",
-            "x-logo-url": "https://example.com/logo",
-        },
+        json_schema_extra=SchemaExtraMetadata(
+            title="Stable Diffusion", description="Configuration for Stable Diffusion."
+        ).as_json_schema_extra(),
     )
     replica_count: int = Field(
         default=1,

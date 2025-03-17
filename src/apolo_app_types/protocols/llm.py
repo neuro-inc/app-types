@@ -7,6 +7,7 @@ from apolo_app_types.protocols.common import (
     HuggingFaceModel,
     Ingress,
     Preset,
+    SchemaExtraMetadata,
 )
 from apolo_app_types.protocols.common.networking import RestAPI
 from apolo_app_types.protocols.huggingface_storage_cache import (
@@ -30,11 +31,10 @@ class LLMApi(BaseModel):
 class LLMModel(BaseModel):
     model_config = ConfigDict(
         protected_namespaces=(),
-        json_schema_extra={
-            "x-title": "LLM Configuration",
-            "x-description": "Configuration for LLM.",
-            "x-logo-url": "https://example.com/logo",
-        },
+        json_schema_extra=SchemaExtraMetadata(
+            title="LLM",
+            description="Configuration for LLM.",
+        ).as_json_schema_extra(),
     )
     hugging_face_model: HuggingFaceModel = Field(  # noqa: N815
         ...,

@@ -8,6 +8,7 @@ from .outputs import AppOutputs, AppOutputsDeployer
 from .postgres import Postgres
 from .preset import Preset
 from .redis import Redis, RedisMaster
+from .schema_extra import SchemaExtraMetadata
 from .secrets_ import K8sSecret, OptionalStrOrSecret, StrOrSecret
 from .storage import (
     ApoloMountMode,
@@ -43,4 +44,5 @@ __all__ = [
     "Bucket",
     "AppOutputsDeployer",
     "AppInputs",
+    "SchemaExtraMetadata",
 ]
