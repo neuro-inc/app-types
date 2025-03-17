@@ -16,7 +16,7 @@ from apolo_app_types.protocols.common import (
     ApoloStorageMount,
     MountPath,
 )
-from apolo_app_types.protocols.common.hugging_face import serialize_hf_token
+from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
 from apolo_app_types.protocols.llm import LLMModel
 
 
@@ -72,7 +72,7 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
 
     def _configure_env(self, llm_model: LLMModel) -> dict[str, t.Any]:
         return {
-            "HUGGING_FACE_HUB_TOKEN": serialize_hf_token(
+            "HUGGING_FACE_HUB_TOKEN": serialize_optional_secret(
                 llm_model.hugging_face_model.hf_token
             )
         }

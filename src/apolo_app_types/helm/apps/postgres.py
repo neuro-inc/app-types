@@ -16,6 +16,7 @@ from apolo_app_types.protocols.common.buckets import (
     MinioBucketCredentials,
     S3BucketCredentials,
 )
+from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
 from apolo_app_types.protocols.postgres import CrunchyPostgresInputs, PostgresDBUser
 
 
@@ -162,7 +163,9 @@ class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
                 "endpoint": s3_like_bucket_creds.endpoint_url,
                 "region": s3_like_bucket_creds.region_name,
                 "key": s3_like_bucket_creds.access_key_id,
-                "keySecret": s3_like_bucket_creds.secret_access_key.get_secret_value(),
+                "keySecret": serialize_optional_secret(
+                    s3_like_bucket_creds.secret_access_key
+                ),
             }
             return {"s3": backup_config}
         if bucket.bucket_provider == BucketProvider.GCP:

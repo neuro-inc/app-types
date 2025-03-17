@@ -6,6 +6,7 @@ from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import gen_extra_values
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
 from apolo_app_types.protocols.common.buckets import BucketProvider, S3BucketCredentials
+from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
 
 
 WEAVIATE_BUCKET_NAME = "weaviate-backup"
@@ -64,7 +65,7 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
             [
                 bucket_credentials.name,
                 bucket_credentials.access_key_id,
-                bucket_credentials.secret_access_key.get_secret_value(),
+                bucket_credentials.secret_access_key,
                 s3_endpoint,
                 bucket_credentials.region_name,
             ]
@@ -82,8 +83,8 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
                 },
                 "secrets": {
                     "AWS_ACCESS_KEY_ID": bucket_credentials.access_key_id,
-                    "AWS_SECRET_ACCESS_KEY": (
-                        bucket_credentials.secret_access_key.get_secret_value()
+                    "AWS_SECRET_ACCESS_KEY": serialize_optional_secret(
+                        bucket_credentials.secret_access_key
                     ),
                 },
             }
