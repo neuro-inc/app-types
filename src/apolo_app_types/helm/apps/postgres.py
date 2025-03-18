@@ -17,10 +17,10 @@ from apolo_app_types.protocols.common.buckets import (
     S3BucketCredentials,
 )
 from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
-from apolo_app_types.protocols.postgres import CrunchyPostgresInputs, PostgresDBUser
+from apolo_app_types.protocols.postgres import PostgresDBUser, PostgresInputs
 
 
-class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
+class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
     def __init__(self, *args: t.Any, **kwargs: t.Any):
         super().__init__(*args, **kwargs)
 
@@ -181,7 +181,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
 
     async def gen_extra_values(
         self,
-        input_: CrunchyPostgresInputs,
+        input_: PostgresInputs,
         app_name: str,
         namespace: str,
         *_: t.Any,

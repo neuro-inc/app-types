@@ -82,7 +82,7 @@ class PostgresConfig(BaseModel):
     )
 
 
-class CrunchyPostgresInputs(AppInputs):
+class PostgresInputs(AppInputs):
     preset: Preset
     postgres_config: PostgresConfig
     pg_bouncer: PGBouncer
@@ -111,5 +111,5 @@ class PostgresUsers(BaseModel):
     users: list[CrunchyPostgresUserCredentials]
 
 
-class PostgresOutputsV2(AppOutputs):
+class PostgresOutputs(AppOutputs):
     postgres_users: PostgresUsers | None = None
