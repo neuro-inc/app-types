@@ -1,8 +1,6 @@
-from typing import Any
-
 from pydantic import BaseModel, ConfigDict, Field
 
-from apolo_app_types.protocols.common.secrets_ import K8sSecret, OptionalStrOrSecret
+from apolo_app_types.protocols.common.secrets_ import OptionalStrOrSecret
 
 
 class HuggingFaceModel(BaseModel):
@@ -22,14 +20,3 @@ class HuggingFaceModel(BaseModel):
         description="The Hugging Face API token.",
         title="Hugging Face Token",
     )
-
-
-def serialize_hf_token(value: str | K8sSecret | None) -> dict[str, Any] | str:
-    if value is None:
-        return ""
-    if isinstance(value, str):
-        return value
-    if isinstance(value, K8sSecret):
-        return value.model_dump()
-    err_msg = f"Unsupported type for hfToken: {type(value)}"
-    raise ValueError(err_msg)
