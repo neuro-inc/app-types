@@ -32,7 +32,7 @@ async def post_outputs(api_url: str, api_token: str, outputs: dict[str, t.Any]) 
         )
 
 
-async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> None:
+async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> bool:
     app_type = helm_outputs["PLATFORM_APPS_APP_TYPE"]
     platform_apps_url = helm_outputs["PLATFORM_APPS_URL"]
     platform_apps_token = helm_outputs["PLATFORM_APPS_TOKEN"]
@@ -63,3 +63,5 @@ async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> None:
         )
     except Exception as e:
         logger.error("An error occurred: %s", e)
+        return False
+    return True
