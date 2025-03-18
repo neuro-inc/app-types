@@ -4,6 +4,7 @@ from pathlib import Path
 from apolo_app_types import SparkJobInputs
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
+    append_apolo_storage_integration_annotations,
     gen_apolo_storage_integration_annotations,
     gen_apolo_storage_integration_labels,
     gen_extra_values,
@@ -12,6 +13,9 @@ from apolo_app_types.protocols.common.storage import (
     ApoloMountMode,
     ApoloStorageMount,
     MountPath,
+)
+from apolo_app_types.protocols.spark_job import (
+    PythonSpecificConfig,
 )
 
 
@@ -24,10 +28,9 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
     ) -> dict[str, t.Any]:
         extra_annotations: dict[str, str] = {}
         main_app_file_path = Path(input_.spark_job.main_application_file.path)
-        filename = str(main_app_file_path.name)
         main_app_file_mount = ApoloStorageMount(
             storage_path=str(main_app_file_path.parent),
-            mount_path=MountPath(path=f"/opt/spark/{filename}"),
+            mount_path=MountPath(path="/opt/spark"),
             mode=ApoloMountMode(mode="r"),
         )
         extra_annotations.update(
@@ -66,7 +69,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         # storages
         # input_.spark_job.main_application_file
 
-        values = {
+        values: dict[str, t.Any] = {
             "spark": {
                 "type": input_.spark_job.type.value,
                 "image": {
@@ -102,53 +105,51 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             }
             values["spark"]["dynamicAllocation"] = dynamic_allocation
 
-        # values: dict[str, t.Any] = {
-        #     "image": {
-        #         "repository": input_.spark_job.image.repository,
-        #         "tag": input_.spark_job.image.tag or "latest",
-        #     },
-        #     **extra_values,
-        # }
+        deps: dict[str, t.Any] = {}
+        if input_.spark_job.dependencies:
+            deps = input_.spark_job.dependencies.model_dump()
 
-        values["deps"] = {}
+        if (
+            input_.spark_job.spark_application_config
+            and isinstance(
+                input_.spark_job.spark_application_config, PythonSpecificConfig
+            )  # noqa: E501
+        ):
+            pypi_packages = input_.spark_job.spark_application_config.pypi_packages
+            if isinstance(pypi_packages, list):
+                pkg_list: list[str] = pypi_packages
+                deps["pypi_packages"] = pkg_list
+
+            deps_mount = ApoloStorageMount(
+                storage_path=f"storage:{namespace}/spark/deps",
+                mount_path=MountPath(path="/opt/spark/deps"),
+                mode=ApoloMountMode(mode="rw"),
+            )
+            deps_annotation = gen_apolo_storage_integration_annotations([deps_mount])
+            values["pyspark_dep_manager"] = {
+                "labels": gen_apolo_storage_integration_labels(inject_storage=True),
+                "annotations": deps_annotation,
+            }
+            # append to existing storage annotation
+            values["spark"]["driver"]["annotations"] = (
+                append_apolo_storage_integration_annotations(
+                    values["spark"]["driver"]["annotations"], [deps_mount]
+                )
+            )
+            values["spark"]["executor"]["annotations"] = (
+                append_apolo_storage_integration_annotations(
+                    values["spark"]["executor"]["annotations"], [deps_mount]
+                )
+            )
+
+            # add this env var so that pyspark can load the dependencies
+            pyspark_env_var = {
+                "name": "PYSPARK_PYTHON",
+                "value": f"{deps_mount.mount_path.path}/pyspark_pex_env.pex",
+            }
+            values["spark"]["driver"]["env"] = [pyspark_env_var]
+            values["spark"]["executor"]["env"] = [pyspark_env_var]
+
+        values["deps"] = deps
+
         return values
-
-        # return {
-        #     "spark-operator": {
-        #         "spark": {
-        #             "jobNamespaces": [namespace],
-        #             "serviceAccount": {
-        #                 "create": True,
-        #                 "name": "",
-        #                 "annotations": {},
-        #                 "automountServiceAccountToken": True,
-        #             },
-        #             "rbac": {"create": True, "annotations": {}},
-        #         }
-        #     },
-        #     "spark": {
-        #         "type": "Python",
-        #         "pythonVersion": None,
-        #         "image": {"repository": "spark", "tag": "3.5.3"},
-        #         "mainApplicationFile": "main.py",
-        #         "volumes": [],
-        #         "driver": {"env": [], "volumeMounts": []},
-        #         "executor": {"volumeMounts": [], "env": []},
-        #         "dynamicAllocation": {
-        #             "enabled": False,
-        #             "initialExecutors": None,
-        #             "minExecutors": None,
-        #             "maxExecutors": None,
-        #             "shuffleTrackingTimeout": None,
-        #         },
-        #         "deps": {
-        #             "jars": [],
-        #             "files": [],
-        #             "pyFiles": [],
-        #             "packages": [],
-        #             "excludePackages": [],
-        #             "repositories": [],
-        #             "archives": [],
-        #         },
-        #     },
-        # }
