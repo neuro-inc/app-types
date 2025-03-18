@@ -54,11 +54,12 @@ from apolo_app_types.protocols.llm import (
 )
 from apolo_app_types.protocols.mlflow import MLFlowInputs, MLFlowOutputs
 from apolo_app_types.protocols.postgres import (
-    CrunchyPostgresInputs,
     CrunchyPostgresOutputs,
     CrunchyPostgresUserCredentials,
     PGBouncer,
     PostgresConfig,
+    PostgresInputs,
+    PostgresOutputs,
 )
 from apolo_app_types.protocols.private_gpt import PrivateGPTInputs, PrivateGPTOutputs
 from apolo_app_types.protocols.pycharm import PycharmInputs, PycharmOutputs
@@ -99,7 +100,7 @@ __all__ = [
     "VLLMOutputs",
     "MLFlowInputs",
     "MLFlowOutputs",
-    "CrunchyPostgresInputs",
+    "PostgresInputs",
     "CrunchyPostgresOutputs",
     "ShellInputs",
     "ShellOutputs",
@@ -145,4 +146,5 @@ __all__ = [
     "Service",
     "Env",
     "AppOutputsDeployer",
+    "PostgresOutputs",
 ]

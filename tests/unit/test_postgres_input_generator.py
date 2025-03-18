@@ -3,7 +3,7 @@ import base64
 import pydantic
 import pytest
 
-from apolo_app_types import Bucket, CrunchyPostgresInputs
+from apolo_app_types import Bucket, PostgresInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.protocols.common import Preset
 from apolo_app_types.protocols.common.buckets import (
@@ -28,7 +28,7 @@ async def test_values_postgresql_generation(setup_clients, mock_get_preset_cpu):
 
     apolo_client = setup_clients
     _, helm_params = await app_type_to_vals(
-        input_=CrunchyPostgresInputs(
+        input_=PostgresInputs(
             preset=Preset(
                 name="cpu-large",
             ),
@@ -93,7 +93,7 @@ async def test_values_postgresql_generation_without_user(
 
     apolo_client = setup_clients
     _, helm_params = await app_type_to_vals(
-        input_=CrunchyPostgresInputs(
+        input_=PostgresInputs(
             preset=Preset(
                 name="cpu-large",
             ),
@@ -165,7 +165,7 @@ async def test_values_postgresql_generation_with_gcp_bucket(
     key_data = "Some string"
     apolo_client = setup_clients
     _, helm_params = await app_type_to_vals(
-        input_=CrunchyPostgresInputs(
+        input_=PostgresInputs(
             preset=Preset(
                 name="cpu-large",
             ),
@@ -227,7 +227,7 @@ async def test_values_postgresql_generation_with_minio(
 
     apolo_client = setup_clients
     _, helm_params = await app_type_to_vals(
-        input_=CrunchyPostgresInputs(
+        input_=PostgresInputs(
             preset=Preset(
                 name="cpu-large",
             ),
@@ -299,7 +299,7 @@ async def test_values_postgresql_generation_without_matching_bucket_and_creds(
     apolo_client = setup_clients
     with pytest.raises(pydantic.ValidationError):
         _, helm_params = await app_type_to_vals(
-            input_=CrunchyPostgresInputs(
+            input_=PostgresInputs(
                 preset=Preset(
                     name="cpu-large",
                 ),

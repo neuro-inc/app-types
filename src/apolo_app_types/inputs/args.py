@@ -3,8 +3,8 @@ import typing as t
 import apolo_sdk
 
 from apolo_app_types import (
-    CrunchyPostgresInputs,
     LLMInputs,
+    PostgresInputs,
     StableDiffusionInputs,
     WeaviateInputs,
 )
@@ -66,7 +66,7 @@ async def get_installation_vals(
         AppType.StableDiffusion: StableDiffusionInputs,
         AppType.Weaviate: WeaviateInputs,
         AppType.DockerHub: DockerHubInputs,
-        AppType.PostgreSQL: CrunchyPostgresInputs,
+        AppType.PostgreSQL: PostgresInputs,
         AppType.CustomDeployment: CustomDeploymentInputs,
     }
 
