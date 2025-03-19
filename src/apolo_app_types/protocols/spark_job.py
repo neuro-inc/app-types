@@ -8,10 +8,6 @@ from apolo_app_types.protocols.common.preset import Preset
 from apolo_app_types.protocols.common.storage import ApoloStorageFile, ApoloStorageMount
 
 
-class File:
-    filepath: str
-
-
 class SparkApplicationType(StrEnum):
     PYTHON = "Python"
     SCALA = "Scala"
@@ -24,7 +20,7 @@ class SparkExecutorConfig(BaseModel):
 
 
 class PythonSpecificConfig(BaseModel):
-    pypi_packages: list[str] | File | None = None
+    pypi_packages: list[str] | ApoloStorageFile | None = None
 
 
 class JavaSpecificConfig(BaseModel):
