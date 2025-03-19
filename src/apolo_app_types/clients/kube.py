@@ -88,7 +88,7 @@ async def get_service_host_port(match_labels: dict[str, str]) -> tuple[str, str]
     return host, post
 
 
-async def get_secret(label: str) -> dict[str, typing.Any]:
+async def get_secret(label: str) -> typing.Any:
     try:
         config.load_incluster_config()
 

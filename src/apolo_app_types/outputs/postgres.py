@@ -59,6 +59,6 @@ async def get_postgres_outputs(
         raise Exception(msg)
     users = []
 
-    for item in secrets["items"]:
-        users.append(postgres_creds_from_kube_secret_data(item["data"]))
+    for item in secrets.items:
+        users.append(postgres_creds_from_kube_secret_data(item.data))
     return PostgresOutputs(postgres_users=PostgresUsers(users=users)).model_dump()
