@@ -2,7 +2,7 @@ from enum import StrEnum
 
 from pydantic import BaseModel
 
-from apolo_app_types.protocols.common import AppInputsV2, AppOutputsV2
+from apolo_app_types.protocols.common import AppInputs, AppOutputs
 from apolo_app_types.protocols.common.containers import ContainerImage
 from apolo_app_types.protocols.common.preset import Preset
 from apolo_app_types.protocols.common.storage import ApoloStorageFile, ApoloStorageMount
@@ -62,9 +62,9 @@ class SparkJobModel(BaseModel):
     volumes: list[ApoloStorageMount] | None = None
 
 
-class SparkJobInputs(AppInputsV2):
+class SparkJobInputs(AppInputs):
     spark_job: SparkJobModel
 
 
-class SparkJobOutputs(AppOutputsV2):
+class SparkJobOutputs(AppOutputs):
     pass

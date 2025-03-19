@@ -44,7 +44,7 @@ async def test_values_weaviate_generation_basic(setup_clients, mock_get_preset_c
                 enabled=False,
                 clusterName="test",
             ),
-            clusterApi=BasicAuth(  # noqa: N815
+            cluster_api=BasicAuth(  # noqa: N815
                 username="testuser",
                 password="testpass",
             ),
@@ -118,7 +118,7 @@ async def test_values_weaviate_generation_with_ingress(
                 clusterName="test-cluster",
                 grpc=IngressGrpc(enabled=True),
             ),
-            clusterApi=BasicAuth(  # noqa: N815
+            cluster_api=BasicAuth(  # noqa: N815
                 username="testuser",
                 password="testpass",
             ),
@@ -163,7 +163,7 @@ async def test_values_weaviate_generation_with_auth(setup_clients, mock_get_pres
                 clusterName="test-cluster",
                 grpc=IngressGrpc(enabled=True),
             ),
-            clusterApi=BasicAuth(  # noqa: N815
+            cluster_api=BasicAuth(  # noqa: N815
                 username="testuser",
                 password="testpass",
             ),

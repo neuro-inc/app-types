@@ -1,8 +1,9 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
-from apolo_app_types.protocols.common import AppInputsV2, AppOutputsV2, Preset, RestAPI
+from apolo_app_types.protocols.common import AppInputs, AppOutputs, Preset, RestAPI
 from apolo_app_types.protocols.common.containers import ContainerImage
 from apolo_app_types.protocols.common.ingress import Ingress
+from apolo_app_types.protocols.dockerhub import DockerConfigModel
 
 
 class AutoscalingBase(BaseModel):
@@ -35,6 +36,14 @@ class Service(BaseModel):
 
 
 class CustomDeploymentModel(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra={
+            "x-title": "Custom Deployment Configuration",
+            "x-description": "Configuration for Custom Deployment",
+            "x-logo-url": "https://example.com/logo",
+        },
+    )
     preset: Preset = Field(description="Name of the preset configuration to use")
     http_auth: bool = Field(
         default=True, description="Enable/disable HTTP authentication"
@@ -57,10 +66,13 @@ class CustomDeploymentModel(BaseModel):
     )
 
 
-class CustomDeploymentInputs(AppInputsV2):
+class CustomDeploymentInputs(AppInputs):
     custom_deployment: CustomDeploymentModel
+    dockerconfigjson: DockerConfigModel | None = Field(
+        default=None, description="Docker config JSON"
+    )
 
 
-class CustomDeploymentOutputs(AppOutputsV2):
+class CustomDeploymentOutputs(AppOutputs):
     internal_web_app_url: RestAPI | None = None
     external_web_app_url: RestAPI | None = None

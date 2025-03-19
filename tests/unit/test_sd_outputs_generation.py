@@ -18,9 +18,9 @@ async def test_sd(setup_clients, mock_kubernetes_client):
     assert res["internal_api"]["host"] == "app.default-namespace"
     assert res["internal_api"]["base_path"] == "/sdapi/v1"
     assert res["hf_model"] == {
-        "modelHFName": "SD-Model",
-        "modelFiles": None,
-        "hfToken": None,
+        "model_hf_name": "SD-Model",
+        "model_files": None,
+        "hf_token": None,
     }
 
 
@@ -40,9 +40,9 @@ async def test_sd_without_files(setup_clients, mock_kubernetes_client):
     assert res["internal_api"]["host"] == "app.default-namespace"
     assert res["internal_api"]["base_path"] == "/sdapi/v1"
     assert res["hf_model"] == {
-        "modelHFName": "SD-Model",
-        "hfToken": None,
-        "modelFiles": None,
+        "model_hf_name": "SD-Model",
+        "hf_token": None,
+        "model_files": None,
     }
 
 

@@ -1,12 +1,13 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from apolo_app_types.protocols.common import (
-    AppInputsV2,
+    AppInputs,
     AppOutputs,
-    AppOutputsV2,
+    AppOutputsDeployer,
     HuggingFaceModel,
     Ingress,
     Preset,
+    SchemaExtraMetadata,
 )
 from apolo_app_types.protocols.common.networking import RestAPI
 from apolo_app_types.protocols.huggingface_storage_cache import (
@@ -28,17 +29,24 @@ class LLMApi(BaseModel):
 
 
 class LLMModel(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="LLM",
+            description="Configuration for LLM.",
+        ).as_json_schema_extra(),
+    )
     hugging_face_model: HuggingFaceModel = Field(  # noqa: N815
         ...,
         description="The name of the Hugging Face model.",
         title="Hugging Face Model Name",
     )
-    tokenizerHFName: str = Field(  # noqa: N815
+    tokenizer_hf_name: str = Field(  # noqa: N815
         "",
         description="The name of the tokenizer associated with the Hugging Face model.",
         title="Hugging Face Tokenizer Name",
     )
-    serverExtraArgs: list[str] = Field(  # noqa: N815
+    server_extra_args: list[str] = Field(  # noqa: N815
         default_factory=list,
         description="Extra arguments to pass to the server.",
         title="Server Extra Arguments",
@@ -59,14 +67,14 @@ class Web(BaseModel):
     preset_name: str
 
 
-class LLMInputs(AppInputsV2):
+class LLMInputs(AppInputs):
     preset: Preset
     ingress: Ingress
     llm: LLMModel
     storage_cache: HuggingFaceStorageCacheModel | None = None
 
 
-class OpenAICompatibleAPI(AppOutputs):
+class OpenAICompatibleAPI(AppOutputsDeployer):
     model_name: str
     host: str
     port: str
@@ -93,7 +101,7 @@ class OpenAICompatibleCompletionsAPI(OpenAICompatibleChatAPI):
         return self.api_base + "/completions"
 
 
-class VLLMOutputs(AppOutputs):
+class VLLMOutputs(AppOutputsDeployer):
     chat_internal_api: OpenAICompatibleChatAPI | None
     chat_external_api: OpenAICompatibleChatAPI | None
     embeddings_internal_api: OpenAICompatibleEmbeddingsAPI | None
@@ -105,7 +113,7 @@ class LLMSpecific(BaseModel):
     api_key: str | None = None
 
 
-class VLLMOutputsV2(AppOutputsV2):
+class VLLMOutputsV2(AppOutputs):
     chat_internal_api: RestAPI | None = None
     chat_external_api: RestAPI | None = None
     embeddings_internal_api: RestAPI | None = None

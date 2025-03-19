@@ -1,6 +1,9 @@
 import enum
 
-from pydantic import BaseModel, Field, SecretStr
+from pydantic import BaseModel, ConfigDict, Field
+
+from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
+from apolo_app_types.protocols.common.secrets_ import StrOrSecret
 
 
 class CredentialsType(str, enum.Enum):
@@ -35,7 +38,7 @@ class MinioBucketCredentials(BucketCredentials):
         description="The access key ID of the bucket.",
         title="Bucket access key ID",
     )
-    secret_access_key: SecretStr = Field(
+    secret_access_key: StrOrSecret = Field(
         ...,
         description="The secret access key of the bucket.",
         title="Bucket secret access key",
@@ -58,7 +61,7 @@ class S3BucketCredentials(BucketCredentials):
         description="The access key ID of the bucket.",
         title="Bucket access key ID",
     )
-    secret_access_key: SecretStr = Field(
+    secret_access_key: StrOrSecret = Field(
         ...,
         description="The secret access key of the bucket.",
         title="Bucket secret access key",
@@ -84,6 +87,13 @@ class BucketProvider(str, enum.Enum):
 
 
 class Bucket(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Bucket",
+            description="Configuration for Bucket.",
+        ).as_json_schema_extra(),
+    )
     id: str = Field(
         ...,
         description="The bucket ID.",

@@ -7,7 +7,7 @@ from apolo_app_types import (
     CrunchyPostgresUserCredentials,
 )
 from apolo_app_types.clients.kube import get_secret
-from apolo_app_types.protocols.postgres import PostgresOutputsV2, PostgresUsers
+from apolo_app_types.protocols.postgres import PostgresOutputs, PostgresUsers
 
 
 logger = logging.getLogger()
@@ -59,6 +59,6 @@ async def get_postgres_outputs(
         raise Exception(msg)
     users = []
 
-    for item in secrets["items"]:
-        users.append(postgres_creds_from_kube_secret_data(item["data"]))
-    return PostgresOutputsV2(postgres_users=PostgresUsers(users=users)).model_dump()
+    for item in secrets.items:
+        users.append(postgres_creds_from_kube_secret_data(item.data))
+    return PostgresOutputs(postgres_users=PostgresUsers(users=users)).model_dump()

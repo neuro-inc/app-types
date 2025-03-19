@@ -16,10 +16,11 @@ from apolo_app_types.protocols.common.buckets import (
     MinioBucketCredentials,
     S3BucketCredentials,
 )
-from apolo_app_types.protocols.postgres import CrunchyPostgresInputs, PostgresDBUser
+from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
+from apolo_app_types.protocols.postgres import PostgresDBUser, PostgresInputs
 
 
-class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
+class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
     def __init__(self, *args: t.Any, **kwargs: t.Any):
         super().__init__(*args, **kwargs)
 
@@ -162,7 +163,9 @@ class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
                 "endpoint": s3_like_bucket_creds.endpoint_url,
                 "region": s3_like_bucket_creds.region_name,
                 "key": s3_like_bucket_creds.access_key_id,
-                "keySecret": s3_like_bucket_creds.secret_access_key.get_secret_value(),
+                "keySecret": serialize_optional_secret(
+                    s3_like_bucket_creds.secret_access_key
+                ),
             }
             return {"s3": backup_config}
         if bucket.bucket_provider == BucketProvider.GCP:
@@ -178,7 +181,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[CrunchyPostgresInputs]):
 
     async def gen_extra_values(
         self,
-        input_: CrunchyPostgresInputs,
+        input_: PostgresInputs,
         app_name: str,
         namespace: str,
         *_: t.Any,
