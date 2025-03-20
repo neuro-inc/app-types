@@ -1,5 +1,6 @@
 import typing as t
-from pathlib import Path
+
+from yarl import URL
 
 from apolo_app_types import SparkJobInputs
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
@@ -27,7 +28,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         self, input_: SparkJobInputs
     ) -> dict[str, t.Any]:
         extra_annotations: dict[str, str] = {}
-        main_app_file_path = Path(input_.spark_job.main_application_file.path)
+        main_app_file_path = URL(input_.spark_job.main_application_file.path)
         main_app_file_mount = ApoloStorageMount(
             storage_path=str(main_app_file_path.parent),
             mount_path=MountPath(path="/opt/spark"),
