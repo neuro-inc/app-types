@@ -13,6 +13,7 @@ from apolo_app_types.helm.apps.common import (
 from apolo_app_types.protocols.common.storage import (
     ApoloMountMode,
     ApoloStorageMount,
+    ApoloStoragePath,
     MountPath,
 )
 from apolo_app_types.protocols.spark_job import (
@@ -30,7 +31,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         extra_annotations: dict[str, str] = {}
         main_app_file_path = URL(input_.spark_job.main_application_file.path)
         main_app_file_mount = ApoloStorageMount(
-            storage_path=str(main_app_file_path.parent),
+            storage_path=ApoloStoragePath(path=str(main_app_file_path.parent)),
             mount_path=MountPath(path="/opt/spark"),
             mode=ApoloMountMode(mode="r"),
         )
