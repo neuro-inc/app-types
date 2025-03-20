@@ -3,6 +3,7 @@ import typing as t
 from yarl import URL
 
 from apolo_app_types import SparkJobInputs
+from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
     append_apolo_storage_integration_annotations,
@@ -122,11 +123,15 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
                 pkg_list: list[str] = pypi_packages
                 deps["pypi_packages"] = pkg_list
 
-            if input_.app_data_path is None:
-                err = "app_data_path is required for PythonSpecificConfig"
-                raise ValueError(err)
-
-            pypi_packages_storage_path = URL(input_.app_data_path) / "spark" / "deps"
+            pypi_packages_storage_path = (
+                URL(
+                    self.get_app_data_storage_path(
+                        app_type=AppType.SparkJob, app_name=app_name
+                    )
+                )
+                / "spark"
+                / "deps"
+            )
             deps_mount = ApoloStorageMount(
                 storage_path=ApoloStoragePath(path=pypi_packages_storage_path),
                 mount_path=MountPath(path="/opt/spark/deps"),
