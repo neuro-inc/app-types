@@ -47,6 +47,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         input_: SparkJobInputs,
         app_name: str,
         namespace: str,
+        app_data_path: str | None = None,
         *_: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -122,7 +123,11 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
                 pkg_list: list[str] = pypi_packages
                 deps["pypi_packages"] = pkg_list
 
-            pypi_packages_storage_path = f"storage://{self.client.config.cluster_name}/{self.client.config.org_name}/{self.client.config.project_name}/{app_name}/{namespace}/spark/deps"
+            if app_data_path is None:
+                err = "app_data_path is required for PythonSpecificConfig"
+                raise ValueError(err)
+
+            pypi_packages_storage_path = URL(app_data_path) / "spark" / "deps"
             deps_mount = ApoloStorageMount(
                 storage_path=ApoloStoragePath(path=pypi_packages_storage_path),
                 mount_path=MountPath(path="/opt/spark/deps"),

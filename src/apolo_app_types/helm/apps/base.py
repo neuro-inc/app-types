@@ -25,6 +25,7 @@ class BaseChartValueProcessor(abc.ABC, t.Generic[AppInputT]):
         input_: AppInputT,
         app_name: str,
         namespace: str,
+        app_data_path: str | None = None,
         *args: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
