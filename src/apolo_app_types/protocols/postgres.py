@@ -108,7 +108,7 @@ class CrunchyPostgresOutputs(AppOutputsDeployer):
 
 
 class PostgresUsers(BaseModel):
-    users: list[CrunchyPostgresUserCredentials]
+    users: dict[str, CrunchyPostgresUserCredentials]
 
 
 class PostgresOutputs(AppOutputs):

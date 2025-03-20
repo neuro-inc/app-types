@@ -61,4 +61,6 @@ async def get_postgres_outputs(
 
     for item in secrets.items:
         users.append(postgres_creds_from_kube_secret_data(item.data))
-    return PostgresOutputs(postgres_users=PostgresUsers(users=users)).model_dump()
+    return PostgresOutputs(
+        postgres_users=PostgresUsers(users={_.user: _ for _ in users})
+    ).model_dump()
