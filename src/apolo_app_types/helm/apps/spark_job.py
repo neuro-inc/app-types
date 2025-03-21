@@ -85,7 +85,8 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
                         "platform.apolo.us/component": "app",
                         **extra_labels,
                     },
-                    "annotations": {**storage_annotations, **driver_extra_values},
+                    "annotations": storage_annotations,
+                    **driver_extra_values,
                 },
                 "executor": {
                     "labels": {
@@ -93,7 +94,8 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
                         "platform.apolo.us/component": "app",
                         **extra_labels,
                     },
-                    "annotations": {**storage_annotations, **executor_extra_values},
+                    "annotations": storage_annotations,
+                    **executor_extra_values,
                 },
             }
         }
