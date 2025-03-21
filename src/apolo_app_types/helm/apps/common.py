@@ -215,9 +215,14 @@ def gen_apolo_storage_integration_labels(
 def append_apolo_storage_integration_annotations(
     current_annotations: dict[str, t.Any], storage_mounts: t.Sequence[ApoloStorageMount]
 ) -> dict[str, str]:
-    current_list: list[str] = current_annotations.get(
-        "platform.apolo.us/inject-storage", []
+    current_annotation_str: str | None = current_annotations.get(
+        "platform.apolo.us/inject-storage"
     )
+    if current_annotation_str:
+        current_list = json.loads(current_annotation_str)
+    else:
+        current_list = []
+
     new_annotations_dict = gen_apolo_storage_integration_annotations(storage_mounts)
     new_annotations = json.loads(
         new_annotations_dict["platform.apolo.us/inject-storage"]
