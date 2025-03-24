@@ -1,7 +1,7 @@
 import base64
 import typing as t
 
-from apolo_app_types import Bucket
+from apolo_app_types import Bucket, K8sSecret
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
     get_preset,
@@ -170,9 +170,13 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
             return {"s3": backup_config}
         if bucket.bucket_provider == BucketProvider.GCP:
             bucket_creds: GCPBucketCredentials = bucket.credentials[0]  # type: ignore
+            if not isinstance(bucket_creds.key_data, K8sSecret):
+                key = base64.b64decode(bucket_creds.key_data).decode()
+            else:
+                key = bucket_creds.key_data  # type: ignore
             backup_config = {
                 "bucket": bucket.id,
-                "key": base64.b64decode(bucket_creds.key_data).decode(),
+                "key": key,
             }
             return {"gcs": backup_config}
         # For Azure, we need to return a bit more data from API

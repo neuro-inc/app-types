@@ -25,7 +25,7 @@ class BucketCredentials(BaseModel):
 
 
 class GCPBucketCredentials(BucketCredentials):
-    key_data: str = Field(
+    key_data: StrOrSecret = Field(
         ...,
         description="The key data of the bucket.",
         title="Bucket key data",

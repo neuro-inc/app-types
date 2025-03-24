@@ -38,6 +38,13 @@ class DockerHubInputs(AppInputs):
 
 
 class DockerConfigModel(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Docker Config",
+            description="Docker configuration content.",
+        ).as_json_schema_extra(),
+    )
     filecontents: str = Field(
         ...,
         title="Docker config file contents",
@@ -46,4 +53,4 @@ class DockerConfigModel(BaseModel):
 
 
 class DockerHubOutputs(AppOutputs):
-    dockerconfigjson: DockerConfigModel = Field(..., title="Docker config JSON")
+    dockerconfigjson: DockerConfigModel
