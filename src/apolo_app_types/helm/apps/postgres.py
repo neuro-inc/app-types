@@ -170,10 +170,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
             return {"s3": backup_config}
         if bucket.bucket_provider == BucketProvider.GCP:
             bucket_creds: GCPBucketCredentials = bucket.credentials[0]  # type: ignore
-            if not isinstance(bucket_creds.key_data, K8sSecret):
-                key = base64.b64decode(bucket_creds.key_data).decode()
-            else:
-                key = bucket_creds.key_data  # type: ignore
+            key = serialize_optional_secret(bucket_creds.key_data)
             backup_config = {
                 "bucket": bucket.id,
                 "key": key,
