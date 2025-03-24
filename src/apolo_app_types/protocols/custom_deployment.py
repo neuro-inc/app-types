@@ -1,6 +1,12 @@
 from pydantic import BaseModel, ConfigDict, Field
 
-from apolo_app_types.protocols.common import AppInputs, AppOutputs, Preset, RestAPI, SchemaExtraMetadata
+from apolo_app_types.protocols.common import (
+    AppInputs,
+    AppOutputs,
+    Preset,
+    RestAPI,
+    SchemaExtraMetadata,
+)
 from apolo_app_types.protocols.common.ingress import Ingress
 from apolo_app_types.protocols.dockerhub import DockerConfigModel
 
