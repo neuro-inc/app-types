@@ -28,12 +28,23 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
 
     def _configure_application_storage(
         self, input_: SparkJobInputs
-    ) -> dict[str, t.Any]:
+    ) -> tuple[dict[str, t.Any], str]:
+        """
+        Configure the storage for the application.
+
+        Args:
+            input_: The input data for the SparkJob.
+
+        Returns:
+            A tuple with the extra annotations and the main application file
+            for spark application.
+        """
         extra_annotations: dict[str, str] = {}
         main_app_file_path = URL(input_.spark_job.main_application_file.path)
+        mount_path = "/opt/spark"
         main_app_file_mount = ApoloStorageMount(
             storage_path=ApoloStoragePath(path=str(main_app_file_path.parent)),
-            mount_path=MountPath(path="/opt/spark"),
+            mount_path=MountPath(path=mount_path),
             mode=ApoloMountMode(mode="r"),
         )
         extra_annotations.update(
@@ -41,7 +52,9 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
                 [main_app_file_mount] + (input_.spark_job.volumes or [])
             )
         )
-        return extra_annotations
+
+        main_application_file = f"local://{mount_path}/{main_app_file_path.name}"
+        return extra_annotations, main_application_file
 
     async def gen_extra_values(
         self,
@@ -67,12 +80,14 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             namespace=namespace,
         )
         extra_labels = gen_apolo_storage_integration_labels(inject_storage=True)
-        storage_annotations = self._configure_application_storage(input_)
+        storage_annotations, main_application_file = (
+            self._configure_application_storage(input_)
+        )
 
         values: dict[str, t.Any] = {
             "namespace": namespace,
             "spark": {
-                "mainApplicationFile": f"local://{input_.spark_job.main_application_file.path}",
+                "mainApplicationFile": main_application_file,
                 "type": input_.spark_job.type.value,
                 "image": {
                     "repository": input_.spark_job.image.repository,
