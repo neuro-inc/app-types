@@ -104,7 +104,9 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
 
         return values
 
-    def add_autoscaling_config(self, values: dict[str, t.Any], input_: SparkJobInputs):
+    def add_autoscaling_config(
+        self, values: dict[str, t.Any], input_: SparkJobInputs
+    ) -> None:
         if input_.spark_job.spark_auto_scaling_config:
             dynamic_allocation: dict[str, t.Any] = {
                 "enabled": (input_.spark_job.spark_auto_scaling_config.enabled),
@@ -120,8 +122,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         input_: SparkJobInputs,
         app_name: str,
         values: dict[str, t.Any],
-        deps: list,
-    ):
+    ) -> None:
         deps: dict[str, t.Any] = {}
         if input_.spark_job.dependencies:
             deps = input_.spark_job.dependencies.model_dump()
