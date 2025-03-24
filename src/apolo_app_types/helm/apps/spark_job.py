@@ -69,12 +69,10 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         extra_labels = gen_apolo_storage_integration_labels(inject_storage=True)
         storage_annotations = self._configure_application_storage(input_)
 
-        # storages
-        # input_.spark_job.main_application_file
-
         values: dict[str, t.Any] = {
             "namespace": namespace,
             "spark": {
+                "mainApplicationFile": f"local://{input_.spark_job.main_application_file.path}",
                 "type": input_.spark_job.type.value,
                 "image": {
                     "repository": input_.spark_job.image.repository,
@@ -101,6 +99,12 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             },
         }
 
+        self.add_autoscaling_config(values=values, input_=input_)
+        self.add_dependencies(input_=input_, app_name=app_name, values=values)
+
+        return values
+
+    def add_autoscaling_config(self, values: dict[str, t.Any], input_: SparkJobInputs):
         if input_.spark_job.spark_auto_scaling_config:
             dynamic_allocation: dict[str, t.Any] = {
                 "enabled": (input_.spark_job.spark_auto_scaling_config.enabled),
@@ -111,6 +115,13 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             }
             values["spark"]["dynamicAllocation"] = dynamic_allocation
 
+    def add_dependencies(
+        self,
+        input_: SparkJobInputs,
+        app_name: str,
+        values: dict[str, t.Any],
+        deps: list,
+    ):
         deps: dict[str, t.Any] = {}
         if input_.spark_job.dependencies:
             deps = input_.spark_job.dependencies.model_dump()
@@ -166,5 +177,3 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             values["spark"]["executor"]["env"] = [pyspark_env_var]
 
         values["deps"] = deps
-
-        return values
