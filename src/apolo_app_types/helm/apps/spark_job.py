@@ -166,4 +166,15 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
 
         values["deps"] = deps
 
+        # operator params
+        values["spark-operator"] = {
+            "spark": {
+                "jobNamespaces": [namespace],
+                "serviceAccount": {
+                    "create": True,
+                    "name": "spark-operator-spark",
+                },
+            }
+        }
+
         return values
