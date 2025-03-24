@@ -73,6 +73,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         # input_.spark_job.main_application_file
 
         values: dict[str, t.Any] = {
+            "namespace": namespace,
             "spark": {
                 "type": input_.spark_job.type.value,
                 "image": {
@@ -97,7 +98,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
                     "annotations": storage_annotations,
                     **executor_extra_values,
                 },
-            }
+            },
         }
 
         if input_.spark_job.spark_auto_scaling_config:
@@ -165,16 +166,5 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             values["spark"]["executor"]["env"] = [pyspark_env_var]
 
         values["deps"] = deps
-
-        # operator params
-        values["spark-operator"] = {
-            "spark": {
-                "jobNamespaces": [namespace],
-                "serviceAccount": {
-                    "create": True,
-                    "name": "spark-operator-spark",
-                },
-            }
-        }
 
         return values
