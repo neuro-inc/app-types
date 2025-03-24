@@ -173,7 +173,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
             if not isinstance(bucket_creds.key_data, K8sSecret):
                 key = base64.b64decode(bucket_creds.key_data).decode()
             else:
-                key = bucket_creds.key_data # type: ignore
+                key = bucket_creds.key_data  # type: ignore
             backup_config = {
                 "bucket": bucket.id,
                 "key": key,
