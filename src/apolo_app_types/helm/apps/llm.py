@@ -5,7 +5,7 @@ from apolo_sdk import Preset
 from apolo_app_types import LLMInputs
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
-    gen_apolo_storage_integration_annotations,
+    append_apolo_storage_integration_annotations,
     gen_apolo_storage_integration_labels,
     gen_extra_values,
     get_preset,
@@ -85,8 +85,8 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
                 mount_path=MountPath(path="/root/.cache/huggingface"),
                 mode=ApoloMountMode(mode="rw"),
             )
-            extra_annotations.update(
-                **gen_apolo_storage_integration_annotations([storage_mount])
+            extra_annotations = append_apolo_storage_integration_annotations(
+                extra_annotations, [storage_mount]
             )
         return extra_annotations
 

@@ -190,9 +190,9 @@ def sanitize_dict_string(
     return dict_str
 
 
-def gen_apolo_storage_integration_annotations(
+def _gen_apolo_storage_integration_annotations(
     storage_mounts: t.Sequence[ApoloStorageMount],
-) -> dict[str, str]:
+) -> list[dict[str, str]]:
     storage_mount_annotations = []
     for storage_mount in storage_mounts:
         storage_mount_annotations.append(
@@ -202,7 +202,7 @@ def gen_apolo_storage_integration_annotations(
                 "mount_mode": storage_mount.mode.mode.value,
             }
         )
-    return {APOLO_STORAGE_ANNOTATION: json.dumps(storage_mount_annotations)}
+    return storage_mount_annotations
 
 
 def gen_apolo_storage_integration_labels(
@@ -217,19 +217,20 @@ def gen_apolo_storage_integration_labels(
 def append_apolo_storage_integration_annotations(
     current_annotations: dict[str, t.Any], storage_mounts: t.Sequence[ApoloStorageMount]
 ) -> dict[str, str]:
-    current_annotation_str: str | None = current_annotations.get(
-        APOLO_STORAGE_ANNOTATION
-    )
-    if current_annotation_str:
-        current_list = json.loads(current_annotation_str)
+    """
+    Returns a new dict with the storage annotations appended to the current annotations.
+    """
+    cur_annot = deepcopy(current_annotations)
+    cur_apolo_annotation_str: str | None = cur_annot.get(APOLO_STORAGE_ANNOTATION)
+    if cur_apolo_annotation_str:
+        current_list = json.loads(cur_apolo_annotation_str)
     else:
         current_list = []
 
-    new_annotations_dict = gen_apolo_storage_integration_annotations(storage_mounts)
-    new_annotations = json.loads(new_annotations_dict[APOLO_STORAGE_ANNOTATION])
+    new_annotations = _gen_apolo_storage_integration_annotations(storage_mounts)
     current_list.extend(new_annotations)
-    current_annotations[APOLO_STORAGE_ANNOTATION] = json.dumps(current_list)
-    return current_annotations
+    cur_annot[APOLO_STORAGE_ANNOTATION] = json.dumps(current_list)
+    return cur_annot
 
 
 async def gen_extra_values(

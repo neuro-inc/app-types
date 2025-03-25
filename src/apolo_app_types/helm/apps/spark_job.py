@@ -7,7 +7,6 @@ from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
     append_apolo_storage_integration_annotations,
-    gen_apolo_storage_integration_annotations,
     gen_apolo_storage_integration_labels,
     gen_extra_values,
 )
@@ -48,10 +47,8 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             mount_path=MountPath(path=mount_path),
             mode=ApoloMountMode(mode="r"),
         )
-        extra_annotations.update(
-            **gen_apolo_storage_integration_annotations(
-                [main_app_file_mount] + (input_.spark_job.volumes or [])
-            )
+        extra_annotations = append_apolo_storage_integration_annotations(
+            extra_annotations, [main_app_file_mount] + (input_.spark_job.volumes or [])
         )
 
         main_application_file = f"local://{mount_path}/{main_app_file_path.name}"
@@ -168,7 +165,9 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
                 mount_path=MountPath(path="/opt/spark/deps"),
                 mode=ApoloMountMode(mode="rw"),
             )
-            deps_annotation = gen_apolo_storage_integration_annotations([deps_mount])
+            deps_annotation = append_apolo_storage_integration_annotations(
+                {}, [deps_mount]
+            )
             values["pyspark_dep_manager"] = {
                 "labels": gen_apolo_storage_integration_labels(inject_storage=True),
                 "annotations": deps_annotation,
