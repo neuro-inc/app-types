@@ -1,6 +1,6 @@
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from apolo_app_types.protocols.common import AppInputs, AppOutputs
 from apolo_app_types.protocols.common.containers import ContainerImage
@@ -10,13 +10,6 @@ from apolo_app_types.protocols.common.storage import ApoloStorageFile, ApoloStor
 
 
 class SparkApplicationType(StrEnum):
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Spark Application type",
-            description="Choose the type of the Spark application",
-        ).as_json_schema_extra(),
-    )
     PYTHON = "Python"
     SCALA = "Scala"
     JAVA = "Java"
@@ -61,15 +54,53 @@ class SparkApplicationModel(BaseModel):
             description="Run scalable Apache Spark applications",
         ).as_json_schema_extra(),
     )
-    type: SparkApplicationType
-    image: ContainerImage
-    main_application_file: ApoloStorageFile
+    type: SparkApplicationType = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Spark Application type",
+            description="Choose the type of the Spark application",
+        ).as_json_schema_extra(),
+    )
+    image: ContainerImage = Field(
+        default=ContainerImage(repository="spark", tag="3.5.3")
+    )
+    main_application_file: ApoloStorageFile = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Main Application File",
+            description="The main application file to be executed",
+        ).as_json_schema_extra(),
+    )
     arguments: list[str] | None = None
     dependencies: SparkDependencies | None = None
-    spark_application_config: PythonSpecificConfig | JavaSpecificConfig | None
-    spark_auto_scaling_config: SparkAutoScalingConfig | None
-    driver_preset: Preset
-    executor_preset: Preset
+    spark_application_config: PythonSpecificConfig | JavaSpecificConfig | None = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Spark Application Configuration",
+            description="Language specific configuration to the Spark application type",
+        ).as_json_schema_extra(),
+    )
+    spark_auto_scaling_config: SparkAutoScalingConfig | None = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Spark Auto Scaling Configuration",
+            description="Configuration for the Spark auto scaling",
+        ).as_json_schema_extra(),
+    )
+    driver_preset: Preset = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Driver Preset",
+            description="Preset configuration to be used by the driver",
+        ).as_json_schema_extra(),
+    )
+    executor_preset: Preset = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Executor Preset",
+            description="Preset configuration to be used by the executor",
+        ).as_json_schema_extra(),
+    )
     volumes: list[ApoloStorageMount] | None = None
 
 
