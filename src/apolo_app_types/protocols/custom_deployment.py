@@ -1,6 +1,12 @@
 from pydantic import BaseModel, ConfigDict, Field
 
-from apolo_app_types.protocols.common import AppInputs, AppOutputs, Preset, RestAPI
+from apolo_app_types.protocols.common import (
+    AppInputs,
+    AppOutputs,
+    Preset,
+    RestAPI,
+    SchemaExtraMetadata,
+)
 from apolo_app_types.protocols.common.containers import ContainerImage
 from apolo_app_types.protocols.common.ingress import Ingress
 from apolo_app_types.protocols.dockerhub import DockerConfigModel
@@ -38,11 +44,10 @@ class Service(BaseModel):
 class CustomDeploymentModel(BaseModel):
     model_config = ConfigDict(
         protected_namespaces=(),
-        json_schema_extra={
-            "x-title": "Custom Deployment Configuration",
-            "x-description": "Configuration for Custom Deployment",
-            "x-logo-url": "https://example.com/logo",
-        },
+        json_schema_extra=SchemaExtraMetadata(
+            title="Custom Deployment",
+            description="Configuration for Custom Deployment.",
+        ).as_json_schema_extra(),
     )
     preset: Preset = Field(description="Name of the preset configuration to use")
     http_auth: bool = Field(
@@ -68,9 +73,7 @@ class CustomDeploymentModel(BaseModel):
 
 class CustomDeploymentInputs(AppInputs):
     custom_deployment: CustomDeploymentModel
-    dockerconfigjson: DockerConfigModel | None = Field(
-        default=None, description="Docker config JSON"
-    )
+    dockerconfigjson: DockerConfigModel | None = None
 
 
 class CustomDeploymentOutputs(AppOutputs):
