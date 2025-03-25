@@ -8,8 +8,9 @@ from apolo_app_types.protocols.common import (
     SchemaExtraMetadata,
 )
 from apolo_app_types.protocols.common.ingress import Ingress
-from apolo_app_types.protocols.dockerhub import DockerConfigModel
 from apolo_app_types.protocols.common.storage import ApoloStorageMount
+from apolo_app_types.protocols.dockerhub import DockerConfigModel
+
 
 class ContainerImage(BaseModel):
     repository: str

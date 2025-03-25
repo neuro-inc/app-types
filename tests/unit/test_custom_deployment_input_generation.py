@@ -10,13 +10,14 @@ from apolo_app_types import (
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import Ingress, Preset
-from apolo_app_types.protocols.custom_deployment import CustomDeploymentModel
 from apolo_app_types.protocols.common.storage import (
+    ApoloMountMode,
     ApoloStorageMount,
     ApoloStoragePath,
-    ApoloMountMode,
     MountPath,
 )
+from apolo_app_types.protocols.custom_deployment import CustomDeploymentModel
+
 
 @pytest.mark.asyncio
 async def test_custom_deployment_values_generation(setup_clients):
@@ -132,16 +133,17 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
         "enabled": True,
         "port": 8080,
     }
-    
+
     assert "podAnnotations" in helm_params
     annotations = helm_params["podAnnotations"]
     assert "platform.apolo.us/inject-storage" in annotations
 
     from json import loads
+
     storage_json = annotations["platform.apolo.us/inject-storage"]
     parsed_storage = loads(storage_json)
     assert len(parsed_storage) == 2
-    
+
     assert parsed_storage[0]["storage_path"] == "storage://mycluster/myorg/myproj/data"
     assert parsed_storage[0]["mount_path"] == "/app/data"
     assert parsed_storage[0]["mount_mode"] == "rw"
