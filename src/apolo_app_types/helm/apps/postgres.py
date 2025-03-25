@@ -1,7 +1,6 @@
-import base64
 import typing as t
 
-from apolo_app_types import Bucket, K8sSecret
+from apolo_app_types import Bucket
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
     get_preset,
