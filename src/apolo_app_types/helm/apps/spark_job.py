@@ -11,6 +11,7 @@ from apolo_app_types.helm.apps.common import (
     gen_apolo_storage_integration_labels,
     gen_extra_values,
 )
+from apolo_app_types.helm.utils.storage import get_app_data_storage_path
 from apolo_app_types.protocols.common.storage import (
     ApoloMountMode,
     ApoloStorageMount,
@@ -155,8 +156,8 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
 
             pypi_packages_storage_path = (
                 URL(
-                    self.get_app_data_storage_path(
-                        app_type=AppType.SparkJob, app_name=app_name
+                    get_app_data_storage_path(
+                        client=self.client, app_type=AppType.SparkJob, app_name=app_name
                     )
                 )
                 / "spark"
