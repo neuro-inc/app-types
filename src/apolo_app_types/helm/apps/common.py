@@ -20,6 +20,8 @@ from apolo_app_types.protocols.common import (
 
 logger = logging.getLogger(__name__)
 
+APOLO_STORAGE_ANNOTATION = "platform.apolo.us/inject-storage"
+
 
 def get_preset(client: apolo_sdk.Client, preset_name: str) -> apolo_sdk.Preset:
     if os.environ.get("ENV") == "local":
@@ -200,7 +202,7 @@ def gen_apolo_storage_integration_annotations(
                 "mount_mode": storage_mount.mode.mode.value,
             }
         )
-    return {"platform.apolo.us/inject-storage": json.dumps(storage_mount_annotations)}
+    return {APOLO_STORAGE_ANNOTATION: json.dumps(storage_mount_annotations)}
 
 
 def gen_apolo_storage_integration_labels(
@@ -208,7 +210,7 @@ def gen_apolo_storage_integration_labels(
     inject_storage: bool = False,
 ) -> dict[str, str]:
     if inject_storage:
-        return {"platform.apolo.us/inject-storage": "true"}
+        return {APOLO_STORAGE_ANNOTATION: "true"}
     return {}
 
 
@@ -216,7 +218,7 @@ def append_apolo_storage_integration_annotations(
     current_annotations: dict[str, t.Any], storage_mounts: t.Sequence[ApoloStorageMount]
 ) -> dict[str, str]:
     current_annotation_str: str | None = current_annotations.get(
-        "platform.apolo.us/inject-storage"
+        APOLO_STORAGE_ANNOTATION
     )
     if current_annotation_str:
         current_list = json.loads(current_annotation_str)
@@ -224,11 +226,9 @@ def append_apolo_storage_integration_annotations(
         current_list = []
 
     new_annotations_dict = gen_apolo_storage_integration_annotations(storage_mounts)
-    new_annotations = json.loads(
-        new_annotations_dict["platform.apolo.us/inject-storage"]
-    )
+    new_annotations = json.loads(new_annotations_dict[APOLO_STORAGE_ANNOTATION])
     current_list.extend(new_annotations)
-    current_annotations["platform.apolo.us/inject-storage"] = json.dumps(current_list)
+    current_annotations[APOLO_STORAGE_ANNOTATION] = json.dumps(current_list)
     return current_annotations
 
 
