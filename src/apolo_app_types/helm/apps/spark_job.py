@@ -23,9 +23,6 @@ from apolo_app_types.protocols.spark_job import (
 
 
 class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
-    def __init__(self, *args: t.Any, **kwargs: t.Any):
-        super().__init__(*args, **kwargs)
-
     def _configure_application_storage(
         self, input_: SparkJobInputs
     ) -> tuple[dict[str, t.Any], str]:
