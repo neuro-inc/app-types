@@ -156,6 +156,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
                 )
                 / "spark"
                 / "deps"
+                / "pypi"
             )
             deps_mount = ApoloStorageMount(
                 storage_path=ApoloStoragePath(path=str(pypi_packages_storage_path)),
