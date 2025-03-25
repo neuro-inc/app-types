@@ -161,7 +161,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
                 "bucket": bucket.id,
                 "endpoint": s3_like_bucket_creds.endpoint_url,
                 "region": s3_like_bucket_creds.region_name,
-                "key": s3_like_bucket_creds.access_key_id,
+                "key": serialize_optional_secret(s3_like_bucket_creds.access_key_id),
                 "keySecret": serialize_optional_secret(
                     s3_like_bucket_creds.secret_access_key
                 ),

@@ -56,7 +56,7 @@ class MinioBucketCredentials(BucketCredentials):
 
 
 class S3BucketCredentials(BucketCredentials):
-    access_key_id: str = Field(
+    access_key_id: StrOrSecret = Field(
         ...,
         description="The access key ID of the bucket.",
         title="Bucket access key ID",
