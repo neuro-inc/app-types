@@ -10,8 +10,9 @@ from apolo_app_types.protocols.common import (
 )
 from apolo_app_types.protocols.common.containers import ContainerImage
 from apolo_app_types.protocols.common.ingress import Ingress
-from apolo_app_types.protocols.dockerhub import DockerConfigModel
 from apolo_app_types.protocols.common.storage import ApoloStorageMount
+from apolo_app_types.protocols.dockerhub import DockerConfigModel
+
 
 class AutoscalingBase(AbstractAppFieldType):
     type: str
