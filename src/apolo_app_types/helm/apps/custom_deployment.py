@@ -4,6 +4,8 @@ from apolo_app_types import CustomDeploymentInputs
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
     gen_extra_values,
+    gen_apolo_storage_integration_annotations,
+    gen_apolo_storage_integration_labels
 )
 
 
@@ -12,6 +14,31 @@ class CustomDeploymentChartValueProcessor(
 ):
     def __init__(self, *args: t.Any, **kwargs: t.Any):
         super().__init__(*args, **kwargs)
+
+    def _configure_storage_annotations(
+        self, input_: CustomDeploymentInputs
+    ) -> dict[str, str]:
+        """
+        If 'storage_mounts' is non-empty, generate the appropriate JSON annotation
+        so that Apolo's storage injection can mount them. 
+        """
+        if not input_.custom_deployment.storage_mounts:
+            return {}
+        return gen_apolo_storage_integration_annotations(
+            input_.custom_deployment.storage_mounts
+        )
+
+    def _configure_storage_labels(
+        self, input_: CustomDeploymentInputs
+    ) -> dict[str, str]:
+        """
+        If 'storage_mounts' is non-empty, add a label to indicate
+        that storage injection is needed.
+        """
+        if not input_.custom_deployment.storage_mounts:
+            return {}
+        return gen_apolo_storage_integration_labels(inject_storage=True)
+
 
     async def gen_extra_values(
         self,
@@ -75,6 +102,14 @@ class CustomDeploymentChartValueProcessor(
                     input_.custom_deployment.autoscaling.target_memory_utilization_percentage
                 ),
             }
+
+        storage_annotations = self._configure_storage_annotations(input_)
+        if storage_annotations:
+            values["podAnnotations"] = storage_annotations
+
+        storage_labels = self._configure_storage_labels(input_)
+        if storage_labels:
+            values["podExtraLabels"] = storage_labels
 
         if input_.dockerconfigjson:
             values["dockerconfigjson"] = input_.dockerconfigjson.filecontents
