@@ -11,10 +11,10 @@ from apolo_app_types.protocols.common import Preset
 from apolo_app_types.protocols.common.storage import ApoloStorageFile
 from apolo_app_types.protocols.spark_job import (
     PythonSpecificConfig,
+    SparkApplicationModel,
     SparkApplicationType,
     SparkAutoScalingConfig,
     SparkDependencies,
-    SparkJobModel,
 )
 
 
@@ -22,7 +22,7 @@ from apolo_app_types.protocols.spark_job import (
 async def test_spark_job_values_generation(setup_clients):
     helm_args, helm_params = await app_type_to_vals(
         input_=SparkJobInputs(
-            spark_job=SparkJobModel(
+            spark_job=SparkApplicationModel(
                 driver_preset=Preset(name="cpu-small"),
                 executor_preset=Preset(name="cpu-medium"),
                 type=SparkApplicationType.PYTHON,
