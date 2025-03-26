@@ -1,6 +1,9 @@
 from apolo_app_types import HuggingFaceModel, LLMInputs
 from apolo_app_types.app_types import AppType
-from apolo_app_types.helm.apps.common import _get_match_expressions
+from apolo_app_types.helm.apps.common import (
+    APOLO_STORAGE_ANNOTATION,
+    _get_match_expressions,
+)
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import ApoloStoragePath, Ingress, Preset
 from apolo_app_types.protocols.common.secrets_ import K8sSecret, Secret, SecretKeyRef
@@ -439,10 +442,10 @@ async def test_values_llm_generation__storage_integrated(
             "enabled": False,
         },
         "podAnnotations": {
-            "platform.apolo.us/inject-storage": '[{"storage_path": "storage://some-cluster/some-org/some-proj/some-folder", "mount_path": "/root/.cache/huggingface", "mount_mode": "rw"}]'  # noqa: E501
+            APOLO_STORAGE_ANNOTATION: '[{"storage_path": "storage://some-cluster/some-org/some-proj/some-folder", "mount_path": "/root/.cache/huggingface", "mount_mode": "rw"}]'  # noqa: E501
         },
         "podExtraLabels": {
-            "platform.apolo.us/inject-storage": "true",
+            APOLO_STORAGE_ANNOTATION: "true",
         },
         "modelDownload": {"hookEnabled": True, "initEnabled": False},
         "cache": {"enabled": False},

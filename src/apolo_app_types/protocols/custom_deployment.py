@@ -7,13 +7,9 @@ from apolo_app_types.protocols.common import (
     RestAPI,
     SchemaExtraMetadata,
 )
+from apolo_app_types.protocols.common.containers import ContainerImage
 from apolo_app_types.protocols.common.ingress import Ingress
 from apolo_app_types.protocols.dockerhub import DockerConfigModel
-
-
-class ContainerImage(BaseModel):
-    repository: str
-    tag: str | None = None
 
 
 class AutoscalingBase(BaseModel):

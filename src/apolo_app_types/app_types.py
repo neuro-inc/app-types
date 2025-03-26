@@ -7,6 +7,7 @@ from apolo_app_types.protocols.huggingface_storage_cache import (
     HuggingFaceStorageCacheInputs,
 )
 from apolo_app_types.protocols.llm import LLMInputs
+from apolo_app_types.protocols.spark_job import SparkJobInputs
 from apolo_app_types.protocols.weaviate import WeaviateInputs
 
 
@@ -28,6 +29,7 @@ class AppType(enum.StrEnum):
     DockerHub = "dockerhub"
     HuggingFaceStorageCache = "huggingface-storage-cache"
     CustomDeployment = "custom-deployment"
+    SparkJob = "spark-job"
 
     def __repr__(self) -> str:
         return str(self)
@@ -61,6 +63,8 @@ class AppType(enum.StrEnum):
             return AppType.DockerHub
         if isinstance(inputs, HuggingFaceStorageCacheInputs):
             return AppType.HuggingFaceStorageCache
+        if isinstance(inputs, SparkJobInputs):
+            return AppType.SparkJob
 
         error_message = f"Unsupported input type: {type(inputs).__name__}"
         raise ValueError(error_message)
