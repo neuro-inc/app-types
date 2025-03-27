@@ -54,7 +54,7 @@ class CustomDeploymentChartValueProcessor(
             }
 
         if input_.name_override:
-            values["nameOverride"] = input_.name_override
+            values["nameOverride"] = input_.name_override.name
 
         if input_.autoscaling and input_.autoscaling.enabled:
             values["autoscaling"] = {
