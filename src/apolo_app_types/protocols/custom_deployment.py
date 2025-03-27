@@ -9,7 +9,6 @@ from apolo_app_types.protocols.common import (
 )
 from apolo_app_types.protocols.common.containers import ContainerImage
 from apolo_app_types.protocols.common.ingress import Ingress
-from apolo_app_types.protocols.dockerhub import DockerConfigModel
 
 
 class AutoscalingBase(BaseModel):
@@ -41,7 +40,15 @@ class Service(BaseModel):
     port: int
 
 
-class CustomDeploymentModel(BaseModel):
+class DeploymentName(BaseModel):
+    name: str | None = Field(
+        default=None,
+        title="Deployment Name",
+        description="Override name for the deployment",
+    )
+
+
+class CustomDeploymentInputs(AppInputs):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
@@ -50,15 +57,18 @@ class CustomDeploymentModel(BaseModel):
         ).as_json_schema_extra(),
     )
     preset: Preset = Field(description="Name of the preset configuration to use")
-    http_auth: bool = Field(
-        default=True, description="Enable/disable HTTP authentication"
+    name_override: DeploymentName | None = Field(
+        default=None,
+        title="Deployment Name",
+        description="Override name for the deployment",
     )
-    name_override: str | None = Field(
-        default=None, description="Override name for the deployment"
+    image: ContainerImage = Field(
+        ..., title="Container Image", description="Container image configuration"
     )
-    image: ContainerImage = Field(..., description="Container image configuration")
     autoscaling: AutoscalingHPA | None = Field(
-        default=None, description="Autoscaling configuration. Currently not used"
+        default=None,
+        title="AutoScaling Settings",
+        description="Autoscaling configuration. Currently not used",
     )
     container: Container | None = Field(
         default=None, description="Container configuration settings"
@@ -69,11 +79,6 @@ class CustomDeploymentModel(BaseModel):
     ingress: Ingress | None = Field(
         default=None, description="Ingress configuration settings"
     )
-
-
-class CustomDeploymentInputs(AppInputs):
-    custom_deployment: CustomDeploymentModel
-    dockerconfigjson: DockerConfigModel | None = None
 
 
 class CustomDeploymentOutputs(AppOutputs):

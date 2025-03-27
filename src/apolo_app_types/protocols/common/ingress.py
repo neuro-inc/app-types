@@ -25,4 +25,9 @@ class Ingress(BaseModel):
         description="The name of the cluster where the ingress is deployed.",
         title="Cluster Name",
     )
-    grpc: IngressGrpc | None = None
+    grpc: IngressGrpc | None = Field(default=None, title="Enable GRPC")
+    http_auth: bool = Field(
+        default=False,
+        title="Enable Platform Authentication",
+        description="Enable/disable HTTP authentication",
+    )

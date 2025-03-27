@@ -26,56 +26,50 @@ class CustomDeploymentChartValueProcessor(
         """
         extra_values = await gen_extra_values(
             apolo_client=self.client,
-            preset_type=input_.custom_deployment.preset,
+            preset_type=input_.preset,
             namespace=namespace,
-            ingress=input_.custom_deployment.ingress,
+            ingress=input_.ingress,
         )
         values: dict[str, t.Any] = {
             "image": {
-                "repository": input_.custom_deployment.image.repository,
-                "tag": input_.custom_deployment.image.tag or "latest",
+                "repository": input_.image.repository,
+                "tag": input_.image.tag or "latest",
             },
             **extra_values,
         }
 
-        if input_.custom_deployment.container:
+        if input_.container:
             values["container"] = {
-                "command": input_.custom_deployment.container.command,
-                "args": input_.custom_deployment.container.args,
+                "command": input_.container.command,
+                "args": input_.container.args,
                 "env": [
                     {"name": env.name, "value": env.value}
-                    for env in input_.custom_deployment.container.env
+                    for env in input_.container.env
                 ],
             }
-        if (
-            input_.custom_deployment.service
-            and input_.custom_deployment.service.enabled
-        ):
+        if input_.service and input_.service.enabled:
             values["service"] = {
                 "enabled": True,
-                "port": input_.custom_deployment.service.port,
+                "port": input_.service.port,
             }
 
-        if input_.custom_deployment.name_override:
-            values["nameOverride"] = input_.custom_deployment.name_override
+        if input_.name_override:
+            values["nameOverride"] = input_.name_override
 
-        if (
-            input_.custom_deployment.autoscaling
-            and input_.custom_deployment.autoscaling.enabled
-        ):
+        if input_.autoscaling and input_.autoscaling.enabled:
             values["autoscaling"] = {
                 "enabled": True,
-                "type": input_.custom_deployment.autoscaling.type,
-                "min_replicas": input_.custom_deployment.autoscaling.min_replicas,
-                "max_replicas": input_.custom_deployment.autoscaling.max_replicas,
+                "type": input_.autoscaling.type,
+                "min_replicas": input_.autoscaling.min_replicas,
+                "max_replicas": input_.autoscaling.max_replicas,
                 "target_cpu_utilization_percentage": (
-                    input_.custom_deployment.autoscaling.target_cpu_utilization_percentage
+                    input_.autoscaling.target_cpu_utilization_percentage
                 ),
                 "target_memory_utilization_percentage": (
-                    input_.custom_deployment.autoscaling.target_memory_utilization_percentage
+                    input_.autoscaling.target_memory_utilization_percentage
                 ),
             }
 
-        if input_.dockerconfigjson:
-            values["dockerconfigjson"] = input_.dockerconfigjson.filecontents
+        if input_.image.dockerconfigjson:
+            values["dockerconfigjson"] = input_.image.dockerconfigjson.filecontents
         return values
