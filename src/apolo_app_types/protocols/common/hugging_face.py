@@ -37,13 +37,13 @@ class HuggingFaceCache(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="HuggingFace Cache",
-            description="Configuration for HuggingFace cache.",
+            title="Hugging Face Cache",
+            description="Configuration for Hugging Face cache.",
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     storage_path: ApoloFilesPath = Field(
         ...,
-        description="The path to the Apolo Files where HuggingFace artifacts are cached.",  # noqa: E501
+        description="The path to the Apolo Files where Hugging Face artifacts are cached.",  # noqa: E501
         title="Storage path",
     )
