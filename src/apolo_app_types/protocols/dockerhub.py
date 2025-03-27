@@ -4,10 +4,12 @@ from apolo_app_types.protocols.common import (
     AbstractAppFieldType,
     AppInputs,
     AppOutputs,
+)
+from apolo_app_types.protocols.common.schema_extra import (
     SchemaExtraMetadata,
     SchemaMetaType,
-    StrOrSecret,
 )
+from apolo_app_types.protocols.common.secrets_ import StrOrSecret
 
 
 class DockerHubModel(AbstractAppFieldType):

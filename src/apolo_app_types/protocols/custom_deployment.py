@@ -1,8 +1,8 @@
 from pydantic import ConfigDict, Field
 
+from apolo_app_types import AppInputs
 from apolo_app_types.protocols.common import (
     AbstractAppFieldType,
-    AppInputs,
     AppOutputs,
     Preset,
     RestAPI,
@@ -11,7 +11,6 @@ from apolo_app_types.protocols.common import (
 from apolo_app_types.protocols.common.containers import ContainerImage
 from apolo_app_types.protocols.common.ingress import Ingress
 from apolo_app_types.protocols.common.storage import ApoloFilesMount
-from apolo_app_types.protocols.dockerhub import DockerConfigModel
 
 
 class AutoscalingBase(AbstractAppFieldType):
@@ -43,7 +42,29 @@ class Service(AbstractAppFieldType):
     port: int
 
 
-class CustomDeploymentModel(AbstractAppFieldType):
+class DeploymentName(AbstractAppFieldType):
+    name: str | None = Field(
+        default=None,
+        title="Deployment Name",
+        description="Override name for the deployment",
+    )
+
+
+class StorageMounts(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Storage Mounts",
+            description="Mount external storage paths",
+        ).as_json_schema_extra(),
+    )
+    mounts: list[ApoloFilesMount] = Field(
+        default_factory=list,
+        description="List of ApoloStorageMount objects to mount external storage paths",
+    )
+
+
+class CustomDeploymentInputs(AppInputs):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
@@ -52,15 +73,18 @@ class CustomDeploymentModel(AbstractAppFieldType):
         ).as_json_schema_extra(),
     )
     preset: Preset = Field(description="Name of the preset configuration to use")
-    http_auth: bool = Field(
-        default=True, description="Enable/disable HTTP authentication"
+    name_override: DeploymentName | None = Field(
+        default=None,
+        title="Deployment Name",
+        description="Override name for the deployment",
     )
-    name_override: str | None = Field(
-        default=None, description="Override name for the deployment"
+    image: ContainerImage = Field(
+        ..., title="Container Image", description="Container image configuration"
     )
-    image: ContainerImage = Field(..., description="Container image configuration")
     autoscaling: AutoscalingHPA | None = Field(
-        default=None, description="Autoscaling configuration. Currently not used"
+        default=None,
+        title="AutoScaling Settings",
+        description="Autoscaling configuration. Currently not used",
     )
     container: Container | None = Field(
         default=None, description="Container configuration settings"
@@ -71,15 +95,9 @@ class CustomDeploymentModel(AbstractAppFieldType):
     ingress: Ingress | None = Field(
         default=None, description="Ingress configuration settings"
     )
-    storage_mounts: list[ApoloFilesMount] = Field(
-        default_factory=list,
-        description="List of ApoloStorageMount objects to mount external storage paths",
+    storage_mounts: StorageMounts | None = Field(
+        default=None, description="Mount external storage paths"
     )
-
-
-class CustomDeploymentInputs(AppInputs):
-    custom_deployment: CustomDeploymentModel
-    dockerconfigjson: DockerConfigModel | None = None
 
 
 class CustomDeploymentOutputs(AppOutputs):
