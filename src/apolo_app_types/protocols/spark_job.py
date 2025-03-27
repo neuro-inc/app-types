@@ -1,12 +1,17 @@
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
-from apolo_app_types.protocols.common import AppInputs, AppOutputs
-from apolo_app_types.protocols.common.containers import ContainerImage
-from apolo_app_types.protocols.common.preset import Preset
-from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
-from apolo_app_types.protocols.common.storage import ApoloStorageFile, ApoloStorageMount
+from apolo_app_types.protocols.common import (
+    AbstractAppFieldType,
+    ApoloFilesFile,
+    ApoloFilesMount,
+    AppInputs,
+    AppOutputs,
+    ContainerImage,
+    Preset,
+    SchemaExtraMetadata,
+)
 
 
 class SparkApplicationType(StrEnum):
@@ -16,19 +21,19 @@ class SparkApplicationType(StrEnum):
     R = "R"
 
 
-class SparkExecutorConfig(BaseModel):
+class SparkExecutorConfig(AbstractAppFieldType):
     instances: int
 
 
-class PythonSpecificConfig(BaseModel):
-    pypi_packages: list[str] | ApoloStorageFile | None = None
+class PythonSpecificConfig(AbstractAppFieldType):
+    pypi_packages: list[str] | ApoloFilesFile | None = None
 
 
-class JavaSpecificConfig(BaseModel):
+class JavaSpecificConfig(AbstractAppFieldType):
     main_class: str
 
 
-class SparkDependencies(BaseModel):
+class SparkDependencies(AbstractAppFieldType):
     jars: list[str] | None = None
     py_files: list[str] | None = None
     files: list[str] | None = None
@@ -38,7 +43,7 @@ class SparkDependencies(BaseModel):
     archives: list[str] | None = None
 
 
-class SparkAutoScalingConfig(BaseModel):
+class SparkAutoScalingConfig(AbstractAppFieldType):
     enabled: bool = False
     initial_executors: int | None
     min_executors: int
@@ -46,7 +51,7 @@ class SparkAutoScalingConfig(BaseModel):
     shuffle_tracking_timeout: int
 
 
-class SparkApplicationModel(BaseModel):
+class SparkApplicationModel(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
@@ -64,7 +69,7 @@ class SparkApplicationModel(BaseModel):
     image: ContainerImage = Field(
         default=ContainerImage(repository="spark", tag="3.5.3")
     )
-    main_application_file: ApoloStorageFile = Field(
+    main_application_file: ApoloFilesFile = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
             title="Main Application File",
@@ -101,7 +106,7 @@ class SparkApplicationModel(BaseModel):
             description="Preset configuration to be used by the executor",
         ).as_json_schema_extra(),
     )
-    volumes: list[ApoloStorageMount] | None = None
+    volumes: list[ApoloFilesMount] | None = None
 
 
 class SparkJobInputs(AppInputs):

@@ -8,7 +8,7 @@ from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import APOLO_STORAGE_ANNOTATION
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import Preset
-from apolo_app_types.protocols.common.storage import ApoloStorageFile
+from apolo_app_types.protocols.common.storage import ApoloFilesFile
 from apolo_app_types.protocols.spark_job import (
     PythonSpecificConfig,
     SparkApplicationModel,
@@ -27,9 +27,7 @@ async def test_spark_job_values_generation(setup_clients):
                 executor_preset=Preset(name="cpu-medium"),
                 type=SparkApplicationType.PYTHON,
                 image=ContainerImage(repository="myrepo/spark-job", tag="v1.2.3"),
-                main_application_file=ApoloStorageFile(
-                    path="storage://path/to/main.py"
-                ),
+                main_application_file=ApoloFilesFile(path="storage://path/to/main.py"),
                 spark_auto_scaling_config=SparkAutoScalingConfig(
                     enabled=True,
                     initial_executors=2,

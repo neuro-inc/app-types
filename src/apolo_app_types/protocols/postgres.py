@@ -1,17 +1,19 @@
 import enum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from apolo_app_types import AppInputs, Bucket
 from apolo_app_types.protocols.common import (
+    AbstractAppFieldType,
     AppOutputs,
     AppOutputsDeployer,
     Preset,
     SchemaExtraMetadata,
+    SchemaMetaType,
 )
 
 
-class PGBouncer(BaseModel):
+class PGBouncer(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
@@ -39,7 +41,7 @@ class PostgresSupportedVersions(enum.StrEnum):
     v16 = "16"
 
 
-class PostgresDBUser(BaseModel):
+class PostgresDBUser(AbstractAppFieldType):
     name: str = Field(
         ...,
         description="Name of the database user.",
@@ -52,7 +54,7 @@ class PostgresDBUser(BaseModel):
     )
 
 
-class PostgresConfig(BaseModel):
+class PostgresConfig(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
@@ -89,7 +91,15 @@ class PostgresInputs(AppInputs):
     backup_bucket: Bucket
 
 
-class CrunchyPostgresUserCredentials(BaseModel):
+class CrunchyPostgresUserCredentials(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Postgres User Credentials",
+            description="Configuration for Crunchy Postgres user credentials.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
     user: str
     password: str
     host: str
@@ -107,7 +117,7 @@ class CrunchyPostgresOutputs(AppOutputsDeployer):
     users: list[CrunchyPostgresUserCredentials]
 
 
-class PostgresUsers(BaseModel):
+class PostgresUsers(AbstractAppFieldType):
     users: list[CrunchyPostgresUserCredentials]
 
 
