@@ -25,14 +25,6 @@ class SparkExecutorConfig(AbstractAppFieldType):
     instances: int
 
 
-class PythonSpecificConfig(AbstractAppFieldType):
-    pypi_packages: list[str] | ApoloFilesFile | None = None
-
-
-class JavaSpecificConfig(AbstractAppFieldType):
-    main_class: str
-
-
 class SparkDependencies(AbstractAppFieldType):
     jars: list[str] | None = None
     py_files: list[str] | None = None
@@ -41,6 +33,7 @@ class SparkDependencies(AbstractAppFieldType):
     exclude_packages: list[str] | None = None
     repositories: list[str] | None = None
     archives: list[str] | None = None
+    pypi_packages: list[str] | ApoloFilesFile | None = None
 
 
 class SparkAutoScalingConfig(AbstractAppFieldType):
@@ -51,23 +44,13 @@ class SparkAutoScalingConfig(AbstractAppFieldType):
     shuffle_tracking_timeout: int
 
 
-class SparkApplicationModel(AbstractAppFieldType):
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Spark Application",
-            description="Run scalable Apache Spark applications",
-        ).as_json_schema_extra(),
-    )
+class SparkApplicationConfig(AbstractAppFieldType):
     type: SparkApplicationType = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
             title="Spark Application type",
             description="Choose the type of the Spark application",
         ).as_json_schema_extra(),
-    )
-    image: ContainerImage = Field(
-        default=ContainerImage(repository="spark", tag="3.5.3")
     )
     main_application_file: ApoloFilesFile = Field(
         ...,
@@ -77,12 +60,27 @@ class SparkApplicationModel(AbstractAppFieldType):
         ).as_json_schema_extra(),
     )
     arguments: list[str] | None = None
+    main_class: str | None = Field(default=None, title="Main Class for Java Apps")
     dependencies: SparkDependencies | None = None
-    spark_application_config: PythonSpecificConfig | JavaSpecificConfig | None = Field(
+    volumes: list[ApoloFilesMount] | None = None
+
+
+class SparkJobInputs(AppInputs):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Spark Application",
+            description="Run scalable Apache Spark applications",
+        ).as_json_schema_extra(),
+    )
+    image: ContainerImage = Field(
+        default=ContainerImage(repository="spark", tag="3.5.3")
+    )
+    spark_application_config: SparkApplicationConfig = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
-            title="Spark Application Configuration",
-            description="Language specific configuration to the Spark application type",
+            title="Application Configuration",
+            description="Configuration for the Spark application",
         ).as_json_schema_extra(),
     )
     spark_auto_scaling_config: SparkAutoScalingConfig | None = Field(
@@ -106,11 +104,6 @@ class SparkApplicationModel(AbstractAppFieldType):
             description="Preset configuration to be used by the executor",
         ).as_json_schema_extra(),
     )
-    volumes: list[ApoloFilesMount] | None = None
-
-
-class SparkJobInputs(AppInputs):
-    spark_job: SparkApplicationModel
 
 
 class SparkJobOutputs(AppOutputs):
