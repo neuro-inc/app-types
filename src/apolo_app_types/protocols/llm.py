@@ -34,7 +34,6 @@ class LLMModel(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="LLM",
             description="Configuration for LLM.",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     hugging_face_model: HuggingFaceModel = Field(  # noqa: N815

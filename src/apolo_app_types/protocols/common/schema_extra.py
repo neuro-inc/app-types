@@ -12,7 +12,7 @@ class SchemaMetaType(enum.StrEnum):
 class SchemaExtraMetadata(BaseModel):
     title: str = Field(..., alias="x-title")
     description: str = Field(..., alias="x-description")
-    meta_type: SchemaMetaType = Field(..., alias="x-meta-type")
+    meta_type: SchemaMetaType = Field(SchemaMetaType.INLINE, alias="x-meta-type")
     logo_url: str | None = Field(None, alias="x-logo-url")
     model_config = {"populate_by_name": True}
 

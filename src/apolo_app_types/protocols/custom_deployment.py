@@ -7,7 +7,6 @@ from apolo_app_types.protocols.common import (
     Preset,
     RestAPI,
     SchemaExtraMetadata,
-    SchemaMetaType,
 )
 from apolo_app_types.protocols.common.containers import ContainerImage
 from apolo_app_types.protocols.common.ingress import Ingress
@@ -49,7 +48,6 @@ class CustomDeploymentModel(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Custom Deployment",
             description="Configuration for Custom Deployment.",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     preset: Preset = Field(description="Name of the preset configuration to use")

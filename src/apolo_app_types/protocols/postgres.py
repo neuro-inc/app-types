@@ -19,7 +19,6 @@ class PGBouncer(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="PG Bouncer",
             description="Configuration for PG Bouncer.",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     preset: Preset = Field(
@@ -61,7 +60,6 @@ class PostgresConfig(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Postgres",
             description="Configuration for Postgres.",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     postgres_version: PostgresSupportedVersions = Field(

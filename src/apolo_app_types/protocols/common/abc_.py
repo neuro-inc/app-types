@@ -5,7 +5,6 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from apolo_app_types.protocols.common.schema_extra import (
     SchemaExtraMetadata,
-    SchemaMetaType,
 )
 from apolo_app_types.protocols.common.validator import validate_complex_type_prop
 
@@ -16,7 +15,6 @@ class AbstractAppFieldType(BaseModel, abc.ABC):
         json_schema_extra=SchemaExtraMetadata(
             title="",
             description="",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
 

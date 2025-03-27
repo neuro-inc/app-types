@@ -16,7 +16,6 @@ class DockerHubModel(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="DockerHub",
             description="Configuration for DockerHub.",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     registry_url: str = Field(  # noqa: N815

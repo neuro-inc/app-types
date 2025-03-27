@@ -26,7 +26,6 @@ class StableDiffusionParams(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Stable Diffusion",
             description="Configuration for Stable Diffusion.",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     replica_count: int = Field(

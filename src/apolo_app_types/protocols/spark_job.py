@@ -11,7 +11,6 @@ from apolo_app_types.protocols.common import (
     ContainerImage,
     Preset,
     SchemaExtraMetadata,
-    SchemaMetaType,
 )
 
 
@@ -58,7 +57,6 @@ class SparkApplicationModel(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Spark Application",
             description="Run scalable Apache Spark applications",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     type: SparkApplicationType = Field(
@@ -66,7 +64,6 @@ class SparkApplicationModel(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Spark Application type",
             description="Choose the type of the Spark application",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     image: ContainerImage = Field(
@@ -77,7 +74,6 @@ class SparkApplicationModel(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Main Application File",
             description="The main application file to be executed",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     arguments: list[str] | None = None
@@ -87,7 +83,6 @@ class SparkApplicationModel(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Spark Application Configuration",
             description="Language specific configuration to the Spark application type",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     spark_auto_scaling_config: SparkAutoScalingConfig | None = Field(
@@ -95,7 +90,6 @@ class SparkApplicationModel(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Spark Auto Scaling Configuration",
             description="Configuration for the Spark auto scaling",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     driver_preset: Preset = Field(
@@ -103,7 +97,6 @@ class SparkApplicationModel(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Driver Preset",
             description="Preset configuration to be used by the driver",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     executor_preset: Preset = Field(
@@ -111,7 +104,6 @@ class SparkApplicationModel(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Executor Preset",
             description="Preset configuration to be used by the executor",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     volumes: list[ApoloFilesMount] | None = None

@@ -3,7 +3,6 @@ from pydantic import ConfigDict, Field
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.schema_extra import (
     SchemaExtraMetadata,
-    SchemaMetaType,
 )
 
 
@@ -17,7 +16,6 @@ class Ingress(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Ingress",
             description="Configuration for Ingress.",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     enabled: bool = Field(

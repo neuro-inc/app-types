@@ -15,7 +15,6 @@ class StorageGB(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Storage",
             description="Storage configuration.",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     size: int = Field(
@@ -37,7 +36,6 @@ class ApoloFilesPath(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Apolo Files path",
             description="Path within Apolo Files application to use.",
-            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     path: str = Field(
