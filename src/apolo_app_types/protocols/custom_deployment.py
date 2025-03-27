@@ -10,7 +10,7 @@ from apolo_app_types.protocols.common import (
 )
 from apolo_app_types.protocols.common.containers import ContainerImage
 from apolo_app_types.protocols.common.ingress import Ingress
-from apolo_app_types.protocols.common.storage import ApoloStorageMount
+from apolo_app_types.protocols.common.storage import ApoloFilesMount
 from apolo_app_types.protocols.dockerhub import DockerConfigModel
 
 
@@ -71,7 +71,7 @@ class CustomDeploymentModel(AbstractAppFieldType):
     ingress: Ingress | None = Field(
         default=None, description="Ingress configuration settings"
     )
-    storage_mounts: list[ApoloStorageMount] = Field(
+    storage_mounts: list[ApoloFilesMount] = Field(
         default_factory=list,
         description="List of ApoloStorageMount objects to mount external storage paths",
     )

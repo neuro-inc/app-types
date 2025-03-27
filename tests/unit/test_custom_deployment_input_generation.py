@@ -11,9 +11,9 @@ from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import Ingress, Preset
 from apolo_app_types.protocols.common.storage import (
+    ApoloFilesMount,
+    ApoloFilesPath,
     ApoloMountMode,
-    ApoloStorageMount,
-    ApoloStoragePath,
     MountPath,
 )
 from apolo_app_types.protocols.custom_deployment import CustomDeploymentModel
@@ -96,15 +96,15 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
                     clusterName="default",
                 ),
                 storage_mounts=[
-                    ApoloStorageMount(
-                        storage_path=ApoloStoragePath(
+                    ApoloFilesMount(
+                        storage_path=ApoloFilesPath(
                             path="storage://mycluster/myorg/myproj/data"
                         ),
                         mount_path=MountPath(path="/app/data"),
                         mode=ApoloMountMode(mode="rw"),
                     ),
-                    ApoloStorageMount(
-                        storage_path=ApoloStoragePath(
+                    ApoloFilesMount(
+                        storage_path=ApoloFilesPath(
                             path="storage://mycluster/myorg/config"
                         ),
                         mount_path=MountPath(path="/config"),
