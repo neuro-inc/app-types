@@ -1,7 +1,8 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
+from apolo_app_types import AppInputs
 from apolo_app_types.protocols.common import (
-    AppInputs,
+    AbstractAppFieldType,
     AppOutputs,
     Preset,
     RestAPI,
@@ -9,9 +10,10 @@ from apolo_app_types.protocols.common import (
 )
 from apolo_app_types.protocols.common.containers import ContainerImage
 from apolo_app_types.protocols.common.ingress import Ingress
+from apolo_app_types.protocols.common.storage import ApoloFilesMount
 
 
-class AutoscalingBase(BaseModel):
+class AutoscalingBase(AbstractAppFieldType):
     type: str
     enabled: bool | None = None
     min_replicas: int | None = None
@@ -24,27 +26,41 @@ class AutoscalingHPA(AutoscalingBase):
     target_memory_utilization_percentage: int | None = None
 
 
-class Env(BaseModel):
+class Env(AbstractAppFieldType):
     name: str
     value: str
 
 
-class Container(BaseModel):
+class Container(AbstractAppFieldType):
     command: list[str] | None = None
     args: list[str] | None = None
     env: list[Env] = Field(default_factory=list)
 
 
-class Service(BaseModel):
+class Service(AbstractAppFieldType):
     enabled: bool
     port: int
 
 
-class DeploymentName(BaseModel):
+class DeploymentName(AbstractAppFieldType):
     name: str | None = Field(
         default=None,
         title="Deployment Name",
         description="Override name for the deployment",
+    )
+
+
+class StorageMounts(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Storage Mounts",
+            description="Mount external storage paths",
+        ).as_json_schema_extra(),
+    )
+    mounts: list[ApoloFilesMount] = Field(
+        default_factory=list,
+        description="List of ApoloStorageMount objects to mount external storage paths",
     )
 
 
@@ -78,6 +94,9 @@ class CustomDeploymentInputs(AppInputs):
     )
     ingress: Ingress | None = Field(
         default=None, description="Ingress configuration settings"
+    )
+    storage_mounts: StorageMounts | None = Field(
+        default=None, description="Mount external storage paths"
     )
 
 

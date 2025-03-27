@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import Field, field_validator
 
 from apolo_app_types import AppInputs
 from apolo_app_types.protocols.common import (
@@ -15,10 +15,6 @@ from apolo_app_types.protocols.common import (
 
 
 WEAVIATE_MIN_GB_STORAGE = 32
-
-
-class WeaviateAuthentication(BaseModel):
-    enabled: str = "false"
 
 
 class WeaviateInputs(AppInputs):
@@ -43,12 +39,6 @@ class WeaviateInputs(AppInputs):
             err_msg = "Storage size must be specified as int."
             raise ValueError(err_msg)
         return value
-
-
-class WeaviateEndpoints(BaseModel):
-    graphql_endpoint: str | None = Field(default=None)
-    rest_endpoint: str | None = Field(default=None)
-    grpc_endpoint: str | None = Field(default=None)
 
 
 class WeaviateOutputs(AppOutputs):
