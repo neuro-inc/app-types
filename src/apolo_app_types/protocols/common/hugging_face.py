@@ -38,12 +38,12 @@ class HuggingFaceCache(AbstractAppFieldType):
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
             title="Hugging Face Cache",
-            description="Configuration for Hugging Face cache.",
+            description="Configuration for the Hugging Face cache.",
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     files_path: ApoloFilesPath = Field(
         ...,
-        description="The path to the Apolo Files where Hugging Face artifacts are cached.",  # noqa: E501
+        description="The path to the Apolo Files directory where Hugging Face artifacts are cached.",  # noqa: E501
         title="Files Path",
     )
