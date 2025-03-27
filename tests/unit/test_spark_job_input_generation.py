@@ -9,6 +9,8 @@ from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import Preset
 from apolo_app_types.protocols.common.storage import ApoloFilesFile
 from apolo_app_types.protocols.spark_job import (
+    DriverConfig,
+    ExecutorConfig,
     SparkApplicationConfig,
     SparkApplicationType,
     SparkAutoScalingConfig,
@@ -29,8 +31,10 @@ async def test_spark_job_values_generation(setup_clients):
                     pypi_packages=["scikit-learn==1.0.2"],
                 ),
             ),
-            driver_preset=Preset(name="cpu-small"),
-            executor_preset=Preset(name="cpu-medium"),
+            driver_config=DriverConfig(preset=Preset(name="cpu-small")),
+            executor_config=ExecutorConfig(
+                preset=Preset(name="cpu-medium"), instances=1
+            ),
             image=ContainerImage(repository="myrepo/spark-job", tag="v1.2.3"),
             spark_auto_scaling_config=SparkAutoScalingConfig(
                 enabled=True,

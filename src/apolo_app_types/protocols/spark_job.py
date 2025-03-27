@@ -21,27 +21,106 @@ class SparkApplicationType(StrEnum):
     R = "R"
 
 
-class SparkExecutorConfig(AbstractAppFieldType):
-    instances: int
+class DriverConfig(AbstractAppFieldType):
+    preset: Preset = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Driver Preset",
+            description="Preset configuration to be used by the driver",
+        ).as_json_schema_extra(),
+    )
+
+
+class ExecutorConfig(AbstractAppFieldType):
+    instances: int = Field(
+        default=1, title="Instances", description="Number of instances"
+    )
+    preset: Preset = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Executor Preset",
+            description="Preset configuration to be used by the executor",
+        ).as_json_schema_extra(),
+    )
 
 
 class SparkDependencies(AbstractAppFieldType):
-    jars: list[str] | None = None
-    py_files: list[str] | None = None
-    files: list[str] | None = None
-    packages: list[str] | None = None
-    exclude_packages: list[str] | None = None
-    repositories: list[str] | None = None
-    archives: list[str] | None = None
-    pypi_packages: list[str] | ApoloFilesFile | None = None
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Spark Dependencies",
+            description="Dependencies for the Spark application",
+        ).as_json_schema_extra(),
+    )
+    jars: list[str] | None = Field(
+        default=None,
+        title="Jars",
+        description="List of jars to be included as dependencies",
+    )
+    py_files: list[str] | None = Field(
+        default=None,
+        title="Python Files",
+        description="List of Python files to be included as dependencies",
+    )
+    files: list[str] | None = Field(
+        default=None,
+        title="Files",
+        description="List of files to be included as dependencies",
+    )
+    packages: list[str] | None = Field(
+        default=None,
+        title="Packages",
+        description="List of packages to be included as dependencies",
+    )
+    exclude_packages: list[str] | None = Field(
+        default=None,
+        title="Exclude Packages",
+        description="List of packages to be excluded as dependencies",
+    )
+    repositories: list[str] | None = Field(
+        default=None,
+        title="Repositories",
+        description="List of repositories to be included as dependencies",
+    )
+    archives: list[str] | None = Field(
+        default=None,
+        title="Archives",
+        description="List of archives to be included as dependencies",
+    )
+    pypi_packages: list[str] | ApoloFilesFile | None = Field(
+        default=None,
+        title="PyPi Packages",
+        description=(
+            "List of PyPi packages to be downloaded and included as dependencies"
+        ),
+    )
 
 
 class SparkAutoScalingConfig(AbstractAppFieldType):
-    enabled: bool = False
-    initial_executors: int | None
-    min_executors: int
-    max_executors: int
-    shuffle_tracking_timeout: int
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Spark Auto Scaling Configuration",
+            description="Configuration for the Spark auto scaling",
+        ).as_json_schema_extra(),
+    )
+    enabled: bool = Field(
+        default=False, title="Enabled", description="Enable auto scaling"
+    )
+    initial_executors: int | None = Field(
+        default=None,
+        title="Initial Executors",
+        description="Initial number of executors",
+    )
+    min_executors: int = Field(
+        default=1, title="Min Executors", description="Minimum number of executors"
+    )
+    max_executors: int = Field(
+        default=1, title="Max Executors", description="Maximum number of executors"
+    )
+    shuffle_tracking_timeout: int = Field(
+        ..., title="Shuffle Tracking Timeout", description="Shuffle tracking timeout"
+    )
 
 
 class SparkApplicationConfig(AbstractAppFieldType):
@@ -90,18 +169,18 @@ class SparkJobInputs(AppInputs):
             description="Configuration for the Spark auto scaling",
         ).as_json_schema_extra(),
     )
-    driver_preset: Preset = Field(
+    driver_config: DriverConfig = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
-            title="Driver Preset",
-            description="Preset configuration to be used by the driver",
+            title="Driver Configuration",
+            description="Configuration for the driver",
         ).as_json_schema_extra(),
     )
-    executor_preset: Preset = Field(
+    executor_config: ExecutorConfig = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
-            title="Executor Preset",
-            description="Preset configuration to be used by the executor",
+            title="Executor Configuration",
+            description="Configuration for the executor",
         ).as_json_schema_extra(),
     )
 

@@ -66,12 +66,12 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         # Labels and annotations
         driver_extra_values = await gen_extra_values(
             apolo_client=self.client,
-            preset_type=input_.driver_preset,
+            preset_type=input_.driver_config.preset,
             namespace=namespace,
         )
         executor_extra_values = await gen_extra_values(
             apolo_client=self.client,
-            preset_type=input_.executor_preset,
+            preset_type=input_.executor_config.preset,
             namespace=namespace,
         )
         extra_labels = gen_apolo_storage_integration_labels(inject_storage=True)
@@ -91,7 +91,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
                 },
                 "driver": {
                     "labels": {
-                        "platform.apolo.us/preset": input_.driver_preset.name,  # noqa: E501
+                        "platform.apolo.us/preset": input_.driver_config.preset.name,  # noqa: E501
                         "platform.apolo.us/component": "app",
                         **extra_labels,
                     },
@@ -100,11 +100,12 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
                 },
                 "executor": {
                     "labels": {
-                        "platform.apolo.us/preset": input_.executor_preset.name,  # noqa: E501
+                        "platform.apolo.us/preset": input_.executor_config.preset.name,  # noqa: E501
                         "platform.apolo.us/component": "app",
                         **extra_labels,
                     },
                     "annotations": storage_annotations,
+                    "instances": input_.executor_config.instances,
                     **executor_extra_values,
                 },
             },
