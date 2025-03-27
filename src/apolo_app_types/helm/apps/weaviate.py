@@ -82,7 +82,9 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
                     "BACKUP_S3_REGION": bucket_credentials.region_name,
                 },
                 "secrets": {
-                    "AWS_ACCESS_KEY_ID": bucket_credentials.access_key_id,
+                    "AWS_ACCESS_KEY_ID": serialize_optional_secret(
+                        bucket_credentials.access_key_id
+                    ),
                     "AWS_SECRET_ACCESS_KEY": serialize_optional_secret(
                         bucket_credentials.secret_access_key
                     ),
