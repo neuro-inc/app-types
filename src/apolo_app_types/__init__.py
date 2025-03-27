@@ -1,6 +1,6 @@
 from apolo_app_types.protocols.apolo_deploy import ApoloDeployInputs, ApoloDeployOutputs
 from apolo_app_types.protocols.common import (
-    ApoloStorageMount,
+    ApoloFilesMount,
     AppInputs,
     AppInputsDeployer,
     AppOutputs,
@@ -34,9 +34,9 @@ from apolo_app_types.protocols.dockerhub import (
     DockerHubOutputs,
 )
 from apolo_app_types.protocols.fooocus import FooocusInputs, FooocusOutputs
-from apolo_app_types.protocols.huggingface_storage_cache import (
-    HuggingFaceStorageCacheInputs,
-    HuggingFaceStorageCacheOutputs,
+from apolo_app_types.protocols.huggingface_cache import (
+    HuggingFaceCacheInputs,
+    HuggingFaceCacheOutputs,
 )
 from apolo_app_types.protocols.jupyter import (
     JupyterInputs,
@@ -64,6 +64,7 @@ from apolo_app_types.protocols.postgres import (
 from apolo_app_types.protocols.private_gpt import PrivateGPTInputs, PrivateGPTOutputs
 from apolo_app_types.protocols.pycharm import PycharmInputs, PycharmOutputs
 from apolo_app_types.protocols.shell import ShellInputs, ShellOutputs
+from apolo_app_types.protocols.spark_job import SparkJobInputs, SparkJobOutputs
 from apolo_app_types.protocols.stable_diffusion import (
     SDModel,
     SDOutputs,
@@ -136,9 +137,9 @@ __all__ = [
     "DockerHubInputs",
     "DockerHubOutputs",
     "DockerConfigModel",
-    "ApoloStorageMount",
-    "HuggingFaceStorageCacheInputs",
-    "HuggingFaceStorageCacheOutputs",
+    "ApoloFilesMount",
+    "HuggingFaceCacheInputs",
+    "HuggingFaceCacheOutputs",
     "CustomDeploymentInputs",
     "CustomDeploymentOutputs",
     "ContainerImage",
@@ -147,4 +148,6 @@ __all__ = [
     "Env",
     "AppOutputsDeployer",
     "PostgresOutputs",
+    "SparkJobInputs",
+    "SparkJobOutputs",
 ]

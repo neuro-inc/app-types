@@ -12,13 +12,15 @@ from apolo_sdk import Preset
 
 from apolo_app_types.helm.apps.ingress import get_ingress_values
 from apolo_app_types.protocols.common import (
-    ApoloStorageMount,
+    ApoloFilesMount,
     Ingress,
     Preset as PresetType,
 )
 
 
 logger = logging.getLogger(__name__)
+
+APOLO_STORAGE_ANNOTATION = "platform.apolo.us/inject-storage"
 
 
 def get_preset(client: apolo_sdk.Client, preset_name: str) -> apolo_sdk.Preset:
@@ -189,10 +191,10 @@ def sanitize_dict_string(
 
 
 def gen_apolo_storage_integration_annotations(
-    storage_mounts: t.Sequence[ApoloStorageMount],
-) -> dict[str, str]:
+    files_mouts: t.Sequence[ApoloFilesMount],
+) -> list[dict[str, str]]:
     storage_mount_annotations = []
-    for storage_mount in storage_mounts:
+    for storage_mount in files_mouts:
         storage_mount_annotations.append(
             {
                 "storage_path": storage_mount.storage_path.path,
@@ -200,7 +202,7 @@ def gen_apolo_storage_integration_annotations(
                 "mount_mode": storage_mount.mode.mode.value,
             }
         )
-    return {"platform.apolo.us/inject-storage": json.dumps(storage_mount_annotations)}
+    return storage_mount_annotations
 
 
 def gen_apolo_storage_integration_labels(
@@ -208,8 +210,27 @@ def gen_apolo_storage_integration_labels(
     inject_storage: bool = False,
 ) -> dict[str, str]:
     if inject_storage:
-        return {"platform.apolo.us/inject-storage": "true"}
+        return {APOLO_STORAGE_ANNOTATION: "true"}
     return {}
+
+
+def append_apolo_storage_integration_annotations(
+    current_annotations: dict[str, t.Any], files_mounts: t.Sequence[ApoloFilesMount]
+) -> dict[str, str]:
+    """
+    Returns a new dict with the storage annotations appended to the current annotations.
+    """
+    cur_annot = deepcopy(current_annotations)
+    cur_apolo_annotation_str: str | None = cur_annot.get(APOLO_STORAGE_ANNOTATION)
+    if cur_apolo_annotation_str:
+        current_list = json.loads(cur_apolo_annotation_str)
+    else:
+        current_list = []
+
+    new_annotations = gen_apolo_storage_integration_annotations(files_mounts)
+    current_list.extend(new_annotations)
+    cur_annot[APOLO_STORAGE_ANNOTATION] = json.dumps(current_list)
+    return cur_annot
 
 
 async def gen_extra_values(

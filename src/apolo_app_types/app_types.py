@@ -3,10 +3,11 @@ import enum
 from apolo_app_types import StableDiffusionInputs
 from apolo_app_types.protocols.common import AppInputs
 from apolo_app_types.protocols.dockerhub import DockerHubInputs
-from apolo_app_types.protocols.huggingface_storage_cache import (
-    HuggingFaceStorageCacheInputs,
+from apolo_app_types.protocols.huggingface_cache import (
+    HuggingFaceCacheInputs,
 )
 from apolo_app_types.protocols.llm import LLMInputs
+from apolo_app_types.protocols.spark_job import SparkJobInputs
 from apolo_app_types.protocols.weaviate import WeaviateInputs
 
 
@@ -26,8 +27,9 @@ class AppType(enum.StrEnum):
     Shell = "shell"
     ApoloDeploy = "apolo-deploy"
     DockerHub = "dockerhub"
-    HuggingFaceStorageCache = "huggingface-storage-cache"
+    HuggingFaceCache = "huggingface-cache"
     CustomDeployment = "custom-deployment"
+    SparkJob = "spark-job"
 
     def __repr__(self) -> str:
         return str(self)
@@ -46,7 +48,7 @@ class AppType(enum.StrEnum):
 
     def is_appless(self) -> bool:
         return self in {
-            AppType.HuggingFaceStorageCache,
+            AppType.HuggingFaceCache,
         }
 
     @classmethod
@@ -59,8 +61,10 @@ class AppType(enum.StrEnum):
             return AppType.StableDiffusion
         if isinstance(inputs, DockerHubInputs):
             return AppType.DockerHub
-        if isinstance(inputs, HuggingFaceStorageCacheInputs):
-            return AppType.HuggingFaceStorageCache
+        if isinstance(inputs, HuggingFaceCacheInputs):
+            return AppType.HuggingFaceCache
+        if isinstance(inputs, SparkJobInputs):
+            return AppType.SparkJob
 
         error_message = f"Unsupported input type: {type(inputs).__name__}"
         raise ValueError(error_message)

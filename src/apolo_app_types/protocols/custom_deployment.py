@@ -1,23 +1,20 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from apolo_app_types.protocols.common import (
+    AbstractAppFieldType,
     AppInputs,
     AppOutputs,
     Preset,
     RestAPI,
     SchemaExtraMetadata,
 )
+from apolo_app_types.protocols.common.containers import ContainerImage
 from apolo_app_types.protocols.common.ingress import Ingress
 from apolo_app_types.protocols.common.storage import ApoloStorageMount
 from apolo_app_types.protocols.dockerhub import DockerConfigModel
 
 
-class ContainerImage(BaseModel):
-    repository: str
-    tag: str | None = None
-
-
-class AutoscalingBase(BaseModel):
+class AutoscalingBase(AbstractAppFieldType):
     type: str
     enabled: bool | None = None
     min_replicas: int | None = None
@@ -30,23 +27,23 @@ class AutoscalingHPA(AutoscalingBase):
     target_memory_utilization_percentage: int | None = None
 
 
-class Env(BaseModel):
+class Env(AbstractAppFieldType):
     name: str
     value: str
 
 
-class Container(BaseModel):
+class Container(AbstractAppFieldType):
     command: list[str] | None = None
     args: list[str] | None = None
     env: list[Env] = Field(default_factory=list)
 
 
-class Service(BaseModel):
+class Service(AbstractAppFieldType):
     enabled: bool
     port: int
 
 
-class CustomDeploymentModel(BaseModel):
+class CustomDeploymentModel(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(

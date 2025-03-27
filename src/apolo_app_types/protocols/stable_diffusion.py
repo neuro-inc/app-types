@@ -1,6 +1,7 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from apolo_app_types.protocols.common import (
+    AbstractAppFieldType,
     AppInputs,
     AppInputsDeployer,
     AppOutputs,
@@ -10,6 +11,7 @@ from apolo_app_types.protocols.common import (
     Preset,
     RestAPI,
     SchemaExtraMetadata,
+    SchemaMetaType,
 )
 
 
@@ -18,11 +20,12 @@ class StableStudio(AppInputsDeployer):
     preset: Preset
 
 
-class StableDiffusionParams(BaseModel):
+class StableDiffusionParams(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Stable Diffusion", description="Configuration for Stable Diffusion."
+            title="Stable Diffusion",
+            description="Configuration for Stable Diffusion.",
         ).as_json_schema_extra(),
     )
     replica_count: int = Field(
@@ -53,7 +56,15 @@ class TextToImgAPI(AppOutputsDeployer):
         return self.api_base + "/txt2img"
 
 
-class SDModel(BaseModel):
+class SDModel(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Stable Diffusion Model",
+            description="Stable Diffusion Model hosted in application.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
     name: str
     files: str
 

@@ -1,7 +1,6 @@
-import base64
 import typing as t
 
-from apolo_app_types import Bucket, K8sSecret
+from apolo_app_types import Bucket
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
     get_preset,
@@ -162,7 +161,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
                 "bucket": bucket.id,
                 "endpoint": s3_like_bucket_creds.endpoint_url,
                 "region": s3_like_bucket_creds.region_name,
-                "key": s3_like_bucket_creds.access_key_id,
+                "key": serialize_optional_secret(s3_like_bucket_creds.access_key_id),
                 "keySecret": serialize_optional_secret(
                     s3_like_bucket_creds.secret_access_key
                 ),
@@ -170,10 +169,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
             return {"s3": backup_config}
         if bucket.bucket_provider == BucketProvider.GCP:
             bucket_creds: GCPBucketCredentials = bucket.credentials[0]  # type: ignore
-            if not isinstance(bucket_creds.key_data, K8sSecret):
-                key = base64.b64decode(bucket_creds.key_data).decode()
-            else:
-                key = bucket_creds.key_data  # type: ignore
+            key = serialize_optional_secret(bucket_creds.key_data)
             backup_config = {
                 "bucket": bucket.id,
                 "key": key,

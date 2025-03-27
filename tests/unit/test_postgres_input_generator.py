@@ -1,5 +1,3 @@
-import base64
-
 import pydantic
 import pytest
 
@@ -187,7 +185,7 @@ async def test_values_postgresql_generation_with_gcp_bucket(
                 credentials=[
                     GCPBucketCredentials(
                         name="some_name",
-                        key_data=base64.b64encode(key_data.encode()),
+                        key_data=key_data,
                     )
                 ],
                 bucket_provider=BucketProvider.GCP,

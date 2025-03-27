@@ -6,11 +6,12 @@ import httpx
 from apolo_app_types.app_types import AppType
 from apolo_app_types.outputs.custom_deployment import get_custom_deployment_outputs
 from apolo_app_types.outputs.dockerhub import get_dockerhub_outputs
-from apolo_app_types.outputs.huggingface_storage_cache import (
-    get_app_outputs as get_huggingface_storage_cache_outputs,
+from apolo_app_types.outputs.huggingface_cache import (
+    get_app_outputs as get_huggingface_cache_outputs,
 )
 from apolo_app_types.outputs.llm import get_llm_inference_outputs
 from apolo_app_types.outputs.postgres import get_postgres_outputs
+from apolo_app_types.outputs.spark_job import get_spark_job_outputs
 from apolo_app_types.outputs.stable_diffusion import get_stable_diffusion_outputs
 from apolo_app_types.outputs.weaviate import get_weaviate_outputs
 
@@ -47,10 +48,12 @@ async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> bool:
             conv_outputs = await get_dockerhub_outputs(helm_outputs)
         elif app_type == AppType.PostgreSQL:
             conv_outputs = await get_postgres_outputs(helm_outputs)
-        elif app_type == AppType.HuggingFaceStorageCache:
-            conv_outputs = await get_huggingface_storage_cache_outputs(helm_outputs)
+        elif app_type == AppType.HuggingFaceCache:
+            conv_outputs = await get_huggingface_cache_outputs(helm_outputs)
         elif app_type == AppType.CustomDeployment:
             conv_outputs = await get_custom_deployment_outputs(helm_outputs)
+        elif app_type == AppType.SparkJob:
+            conv_outputs = await get_spark_job_outputs(helm_outputs)
         else:
             err_msg = f"Unsupported app type: {app_type} for posting outputs"
             raise ValueError(err_msg)
