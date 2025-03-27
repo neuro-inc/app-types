@@ -3,7 +3,7 @@ import typing as t
 from apolo_app_types import CustomDeploymentInputs
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
-    gen_apolo_storage_integration_annotations,
+    append_apolo_storage_integration_annotations,
     gen_apolo_storage_integration_labels,
     gen_extra_values,
 )
@@ -24,8 +24,8 @@ class CustomDeploymentChartValueProcessor(
         """
         if not input_.custom_deployment.storage_mounts:
             return {}
-        return gen_apolo_storage_integration_annotations(
-            input_.custom_deployment.storage_mounts
+        return append_apolo_storage_integration_annotations(
+            {}, input_.custom_deployment.storage_mounts
         )
 
     def _configure_storage_labels(
