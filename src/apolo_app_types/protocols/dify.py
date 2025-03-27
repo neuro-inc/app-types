@@ -1,6 +1,5 @@
-from pydantic import BaseModel
-
 from apolo_app_types.protocols.common import (
+    AbstractAppFieldType,
     AppInputsDeployer,
     AppOutputsDeployer,
     Postgres,
@@ -8,22 +7,22 @@ from apolo_app_types.protocols.common import (
 )
 
 
-class DifyApi(BaseModel):
+class DifyApi(AbstractAppFieldType):
     replicas: int | None
     preset_name: str
     title: str
 
 
-class DifyWorker(BaseModel):
+class DifyWorker(AbstractAppFieldType):
     replicas: int | None
     preset_name: str
 
 
-class DifyProxy(BaseModel):
+class DifyProxy(AbstractAppFieldType):
     preset_name: str
 
 
-class DifyWeb(BaseModel):
+class DifyWeb(AbstractAppFieldType):
     replicas: int | None
     preset_name: str
 

@@ -1,19 +1,22 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from apolo_app_types.protocols.common import (
+    AbstractAppFieldType,
     AppInputs,
     AppOutputs,
     SchemaExtraMetadata,
+    SchemaMetaType,
     StrOrSecret,
 )
 
 
-class DockerHubModel(BaseModel):
+class DockerHubModel(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
             title="DockerHub",
             description="Configuration for DockerHub.",
+            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     registry_url: str = Field(  # noqa: N815
@@ -37,12 +40,13 @@ class DockerHubInputs(AppInputs):
     dockerhub: DockerHubModel
 
 
-class DockerConfigModel(BaseModel):
+class DockerConfigModel(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
             title="Docker Config",
             description="Docker configuration content.",
+            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     filecontents: str = Field(

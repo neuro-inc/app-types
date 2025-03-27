@@ -12,7 +12,7 @@ from apolo_sdk import Preset
 
 from apolo_app_types.helm.apps.ingress import get_ingress_values
 from apolo_app_types.protocols.common import (
-    ApoloStorageMount,
+    ApoloFilesMount,
     Ingress,
     Preset as PresetType,
 )
@@ -190,11 +190,11 @@ def sanitize_dict_string(
     return dict_str
 
 
-def _gen_apolo_storage_integration_annotations(
-    storage_mounts: t.Sequence[ApoloStorageMount],
-) -> list[dict[str, str]]:
+def gen_apolo_storage_integration_annotations(
+    files_mouts: t.Sequence[ApoloFilesMount],
+) -> dict[str, str]:
     storage_mount_annotations = []
-    for storage_mount in storage_mounts:
+    for storage_mount in files_mouts:
         storage_mount_annotations.append(
             {
                 "storage_path": storage_mount.storage_path.path,
@@ -215,7 +215,7 @@ def gen_apolo_storage_integration_labels(
 
 
 def append_apolo_storage_integration_annotations(
-    current_annotations: dict[str, t.Any], storage_mounts: t.Sequence[ApoloStorageMount]
+    current_annotations: dict[str, t.Any], files_mounts: t.Sequence[ApoloFilesMount]
 ) -> dict[str, str]:
     """
     Returns a new dict with the storage annotations appended to the current annotations.
@@ -227,7 +227,7 @@ def append_apolo_storage_integration_annotations(
     else:
         current_list = []
 
-    new_annotations = _gen_apolo_storage_integration_annotations(storage_mounts)
+    new_annotations = gen_apolo_storage_integration_annotations(files_mounts)
     current_list.extend(new_annotations)
     cur_annot[APOLO_STORAGE_ANNOTATION] = json.dumps(current_list)
     return cur_annot

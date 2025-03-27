@@ -12,8 +12,8 @@ from apolo_app_types.helm.apps.common import (
 )
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
 from apolo_app_types.protocols.common import (
+    ApoloFilesMount,
     ApoloMountMode,
-    ApoloStorageMount,
     MountPath,
 )
 from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
@@ -79,9 +79,9 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
 
     def _configure_extra_annotations(self, input_: LLMInputs) -> dict[str, str]:
         extra_annotations: dict[str, str] = {}
-        if input_.storage_cache:
-            storage_mount = ApoloStorageMount(
-                storage_path=input_.storage_cache.storage_path,
+        if input_.cache_config:
+            storage_mount = ApoloFilesMount(
+                storage_path=input_.cache_config.storage_path,
                 mount_path=MountPath(path="/root/.cache/huggingface"),
                 mode=ApoloMountMode(mode="rw"),
             )
@@ -92,14 +92,14 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
 
     def _configure_extra_labels(self, input_: LLMInputs) -> dict[str, str]:
         extra_labels: dict[str, str] = {}
-        if input_.storage_cache:
+        if input_.cache_config:
             extra_labels.update(
                 **gen_apolo_storage_integration_labels(inject_storage=True)
             )
         return extra_labels
 
     def _configure_model_download(self, input_: LLMInputs) -> dict[str, t.Any]:
-        if input_.storage_cache:
+        if input_.cache_config:
             return {
                 "modelDownload": {
                     "hookEnabled": True,

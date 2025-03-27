@@ -1,21 +1,21 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from apolo_app_types.protocols.common import (
+    AbstractAppFieldType,
     AppInputs,
     AppOutputs,
     AppOutputsDeployer,
+    HuggingFaceCache,
     HuggingFaceModel,
     Ingress,
     Preset,
     SchemaExtraMetadata,
+    SchemaMetaType,
 )
 from apolo_app_types.protocols.common.networking import RestAPI
-from apolo_app_types.protocols.huggingface_storage_cache import (
-    HuggingFaceStorageCacheModel,
-)
 
 
-class LLMApi(BaseModel):
+class LLMApi(AbstractAppFieldType):
     replicas: int | None = Field(  # noqa: N815
         default=None,
         description="Replicas count.",
@@ -28,12 +28,13 @@ class LLMApi(BaseModel):
     )
 
 
-class LLMModel(BaseModel):
+class LLMModel(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
             title="LLM",
             description="Configuration for LLM.",
+            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     hugging_face_model: HuggingFaceModel = Field(  # noqa: N815
@@ -53,16 +54,16 @@ class LLMModel(BaseModel):
     )
 
 
-class Worker(BaseModel):
+class Worker(AbstractAppFieldType):
     replicas: int | None
     preset_name: str
 
 
-class Proxy(BaseModel):
+class Proxy(AbstractAppFieldType):
     preset_name: str
 
 
-class Web(BaseModel):
+class Web(AbstractAppFieldType):
     replicas: int | None
     preset_name: str
 
@@ -71,7 +72,7 @@ class LLMInputs(AppInputs):
     preset: Preset
     ingress: Ingress
     llm: LLMModel
-    storage_cache: HuggingFaceStorageCacheModel | None = None
+    cache_config: HuggingFaceCache | None = None
 
 
 class OpenAICompatibleAPI(AppOutputsDeployer):
@@ -108,7 +109,15 @@ class VLLMOutputs(AppOutputsDeployer):
     embeddings_external_api: OpenAICompatibleEmbeddingsAPI | None
 
 
-class LLMSpecific(BaseModel):
+class LLMSpecific(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="LLM Server Details",
+            description="Configuration details of the LLM server.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
     tokenizer_name: str | None = None
     api_key: str | None = None
 

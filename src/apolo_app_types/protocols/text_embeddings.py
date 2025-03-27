@@ -1,6 +1,5 @@
-from pydantic import BaseModel
-
 from apolo_app_types.protocols.common import (
+    AbstractAppFieldType,
     AppInputsDeployer,
     AppOutputsDeployer,
     HuggingFaceModel,
@@ -9,7 +8,7 @@ from apolo_app_types.protocols.common import (
 from apolo_app_types.protocols.llm import OpenAICompatibleEmbeddingsAPI
 
 
-class Image(BaseModel):
+class Image(AbstractAppFieldType):
     tag: str
 
 

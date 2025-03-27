@@ -1,19 +1,26 @@
+from .abc_ import (
+    AbstractAppFieldType,
+    AppInputs,
+    AppInputsDeployer,
+    AppOutputs,
+    AppOutputsDeployer,
+)
 from .auth import BasicAuth
 from .buckets import Bucket
-from .hugging_face import HuggingFaceModel
+from .containers import ContainerImage
+from .hugging_face import HuggingFaceCache, HuggingFaceModel
 from .ingress import Ingress, IngressGrpc
-from .inputs import AppInputs, AppInputsDeployer
 from .networking import GraphQLAPI, GrpcAPI, RestAPI
-from .outputs import AppOutputs, AppOutputsDeployer
 from .postgres import Postgres
 from .preset import Preset
 from .redis import Redis, RedisMaster
-from .schema_extra import SchemaExtraMetadata
+from .schema_extra import SchemaExtraMetadata, SchemaMetaType
 from .secrets_ import K8sSecret, OptionalStrOrSecret, StrOrSecret
 from .storage import (
+    ApoloFilesFile,
+    ApoloFilesMount,
+    ApoloFilesPath,
     ApoloMountMode,
-    ApoloStorageMount,
-    ApoloStoragePath,
     MountPath,
     StorageGB,
 )
@@ -28,11 +35,13 @@ __all__ = [
     "Redis",
     "RedisMaster",
     "HuggingFaceModel",
+    "HuggingFaceCache",
     "Preset",
     "BasicAuth",
     "StorageGB",
-    "ApoloStorageMount",
-    "ApoloStoragePath",
+    "ApoloFilesMount",
+    "ApoloFilesPath",
+    "ApoloFilesFile",
     "ApoloMountMode",
     "MountPath",
     "GrpcAPI",
@@ -45,4 +54,7 @@ __all__ = [
     "AppOutputsDeployer",
     "AppInputs",
     "SchemaExtraMetadata",
+    "SchemaMetaType",
+    "AbstractAppFieldType",
+    "ContainerImage",
 ]

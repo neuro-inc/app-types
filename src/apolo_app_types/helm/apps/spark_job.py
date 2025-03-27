@@ -12,9 +12,9 @@ from apolo_app_types.helm.apps.common import (
 )
 from apolo_app_types.helm.utils.storage import get_app_data_storage_path
 from apolo_app_types.protocols.common.storage import (
+    ApoloFilesMount,
+    ApoloFilesPath,
     ApoloMountMode,
-    ApoloStorageMount,
-    ApoloStoragePath,
     MountPath,
 )
 from apolo_app_types.protocols.spark_job import (
@@ -39,8 +39,8 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         extra_annotations: dict[str, str] = {}
         main_app_file_path = URL(input_.spark_job.main_application_file.path)
         mount_path = "/opt/spark"
-        main_app_file_mount = ApoloStorageMount(
-            storage_path=ApoloStoragePath(path=str(main_app_file_path.parent)),
+        main_app_file_mount = ApoloFilesMount(
+            storage_path=ApoloFilesPath(path=str(main_app_file_path.parent)),
             mount_path=MountPath(path=mount_path),
             mode=ApoloMountMode(mode="r"),
         )
@@ -158,8 +158,8 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
                 / "deps"
                 / "pypi"
             )
-            deps_mount = ApoloStorageMount(
-                storage_path=ApoloStoragePath(path=str(pypi_packages_storage_path)),
+            deps_mount = ApoloFilesMount(
+                storage_path=ApoloFilesPath(path=str(pypi_packages_storage_path)),
                 mount_path=MountPath(path="/opt/spark/deps"),
                 mode=ApoloMountMode(mode="rw"),
             )

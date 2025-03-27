@@ -1,9 +1,9 @@
-from pydantic import BaseModel
+from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 
 
-class RedisMaster(BaseModel):
-    preset_name: str
+class RedisMaster(AbstractAppFieldType):
+    preset_name: str  # todo: switch to src/apolo_app_types/protocols/common/preset.py
 
 
-class Redis(BaseModel):
+class Redis(AbstractAppFieldType):
     master: RedisMaster

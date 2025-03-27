@@ -1,18 +1,20 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from apolo_app_types.protocols.common import (
+    AbstractAppFieldType,
     AppInputs,
     AppOutputs,
     Preset,
     RestAPI,
     SchemaExtraMetadata,
+    SchemaMetaType,
 )
 from apolo_app_types.protocols.common.containers import ContainerImage
 from apolo_app_types.protocols.common.ingress import Ingress
 from apolo_app_types.protocols.dockerhub import DockerConfigModel
 
 
-class AutoscalingBase(BaseModel):
+class AutoscalingBase(AbstractAppFieldType):
     type: str
     enabled: bool | None = None
     min_replicas: int | None = None
@@ -25,28 +27,29 @@ class AutoscalingHPA(AutoscalingBase):
     target_memory_utilization_percentage: int | None = None
 
 
-class Env(BaseModel):
+class Env(AbstractAppFieldType):
     name: str
     value: str
 
 
-class Container(BaseModel):
+class Container(AbstractAppFieldType):
     command: list[str] | None = None
     args: list[str] | None = None
     env: list[Env] = Field(default_factory=list)
 
 
-class Service(BaseModel):
+class Service(AbstractAppFieldType):
     enabled: bool
     port: int
 
 
-class CustomDeploymentModel(BaseModel):
+class CustomDeploymentModel(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
             title="Custom Deployment",
             description="Configuration for Custom Deployment.",
+            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     preset: Preset = Field(description="Name of the preset configuration to use")

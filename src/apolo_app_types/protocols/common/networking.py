@@ -1,9 +1,23 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, Field
+
+from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
+from apolo_app_types.protocols.common.schema_extra import (
+    SchemaExtraMetadata,
+    SchemaMetaType,
+)
 
 
-class HttpApi(BaseModel):
+class HttpApi(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="HTTP API",
+            description="HTTP API Configuration.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
     host: str = Field(..., description="The host of the HTTP endpoint.")
     port: int = Field(default=80, description="The port of the HTTP endpoint.")
     protocol: str = Field(
