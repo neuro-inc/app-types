@@ -1,5 +1,6 @@
 from pydantic import ConfigDict, Field
 
+from apolo_app_types import StrOrSecret
 from apolo_app_types.protocols.common import (
     AbstractAppFieldType,
     AppInputs,
@@ -9,7 +10,6 @@ from apolo_app_types.protocols.common.schema_extra import (
     SchemaExtraMetadata,
     SchemaMetaType,
 )
-from apolo_app_types.protocols.common.secrets import StrOrSecret
 
 
 class DockerHubModel(AbstractAppFieldType):
