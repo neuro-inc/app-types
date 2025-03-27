@@ -192,7 +192,7 @@ def sanitize_dict_string(
 
 def gen_apolo_storage_integration_annotations(
     files_mouts: t.Sequence[ApoloFilesMount],
-) -> dict[str, str]:
+) -> list[dict[str, str]]:
     storage_mount_annotations = []
     for storage_mount in files_mouts:
         storage_mount_annotations.append(
