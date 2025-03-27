@@ -42,8 +42,8 @@ class HuggingFaceCache(AbstractAppFieldType):
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
-    storage_path: ApoloFilesPath = Field(
+    files_path: ApoloFilesPath = Field(
         ...,
         description="The path to the Apolo Files where Hugging Face artifacts are cached.",  # noqa: E501
-        title="Storage path",
+        title="Files Path",
     )
