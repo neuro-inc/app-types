@@ -151,5 +151,5 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
     assert parsed_storage[1]["mount_path"] == "/config"
     assert parsed_storage[1]["mount_mode"] == "r"
 
-    pod_labels = helm_params.get("podExtraLabels", {})
+    pod_labels = helm_params.get("podLabels", {})
     assert pod_labels.get("platform.apolo.us/inject-storage") == "true"
