@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Any
 
 from pydantic import ConfigDict
 
@@ -9,15 +9,16 @@ from apolo_app_types.protocols.common.schema_extra import (
 )
 
 class ApoloSecret(BaseModel):
-    name: Literal["apps-secrets"] = "apps-secrets"
-    key: str  # noqa: N815
+    key: str
 
 
 StrOrSecret = str | ApoloSecret
 OptionalStrOrSecret = StrOrSecret | None
 
 
-def serialize_optional_secret(value: OptionalStrOrSecret) -> dict[str, Any] | str:
+def serialize_optional_secret(
+    value: OptionalStrOrSecret, secret_name: str = "apps-secrets"
+) -> dict[str, Any] | str:
     if value is None:
         return ""
     if isinstance(value, str):
@@ -26,7 +27,7 @@ def serialize_optional_secret(value: OptionalStrOrSecret) -> dict[str, Any] | st
         return {
             "valueFrom": {
                 "secretKeyRef": {
-                    "name": value.name,
+                    "name": secret_name,
                     "key": value.key,
                 }
             }
