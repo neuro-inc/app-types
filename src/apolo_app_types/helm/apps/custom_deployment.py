@@ -102,7 +102,7 @@ class CustomDeploymentChartValueProcessor(
 
         storage_labels = self._configure_storage_labels(input_)
         if storage_labels:
-            values["podExtraLabels"] = storage_labels
+            values["podLabels"] = storage_labels
 
         if input_.image.dockerconfigjson:
             values["dockerconfigjson"] = input_.image.dockerconfigjson.filecontents
