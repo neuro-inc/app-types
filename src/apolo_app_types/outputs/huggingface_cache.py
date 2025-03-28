@@ -15,7 +15,7 @@ async def get_app_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any]:
     storage_path = helm_values["storage_path"]
     return HuggingFaceCacheOutputs(
         cache_config=HuggingFaceCache(
-            storage_path=ApoloFilesPath(
+            files_path=ApoloFilesPath(
                 path=storage_path,
             ),
         ),

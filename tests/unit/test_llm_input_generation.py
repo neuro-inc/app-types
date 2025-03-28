@@ -375,7 +375,7 @@ async def test_values_llm_generation__storage_integrated(
                 ),
             ),
             cache_config=HuggingFaceCache(
-                storage_path=ApoloFilesPath(
+                files_path=ApoloFilesPath(
                     path="storage://some-cluster/some-org/some-proj/some-folder"
                 ),
             ),
