@@ -14,10 +14,8 @@ from .networking import GraphQLAPI, GrpcAPI, RestAPI
 from .postgres import Postgres
 from .preset import Preset
 from .redis import Redis, RedisMaster
-from .schema_extra import SchemaExtraMetadata
-from .secrets_ import ApoloSecret, OptionalStrOrSecret, StrOrSecret
 from .schema_extra import SchemaExtraMetadata, SchemaMetaType
-from .secrets_ import K8sSecret, OptionalStrOrSecret, StrOrSecret
+from .secrets_ import ApoloSecret, OptionalStrOrSecret, StrOrSecret
 from .storage import (
     ApoloFilesFile,
     ApoloFilesMount,

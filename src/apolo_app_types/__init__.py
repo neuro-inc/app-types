@@ -1,8 +1,7 @@
 from apolo_app_types.protocols.apolo_deploy import ApoloDeployInputs, ApoloDeployOutputs
 from apolo_app_types.protocols.common import (
-    ApoloSecret,
-    ApoloStorageMount,
     ApoloFilesMount,
+    ApoloSecret,
     AppInputs,
     AppInputsDeployer,
     AppOutputs,

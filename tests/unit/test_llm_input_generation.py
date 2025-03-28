@@ -5,13 +5,8 @@ from apolo_app_types.helm.apps.common import (
     _get_match_expressions,
 )
 from apolo_app_types.inputs.args import app_type_to_vals
-from apolo_app_types.protocols.common import ApoloStoragePath, Ingress, Preset
-from apolo_app_types.protocols.common.secrets_ import ApoloSecret
-from apolo_app_types.protocols.huggingface_storage_cache import (
-    HuggingFaceStorageCacheModel
-)
 from apolo_app_types.protocols.common import ApoloFilesPath, Ingress, Preset
-from apolo_app_types.protocols.common.secrets_ import K8sSecret, Secret, SecretKeyRef
+from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 from apolo_app_types.protocols.huggingface_cache import (
     HuggingFaceCache,
 )

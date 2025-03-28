@@ -8,7 +8,16 @@ from apolo_app_types.protocols.common.schema_extra import (
     SchemaMetaType,
 )
 
-class ApoloSecret(BaseModel):
+
+class ApoloSecret(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Secret",
+            description="Apolo Secret Configuration.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
     key: str
 
 
