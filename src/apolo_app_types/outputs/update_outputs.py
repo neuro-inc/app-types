@@ -33,30 +33,36 @@ async def post_outputs(api_url: str, api_token: str, outputs: dict[str, t.Any]) 
         )
 
 
-async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> bool:
+async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> bool:  # noqa: C901
     app_type = helm_outputs["PLATFORM_APPS_APP_TYPE"]
     platform_apps_url = helm_outputs["PLATFORM_APPS_URL"]
     platform_apps_token = helm_outputs["PLATFORM_APPS_TOKEN"]
     try:
-        if app_type == AppType.LLMInference:
-            conv_outputs = await get_llm_inference_outputs(helm_outputs)
-        elif app_type == AppType.StableDiffusion:
-            conv_outputs = await get_stable_diffusion_outputs(helm_outputs)
-        elif app_type == AppType.Weaviate:
-            conv_outputs = await get_weaviate_outputs(helm_outputs)
-        elif app_type == AppType.DockerHub:
-            conv_outputs = await get_dockerhub_outputs(helm_outputs)
-        elif app_type == AppType.PostgreSQL:
-            conv_outputs = await get_postgres_outputs(helm_outputs)
-        elif app_type == AppType.HuggingFaceCache:
-            conv_outputs = await get_huggingface_cache_outputs(helm_outputs)
-        elif app_type == AppType.CustomDeployment:
-            conv_outputs = await get_custom_deployment_outputs(helm_outputs)
-        elif app_type == AppType.SparkJob:
-            conv_outputs = await get_spark_job_outputs(helm_outputs)
-        else:
-            err_msg = f"Unsupported app type: {app_type} for posting outputs"
-            raise ValueError(err_msg)
+        match app_type:
+            case AppType.LLMInference:
+                conv_outputs = await get_llm_inference_outputs(helm_outputs)
+            case AppType.StableDiffusion:
+                conv_outputs = await get_stable_diffusion_outputs(helm_outputs)
+            case AppType.Weaviate:
+                conv_outputs = await get_weaviate_outputs(helm_outputs)
+            case AppType.DockerHub:
+                conv_outputs = await get_dockerhub_outputs(helm_outputs)
+            case AppType.PostgreSQL:
+                conv_outputs = await get_postgres_outputs(helm_outputs)
+            case AppType.HuggingFaceCache:
+                conv_outputs = await get_huggingface_cache_outputs(helm_outputs)
+            case AppType.CustomDeployment:
+                conv_outputs = await get_custom_deployment_outputs(helm_outputs)
+            case AppType.SparkJob:
+                conv_outputs = await get_spark_job_outputs(helm_outputs)
+            case AppType.Fooocus:
+                labels = {"application": "fooocus"}
+                conv_outputs = await get_custom_deployment_outputs(
+                    helm_outputs, labels=labels
+                )
+            case _:
+                err_msg = f"Unsupported app type: {app_type} for posting outputs"
+                raise ValueError(err_msg)
         logger.info("Outputs: %s", conv_outputs)
 
         await post_outputs(

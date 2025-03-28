@@ -1,9 +1,16 @@
-from apolo_app_types import OptionalStrOrSecret, AppOutputs
-from pydantic import field_validator, BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from yarl import URL
 
-from apolo_app_types.protocols.common import AppInputsDeployer, AppOutputsDeployer, AppInputs, Preset, \
-    SchemaExtraMetadata
+from apolo_app_types import AppOutputs, OptionalStrOrSecret
+from apolo_app_types.protocols.common import (
+    AppInputs,
+    AppInputsDeployer,
+    AppOutputsDeployer,
+    Ingress,
+    Preset,
+    SchemaExtraMetadata,
+)
+from apolo_app_types.protocols.common.networking import HttpApi
 
 
 class FooocusInputs(AppInputsDeployer):
@@ -26,7 +33,7 @@ class FooocusSpecificAppInputs(BaseModel):
         ).as_json_schema_extra(),
     )
     http_auth: bool = Field(
-        True,
+        default=True,
         description="Whether to use HTTP authentication.",
         title="HTTP Authentication",
     )
@@ -40,6 +47,7 @@ class FooocusSpecificAppInputs(BaseModel):
 class FooocusAppInputs(AppInputs):
     preset: Preset
     fooocus_specific: FooocusSpecificAppInputs
+    ingress: Ingress
 
 
 class FooocusOutputs(AppOutputsDeployer):
@@ -48,5 +56,5 @@ class FooocusOutputs(AppOutputsDeployer):
 
 
 class FooocusAppOutputs(AppOutputs):
-    internal_web_app_url: str
-    external_web_app_url: str
+    internal_web_app_url: HttpApi | None = None
+    external_web_app_url: HttpApi | None = None

@@ -33,7 +33,12 @@ from apolo_app_types.protocols.dockerhub import (
     DockerHubInputs,
     DockerHubOutputs,
 )
-from apolo_app_types.protocols.fooocus import FooocusInputs, FooocusOutputs
+from apolo_app_types.protocols.fooocus import (
+    FooocusAppInputs,
+    FooocusAppOutputs,
+    FooocusInputs,
+    FooocusOutputs,
+)
 from apolo_app_types.protocols.huggingface_cache import (
     HuggingFaceCacheInputs,
     HuggingFaceCacheOutputs,
@@ -78,7 +83,7 @@ from apolo_app_types.protocols.text_embeddings import (
 )
 from apolo_app_types.protocols.vscode import VSCodeInputs, VSCodeOutputs
 from apolo_app_types.protocols.weaviate import WeaviateInputs, WeaviateOutputs
-from apolo_app_types.protocols.fooocus import FooocusAppInputs, FooocusAppOutputs
+
 
 __all__ = [
     "AppInputs",

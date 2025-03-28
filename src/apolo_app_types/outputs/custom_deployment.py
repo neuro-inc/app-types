@@ -11,11 +11,11 @@ logger = logging.getLogger()
 
 
 async def get_custom_deployment_outputs(
-    helm_values: dict[str, t.Any],
+    helm_values: dict[str, t.Any], labels: dict[str, str] | None = None
 ) -> dict[str, t.Any]:
-    internal_host, internal_port = await get_service_host_port(
-        match_labels={"application": "custom-deployment"}
-    )
+    if not labels:
+        labels = {"application": "custom-deployment"}
+    internal_host, internal_port = await get_service_host_port(match_labels=labels)
     internal_web_app_url = None
     if internal_host:
         internal_web_app_url = RestAPI(
@@ -25,9 +25,7 @@ async def get_custom_deployment_outputs(
             protocol="http",
         )
 
-    host_port = await get_ingress_host_port(
-        match_labels={"application": "custom-deployment"}
-    )
+    host_port = await get_ingress_host_port(match_labels=labels)
     external_web_app_url = None
     if host_port:
         host, port = host_port

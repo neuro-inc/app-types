@@ -1,4 +1,5 @@
 import pytest
+import json
 
 from apolo_app_types import (
     Container,
@@ -141,10 +142,8 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
     annotations = helm_params["podAnnotations"]
     assert "platform.apolo.us/inject-storage" in annotations
 
-    from json import loads
-
     storage_json = annotations["platform.apolo.us/inject-storage"]
-    parsed_storage = loads(storage_json)
+    parsed_storage = json.loads(storage_json)
     assert len(parsed_storage) == 2
 
     assert parsed_storage[0]["storage_path"] == "storage://mycluster/myorg/myproj/data"

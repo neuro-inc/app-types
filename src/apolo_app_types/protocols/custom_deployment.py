@@ -38,7 +38,7 @@ class Container(AbstractAppFieldType):
 
 
 class Service(AbstractAppFieldType):
-    enabled: bool
+    enabled: bool = True
     port: int
 
 

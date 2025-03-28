@@ -3,6 +3,7 @@ import typing as t
 import apolo_sdk
 
 from apolo_app_types import (
+    FooocusAppInputs,
     LLMInputs,
     PostgresInputs,
     StableDiffusionInputs,
@@ -16,6 +17,7 @@ from apolo_app_types.helm.apps import (
 )
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.dockerhub import DockerHubModelChartValueProcessor
+from apolo_app_types.helm.apps.fooocus import FooocusChartValueProcessor
 from apolo_app_types.helm.apps.postgres import PostgresValueProcessor
 from apolo_app_types.helm.apps.spark_job import SparkJobValueProcessor
 from apolo_app_types.helm.apps.weaviate import WeaviateChartValueProcessor
@@ -42,6 +44,7 @@ async def app_type_to_vals(
         AppType.PostgreSQL: PostgresValueProcessor,
         AppType.CustomDeployment: CustomDeploymentChartValueProcessor,
         AppType.SparkJob: SparkJobValueProcessor,
+        AppType.Fooocus: FooocusChartValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)
@@ -77,6 +80,7 @@ async def get_installation_vals(
         AppType.PostgreSQL: PostgresInputs,
         AppType.CustomDeployment: CustomDeploymentInputs,
         AppType.SparkJob: SparkJobInputs,
+        AppType.Fooocus: FooocusAppInputs,
     }
 
     if app_type not in input_type_map:
