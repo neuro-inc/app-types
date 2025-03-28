@@ -78,7 +78,7 @@ from apolo_app_types.protocols.text_embeddings import (
 )
 from apolo_app_types.protocols.vscode import VSCodeInputs, VSCodeOutputs
 from apolo_app_types.protocols.weaviate import WeaviateInputs, WeaviateOutputs
-
+from apolo_app_types.protocols.fooocus import FooocusAppInputs, FooocusAppOutputs
 
 __all__ = [
     "AppInputs",
@@ -150,4 +150,6 @@ __all__ = [
     "PostgresOutputs",
     "SparkJobInputs",
     "SparkJobOutputs",
+    "FooocusAppInputs",
+    "FooocusAppOutputs",
 ]
