@@ -1,22 +1,17 @@
 import pytest
 
-from apolo_app_types import (
-    Container,
-    ContainerImage,
-    Env,
-    Service,
-)
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import Ingress, Preset
-from apolo_app_types.protocols.common.storage import (
-    ApoloFilesMount,
-    ApoloFilesPath,
-    ApoloMountMode,
-    MountPath,
-)
 from apolo_app_types.protocols.fooocus import (
-    FooocusAppInputs, FooocusSpecificAppInputs,
+    FooocusAppInputs,
+    FooocusSpecificAppInputs,
+)
+
+from tests.unit.constants import (
+    DEFAULT_CLUSTER_NAME,
+    DEFAULT_ORG_NAME,
+    DEFAULT_PROJECT_NAME,
 )
 
 
@@ -30,9 +25,8 @@ async def test_fooocus_values_generation(setup_clients):
                 clusterName="default",
             ),
             fooocus_specific=FooocusSpecificAppInputs(
-                http_auth=True,
-                huggingface_token_secret="RAW_STRING"
-            )
+                http_auth=True, huggingface_token_secret="RAW_STRING"
+            ),
         ),
         apolo_client=setup_clients,
         app_type=AppType.Fooocus,
@@ -59,13 +53,20 @@ async def test_fooocus_values_generation(setup_clients):
     parsed_storage = loads(storage_json)
     assert len(parsed_storage) == 2
 
-    assert parsed_storage[0]["storage_path"] == "storage://mycluster/myorg/myproj/data"
-    assert parsed_storage[0]["mount_path"] == "/app/data"
+    assert (
+        parsed_storage[0]["storage_path"]
+        == f"storage://{DEFAULT_CLUSTER_NAME}/{DEFAULT_ORG_NAME}/{DEFAULT_PROJECT_NAME}/"
+        f".apps/fooocus/fooocus-app/data"
+    )
+    assert parsed_storage[0]["mount_path"] == "/content/data"
     assert parsed_storage[0]["mount_mode"] == "rw"
 
-    assert parsed_storage[1]["storage_path"] == "storage://mycluster/myorg/config"
-    assert parsed_storage[1]["mount_path"] == "/config"
-    assert parsed_storage[1]["mount_mode"] == "r"
+    assert parsed_storage[1]["storage_path"] == (
+        f"storage://{DEFAULT_CLUSTER_NAME}/{DEFAULT_ORG_NAME}/{DEFAULT_PROJECT_NAME}/"
+        f".apps/fooocus/fooocus-app/app/outputs"
+    )
+    assert parsed_storage[1]["mount_path"] == "/content/app/outputs"
+    assert parsed_storage[1]["mount_mode"] == "rw"
 
     pod_labels = helm_params.get("podExtraLabels", {})
     assert pod_labels.get("platform.apolo.us/inject-storage") == "true"

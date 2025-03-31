@@ -7,6 +7,12 @@ from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 import pytest
 from apolo_sdk import AppsConfig
 
+from tests.unit.constants import (
+    DEFAULT_CLUSTER_NAME,
+    DEFAULT_ORG_NAME,
+    DEFAULT_PROJECT_NAME,
+)
+
 
 def encode_b64(value: str) -> str:
     """Helper function to encode a string in Base64."""
@@ -24,6 +30,10 @@ async def setup_clients():
             mock_cluster.apps = AppsConfig(
                 hostname_templates=["{app_names}.apps.some.org.neu.ro"]
             )
+            mock_apolo_client.config.cluster_name = DEFAULT_CLUSTER_NAME
+            mock_apolo_client.config.org_name = DEFAULT_ORG_NAME
+            mock_apolo_client.config.project_name = DEFAULT_PROJECT_NAME
+
             mock_apolo_client.config.get_cluster = MagicMock(return_value=mock_cluster)
             mock_apolo_client.username = PropertyMock(return_value="test-user")
             mock_bucket = Bucket(

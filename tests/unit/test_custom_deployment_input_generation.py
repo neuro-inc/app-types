@@ -1,5 +1,6 @@
-import pytest
 import json
+
+import pytest
 
 from apolo_app_types import (
     Container,
