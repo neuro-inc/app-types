@@ -1,6 +1,7 @@
-from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
-from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from pydantic import ConfigDict
+
+from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
+from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
 
 
 class AutoscalingBase(AbstractAppFieldType):
