@@ -7,6 +7,7 @@ from apolo_app_types.helm.apps.common import (
     gen_apolo_storage_integration_labels,
     gen_extra_values,
 )
+from apolo_app_types.helm.utils.images import get_apolo_registry_secrets_value
 
 
 class CustomDeploymentChartValueProcessor(
@@ -104,6 +105,10 @@ class CustomDeploymentChartValueProcessor(
         if storage_labels:
             values["podLabels"] = storage_labels
 
-        if input_.image.dockerconfigjson:
+        if input_.image.repository.startswith("images:"):
+            values["dockerconfigjson"] = str(
+                await get_apolo_registry_secrets_value(client=self.client)
+            )
+        elif input_.image.dockerconfigjson:
             values["dockerconfigjson"] = input_.image.dockerconfigjson.filecontents
         return values
