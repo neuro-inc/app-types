@@ -10,7 +10,7 @@ from apolo_app_types.protocols.common.buckets import (
     S3BucketCredentials,
 )
 
-from tests.unit.constants import DEFAULT_NAMESPACE
+from tests.unit.constants import APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
 
 @pytest.mark.asyncio
@@ -53,6 +53,7 @@ async def test_values_weaviate_generation_basic(setup_clients, mock_get_preset_c
         app_type=AppType.Weaviate,
         app_name="weaviate",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
 
     assert helm_params["resources"]["requests"]["cpu"] == "1000.0m"
@@ -127,6 +128,7 @@ async def test_values_weaviate_generation_with_ingress(
         app_type=AppType.Weaviate,
         app_name="weaviate",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
 
     assert helm_params["ingress"]["enabled"] is True
@@ -172,6 +174,7 @@ async def test_values_weaviate_generation_with_auth(setup_clients, mock_get_pres
         app_type=AppType.Weaviate,
         app_name="weaviate",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
 
     assert helm_params["clusterApi"]["username"] == "testuser"
@@ -230,6 +233,7 @@ async def test_values_weaviate_generation_with_backup(
         app_type=AppType.Weaviate,
         app_name="weaviate",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
 
     assert helm_params["backups"]["s3"]["enabled"] is True

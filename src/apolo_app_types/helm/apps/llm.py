@@ -70,10 +70,12 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
             "tokenizerHFName": llm_model.tokenizer_hf_name,
         }
 
-    def _configure_env(self, llm_model: LLMModel) -> dict[str, t.Any]:
+    def _configure_env(
+        self, llm_model: LLMModel, app_secrets_name: str
+    ) -> dict[str, t.Any]:
         return {
             "HUGGING_FACE_HUB_TOKEN": serialize_optional_secret(
-                llm_model.hugging_face_model.hf_token
+                llm_model.hugging_face_model.hf_token, secret_name=app_secrets_name
             )
         }
 
@@ -124,6 +126,7 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
         input_: LLMInputs,
         app_name: str,
         namespace: str,
+        app_secrets_name: str,
         *_: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -167,7 +170,7 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
             *parallel_args,
         ]
         model = self._configure_model(input_.llm)
-        env = self._configure_env(input_.llm)
+        env = self._configure_env(input_.llm, app_secrets_name)
         return merge_list_of_dicts(
             [
                 {

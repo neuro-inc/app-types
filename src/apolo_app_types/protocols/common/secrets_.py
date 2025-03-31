@@ -26,7 +26,7 @@ OptionalStrOrSecret = StrOrSecret | None
 
 
 def serialize_optional_secret(
-    value: OptionalStrOrSecret, secret_name: str = "apps-secrets"
+    value: OptionalStrOrSecret, secret_name: str
 ) -> dict[str, Any] | str:
     if value is None:
         return ""

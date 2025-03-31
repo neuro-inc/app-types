@@ -12,7 +12,7 @@ from apolo_app_types.protocols.huggingface_cache import (
 )
 from apolo_app_types.protocols.llm import LLMModel
 
-from tests.unit.constants import CPU_POOL, DEFAULT_NAMESPACE
+from tests.unit.constants import APP_SECRETS_NAME, CPU_POOL, DEFAULT_NAMESPACE
 
 
 async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
@@ -39,6 +39,7 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
         app_type=AppType.LLMInference,
         app_name="llm",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
     assert helm_params["serverExtraArgs"] == [
         "--flag1.1 --flag1.2",
@@ -108,6 +109,7 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
         app_type=AppType.LLMInference,
         app_name="llm",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
     assert helm_args == [
         "--timeout",
@@ -208,6 +210,7 @@ async def test_values_llm_generation_cpu_apolo_secret(
         app_type=AppType.LLMInference,
         app_name="llm",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
     assert helm_params["serverExtraArgs"] == [
         "--flag1.1 --flag1.2",
@@ -272,6 +275,7 @@ async def test_values_llm_generation_gpu_4x(setup_clients, mock_get_preset_gpu):
         app_type=AppType.LLMInference,
         app_name="llm",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
     # Make sure --tensor-parallel-size=4
     assert helm_params["serverExtraArgs"] == ["--foo", "--tensor-parallel-size=4"]
@@ -294,6 +298,7 @@ async def test_values_llm_generation_gpu_8x(setup_clients, mock_get_preset_gpu):
         app_type=AppType.LLMInference,
         app_name="llm",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
     # Make sure --tensor-parallel-size=8
     assert helm_params["serverExtraArgs"] == ["--bar", "--tensor-parallel-size=8"]
@@ -316,6 +321,7 @@ async def test_values_llm_generation_gpu_8x_pps(setup_clients, mock_get_preset_g
         app_type=AppType.LLMInference,
         app_name="llm",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
     assert helm_params["serverExtraArgs"] == ["--bar", "--pipeline-parallel-size=8"]
 
@@ -345,6 +351,7 @@ async def test_values_llm_generation_gpu_8x_pps_and_tps(
         app_type=AppType.LLMInference,
         app_name="llm",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
     assert helm_params["serverExtraArgs"] == [
         "--bar",
@@ -382,6 +389,7 @@ async def test_values_llm_generation__storage_integrated(
         app_type=AppType.LLMInference,
         app_name="llm",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
     assert helm_args == [
         "--timeout",
