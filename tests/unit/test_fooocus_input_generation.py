@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from apolo_app_types.app_types import AppType
@@ -47,10 +49,8 @@ async def test_fooocus_values_generation(setup_clients):
     annotations = helm_params["podAnnotations"]
     assert "platform.apolo.us/inject-storage" in annotations
 
-    from json import loads
-
     storage_json = annotations["platform.apolo.us/inject-storage"]
-    parsed_storage = loads(storage_json)
+    parsed_storage = json.loads(storage_json)
     assert len(parsed_storage) == 2
 
     assert (

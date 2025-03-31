@@ -6,10 +6,12 @@ from .abc_ import (
     AppOutputsDeployer,
 )
 from .auth import BasicAuth
+from .autoscaling import AutoscalingHPA
 from .buckets import Bucket
 from .containers import ContainerImage
 from .hugging_face import HuggingFaceCache, HuggingFaceModel
 from .ingress import Ingress, IngressGrpc
+from .k8s import Container, DeploymentName, Env, Service
 from .networking import GraphQLAPI, GrpcAPI, RestAPI
 from .postgres import Postgres
 from .preset import Preset
@@ -23,6 +25,7 @@ from .storage import (
     ApoloMountMode,
     MountPath,
     StorageGB,
+    StorageMounts,
 )
 
 
@@ -57,4 +60,10 @@ __all__ = [
     "SchemaMetaType",
     "AbstractAppFieldType",
     "ContainerImage",
+    "AutoscalingHPA",
+    "StorageMounts",
+    "DeploymentName",
+    "Service",
+    "Env",
+    "Container",
 ]

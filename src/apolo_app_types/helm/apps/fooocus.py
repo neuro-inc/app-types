@@ -13,16 +13,14 @@ from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.custom_deployment import (
     CustomDeploymentChartValueProcessor,
 )
-from apolo_app_types.helm.utils.storage import get_app_data_storage_path
+from apolo_app_types.helm.utils.storage import get_app_data_files_path_url
 from apolo_app_types.protocols.common import (
     ApoloFilesMount,
     ApoloFilesPath,
     ApoloMountMode,
-    MountPath,
-)
-from apolo_app_types.protocols.custom_deployment import (
     Container,
     Env,
+    MountPath,
     StorageMounts,
 )
 
@@ -75,7 +73,7 @@ class FooocusChartValueProcessor(BaseChartValueProcessor[FooocusAppInputs]):
         Generate extra Helm values for Foocus configuration.
         """
 
-        base_app_storage_path = get_app_data_storage_path(
+        base_app_storage_path = get_app_data_files_path_url(
             client=self.client, app_type=AppType.Fooocus, app_name=app_name
         )
         data_storage_path = base_app_storage_path / "data"
