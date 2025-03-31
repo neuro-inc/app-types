@@ -68,5 +68,5 @@ async def test_fooocus_values_generation(setup_clients):
     assert parsed_storage[1]["mount_path"] == "/content/app/outputs"
     assert parsed_storage[1]["mount_mode"] == "rw"
 
-    pod_labels = helm_params.get("podExtraLabels", {})
+    pod_labels = helm_params.get("podLabels", {})
     assert pod_labels.get("platform.apolo.us/inject-storage") == "true"
