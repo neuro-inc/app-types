@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from yarl import URL
 
-from apolo_app_types import AppOutputs, OptionalStrOrSecret
+from apolo_app_types import OptionalStrOrSecret
 from apolo_app_types.protocols.common import (
     AppInputs,
     AppInputsDeployer,
@@ -10,7 +10,6 @@ from apolo_app_types.protocols.common import (
     Preset,
     SchemaExtraMetadata,
 )
-from apolo_app_types.protocols.common.networking import HttpApi
 
 
 class FooocusInputs(AppInputsDeployer):
@@ -53,8 +52,3 @@ class FooocusAppInputs(AppInputs):
 class FooocusOutputs(AppOutputsDeployer):
     internal_web_app_url: str
     external_web_app_url: str
-
-
-class FooocusAppOutputs(AppOutputs):
-    internal_web_app_url: HttpApi | None = None
-    external_web_app_url: HttpApi | None = None

@@ -35,7 +35,6 @@ from apolo_app_types.protocols.dockerhub import (
 )
 from apolo_app_types.protocols.fooocus import (
     FooocusAppInputs,
-    FooocusAppOutputs,
     FooocusInputs,
     FooocusOutputs,
 )
@@ -156,5 +155,4 @@ __all__ = [
     "SparkJobInputs",
     "SparkJobOutputs",
     "FooocusAppInputs",
-    "FooocusAppOutputs",
 ]
