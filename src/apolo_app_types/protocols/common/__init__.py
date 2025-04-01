@@ -6,16 +6,18 @@ from .abc_ import (
     AppOutputsDeployer,
 )
 from .auth import BasicAuth
+from .autoscaling import AutoscalingHPA
 from .buckets import Bucket
 from .containers import ContainerImage
 from .hugging_face import HuggingFaceCache, HuggingFaceModel
 from .ingress import Ingress, IngressGrpc
+from .k8s import Container, DeploymentName, Env, Service
 from .networking import GraphQLAPI, GrpcAPI, RestAPI
 from .postgres import Postgres
 from .preset import Preset
 from .redis import Redis, RedisMaster
 from .schema_extra import SchemaExtraMetadata, SchemaMetaType
-from .secrets_ import K8sSecret, OptionalStrOrSecret, StrOrSecret
+from .secrets_ import ApoloSecret, OptionalStrOrSecret, StrOrSecret
 from .storage import (
     ApoloFilesFile,
     ApoloFilesMount,
@@ -23,6 +25,7 @@ from .storage import (
     ApoloMountMode,
     MountPath,
     StorageGB,
+    StorageMounts,
 )
 
 
@@ -47,7 +50,7 @@ __all__ = [
     "GrpcAPI",
     "RestAPI",
     "GraphQLAPI",
-    "K8sSecret",
+    "ApoloSecret",
     "StrOrSecret",
     "OptionalStrOrSecret",
     "Bucket",
@@ -57,4 +60,10 @@ __all__ = [
     "SchemaMetaType",
     "AbstractAppFieldType",
     "ContainerImage",
+    "AutoscalingHPA",
+    "StorageMounts",
+    "DeploymentName",
+    "Service",
+    "Env",
+    "Container",
 ]

@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from apolo_app_types import (
@@ -20,6 +22,8 @@ from apolo_app_types.protocols.custom_deployment import (
     DeploymentName,
     StorageMounts,
 )
+
+from tests.unit.constants import APP_SECRETS_NAME
 
 
 @pytest.mark.asyncio
@@ -47,6 +51,7 @@ async def test_custom_deployment_values_generation(setup_clients):
         app_type=AppType.CustomDeployment,
         app_name="custom-app",
         namespace="default-namespace",
+        app_secrets_name=APP_SECRETS_NAME,
     )
     assert helm_params["image"] == {
         "repository": "myrepo/custom-deployment",
@@ -116,6 +121,7 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
         app_type=AppType.CustomDeployment,
         app_name="custom-app",
         namespace="default-namespace",
+        app_secrets_name=APP_SECRETS_NAME,
     )
 
     # The base checks from the existing test
@@ -137,10 +143,8 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
     annotations = helm_params["podAnnotations"]
     assert "platform.apolo.us/inject-storage" in annotations
 
-    from json import loads
-
     storage_json = annotations["platform.apolo.us/inject-storage"]
-    parsed_storage = loads(storage_json)
+    parsed_storage = json.loads(storage_json)
     assert len(parsed_storage) == 2
 
     assert parsed_storage[0]["storage_path"] == "storage://mycluster/myorg/myproj/data"

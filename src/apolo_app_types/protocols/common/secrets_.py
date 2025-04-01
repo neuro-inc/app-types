@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Any
 
 from pydantic import ConfigDict
 
@@ -9,7 +9,7 @@ from apolo_app_types.protocols.common.schema_extra import (
 )
 
 
-class Secret(AbstractAppFieldType):
+class ApoloSecret(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
@@ -18,28 +18,28 @@ class Secret(AbstractAppFieldType):
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
-    name: Literal["apps-secrets"] = "apps-secrets"
     key: str
 
 
-class SecretKeyRef(AbstractAppFieldType):
-    secretKeyRef: Secret  # noqa: N815
-
-
-class K8sSecret(AbstractAppFieldType):
-    valueFrom: SecretKeyRef  # noqa: N815
-
-
-StrOrSecret = str | K8sSecret
+StrOrSecret = str | ApoloSecret
 OptionalStrOrSecret = StrOrSecret | None
 
 
-def serialize_optional_secret(value: OptionalStrOrSecret) -> dict[str, Any] | str:
+def serialize_optional_secret(
+    value: OptionalStrOrSecret, secret_name: str
+) -> dict[str, Any] | str:
     if value is None:
         return ""
     if isinstance(value, str):
         return value
-    if isinstance(value, K8sSecret):
-        return value.model_dump()
+    if isinstance(value, ApoloSecret):
+        return {
+            "valueFrom": {
+                "secretKeyRef": {
+                    "name": secret_name,
+                    "key": value.key,
+                }
+            }
+        }
     err_msg = f"Unsupported type for secret val: {type(value)}"
     raise ValueError(err_msg)

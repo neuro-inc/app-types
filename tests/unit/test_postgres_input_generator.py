@@ -17,7 +17,7 @@ from apolo_app_types.protocols.postgres import (
     PostgresSupportedVersions,
 )
 
-from tests.unit.constants import DEFAULT_NAMESPACE
+from tests.unit.constants import APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
 
 @pytest.mark.asyncio
@@ -61,6 +61,7 @@ async def test_values_postgresql_generation(setup_clients, mock_get_preset_cpu):
         app_type=AppType.PostgreSQL,
         app_name="psdb",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
     assert helm_params["features"] == {"AutoCreateUserSchema": "true"}
     assert len(helm_params["instances"]) == 1
@@ -126,6 +127,7 @@ async def test_values_postgresql_generation_without_user(
         app_type=AppType.PostgreSQL,
         app_name="psdb",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
     assert helm_params["features"] == {"AutoCreateUserSchema": "true"}
     assert len(helm_params["instances"]) == 1
@@ -195,6 +197,7 @@ async def test_values_postgresql_generation_with_gcp_bucket(
         app_type=AppType.PostgreSQL,
         app_name="psdb",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
     assert helm_params["features"] == {"AutoCreateUserSchema": "true"}
     assert len(helm_params["instances"]) == 1
@@ -260,6 +263,7 @@ async def test_values_postgresql_generation_with_minio(
         app_type=AppType.PostgreSQL,
         app_name="psdb",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
     assert helm_params["features"] == {"AutoCreateUserSchema": "true"}
     assert len(helm_params["instances"]) == 1
@@ -329,4 +333,5 @@ async def test_values_postgresql_generation_without_matching_bucket_and_creds(
             app_type=AppType.PostgreSQL,
             app_name="psdb",
             namespace=DEFAULT_NAMESPACE,
+            app_secrets_name=APP_SECRETS_NAME,
         )

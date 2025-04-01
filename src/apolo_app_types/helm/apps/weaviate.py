@@ -47,7 +47,9 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
 
         return values
 
-    async def _get_backup_values(self, backup_bucket: Bucket) -> dict[str, t.Any]:
+    async def _get_backup_values(
+        self, backup_bucket: Bucket, app_secrets_name: str
+    ) -> dict[str, t.Any]:
         """Configure backup values for Weaviate using Apolo Blob Storage."""
 
         if backup_bucket.bucket_provider is not BucketProvider.AWS:
@@ -83,10 +85,11 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
                 },
                 "secrets": {
                     "AWS_ACCESS_KEY_ID": serialize_optional_secret(
-                        bucket_credentials.access_key_id
+                        bucket_credentials.access_key_id, secret_name=app_secrets_name
                     ),
                     "AWS_SECRET_ACCESS_KEY": serialize_optional_secret(
-                        bucket_credentials.secret_access_key
+                        bucket_credentials.secret_access_key,
+                        secret_name=app_secrets_name,
                     ),
                 },
             }
@@ -97,6 +100,7 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
         input_: WeaviateInputs,
         app_name: str,
         namespace: str,
+        app_secrets_name: str,
         *_: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -115,7 +119,9 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
 
         # Configure backups if enabled
         if input_.backup_bucket:
-            values["backups"] = await self._get_backup_values(input_.backup_bucket)
+            values["backups"] = await self._get_backup_values(
+                input_.backup_bucket, app_secrets_name
+            )
 
         logger.debug("Generated extra Weaviate values: %s", values)
         return merge_list_of_dicts(

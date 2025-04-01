@@ -3,6 +3,7 @@ import typing as t
 import apolo_sdk
 
 from apolo_app_types import (
+    FooocusAppInputs,
     LLMInputs,
     PostgresInputs,
     StableDiffusionInputs,
@@ -16,6 +17,7 @@ from apolo_app_types.helm.apps import (
 )
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.dockerhub import DockerHubModelChartValueProcessor
+from apolo_app_types.helm.apps.fooocus import FooocusChartValueProcessor
 from apolo_app_types.helm.apps.postgres import PostgresValueProcessor
 from apolo_app_types.helm.apps.spark_job import SparkJobValueProcessor
 from apolo_app_types.helm.apps.weaviate import WeaviateChartValueProcessor
@@ -31,6 +33,7 @@ async def app_type_to_vals(
     app_type: AppType,
     app_name: str,
     namespace: str,
+    app_secrets_name: str,
 ) -> tuple[list[str], dict[str, t.Any]]:
     # Mapping AppType to their respective processor classes
     processor_map: dict[AppType, type[BaseChartValueProcessor[t.Any]]] = {
@@ -41,6 +44,7 @@ async def app_type_to_vals(
         AppType.PostgreSQL: PostgresValueProcessor,
         AppType.CustomDeployment: CustomDeploymentChartValueProcessor,
         AppType.SparkJob: SparkJobValueProcessor,
+        AppType.Fooocus: FooocusChartValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)
@@ -52,7 +56,10 @@ async def app_type_to_vals(
     chart_processor = processor_class(apolo_client)
     extra_helm_args = await chart_processor.gen_extra_helm_args()
     extra_vals = await chart_processor.gen_extra_values(
-        input_=input_, app_name=app_name, namespace=namespace
+        input_=input_,
+        app_name=app_name,
+        namespace=namespace,
+        app_secrets_name=app_secrets_name,
     )
     return extra_helm_args, extra_vals
 
@@ -63,6 +70,7 @@ async def get_installation_vals(
     app_name: str,
     app_type: AppType,
     namespace: str = "default",
+    app_secrets_name: str = "apps-secrets",
 ) -> dict[str, t.Any]:
     input_type_map: dict[AppType, type[AppInputs]] = {
         AppType.LLMInference: LLMInputs,
@@ -72,6 +80,7 @@ async def get_installation_vals(
         AppType.PostgreSQL: PostgresInputs,
         AppType.CustomDeployment: CustomDeploymentInputs,
         AppType.SparkJob: SparkJobInputs,
+        AppType.Fooocus: FooocusAppInputs,
     }
 
     if app_type not in input_type_map:
@@ -85,6 +94,7 @@ async def get_installation_vals(
         app_type,
         app_name,
         namespace=namespace,
+        app_secrets_name=app_secrets_name,
     )
 
     return extra_vals

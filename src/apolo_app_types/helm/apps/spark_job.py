@@ -10,7 +10,7 @@ from apolo_app_types.helm.apps.common import (
     gen_apolo_storage_integration_labels,
     gen_extra_values,
 )
-from apolo_app_types.helm.utils.storage import get_app_data_storage_path
+from apolo_app_types.helm.utils.storage import get_app_data_files_path_url
 from apolo_app_types.protocols.common.storage import (
     ApoloFilesMount,
     ApoloFilesPath,
@@ -149,10 +149,8 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
                 deps["pypi_packages"] = pkg_list
 
             pypi_packages_storage_path = (
-                URL(
-                    get_app_data_storage_path(
-                        client=self.client, app_type=AppType.SparkJob, app_name=app_name
-                    )
+                get_app_data_files_path_url(
+                    client=self.client, app_type=AppType.SparkJob, app_name=app_name
                 )
                 / "spark"
                 / "deps"
