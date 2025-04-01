@@ -7,17 +7,17 @@ from apolo_app_types.protocols.common import (
     AppOutputs,
     AppOutputsDeployer,
     BasicAuth,
+    Bucket,
+    Env,
     HuggingFaceModel,
     OptionalStrOrSecret,
     StrOrSecret,
 )
-from apolo_app_types.protocols.common.buckets import Bucket
 from apolo_app_types.protocols.custom_deployment import (
     Container,
     ContainerImage,
     CustomDeploymentInputs,
     CustomDeploymentOutputs,
-    Env,
     Service,
 )
 from apolo_app_types.protocols.dify import (
@@ -33,7 +33,11 @@ from apolo_app_types.protocols.dockerhub import (
     DockerHubInputs,
     DockerHubOutputs,
 )
-from apolo_app_types.protocols.fooocus import FooocusInputs, FooocusOutputs
+from apolo_app_types.protocols.fooocus import (
+    FooocusAppInputs,
+    FooocusInputs,
+    FooocusOutputs,
+)
 from apolo_app_types.protocols.huggingface_cache import (
     HuggingFaceCacheInputs,
     HuggingFaceCacheOutputs,
@@ -127,7 +131,6 @@ __all__ = [
     "ApoloSecret",
     "StrOrSecret",
     "OptionalStrOrSecret",
-    "Bucket",
     "StableDiffusionOutputs",
     "HuggingFaceModel",
     "VLLMOutputsV2",
@@ -150,4 +153,7 @@ __all__ = [
     "PostgresOutputs",
     "SparkJobInputs",
     "SparkJobOutputs",
+    "FooocusAppInputs",
+    "ApoloFilesMount",
+    "Bucket",
 ]

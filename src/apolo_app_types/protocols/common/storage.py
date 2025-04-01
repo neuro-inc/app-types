@@ -109,3 +109,17 @@ class ApoloFilesMount(AbstractAppFieldType):
 
 
 class ApoloFilesFile(ApoloFilesPath): ...
+
+
+class StorageMounts(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Storage Mounts",
+            description="Mount external storage paths",
+        ).as_json_schema_extra(),
+    )
+    mounts: list[ApoloFilesMount] = Field(
+        default_factory=list,
+        description="List of ApoloStorageMount objects to mount external storage paths",
+    )
