@@ -23,6 +23,7 @@ from apolo_app_types.protocols.common import (
     MountPath,
     StorageMounts,
 )
+from apolo_app_types.protocols.common.k8s import Port
 
 
 class FooocusChartValueProcessor(BaseChartValueProcessor[FooocusAppInputs]):
@@ -90,7 +91,7 @@ class FooocusChartValueProcessor(BaseChartValueProcessor[FooocusAppInputs]):
             ),
             ingress=input_.ingress,
             container=Container(env=[Env(name=k, value=v) for k, v in env.items()]),
-            service=Service(port=7865),
+            service=Service(ports=[Port(name="http", port=7865)]),
             storage_mounts=StorageMounts(
                 mounts=[
                     ApoloFilesMount(

@@ -11,6 +11,7 @@ from apolo_app_types import (
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import Ingress, Preset
+from apolo_app_types.protocols.common.k8s import Port
 from apolo_app_types.protocols.common.storage import (
     ApoloFilesMount,
     ApoloFilesPath,
@@ -40,7 +41,7 @@ async def test_custom_deployment_values_generation(setup_clients):
             ),
             service=Service(
                 enabled=True,
-                port=8080,
+                ports=[Port(name="http", port=8080)],
             ),
             ingress=Ingress(
                 enabled=True,
@@ -64,7 +65,7 @@ async def test_custom_deployment_values_generation(setup_clients):
     }
     assert helm_params["service"] == {
         "enabled": True,
-        "port": 8080,
+        "ports": [{"port": 8080, "name": "http"}],
     }
     assert helm_params["ingress"]["enabled"] == True  # noqa: E712
     assert helm_params["ingress"]["className"] == "traefik"
@@ -92,7 +93,9 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
             ),
             service=Service(
                 enabled=True,
-                port=8080,
+                ports=[
+                    Port(name="http", port=8080),
+                ],
             ),
             ingress=Ingress(
                 enabled=False,
@@ -136,7 +139,7 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
     }
     assert helm_params["service"] == {
         "enabled": True,
-        "port": 8080,
+        "ports": [{"name": "http", "port": 8080}],
     }
 
     assert "podAnnotations" in helm_params
