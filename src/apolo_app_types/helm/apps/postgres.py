@@ -148,7 +148,9 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
             "tolerations": tolerations,
         }
 
-    def _get_backup_config(self, bucket: Bucket) -> dict[str, t.Any]:
+    def _get_backup_config(
+        self, bucket: Bucket, app_secrets_name: str
+    ) -> dict[str, t.Any]:
         if bucket.bucket_provider in (
             BucketProvider.MINIO,
             BucketProvider.AWS,
@@ -161,15 +163,19 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
                 "bucket": bucket.id,
                 "endpoint": s3_like_bucket_creds.endpoint_url,
                 "region": s3_like_bucket_creds.region_name,
-                "key": serialize_optional_secret(s3_like_bucket_creds.access_key_id),
+                "key": serialize_optional_secret(
+                    s3_like_bucket_creds.access_key_id, secret_name=app_secrets_name
+                ),
                 "keySecret": serialize_optional_secret(
-                    s3_like_bucket_creds.secret_access_key
+                    s3_like_bucket_creds.secret_access_key, secret_name=app_secrets_name
                 ),
             }
             return {"s3": backup_config}
         if bucket.bucket_provider == BucketProvider.GCP:
             bucket_creds: GCPBucketCredentials = bucket.credentials[0]  # type: ignore
-            key = serialize_optional_secret(bucket_creds.key_data)
+            key = serialize_optional_secret(
+                bucket_creds.key_data, secret_name=app_secrets_name
+            )
             backup_config = {
                 "bucket": bucket.id,
                 "key": key,
@@ -184,6 +190,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
         input_: PostgresInputs,
         app_name: str,
         namespace: str,
+        app_secrets_name: str,
         *_: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -219,6 +226,6 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
         if users_config:
             values["users"] = users_config
 
-        backup_config = self._get_backup_config(input_.backup_bucket)
+        backup_config = self._get_backup_config(input_.backup_bucket, app_secrets_name)
 
         return merge_list_of_dicts([backup_config, values])

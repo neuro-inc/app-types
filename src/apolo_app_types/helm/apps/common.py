@@ -185,7 +185,7 @@ def sanitize_dict_string(
         values = set_value_from_dot_notation(values, key, "****")
     dict_str = yaml.dump(values)
     if len(secrets) > 0:
-        sec_re = re.compile(f"({'|'.join(secrets)})")  # noqa: arg-type
+        sec_re = re.compile(f"({'|'.join(secrets)})")
         return sec_re.sub("****", dict_str)
     return dict_str
 

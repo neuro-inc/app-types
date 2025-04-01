@@ -6,7 +6,7 @@ from apolo_app_types.helm.apps.common import _get_match_expressions
 from apolo_app_types.protocols.common import Ingress, Preset
 from apolo_app_types.protocols.stable_diffusion import StableDiffusionParams
 
-from tests.unit.constants import CPU_POOL, DEFAULT_NAMESPACE
+from tests.unit.constants import APP_SECRETS_NAME, CPU_POOL, DEFAULT_NAMESPACE
 
 
 @pytest.mark.asyncio
@@ -35,6 +35,7 @@ async def test_values_sd_generation(setup_clients, mock_get_preset_cpu):
         app_type=AppType.StableDiffusion,
         app_name="sd",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
 
     assert helm_params["preset_name"] == "cpu-large"
@@ -96,6 +97,7 @@ async def test_values_sd_generation_with_gpu(setup_clients, mock_get_preset_gpu)
         app_type=AppType.StableDiffusion,
         app_name="sd",
         namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
     )
     assert helm_params["preset_name"] == "gpu_preset"
     assert helm_params["api"]["resources"]["requests"]["cpu"] == "1000.0m"

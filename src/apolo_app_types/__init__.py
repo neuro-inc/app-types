@@ -1,13 +1,13 @@
 from apolo_app_types.protocols.apolo_deploy import ApoloDeployInputs, ApoloDeployOutputs
 from apolo_app_types.protocols.common import (
     ApoloFilesMount,
+    ApoloSecret,
     AppInputs,
     AppInputsDeployer,
     AppOutputs,
     AppOutputsDeployer,
     BasicAuth,
     HuggingFaceModel,
-    K8sSecret,
     OptionalStrOrSecret,
     StrOrSecret,
 )
@@ -124,7 +124,7 @@ __all__ = [
     "JupyterTypes",
     "PrivateGPTInputs",
     "PrivateGPTOutputs",
-    "K8sSecret",
+    "ApoloSecret",
     "StrOrSecret",
     "OptionalStrOrSecret",
     "Bucket",

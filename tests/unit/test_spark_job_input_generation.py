@@ -17,6 +17,8 @@ from apolo_app_types.protocols.spark_job import (
     SparkDependencies,
 )
 
+from tests.unit.constants import APP_SECRETS_NAME
+
 
 @pytest.mark.asyncio
 async def test_spark_job_values_generation(setup_clients):
@@ -47,6 +49,7 @@ async def test_spark_job_values_generation(setup_clients):
         app_type=AppType.SparkJob,
         app_name="spark-app",
         namespace="default-namespace",
+        app_secrets_name=APP_SECRETS_NAME,
     )
 
     # Basic configuration assertions
