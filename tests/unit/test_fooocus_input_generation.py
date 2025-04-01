@@ -11,6 +11,7 @@ from apolo_app_types.protocols.fooocus import (
 )
 
 from tests.unit.constants import (
+    APP_SECRETS_NAME,
     DEFAULT_CLUSTER_NAME,
     DEFAULT_ORG_NAME,
     DEFAULT_PROJECT_NAME,
@@ -34,6 +35,7 @@ async def test_fooocus_values_generation(setup_clients):
         app_type=AppType.Fooocus,
         app_name="fooocus-app",
         namespace="default-namespace",
+        app_secrets_name=APP_SECRETS_NAME,
     )
     assert helm_params["image"] == {
         "repository": "ghcr.io/neuro-inc/fooocus",
