@@ -2,7 +2,6 @@ import pytest
 
 from apolo_app_types import (
     ContainerImage,
-    SparkJobInputs,
 )
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import APOLO_STORAGE_ANNOTATION
@@ -10,11 +9,13 @@ from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import Preset
 from apolo_app_types.protocols.common.storage import ApoloFilesFile
 from apolo_app_types.protocols.spark_job import (
-    PythonSpecificConfig,
-    SparkApplicationModel,
+    DriverConfig,
+    ExecutorConfig,
+    SparkApplicationConfig,
     SparkApplicationType,
     SparkAutoScalingConfig,
     SparkDependencies,
+    SparkJobInputs,
 )
 
 from tests.unit.constants import APP_SECRETS_NAME
@@ -24,26 +25,26 @@ from tests.unit.constants import APP_SECRETS_NAME
 async def test_spark_job_values_generation(setup_clients):
     helm_args, helm_params = await app_type_to_vals(
         input_=SparkJobInputs(
-            spark_job=SparkApplicationModel(
-                driver_preset=Preset(name="cpu-small"),
-                executor_preset=Preset(name="cpu-medium"),
+            spark_application_config=SparkApplicationConfig(
                 type=SparkApplicationType.PYTHON,
-                image=ContainerImage(repository="myrepo/spark-job", tag="v1.2.3"),
                 main_application_file=ApoloFilesFile(path="storage://path/to/main.py"),
-                spark_auto_scaling_config=SparkAutoScalingConfig(
-                    enabled=True,
-                    initial_executors=2,
-                    min_executors=1,
-                    max_executors=5,
-                    shuffle_tracking_timeout=30,
-                ),
                 dependencies=SparkDependencies(
                     packages=["package1", "package2"],
+                    pypi_packages=["scikit-learn==1.0.2"],
                 ),
-                spark_application_config=PythonSpecificConfig(
-                    pypi_packages=["scikit-learn==1.0.2"]
-                ),
-            )
+            ),
+            driver_config=DriverConfig(preset=Preset(name="cpu-small")),
+            executor_config=ExecutorConfig(
+                preset=Preset(name="cpu-medium"), instances=1
+            ),
+            image=ContainerImage(repository="myrepo/spark-job", tag="v1.2.3"),
+            spark_auto_scaling_config=SparkAutoScalingConfig(
+                enabled=True,
+                initial_executors=2,
+                min_executors=1,
+                max_executors=5,
+                shuffle_tracking_timeout=30,
+            ),
         ),
         apolo_client=setup_clients,
         app_type=AppType.SparkJob,

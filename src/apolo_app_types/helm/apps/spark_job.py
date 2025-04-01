@@ -17,9 +17,6 @@ from apolo_app_types.protocols.common.storage import (
     ApoloMountMode,
     MountPath,
 )
-from apolo_app_types.protocols.spark_job import (
-    PythonSpecificConfig,
-)
 
 
 class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
@@ -37,7 +34,9 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             for spark application.
         """
         extra_annotations: dict[str, str] = {}
-        main_app_file_path = URL(input_.spark_job.main_application_file.path)
+        main_app_file_path = URL(
+            input_.spark_application_config.main_application_file.path
+        )
         mount_path = "/opt/spark"
         main_app_file_mount = ApoloFilesMount(
             storage_path=ApoloFilesPath(path=str(main_app_file_path.parent)),
@@ -45,7 +44,8 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             mode=ApoloMountMode(mode="r"),
         )
         extra_annotations = append_apolo_storage_integration_annotations(
-            extra_annotations, [main_app_file_mount] + (input_.spark_job.volumes or [])
+            extra_annotations,
+            [main_app_file_mount] + (input_.spark_application_config.volumes or []),
         )
 
         main_application_file = f"local://{mount_path}/{main_app_file_path.name}"
@@ -66,12 +66,12 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         # Labels and annotations
         driver_extra_values = await gen_extra_values(
             apolo_client=self.client,
-            preset_type=input_.spark_job.driver_preset,
+            preset_type=input_.driver_config.preset,
             namespace=namespace,
         )
         executor_extra_values = await gen_extra_values(
             apolo_client=self.client,
-            preset_type=input_.spark_job.executor_preset,
+            preset_type=input_.executor_config.preset,
             namespace=namespace,
         )
         extra_labels = gen_apolo_storage_integration_labels(inject_storage=True)
@@ -83,14 +83,15 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             "namespace": namespace,
             "spark": {
                 "mainApplicationFile": main_application_file,
-                "type": input_.spark_job.type.value,
+                "type": input_.spark_application_config.type.value,
+                "arguments": input_.spark_application_config.arguments,
                 "image": {
-                    "repository": input_.spark_job.image.repository,
-                    "tag": input_.spark_job.image.tag or "latest",
+                    "repository": input_.image.repository,
+                    "tag": input_.image.tag or "latest",
                 },
                 "driver": {
                     "labels": {
-                        "platform.apolo.us/preset": input_.spark_job.driver_preset.name,  # noqa: E501
+                        "platform.apolo.us/preset": input_.driver_config.preset.name,  # noqa: E501
                         "platform.apolo.us/component": "app",
                         **extra_labels,
                     },
@@ -99,11 +100,12 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
                 },
                 "executor": {
                     "labels": {
-                        "platform.apolo.us/preset": input_.spark_job.executor_preset.name,  # noqa: E501
+                        "platform.apolo.us/preset": input_.executor_config.preset.name,  # noqa: E501
                         "platform.apolo.us/component": "app",
                         **extra_labels,
                     },
                     "annotations": storage_annotations,
+                    "instances": input_.executor_config.instances,
                     **executor_extra_values,
                 },
             },
@@ -117,13 +119,13 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
     def add_autoscaling_config(
         self, values: dict[str, t.Any], input_: SparkJobInputs
     ) -> None:
-        if input_.spark_job.spark_auto_scaling_config:
+        if input_.spark_auto_scaling_config:
             dynamic_allocation: dict[str, t.Any] = {
-                "enabled": (input_.spark_job.spark_auto_scaling_config.enabled),
-                "initialExecutors": input_.spark_job.spark_auto_scaling_config.initial_executors,  # noqa: E501
-                "minExecutors": input_.spark_job.spark_auto_scaling_config.min_executors,  # noqa: E501
-                "maxExecutors": input_.spark_job.spark_auto_scaling_config.max_executors,  # noqa: E501
-                "shuffleTrackingTimeout": input_.spark_job.spark_auto_scaling_config.shuffle_tracking_timeout,  # noqa: E501
+                "enabled": (input_.spark_auto_scaling_config.enabled),
+                "initialExecutors": input_.spark_auto_scaling_config.initial_executors,  # noqa: E501
+                "minExecutors": input_.spark_auto_scaling_config.min_executors,  # noqa: E501
+                "maxExecutors": input_.spark_auto_scaling_config.max_executors,  # noqa: E501
+                "shuffleTrackingTimeout": input_.spark_auto_scaling_config.shuffle_tracking_timeout,  # noqa: E501
             }
             values["spark"]["dynamicAllocation"] = dynamic_allocation
 
@@ -134,16 +136,14 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         values: dict[str, t.Any],
     ) -> None:
         deps: dict[str, t.Any] = {}
-        if input_.spark_job.dependencies:
-            deps = input_.spark_job.dependencies.model_dump()
+        if input_.spark_application_config.dependencies:
+            deps = input_.spark_application_config.dependencies.model_dump()
 
         if (
-            input_.spark_job.spark_application_config
-            and isinstance(
-                input_.spark_job.spark_application_config, PythonSpecificConfig
-            )  # noqa: E501
+            input_.spark_application_config.dependencies
+            and input_.spark_application_config.dependencies.pypi_packages
         ):
-            pypi_packages = input_.spark_job.spark_application_config.pypi_packages
+            pypi_packages = input_.spark_application_config.dependencies.pypi_packages
             if isinstance(pypi_packages, list):
                 pkg_list: list[str] = pypi_packages
                 deps["pypi_packages"] = pkg_list
