@@ -7,7 +7,10 @@ from apolo_app_types.helm.apps.common import (
     gen_apolo_storage_integration_labels,
     gen_extra_values,
 )
-from apolo_app_types.helm.utils.images import get_apolo_registry_secrets_value
+from apolo_app_types.helm.utils.images import (
+    get_apolo_registry_secrets_value,
+    get_image_docker_url,
+)
 
 
 class CustomDeploymentChartValueProcessor(
@@ -57,10 +60,16 @@ class CustomDeploymentChartValueProcessor(
             namespace=namespace,
             ingress=input_.ingress,
         )
+        image_docker_url = await get_image_docker_url(
+            client=self.client,
+            image=input_.image.repository,
+            tag=input_.image.tag or "latest",
+        )
+        image, tag = image_docker_url.rsplit(":", 1)
         values: dict[str, t.Any] = {
             "image": {
-                "repository": input_.image.repository,
-                "tag": input_.image.tag or "latest",
+                "repository": image,
+                "tag": tag,
             },
             **extra_values,
         }

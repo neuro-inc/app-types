@@ -4,6 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 
+import apolo_sdk
 import pytest
 from apolo_sdk import AppsConfig
 
@@ -24,7 +25,15 @@ async def setup_clients():
             mock_cluster.apps = AppsConfig(
                 hostname_templates=["{app_names}.apps.some.org.neu.ro"]
             )
+            mock_apolo_client.config.registry_url = PropertyMock(
+                return_value="registry.cluster.org.neu.ro"
+            )
             mock_apolo_client.config.get_cluster = MagicMock(return_value=mock_cluster)
+            mock_apolo_client.parse.remote_image = MagicMock(
+                side_effect=lambda image, cluster_name: apolo_sdk.RemoteImage(
+                    name=image,
+                )
+            )
             mock_apolo_client.username = PropertyMock(return_value="test-user")
             mock_bucket = Bucket(
                 id="bucket-id",

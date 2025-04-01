@@ -20,3 +20,11 @@ async def get_apolo_registry_secrets_value(
     return DockerConfigModel(
         filecontents=str(base64.b64encode(json_contents.encode("utf-8")))
     )
+
+
+async def get_image_docker_url(
+    client: apolo_sdk.Client, image: str, tag: str = "latest"
+) -> str:
+    return client.parse.remote_image(
+        f"{image}:{tag}", cluster_name=client.config.cluster_name
+    ).as_docker_url()
