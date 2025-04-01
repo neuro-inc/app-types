@@ -1,6 +1,6 @@
 import typing as t
 
-from apolo_app_types import CustomDeploymentInputs
+from apolo_app_types import CustomDeploymentInputs, DockerConfigModel
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
     append_apolo_storage_integration_annotations,
@@ -105,10 +105,11 @@ class CustomDeploymentChartValueProcessor(
         if storage_labels:
             values["podLabels"] = storage_labels
 
+        dockerconfig: DockerConfigModel | None = input_.image.dockerconfigjson
+
         if input_.image.repository.startswith("images:"):
-            values["dockerconfigjson"] = str(
-                await get_apolo_registry_secrets_value(client=self.client)
-            )
-        elif input_.image.dockerconfigjson:
-            values["dockerconfigjson"] = input_.image.dockerconfigjson.filecontents
+            dockerconfig = await get_apolo_registry_secrets_value(client=self.client)
+
+        if dockerconfig:
+            values["dockerconfigjson"] = dockerconfig.filecontents
         return values
