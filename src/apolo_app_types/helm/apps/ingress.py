@@ -30,7 +30,10 @@ async def _get_ingress_name_template(client: apolo_sdk.Client) -> str:
 
 
 async def _generate_ingress_config(
-    apolo_client: apolo_sdk.Client, namespace: str, namespace_suffix: str = ""
+    apolo_client: apolo_sdk.Client,
+    ingress: Ingress,
+    namespace: str,
+    namespace_suffix: str = "",
 ) -> dict[str, t.Any]:
     ingress_hostname = await _get_ingress_name_template(apolo_client)
     hostname = ingress_hostname.format(
@@ -56,7 +59,10 @@ async def _generate_ingress_config(
         "hosts": [
             {
                 "host": hostname,
-                "paths": [{"path": "/", "pathType": "Prefix"}],
+                "paths": [
+                    {"path": _.path, "pathType": _.path_type, "portName": _.port_name}
+                    for _ in ingress.paths
+                ],
             }
         ],
     }
@@ -72,11 +78,11 @@ async def get_ingress_values(
         ingress_vals["ingress"]["enabled"] = False
         return ingress_vals
 
-    res = await _generate_ingress_config(apolo_client, namespace)
+    res = await _generate_ingress_config(apolo_client, ingress, namespace)
     ingress_vals["ingress"].update(res)
     if ingress.grpc and ingress.grpc.enabled:
         grpc_ingress_config = await _generate_ingress_config(
-            apolo_client, namespace, namespace_suffix="-grpc"
+            apolo_client, ingress, namespace, namespace_suffix="-grpc"
         )
         ingress_vals["ingress"]["grpc"] = {
             "enabled": True,

@@ -1,4 +1,4 @@
-from pydantic import ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.schema_extra import (
@@ -8,6 +8,24 @@ from apolo_app_types.protocols.common.schema_extra import (
 
 class IngressGrpc(AbstractAppFieldType):
     enabled: bool
+
+
+class IngressPath(BaseModel):
+    path: str = Field(
+        default="/",
+        title="Path",
+        description="Path for the ingress",
+    )
+    path_type: str = Field(
+        default="Prefix",
+        title="PathType",
+        description="Type of path",
+    )
+    port_name: str = Field(
+        default="http",
+        title="PortName",
+        description="Port Name",
+    )
 
 
 class Ingress(AbstractAppFieldType):
@@ -33,4 +51,9 @@ class Ingress(AbstractAppFieldType):
         default=False,
         title="Enable Platform Authentication",
         description="Enable/disable HTTP authentication",
+    )
+    paths: list[IngressPath] = Field(
+        default_factory=lambda: [IngressPath()],
+        title="Paths",
+        description="Paths for the ingress",
     )
