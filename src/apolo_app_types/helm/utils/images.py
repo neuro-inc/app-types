@@ -39,7 +39,7 @@ async def get_apolo_registry_secrets_value(
     contents = {"auths": {host: {"auth": b64_token}}}
     json_contents = json.dumps(contents)
     return DockerConfigModel(
-        filecontents=str(base64.b64encode(json_contents.encode("utf-8")))
+        filecontents=base64.b64encode(json_contents.encode("utf-8")).decode("utf-8")
     )
 
 
