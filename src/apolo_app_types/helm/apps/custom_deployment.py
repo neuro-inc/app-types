@@ -117,7 +117,7 @@ class CustomDeploymentChartValueProcessor(
 
         dockerconfig: DockerConfigModel | None = input_.image.dockerconfigjson
 
-        if input_.image.repository.startswith("images:"):
+        if input_.image.repository.startswith("image:"):
             sa_suffix = (
                 input_.name_override.name
                 if input_.name_override
