@@ -1,11 +1,16 @@
 import typing as t
+from datetime import datetime
 
-from apolo_app_types import CustomDeploymentInputs
+from apolo_app_types import CustomDeploymentInputs, DockerConfigModel
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
     append_apolo_storage_integration_annotations,
     gen_apolo_storage_integration_labels,
     gen_extra_values,
+)
+from apolo_app_types.helm.utils.images import (
+    get_apolo_registry_secrets_value,
+    get_image_docker_url,
 )
 
 
@@ -56,10 +61,16 @@ class CustomDeploymentChartValueProcessor(
             namespace=namespace,
             ingress=input_.ingress,
         )
+        image_docker_url = await get_image_docker_url(
+            client=self.client,
+            image=input_.image.repository,
+            tag=input_.image.tag or "latest",
+        )
+        image, tag = image_docker_url.rsplit(":", 1)
         values: dict[str, t.Any] = {
             "image": {
-                "repository": input_.image.repository,
-                "tag": input_.image.tag or "latest",
+                "repository": image,
+                "tag": tag,
             },
             **extra_values,
         }
@@ -104,6 +115,19 @@ class CustomDeploymentChartValueProcessor(
         if storage_labels:
             values["podLabels"] = storage_labels
 
-        if input_.image.dockerconfigjson:
-            values["dockerconfigjson"] = input_.image.dockerconfigjson.filecontents
+        dockerconfig: DockerConfigModel | None = input_.image.dockerconfigjson
+
+        if input_.image.repository.startswith("image:"):
+            sa_suffix = (
+                input_.name_override.name
+                if input_.name_override
+                else datetime.now().strftime("%Y%m%d%H%M%S")
+            )
+            sa_name = f"custom-deployment-{sa_suffix}"
+            dockerconfig = await get_apolo_registry_secrets_value(
+                client=self.client, sa_name=sa_name
+            )
+
+        if dockerconfig:
+            values["dockerconfigjson"] = dockerconfig.filecontents
         return values
