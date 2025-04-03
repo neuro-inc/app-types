@@ -12,11 +12,11 @@ logger = logging.getLogger(__name__)
 
 
 async def get_app_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any]:
-    storage_path = helm_values["storage_path"]
+    storage_uri = helm_values["storage_uri"]
     return HuggingFaceCacheOutputs(
         cache_config=HuggingFaceCache(
             files_path=ApoloFilesPath(
-                path=storage_path,
+                path=storage_uri,
             ),
         ),
     ).model_dump()

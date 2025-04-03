@@ -56,14 +56,14 @@ async def test_fooocus_values_generation(setup_clients):
     assert len(parsed_storage) == 2
 
     assert (
-        parsed_storage[0]["storage_path"]
+        parsed_storage[0]["storage_uri"]
         == f"storage://{DEFAULT_CLUSTER_NAME}/{DEFAULT_ORG_NAME}/{DEFAULT_PROJECT_NAME}/"
         f".apps/fooocus/fooocus-app/data"
     )
     assert parsed_storage[0]["mount_path"] == "/content/data"
     assert parsed_storage[0]["mount_mode"] == "rw"
 
-    assert parsed_storage[1]["storage_path"] == (
+    assert parsed_storage[1]["storage_uri"] == (
         f"storage://{DEFAULT_CLUSTER_NAME}/{DEFAULT_ORG_NAME}/{DEFAULT_PROJECT_NAME}/"
         f".apps/fooocus/fooocus-app/app/outputs"
     )

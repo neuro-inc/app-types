@@ -101,14 +101,14 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
             storage_mounts=StorageMounts(
                 mounts=[
                     ApoloFilesMount(
-                        storage_path=ApoloFilesPath(
+                        storage_uri=ApoloFilesPath(
                             path="storage://mycluster/myorg/myproj/data"
                         ),
                         mount_path=MountPath(path="/app/data"),
                         mode=ApoloMountMode(mode="rw"),
                     ),
                     ApoloFilesMount(
-                        storage_path=ApoloFilesPath(
+                        storage_uri=ApoloFilesPath(
                             path="storage://mycluster/myorg/config"
                         ),
                         mount_path=MountPath(path="/config"),
@@ -147,11 +147,11 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
     parsed_storage = json.loads(storage_json)
     assert len(parsed_storage) == 2
 
-    assert parsed_storage[0]["storage_path"] == "storage://mycluster/myorg/myproj/data"
+    assert parsed_storage[0]["storage_uri"] == "storage://mycluster/myorg/myproj/data"
     assert parsed_storage[0]["mount_path"] == "/app/data"
     assert parsed_storage[0]["mount_mode"] == "rw"
 
-    assert parsed_storage[1]["storage_path"] == "storage://mycluster/myorg/config"
+    assert parsed_storage[1]["storage_uri"] == "storage://mycluster/myorg/config"
     assert parsed_storage[1]["mount_path"] == "/config"
     assert parsed_storage[1]["mount_mode"] == "r"
 
