@@ -59,7 +59,4 @@ class Ingress(AbstractAppFieldType):
         default_factory=lambda: [IngressPath()],
         title="Paths",
         description="Paths for the Ingress",
-        json_schema_extra=SchemaExtraMetadata(
-            is_advanced_field=True,
-        ).as_json_schema_extra(),
     )
