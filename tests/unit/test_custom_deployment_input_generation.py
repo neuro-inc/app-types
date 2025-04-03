@@ -11,6 +11,7 @@ from apolo_app_types import (
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import Ingress, Preset
+from apolo_app_types.protocols.common.ingress import IngressPath
 from apolo_app_types.protocols.common.k8s import Port
 from apolo_app_types.protocols.common.storage import (
     ApoloFilesMount,
@@ -65,7 +66,7 @@ async def test_custom_deployment_values_generation(setup_clients):
     }
     assert helm_params["service"] == {
         "enabled": True,
-        "ports": [{"port": 8080, "name": "http"}],
+        "ports": [{"containerPort": 8080, "name": "http"}],
     }
     assert helm_params["ingress"]["enabled"] == True  # noqa: E712
     assert helm_params["ingress"]["className"] == "traefik"
@@ -139,7 +140,7 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
     }
     assert helm_params["service"] == {
         "enabled": True,
-        "ports": [{"name": "http", "port": 8080}],
+        "ports": [{"name": "http", "containerPort": 8080}],
     }
 
     assert "podAnnotations" in helm_params
@@ -162,11 +163,133 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
     assert pod_labels.get("platform.apolo.us/inject-storage") == "true"
 
 
+@pytest.mark.asyncio
+async def test_custom_deployment_values_generation_with_multiport_exposure(
+    setup_clients,
+):
+    """
+    Ensure that when service is enabled, multiple ports supplied
+    """
+    custom_deploy_inputs = CustomDeploymentInputs(
+        preset=Preset(name="cpu-small"),
+        name_override=DeploymentName(name="custom-deployment"),
+        image=ContainerImage(
+            repository="multiport",
+            tag="latest",
+        ),
+        container=Container(
+            command=["python", "app.py"],
+            args=["--port", "8080"],
+            env=[Env(name="ENV_VAR", value="value")],
+        ),
+        service=Service(
+            enabled=True,
+            ports=[
+                Port(name="http1", port=8000),
+                Port(name="http2", port=9000),
+            ],
+        ),
+        ingress=Ingress(
+            enabled=True,
+            clusterName="default",
+            paths=[
+                IngressPath(
+                    path="/path_prefix1",
+                    path_type="Prefix",
+                    port_name="http1",
+                ),
+                IngressPath(
+                    path="/path_prefix2",
+                    path_type="Prefix",
+                    port_name="http2",
+                ),
+            ],
+        ),
+    )
+    helm_args, helm_params = await app_type_to_vals(
+        input_=custom_deploy_inputs,
+        apolo_client=setup_clients,
+        app_type=AppType.CustomDeployment,
+        app_name="custom-app",
+        namespace="default-namespace",
+        app_secrets_name=APP_SECRETS_NAME,
+    )
+
+    # The base checks from the existing test
+    assert helm_params["image"] == {
+        "repository": "multiport",
+        "tag": "latest",
+    }
+    assert helm_params["container"] == {
+        "command": ["python", "app.py"],
+        "args": ["--port", "8080"],
+        "env": [{"name": "ENV_VAR", "value": "value"}],
+    }
+    assert helm_params["service"]["enabled"] == True  # noqa: E712
+    assert helm_params["service"]["ports"] == [
+        {"name": "http1", "containerPort": 8000},
+        {"name": "http2", "containerPort": 9000},
+    ]
+    assert helm_params["ingress"]["enabled"] == True  # noqa: E712
+    assert helm_params["ingress"]["className"] == "traefik"
+    assert helm_params["ingress"]["hosts"][0]["paths"] == [
+        {"path": "/path_prefix1", "pathType": "Prefix", "portName": "http1"},
+        {"path": "/path_prefix2", "pathType": "Prefix", "portName": "http2"},
+    ]
+
 
 @pytest.mark.asyncio
-async def test_custom_deployment_values_generation_with_multiport_exposure(setup_clients):
+async def test_custom_deployment_values_generation_path_port_not_supplied(
+    setup_clients,
+):
     """
-    Ensure that when storage_mounts are provided,
-    we generate the correct podAnnotations and labels for Apolo storage injection.
+    Ensure that when service is enabled, multiple ports supplied
     """
-    pass
+    custom_deploy_inputs = CustomDeploymentInputs(
+        preset=Preset(name="cpu-small"),
+        name_override=DeploymentName(name="custom-deployment"),
+        image=ContainerImage(
+            repository="any",
+            tag="latest",
+        ),
+        container=Container(
+            command=["python", "app.py"],
+            args=["--port", "8080"],
+            env=[Env(name="ENV_VAR", value="value")],
+        ),
+        service=Service(
+            enabled=True,
+        ),
+        ingress=Ingress(
+            enabled=True,
+            clusterName="default",
+        ),
+    )
+    helm_args, helm_params = await app_type_to_vals(
+        input_=custom_deploy_inputs,
+        apolo_client=setup_clients,
+        app_type=AppType.CustomDeployment,
+        app_name="custom-app",
+        namespace="default-namespace",
+        app_secrets_name=APP_SECRETS_NAME,
+    )
+
+    # The base checks from the existing test
+    assert helm_params["image"] == {
+        "repository": "any",
+        "tag": "latest",
+    }
+    assert helm_params["container"] == {
+        "command": ["python", "app.py"],
+        "args": ["--port", "8080"],
+        "env": [{"name": "ENV_VAR", "value": "value"}],
+    }
+    assert helm_params["service"]["enabled"] == True  # noqa: E712
+    assert helm_params["service"]["ports"] == [
+        {"name": "http", "containerPort": 80},
+    ]
+    assert helm_params["ingress"]["enabled"] == True  # noqa: E712
+    assert helm_params["ingress"]["className"] == "traefik"
+    assert helm_params["ingress"]["hosts"][0]["paths"] == [
+        {"path": "/", "pathType": "Prefix", "portName": "http"},
+    ]

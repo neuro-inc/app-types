@@ -89,10 +89,13 @@ class CustomDeploymentChartValueProcessor(
         if input_.service and input_.service.enabled:
             values["service"] = {
                 "enabled": True,
-                "ports": [{
-                    "name": _.name,
-                    "containerPort": _.port,
-                } for _ in input_.service.ports],
+                "ports": [
+                    {
+                        "name": _.name,
+                        "containerPort": _.port,
+                    }
+                    for _ in input_.service.ports
+                ],
             }
 
         if input_.name_override:

@@ -11,6 +11,14 @@ class IngressGrpc(AbstractAppFieldType):
 
 
 class IngressPath(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Ingress",
+            description="Configuration for Ingress.",
+            is_advanced_field=True,
+        ).as_json_schema_extra(),
+    )
     path: str = Field(
         default="/",
         title="Path",
@@ -47,13 +55,8 @@ class Ingress(AbstractAppFieldType):
         title="Cluster Name",
     )
     grpc: IngressGrpc | None = Field(default=None, title="Enable GRPC")
-    http_auth: bool = Field(
-        default=False,
-        title="Enable Platform Authentication",
-        description="Enable/disable HTTP authentication",
-    )
     paths: list[IngressPath] = Field(
         default_factory=lambda: [IngressPath()],
         title="Paths",
-        description="Paths for the ingress",
+        description="Paths for the Ingress",
     )
