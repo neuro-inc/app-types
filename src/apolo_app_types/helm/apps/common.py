@@ -197,7 +197,7 @@ def gen_apolo_storage_integration_annotations(
     for storage_mount in files_mouts:
         storage_mount_annotations.append(
             {
-                "storage_path": storage_mount.storage_path.path,
+                "storage_uri": storage_mount.storage_uri.path,
                 "mount_path": storage_mount.mount_path.path,
                 "mount_mode": storage_mount.mode.mode.value,
             }

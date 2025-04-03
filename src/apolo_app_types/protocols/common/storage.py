@@ -91,7 +91,7 @@ class ApoloFilesMount(AbstractAppFieldType):
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
-    storage_path: ApoloFilesPath = Field(
+    storage_uri: ApoloFilesPath = Field(
         ...,
         description="The path to the Apolo Files.",
         title="Storage path",
