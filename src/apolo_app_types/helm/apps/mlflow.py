@@ -122,8 +122,8 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         cd_inputs = CustomDeploymentInputs(
             preset=input_.preset,
             image=ContainerImage(
-                repository="ghcr.io/neuro-inc/mlflow",
-                tag="latest",
+                repository="ghcr.io/mlflow/mlflow",
+                tag="v2.21.3",
             ),
             ingress=input_.ingress,
             container=Container(env=envs),
