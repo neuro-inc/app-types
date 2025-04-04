@@ -21,20 +21,24 @@ async def get_mlflow_outputs(
     if labels is None:
         labels = {"application": "mlflow"}
 
+    internal_host, internal_port = await get_service_host_port(match_labels=labels)
     internal_url = None
-    service_result = await get_service_host_port(match_labels=labels)
-    if service_result:
-        host, port = service_result
+    if internal_host:
         internal_url = RestAPI(
-            host=host, port=int(port), protocol="http", base_path="/"
+            host=internal_host,
+            port=int(internal_port),
+            protocol="http",
+            base_path="/",
         )
 
+    ingress_host_port = await get_ingress_host_port(match_labels=labels)
     external_url = None
-    ingress_result = await get_ingress_host_port(match_labels=labels)
-    if ingress_result:
-        host, port = ingress_result
+    if ingress_host_port:
         external_url = RestAPI(
-            host=host, port=int(port), protocol="https", base_path="/"
+            host=ingress_host_port[0],
+            port=int(ingress_host_port[1]),
+            protocol="https",
+            base_path="/",
         )
 
     return {
