@@ -10,6 +10,8 @@ async def test_mlflow_outputs_generation(
     """
     Validate that get_mlflow_outputs returns the correct
     internal/external URLs from K8s resources labeled application=mlflow.
+    This works regardless of the storage backend (SQLite/Postgres) or
+    artifact store configuration.
     """
 
     async def mock_get_service_host_port(*args, **kwargs):
