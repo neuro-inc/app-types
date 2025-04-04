@@ -39,7 +39,3 @@ test-unit:
 .PHONY: dist
 dist:
 	poetry build --clean
-
-.PHONY: publish
-publish:
-	poetry publish --no-interaction
