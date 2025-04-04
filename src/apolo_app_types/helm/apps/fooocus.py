@@ -94,14 +94,14 @@ class FooocusChartValueProcessor(BaseChartValueProcessor[FooocusAppInputs]):
             storage_mounts=StorageMounts(
                 mounts=[
                     ApoloFilesMount(
-                        storage_path=ApoloFilesPath(
+                        storage_uri=ApoloFilesPath(
                             path=str(data_storage_path),
                         ),
                         mount_path=MountPath(path=str(data_container_dir)),
                         mode=ApoloMountMode(mode="rw"),
                     ),
                     ApoloFilesMount(
-                        storage_path=ApoloFilesPath(
+                        storage_uri=ApoloFilesPath(
                             path=str(outputs_storage_path),
                         ),
                         mount_path=MountPath(path=str(outputs_container_dir)),
