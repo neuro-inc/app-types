@@ -16,6 +16,7 @@ from apolo_app_types.protocols.common import (
     Ingress,
     Preset as PresetType,
 )
+from apolo_app_types.protocols.common.k8s import Port
 
 
 logger = logging.getLogger(__name__)
@@ -245,6 +246,7 @@ async def gen_extra_values(
     preset_type: PresetType,
     ingress: Ingress | None = None,
     namespace: str | None = None,
+    port_configurations: list[Port] | None = None,
 ) -> dict[str, t.Any]:
     preset_name = preset_type.name
     if not preset_name:
@@ -260,7 +262,9 @@ async def gen_extra_values(
         if not namespace:
             exception_msg = "Namespace is required when ingress is provided."
             raise ValueError(exception_msg)
-        ingress_vals = await get_ingress_values(apolo_client, ingress, namespace)
+        ingress_vals = await get_ingress_values(
+            apolo_client, ingress, namespace, port_configurations
+        )
 
     return {
         "preset_name": preset_name,

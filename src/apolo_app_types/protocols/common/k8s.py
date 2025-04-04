@@ -55,23 +55,13 @@ class Port(BaseModel):
         title="Port",
         description="Port number.",
     )
-
-
-class Service(AbstractAppFieldType):
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Service",
-            description="K8S service configuration.",
-        ).as_json_schema_extra(),
+    path_type: str = Field(
+        default="Prefix",
+        title="PathType",
+        description="Type of path",
     )
-    enabled: bool = Field(
-        default=True,
-        title="Enabled",
-        description="Whether to expose the service.",
-    )
-    ports: list[Port] = Field(
-        default_factory=lambda: [Port(name="http", port=80)],
-        title="Ports",
-        description="List of ports to expose.",
+    path: str = Field(
+        default="/",
+        title="Path",
+        description="Path for the port.",
     )

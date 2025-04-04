@@ -18,7 +18,6 @@ from apolo_app_types.protocols.custom_deployment import (
     ContainerImage,
     CustomDeploymentInputs,
     CustomDeploymentOutputs,
-    Service,
 )
 from apolo_app_types.protocols.dify import (
     DifyApi,
@@ -147,7 +146,6 @@ __all__ = [
     "CustomDeploymentOutputs",
     "ContainerImage",
     "Container",
-    "Service",
     "Env",
     "AppOutputsDeployer",
     "PostgresOutputs",

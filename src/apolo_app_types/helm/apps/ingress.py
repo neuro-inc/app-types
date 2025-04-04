@@ -4,6 +4,7 @@ import typing as t
 import apolo_sdk
 
 from apolo_app_types.protocols.common import Ingress
+from apolo_app_types.protocols.common.k8s import Port
 
 
 DOMAIN_SECTION_MAX_LENGTH = 63
@@ -31,8 +32,8 @@ async def _get_ingress_name_template(client: apolo_sdk.Client) -> str:
 
 async def _generate_ingress_config(
     apolo_client: apolo_sdk.Client,
-    ingress: Ingress,
     namespace: str,
+    port_configurations: list[Port] | None = None,
     namespace_suffix: str = "",
 ) -> dict[str, t.Any]:
     ingress_hostname = await _get_ingress_name_template(apolo_client)
@@ -52,17 +53,24 @@ async def _generate_ingress_config(
             f"If your app name is long, consider using shorter app name."
         )
         raise Exception(msg)
-
+    if not port_configurations:
+        paths = [{"path": "/", "pathType": "Prefix", "portName": "http"}]
+    else:
+        paths = [
+            {
+                "path": port.path,
+                "pathType": "Prefix",
+                "portName": port.name,
+            }
+            for port in port_configurations
+        ]
     return {
         "enabled": True,
         "className": "traefik",
         "hosts": [
             {
                 "host": hostname,
-                "paths": [
-                    {"path": _.path, "pathType": _.path_type, "portName": _.port_name}
-                    for _ in ingress.paths
-                ],
+                "paths": paths,
             }
         ],
     }
@@ -72,17 +80,18 @@ async def get_ingress_values(
     apolo_client: apolo_sdk.Client,
     ingress: Ingress,
     namespace: str,
+    port_configurations: list[Port] | None = None,
 ) -> dict[str, t.Any]:
     ingress_vals: dict[str, t.Any] = {"ingress": {"grpc": {"enabled": False}}}
     if not ingress.enabled:
         ingress_vals["ingress"]["enabled"] = False
         return ingress_vals
 
-    res = await _generate_ingress_config(apolo_client, ingress, namespace)
+    res = await _generate_ingress_config(apolo_client, namespace, port_configurations)
     ingress_vals["ingress"].update(res)
     if ingress.grpc and ingress.grpc.enabled:
         grpc_ingress_config = await _generate_ingress_config(
-            apolo_client, ingress, namespace, namespace_suffix="-grpc"
+            apolo_client, namespace, port_configurations, namespace_suffix="-grpc"
         )
         ingress_vals["ingress"]["grpc"] = {
             "enabled": True,
