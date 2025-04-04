@@ -1,3 +1,5 @@
+# File: /src/apolo_app_types/outputs/mlflow.py
+
 import logging
 import typing as t
 
@@ -13,23 +15,24 @@ async def get_mlflow_outputs(
     helm_values: dict[str, t.Any], labels: dict[str, str] | None = None
 ) -> dict[str, t.Any]:
     """
-    Inspect K8s Services/Ingress for the app with 'application=mlflow'.
-    Return a dictionary with 'internal_web_app_url' and 'external_web_app_url'.
+    Gather internal & external MLFlow URLs from K8s resources
+    with label 'application=mlflow'.
     """
     if labels is None:
         labels = {"application": "mlflow"}
 
-    internal_host, internal_port = await get_service_host_port(match_labels=labels)
     internal_url = None
-    if internal_host and internal_port:
+    service_result = await get_service_host_port(match_labels=labels)
+    if service_result:
+        host, port = service_result
         internal_url = RestAPI(
-            host=internal_host, port=int(internal_port), protocol="http", base_path="/"
+            host=host, port=int(port), protocol="http", base_path="/"
         )
 
     external_url = None
-    ingress = await get_ingress_host_port(match_labels=labels)
-    if ingress:
-        host, port = ingress
+    ingress_result = await get_ingress_host_port(match_labels=labels)
+    if ingress_result:
+        host, port = ingress_result
         external_url = RestAPI(
             host=host, port=int(port), protocol="https", base_path="/"
         )
