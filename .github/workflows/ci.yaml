@@ -101,8 +101,11 @@ jobs:
         run: |
           poetry self add poetry-git-version-plugin
           make dist
-      - name: Publish apolo-app-types to PyPi
-        env:
-          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.APP_TYPES_PYPI_TOKEN }}
-        run: |
-          poetry publish
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Sign the dists with Sigstore
+        uses: sigstore/gh-action-sigstore-python@v3.0.0
+        with:
+          inputs: >-
+            ./dist/*.tar.gz
+            ./dist/*.whl
