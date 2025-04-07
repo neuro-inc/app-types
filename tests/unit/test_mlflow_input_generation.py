@@ -14,7 +14,6 @@ from apolo_app_types.protocols.mlflow import (
     MLFlowSpecificInputs,
     MLFlowStorageBackendConfig,
     MLFlowStorageBackendEnum,
-    PostgresAppNameConfig,
     PostgresURIConfig,
     SQLitePVCConfig,
 )
@@ -68,7 +67,7 @@ async def test_values_mlflow_generation_sqlite_pvc(setup_clients, mock_get_prese
     assert helm_params["volumes"][0]["name"] == "mlflow-db-pvc"
     assert (
         helm_params["volumes"][0]["persistentVolumeClaim"]["claimName"]
-        == "my-mlflow-db"
+        == "mlflow-sqlite-storage"
     )
 
     assert "volumeMounts" in helm_params
@@ -148,50 +147,6 @@ async def test_values_mlflow_generation_postgres_uri(
 
 
 @pytest.mark.asyncio
-async def test_values_mlflow_generation_postgres_app_name(
-    setup_clients, mock_get_preset_cpu
-):
-    """
-    Test that MLFlow config uses postgresql://app-name.default/mlflow
-    when using postgres_app_name (backward compatibility).
-    """
-    input_data = MLFlowAppInputs(
-        preset=Preset(name="cpu-small"),
-        ingress=Ingress(enabled=False, clusterName="test-cluster"),
-        mlflow_specific=MLFlowSpecificInputs(
-            http_auth=HttpAuthConfig(enabled=False),
-            storage_backend=MLFlowStorageBackendConfig(
-                backend=MLFlowStorageBackendEnum.POSTGRES
-            ),
-            postgres_app_name=PostgresAppNameConfig(name="pg-app"),
-        ),
-    )
-
-    helm_args, helm_params = await app_type_to_vals(
-        input_=input_data,
-        apolo_client=setup_clients,
-        app_type=AppType.MLFlow,
-        app_name="my-mlflow",
-        namespace=DEFAULT_NAMESPACE,
-        app_secrets_name=APP_SECRETS_NAME,
-    )
-
-    # Check environment var for PG
-    env_vars = helm_params["container"]["env"]
-    tracking_env = next(
-        (e for e in env_vars if e["name"] == "MLFLOW_TRACKING_URI"), None
-    )
-    assert tracking_env is not None
-    assert "postgresql://pg-app.default/mlflow" in tracking_env["value"]
-
-    # No PVC volumes
-    assert "volumes" not in helm_params
-    assert "volumeMounts" not in helm_params
-
-    assert helm_params["labels"]["application"] == "mlflow"
-
-
-@pytest.mark.asyncio
 async def test_values_mlflow_generation_sqlite_no_pvc(
     setup_clients, mock_get_preset_cpu
 ):
@@ -209,9 +164,7 @@ async def test_values_mlflow_generation_sqlite_no_pvc(
         ),
     )
 
-    with pytest.raises(
-        ValueError, match="SQLite chosen but no 'sqlite_pvc_name' provided"
-    ):
+    with pytest.raises(ValueError, match="SQLite chosen but no 'sqlite_pvc' provided."):
         await app_type_to_vals(
             input_=input_data,
             apolo_client=setup_clients,
@@ -228,7 +181,7 @@ async def test_values_mlflow_generation_postgres_no_config(
 ):
     """
     Test that MLFlow raises an error when Postgres is chosen
-    but no URI or app name is provided.
+    but no URI is provided.
     """
     input_data = MLFlowAppInputs(
         preset=Preset(name="cpu-small"),
@@ -241,9 +194,7 @@ async def test_values_mlflow_generation_postgres_no_config(
         ),
     )
 
-    err_msg = (
-        "Postgres chosen but neither 'postgres_uri' nor 'postgres_app_name' provided"
-    )
+    err_msg = "Postgres chosen but 'postgres_uri' not provided"
     with pytest.raises(ValueError, match=err_msg):
         await app_type_to_vals(
             input_=input_data,

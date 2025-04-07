@@ -36,23 +36,6 @@ class MLFlowStorageBackendConfig(AbstractAppFieldType):
     )
 
 
-class PostgresAppNameConfig(AbstractAppFieldType):
-    """Configuration for the Postgres app name."""
-
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Postgres App Name",
-            description="Name of a Postgres app if using POSTGRES.",
-        ).as_json_schema_extra(),
-    )
-    name: str | None = Field(
-        default=None,
-        description="The name of the Postgres application.",
-        title="App Name",
-    )
-
-
 class HttpAuthConfig(AbstractAppFieldType):
     """Configuration for HTTP authentication."""
 
@@ -151,12 +134,6 @@ class MLFlowSpecificInputs(AppInputs):
         default_factory=MLFlowStorageBackendConfig,
         description="MLFlow storage backend configuration",
         title="Storage Backend",
-    )
-
-    postgres_app_name: PostgresAppNameConfig | None = Field(
-        default=None,
-        description="Postgres application name configuration (if using POSTGRES)",
-        title="Postgres App Name",
     )
 
     postgres_uri: PostgresURIConfig | None = Field(

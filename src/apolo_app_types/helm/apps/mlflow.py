@@ -48,8 +48,8 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
         """
-        Generate extra Helm values for MLflow. The final output is mapped
-        into a CustomDeployment's Helm chart values.
+        Generate extra Helm values for MLflow, eventually passed to the
+        'custom-deployment' chart as values.
         """
 
         base_vals = await gen_extra_values(
@@ -60,54 +60,31 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         )
 
         envs: list[Env] = []
-        volumes = []
-        volume_mounts = []
-
         backend_uri = ""
+
         storage_backend = input_.mlflow_specific.storage_backend.backend
         if storage_backend == MLFlowStorageBackendEnum.SQLITE:
-            # Attach a volume for /mlflow-data
-            volumes = [
-                {
-                    "name": "mlflow-db-pvc",
-                    "persistentVolumeClaim": {
-                        "claimName": "mlflow-sqlite-storage",
-                    },
-                }
-            ]
-            volume_mounts = [
-                {
-                    "name": "mlflow-db-pvc",
-                    "mountPath": "/mlflow-data",
-                }
-            ]
+            if not input_.mlflow_specific.sqlite_pvc:
+                error_msg = "SQLite chosen but no 'sqlite_pvc' provided."
+                raise ValueError(error_msg)
 
             backend_uri = "sqlite:///mlflow-data/mlflow.db"
         else:
-            if (
-                input_.mlflow_specific.postgres_uri
-                and input_.mlflow_specific.postgres_uri.uri
-            ):
-                backend_uri = input_.mlflow_specific.postgres_uri.uri
-            elif (
-                input_.mlflow_specific.postgres_app_name
-                and input_.mlflow_specific.postgres_app_name.name
-            ):
-                pg_name = input_.mlflow_specific.postgres_app_name.name
-                backend_uri = f"postgresql://{pg_name}.default/mlflow"
+            postgres_uri = input_.mlflow_specific.postgres_uri
+            if postgres_uri and postgres_uri.uri:
+                backend_uri = postgres_uri.uri
             else:
-                error_msg = (
-                    "Postgres chosen but neither 'postgres_uri' nor "
-                    "'postgres_app_name' provided"
-                )
+                error_msg = "Postgres chosen but 'postgres_uri' not provided"
                 raise ValueError(error_msg)
 
         envs.append(Env(name="MLFLOW_TRACKING_URI", value=backend_uri))
 
         artifact_mounts: StorageMounts | None = None
+        artifact_env_val = None
         if input_.mlflow_specific.artifact_store:
-            artifact_uri = "file:///mlflow-artifacts"
-            envs.append(Env(name="MLFLOW_ARTIFACT_ROOT", value=artifact_uri))
+            artifact_env_val = "file:///mlflow-artifacts"
+            envs.append(Env(name="MLFLOW_ARTIFACT_ROOT", value=artifact_env_val))
+
             if input_.mlflow_specific.artifact_store.path:
                 artifact_mounts = StorageMounts(
                     mounts=[
@@ -126,7 +103,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
             "--host=0.0.0.0",
             "--port=5000",
         ]
-        if any("MLFLOW_ARTIFACT_ROOT" in e.name for e in envs):
+        if artifact_env_val:
             mlflow_args.append("--default-artifact-root=/mlflow-artifacts")
 
         cd_inputs = CustomDeploymentInputs(
@@ -151,10 +128,29 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
             namespace=namespace,
         )
 
-        if volumes:
-            custom_vals["volumes"] = volumes
-        if volume_mounts:
-            custom_vals["volumeMounts"] = volume_mounts
+        if storage_backend == MLFlowStorageBackendEnum.SQLITE:
+            custom_vals["persistentVolumeClaims"] = [
+                {
+                    "name": "mlflow-sqlite-storage",
+                    "size": "5Gi",
+                    "storageClassName": "standard",
+                    "accessModes": ["ReadWriteOnce"],
+                }
+            ]
+            custom_vals["volumes"] = [
+                {
+                    "name": "mlflow-db-pvc",
+                    "persistentVolumeClaim": {
+                        "claimName": "mlflow-sqlite-storage",
+                    },
+                }
+            ]
+            custom_vals["volumeMounts"] = [
+                {
+                    "name": "mlflow-db-pvc",
+                    "mountPath": "/mlflow-data",
+                }
+            ]
 
         merged_vals = {**base_vals, **custom_vals}
         merged_vals.setdefault("labels", {})
