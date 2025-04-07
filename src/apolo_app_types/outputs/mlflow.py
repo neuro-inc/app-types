@@ -1,5 +1,3 @@
-# File: /src/apolo_app_types/outputs/mlflow.py
-
 import logging
 import typing as t
 
