@@ -133,7 +133,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
             preset=input_.preset,
             image=ContainerImage(
                 repository="ghcr.io/apolo-actions/mlflow",
-                tag="latest",
+                tag="v2.19.0",
             ),
             ingress=input_.ingress,
             container=Container(
