@@ -62,7 +62,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         envs: list[Env] = []
         backend_uri = ""
 
-        storage_backend = input_.mlflow_specific.storage_backend.backend
+        storage_backend = input_.mlflow_specific.storage_backend.database
         if storage_backend == MLFlowStorageBackendEnum.SQLITE:
             if not input_.mlflow_specific.sqlite_pvc:
                 error_msg = "SQLite chosen but no 'sqlite_pvc' provided."

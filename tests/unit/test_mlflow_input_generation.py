@@ -33,7 +33,7 @@ async def test_values_mlflow_generation_sqlite_pvc(setup_clients, mock_get_prese
         mlflow_specific=MLFlowSpecificInputs(
             http_auth=HttpAuthConfig(enabled=True),
             storage_backend=MLFlowStorageBackendConfig(
-                backend=MLFlowStorageBackendEnum.SQLITE
+                database=MLFlowStorageBackendEnum.SQLITE
             ),
             sqlite_pvc=SQLitePVCConfig(pvc_name="my-mlflow-db"),
             artifact_store=ArtifactStoreConfig(
@@ -102,7 +102,7 @@ async def test_values_mlflow_generation_postgres_uri(
         mlflow_specific=MLFlowSpecificInputs(
             http_auth=HttpAuthConfig(enabled=False),
             storage_backend=MLFlowStorageBackendConfig(
-                backend=MLFlowStorageBackendEnum.POSTGRES
+                database=MLFlowStorageBackendEnum.POSTGRES
             ),
             postgres_uri=PostgresURIConfig(
                 uri="postgresql://user:pass@custom-host:5432/mlflow"
@@ -159,7 +159,7 @@ async def test_values_mlflow_generation_sqlite_no_pvc(
         mlflow_specific=MLFlowSpecificInputs(
             http_auth=HttpAuthConfig(enabled=True),
             storage_backend=MLFlowStorageBackendConfig(
-                backend=MLFlowStorageBackendEnum.SQLITE
+                database=MLFlowStorageBackendEnum.SQLITE
             ),
         ),
     )
@@ -189,7 +189,7 @@ async def test_values_mlflow_generation_postgres_no_config(
         mlflow_specific=MLFlowSpecificInputs(
             http_auth=HttpAuthConfig(enabled=True),
             storage_backend=MLFlowStorageBackendConfig(
-                backend=MLFlowStorageBackendEnum.POSTGRES
+                database=MLFlowStorageBackendEnum.POSTGRES
             ),
         ),
     )

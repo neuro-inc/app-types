@@ -29,7 +29,7 @@ class MLFlowStorageBackendConfig(AbstractAppFieldType):
             description="Which storage backend to use for MLFlow.",
         ).as_json_schema_extra(),
     )
-    backend: MLFlowStorageBackendEnum = Field(
+    database: MLFlowStorageBackendEnum = Field(
         default=MLFlowStorageBackendEnum.SQLITE,
         description="Storage backend type (SQLite or Postgres)",
         title="Backend Type",
