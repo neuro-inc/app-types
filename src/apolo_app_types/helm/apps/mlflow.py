@@ -47,11 +47,10 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         *args: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
-        err_sqlite_no_pvc = "SQLite chosen but no 'sqlite_pvc_name' provided"
-        err_postgres_no_config = (
-            "Postgres chosen but neither 'postgres_uri' "
-            "nor 'postgres_app_name' provided"
-        )
+        """
+        Generate extra Helm values for MLflow. The final output is mapped
+        into a CustomDeployment's Helm chart values.
+        """
 
         base_vals = await gen_extra_values(
             apolo_client=self.client,
@@ -63,21 +62,16 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         envs: list[Env] = []
         volumes = []
         volume_mounts = []
-        storage_mounts = None
 
-        if (
-            input_.mlflow_specific.storage_backend.backend
-            == MLFlowStorageBackendEnum.SQLITE
-        ):
-            if not input_.mlflow_specific.sqlite_pvc:
-                raise ValueError(err_sqlite_no_pvc)
-
-            envs.append(Env(name="MLFLOW_TRACKING_URI", value="sqlite:///mlflow.db"))
+        backend_uri = ""
+        storage_backend = input_.mlflow_specific.storage_backend.backend
+        if storage_backend == MLFlowStorageBackendEnum.SQLITE:
+            # Attach a volume for /mlflow-data
             volumes = [
                 {
                     "name": "mlflow-db-pvc",
                     "persistentVolumeClaim": {
-                        "claimName": input_.mlflow_specific.sqlite_pvc.pvc_name,
+                        "claimName": "mlflow-sqlite-storage",
                     },
                 }
             ]
@@ -87,29 +81,35 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
                     "mountPath": "/mlflow-data",
                 }
             ]
+
+            backend_uri = "sqlite:///mlflow-data/mlflow.db"
         else:
-            if input_.mlflow_specific.postgres_uri:
-                pg_uri = input_.mlflow_specific.postgres_uri.uri
+            if (
+                input_.mlflow_specific.postgres_uri
+                and input_.mlflow_specific.postgres_uri.uri
+            ):
+                backend_uri = input_.mlflow_specific.postgres_uri.uri
             elif (
                 input_.mlflow_specific.postgres_app_name
                 and input_.mlflow_specific.postgres_app_name.name
             ):
                 pg_name = input_.mlflow_specific.postgres_app_name.name
-                pg_uri = f"postgresql://{pg_name}.default/mlflow"
+                backend_uri = f"postgresql://{pg_name}.default/mlflow"
             else:
-                raise ValueError(err_postgres_no_config)
-
-            envs.append(Env(name="MLFLOW_TRACKING_URI", value=pg_uri))
-
-        if input_.mlflow_specific.artifact_store:
-            envs.append(
-                Env(
-                    name="MLFLOW_ARTIFACT_ROOT",
-                    value="file:///mlflow-artifacts",
+                error_msg = (
+                    "Postgres chosen but neither 'postgres_uri' nor "
+                    "'postgres_app_name' provided"
                 )
-            )
+                raise ValueError(error_msg)
+
+        envs.append(Env(name="MLFLOW_TRACKING_URI", value=backend_uri))
+
+        artifact_mounts: StorageMounts | None = None
+        if input_.mlflow_specific.artifact_store:
+            artifact_uri = "file:///mlflow-artifacts"
+            envs.append(Env(name="MLFLOW_ARTIFACT_ROOT", value=artifact_uri))
             if input_.mlflow_specific.artifact_store.path:
-                storage_mounts = StorageMounts(
+                artifact_mounts = StorageMounts(
                     mounts=[
                         ApoloFilesMount(
                             storage_uri=input_.mlflow_specific.artifact_store.path,
@@ -119,6 +119,16 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
                     ]
                 )
 
+        mlflow_cmd = ["mlflow"]
+        mlflow_args = [
+            "server",
+            f"--backend-store-uri={backend_uri}",
+            "--host=0.0.0.0",
+            "--port=5000",
+        ]
+        if any("MLFLOW_ARTIFACT_ROOT" in e.name for e in envs):
+            mlflow_args.append("--default-artifact-root=/mlflow-artifacts")
+
         cd_inputs = CustomDeploymentInputs(
             preset=input_.preset,
             image=ContainerImage(
@@ -126,9 +136,13 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
                 tag="v2.21.3",
             ),
             ingress=input_.ingress,
-            container=Container(env=envs),
+            container=Container(
+                command=mlflow_cmd,
+                args=mlflow_args,
+                env=envs,
+            ),
             service=Service(port=5000),
-            storage_mounts=storage_mounts,
+            storage_mounts=artifact_mounts,
         )
 
         custom_vals = await self.custom_dep_val_processor.gen_extra_values(
