@@ -132,8 +132,8 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         cd_inputs = CustomDeploymentInputs(
             preset=input_.preset,
             image=ContainerImage(
-                repository="ghcr.io/mlflow/mlflow",
-                tag="v2.21.3",
+                repository="ghcr.io/apolo-actions/mlflow",
+                tag="latest",
             ),
             ingress=input_.ingress,
             container=Container(
