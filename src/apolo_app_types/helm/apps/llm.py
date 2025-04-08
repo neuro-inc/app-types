@@ -96,7 +96,9 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
         extra_labels: dict[str, str] = {}
         if input_.cache_config:
             extra_labels.update(
-                **gen_apolo_storage_integration_labels(inject_storage=True)
+                **gen_apolo_storage_integration_labels(
+                    client=self.client, inject_storage=True
+                )
             )
         return extra_labels
 

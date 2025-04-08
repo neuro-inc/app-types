@@ -20,7 +20,9 @@ from apolo_app_types.protocols.common import (
 
 logger = logging.getLogger(__name__)
 
-APOLO_STORAGE_ANNOTATION = "platform.apolo.us/inject-storage"
+APOLO_STORAGE_LABEL = "platform.apolo.us/inject-storage"
+APOLO_ORG_LABEL = "platform.apolo.us/org"
+APOLO_PROJECT_LABEL = "platform.apolo.us/project"
 
 
 def get_preset(client: apolo_sdk.Client, preset_name: str) -> apolo_sdk.Preset:
@@ -207,10 +209,15 @@ def gen_apolo_storage_integration_annotations(
 
 def gen_apolo_storage_integration_labels(
     *,
+    client: apolo_sdk.Client,
     inject_storage: bool = False,
 ) -> dict[str, str]:
     if inject_storage:
-        return {APOLO_STORAGE_ANNOTATION: "true"}
+        return {
+            APOLO_STORAGE_LABEL: "true",
+            APOLO_ORG_LABEL: client.config.org_name or "",
+            APOLO_PROJECT_LABEL: client.config.project_name or "",
+        }
     return {}
 
 
@@ -221,7 +228,7 @@ def append_apolo_storage_integration_annotations(
     Returns a new dict with the storage annotations appended to the current annotations.
     """
     cur_annot = deepcopy(current_annotations)
-    cur_apolo_annotation_str: str | None = cur_annot.get(APOLO_STORAGE_ANNOTATION)
+    cur_apolo_annotation_str: str | None = cur_annot.get(APOLO_STORAGE_LABEL)
     if cur_apolo_annotation_str:
         current_list = json.loads(cur_apolo_annotation_str)
     else:
@@ -229,7 +236,7 @@ def append_apolo_storage_integration_annotations(
 
     new_annotations = gen_apolo_storage_integration_annotations(files_mounts)
     current_list.extend(new_annotations)
-    cur_annot[APOLO_STORAGE_ANNOTATION] = json.dumps(current_list)
+    cur_annot[APOLO_STORAGE_LABEL] = json.dumps(current_list)
     return cur_annot
 
 

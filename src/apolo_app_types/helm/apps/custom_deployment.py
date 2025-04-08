@@ -42,7 +42,9 @@ class CustomDeploymentChartValueProcessor(
         """
         if not input_.storage_mounts:
             return {}
-        return gen_apolo_storage_integration_labels(inject_storage=True)
+        return gen_apolo_storage_integration_labels(
+            client=self.client, inject_storage=True
+        )
 
     async def gen_extra_values(
         self,

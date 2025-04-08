@@ -1,7 +1,7 @@
 from apolo_app_types import HuggingFaceModel, LLMInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import (
-    APOLO_STORAGE_ANNOTATION,
+    APOLO_STORAGE_LABEL,
     _get_match_expressions,
 )
 from apolo_app_types.inputs.args import app_type_to_vals
@@ -448,10 +448,10 @@ async def test_values_llm_generation__storage_integrated(
             "enabled": False,
         },
         "podAnnotations": {
-            APOLO_STORAGE_ANNOTATION: '[{"storage_uri": "storage://some-cluster/some-org/some-proj/some-folder", "mount_path": "/root/.cache/huggingface", "mount_mode": "rw"}]'  # noqa: E501
+            APOLO_STORAGE_LABEL: '[{"storage_uri": "storage://some-cluster/some-org/some-proj/some-folder", "mount_path": "/root/.cache/huggingface", "mount_mode": "rw"}]'  # noqa: E501
         },
         "podExtraLabels": {
-            APOLO_STORAGE_ANNOTATION: "true",
+            APOLO_STORAGE_LABEL: "true",
         },
         "modelDownload": {"hookEnabled": True, "initEnabled": False},
         "cache": {"enabled": False},
