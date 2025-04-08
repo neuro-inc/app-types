@@ -1,6 +1,8 @@
 from apolo_app_types import HuggingFaceModel, LLMInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import (
+    APOLO_ORG_LABEL,
+    APOLO_PROJECT_LABEL,
     APOLO_STORAGE_LABEL,
     _get_match_expressions,
 )
@@ -452,6 +454,8 @@ async def test_values_llm_generation__storage_integrated(
         },
         "podExtraLabels": {
             APOLO_STORAGE_LABEL: "true",
+            APOLO_ORG_LABEL: "test-org",
+            APOLO_PROJECT_LABEL: "test-project",
         },
         "modelDownload": {"hookEnabled": True, "initEnabled": False},
         "cache": {"enabled": False},

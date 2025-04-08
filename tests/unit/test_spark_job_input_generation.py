@@ -4,7 +4,11 @@ from apolo_app_types import (
     ContainerImage,
 )
 from apolo_app_types.app_types import AppType
-from apolo_app_types.helm.apps.common import APOLO_STORAGE_LABEL
+from apolo_app_types.helm.apps.common import (
+    APOLO_ORG_LABEL,
+    APOLO_PROJECT_LABEL,
+    APOLO_STORAGE_LABEL,
+)
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import Preset
 from apolo_app_types.protocols.common.storage import ApoloFilesFile
@@ -67,6 +71,8 @@ async def test_spark_job_values_generation(setup_clients):
         "platform.apolo.us/preset": "cpu-small",
         "platform.apolo.us/component": "app",
         APOLO_STORAGE_LABEL: "true",
+        APOLO_ORG_LABEL: "test-org",
+        APOLO_PROJECT_LABEL: "test-project",
     }
     assert "PYSPARK_PYTHON" in helm_params["spark"]["driver"]["env"][0]["name"]
 
@@ -75,6 +81,8 @@ async def test_spark_job_values_generation(setup_clients):
         "platform.apolo.us/preset": "cpu-medium",
         "platform.apolo.us/component": "app",
         APOLO_STORAGE_LABEL: "true",
+        APOLO_ORG_LABEL: "test-org",
+        APOLO_PROJECT_LABEL: "test-project",
     }
     assert "PYSPARK_PYTHON" in helm_params["spark"]["executor"]["env"][0]["name"]
 
@@ -100,4 +108,8 @@ async def test_spark_job_values_generation(setup_clients):
     }
 
     # PySpark dependency manager configuration assertions
-    assert helm_params["pyspark_dep_manager"]["labels"] == {APOLO_STORAGE_LABEL: "true"}
+    assert helm_params["pyspark_dep_manager"]["labels"] == {
+        APOLO_STORAGE_LABEL: "true",
+        APOLO_ORG_LABEL: "test-org",
+        APOLO_PROJECT_LABEL: "test-project",
+    }
