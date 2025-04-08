@@ -74,7 +74,9 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             preset_type=input_.executor_config.preset,
             namespace=namespace,
         )
-        extra_labels = gen_apolo_storage_integration_labels(inject_storage=True)
+        extra_labels = gen_apolo_storage_integration_labels(
+            client=self.client, inject_storage=True
+        )
         storage_annotations, main_application_file = (
             self._configure_application_storage(input_)
         )
@@ -165,7 +167,9 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
                 {}, [deps_mount]
             )
             values["pyspark_dep_manager"] = {
-                "labels": gen_apolo_storage_integration_labels(inject_storage=True),
+                "labels": gen_apolo_storage_integration_labels(
+                    client=self.client, inject_storage=True
+                ),
                 "annotations": deps_annotation,
             }
             # append to existing storage annotation
