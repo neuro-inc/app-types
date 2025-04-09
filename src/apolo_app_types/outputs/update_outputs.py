@@ -60,6 +60,11 @@ async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> bool:  # noqa: C
                 conv_outputs = await get_custom_deployment_outputs(
                     helm_outputs, labels=labels
                 )
+            case AppType.MLFlow:
+                labels = {"application": "mlflow"}
+                conv_outputs = await get_custom_deployment_outputs(
+                    helm_outputs, labels=labels
+                )
             case _:
                 err_msg = f"Unsupported app type: {app_type} for posting outputs"
                 raise ValueError(err_msg)

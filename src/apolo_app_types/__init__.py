@@ -55,7 +55,7 @@ from apolo_app_types.protocols.llm import (
     VLLMOutputs,
     VLLMOutputsV2,
 )
-from apolo_app_types.protocols.mlflow import MLFlowInputs, MLFlowOutputs
+from apolo_app_types.protocols.mlflow import MLFlowAppInputs, MLFlowAppOutputs
 from apolo_app_types.protocols.postgres import (
     CrunchyPostgresOutputs,
     CrunchyPostgresUserCredentials,
@@ -102,8 +102,8 @@ __all__ = [
     "JupyterOutputs",
     "LLMInputs",
     "VLLMOutputs",
-    "MLFlowInputs",
-    "MLFlowOutputs",
+    "MLFlowAppInputs",
+    "MLFlowAppOutputs",
     "PostgresInputs",
     "CrunchyPostgresOutputs",
     "ShellInputs",

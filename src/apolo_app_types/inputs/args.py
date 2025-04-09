@@ -18,12 +18,14 @@ from apolo_app_types.helm.apps import (
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.dockerhub import DockerHubModelChartValueProcessor
 from apolo_app_types.helm.apps.fooocus import FooocusChartValueProcessor
+from apolo_app_types.helm.apps.mlflow import MLFlowChartValueProcessor
 from apolo_app_types.helm.apps.postgres import PostgresValueProcessor
 from apolo_app_types.helm.apps.spark_job import SparkJobValueProcessor
 from apolo_app_types.helm.apps.weaviate import WeaviateChartValueProcessor
 from apolo_app_types.protocols.common import AppInputs
 from apolo_app_types.protocols.custom_deployment import CustomDeploymentInputs
 from apolo_app_types.protocols.dockerhub import DockerHubInputs
+from apolo_app_types.protocols.mlflow import MLFlowAppInputs
 from apolo_app_types.protocols.spark_job import SparkJobInputs
 
 
@@ -45,6 +47,7 @@ async def app_type_to_vals(
         AppType.CustomDeployment: CustomDeploymentChartValueProcessor,
         AppType.SparkJob: SparkJobValueProcessor,
         AppType.Fooocus: FooocusChartValueProcessor,
+        AppType.MLFlow: MLFlowChartValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)
@@ -81,6 +84,7 @@ async def get_installation_vals(
         AppType.CustomDeployment: CustomDeploymentInputs,
         AppType.SparkJob: SparkJobInputs,
         AppType.Fooocus: FooocusAppInputs,
+        AppType.MLFlow: MLFlowAppInputs,
     }
 
     if app_type not in input_type_map:
