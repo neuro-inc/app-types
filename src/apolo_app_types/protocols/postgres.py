@@ -113,6 +113,26 @@ class CrunchyPostgresUserCredentials(AbstractAppFieldType):
     uri: str | None = None
 
 
+class PostgresURI(AbstractAppFieldType):
+    """Configuration for the Postgres connection URI."""
+
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Postgres URI",
+            description="Full Postgres connection URI configuration.",
+        ).as_json_schema_extra(),
+    )
+    uri: str | None = Field(
+        default=None,
+        description=(
+            "Full Postgres connection URI if using 'postgres'. "
+            "E.g. 'postgresql://user:pass@host:5432/db'"
+        ),
+        title="URI",
+    )
+
+
 class CrunchyPostgresOutputs(AppOutputsDeployer):
     users: list[CrunchyPostgresUserCredentials]
 

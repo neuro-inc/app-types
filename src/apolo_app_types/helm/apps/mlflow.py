@@ -12,10 +12,13 @@ from apolo_app_types.protocols.common import (
     ContainerImage,
     Env,
     MountPath,
-    Service,
     StorageMounts,
 )
-from apolo_app_types.protocols.custom_deployment import CustomDeploymentInputs
+from apolo_app_types.protocols.common.k8s import Port
+from apolo_app_types.protocols.custom_deployment import (
+    CustomDeploymentInputs,
+    NetworkingConfig,
+)
 from apolo_app_types.protocols.mlflow import (
     MLFlowAppInputs,
     MLFlowMetadataPostgres,
@@ -117,7 +120,13 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
                 args=mlflow_args,
                 env=envs,
             ),
-            service=Service(port=5000),
+            networking=NetworkingConfig(
+                service_enabled=True,
+                ingress=input_.ingress,
+                ports=[
+                    Port(name="http", port=5000),
+                ],
+            ),
             storage_mounts=artifact_mounts,
         )
 

@@ -29,7 +29,12 @@ requires-python = ">=3.9.0,<4.0"
 app-types = "apolo_app_types.cli:cli"
 
 [tool.poetry]
+name = "app-types"
 version = "0.0.0"
+description = "Apolo Platform App Types."
+readme = "README.md"
+license = "Apache 2"
+authors = ["Apolo.us"]
 packages = [
   { include = "apolo_app_types", from = "src" },
 ]

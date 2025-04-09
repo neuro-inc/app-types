@@ -75,7 +75,7 @@ async def test_values_mlflow_generation_default_sqlite(
     assert artifact_env["value"] == "file:///mlflow-artifacts"
 
     # Confirm service is 5000
-    assert helm_params["service"]["port"] == 5000
+    assert helm_params["service"]["ports"][0]["containerPort"] == 5000
     # Confirm "application=mlflow" label
     assert helm_params["labels"]["application"] == "mlflow"
 

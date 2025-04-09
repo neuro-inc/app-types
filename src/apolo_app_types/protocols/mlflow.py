@@ -13,6 +13,7 @@ from apolo_app_types.protocols.common import (
     RestAPI,
     SchemaExtraMetadata,
 )
+from apolo_app_types.protocols.postgres import PostgresURI
 
 
 class MLFlowStorageBackendEnum(str, enum.Enum):
@@ -36,26 +37,6 @@ class MLFlowStorageBackendConfig(AbstractAppFieldType):
         default=MLFlowStorageBackendEnum.SQLITE,
         description="Storage backend type (SQLite or Postgres)",
         title="Backend Type",
-    )
-
-
-class PostgresURI(AbstractAppFieldType):
-    """Configuration for the Postgres connection URI."""
-
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Postgres URI",
-            description="Full Postgres connection URI configuration.",
-        ).as_json_schema_extra(),
-    )
-    uri: str | None = Field(
-        default=None,
-        description=(
-            "Full Postgres connection URI if using 'postgres'. "
-            "E.g. 'postgresql://user:pass@host:5432/db'"
-        ),
-        title="URI",
     )
 
 
@@ -109,6 +90,8 @@ class MLFlowMetadataPostgres(AbstractAppFieldType):
 class MLFlowMetadataSQLite(AbstractAppFieldType):
     type: Literal["sqlite"] = "sqlite"
     pvc_name: str = "mlflow-sqlite-storage"
+    internal_web_app_url: RestAPI | None = None
+    external_web_app_url: RestAPI | None = None
 
 
 MLFlowMetaStorage = MLFlowMetadataPostgres | MLFlowMetadataSQLite
