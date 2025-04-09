@@ -64,7 +64,9 @@ async def test_spark_job_values_generation(setup_clients):
         "repository": "myrepo/spark-job",
         "tag": "v1.2.3",
     }
-    assert helm_params["spark"]["mainApplicationFile"] == "local:///opt/spark/main.py"
+    assert (
+        helm_params["spark"]["mainApplicationFile"] == "local:///opt/spark/app/main.py"
+    )
 
     # Driver configuration assertions
     assert helm_params["spark"]["driver"]["labels"] == {
