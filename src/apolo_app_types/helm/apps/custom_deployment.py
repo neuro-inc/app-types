@@ -61,7 +61,8 @@ class CustomDeploymentChartValueProcessor(
             apolo_client=self.client,
             preset_type=input_.preset,
             namespace=namespace,
-            ingress=input_.ingress,
+            ingress=input_.networking.ingress,
+            port_configurations=input_.networking.ports,
         )
         image_docker_url = await get_image_docker_url(
             client=self.client,
@@ -86,10 +87,16 @@ class CustomDeploymentChartValueProcessor(
                     for env in input_.container.env
                 ],
             }
-        if input_.service and input_.service.enabled:
+        if input_.networking and input_.networking.service_enabled:
             values["service"] = {
                 "enabled": True,
-                "port": input_.service.port,
+                "ports": [
+                    {
+                        "name": _.name,
+                        "containerPort": _.port,
+                    }
+                    for _ in input_.networking.ports
+                ],
             }
 
         if input_.name_override:

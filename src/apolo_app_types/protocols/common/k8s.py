@@ -1,4 +1,4 @@
-from pydantic import ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
@@ -44,13 +44,24 @@ class Container(AbstractAppFieldType):
     env: list[Env] = Field(default_factory=list)
 
 
-class Service(AbstractAppFieldType):
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Service",
-            description="K8S service configuration.",
-        ).as_json_schema_extra(),
+class Port(BaseModel):
+    name: str = Field(
+        default="http",
+        title="Port Name",
+        description="Name of the port.",
     )
-    enabled: bool = True
-    port: int
+    port: int = Field(
+        default=80,
+        title="Port",
+        description="Port number.",
+    )
+    path_type: str = Field(
+        default="Prefix",
+        title="PathType",
+        description="Type of path",
+    )
+    path: str = Field(
+        default="/",
+        title="Path",
+        description="Path for the port.",
+    )
