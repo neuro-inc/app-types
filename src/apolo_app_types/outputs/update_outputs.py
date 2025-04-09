@@ -55,6 +55,11 @@ async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> bool:  # noqa: C
                 conv_outputs = await get_custom_deployment_outputs(helm_outputs)
             case AppType.SparkJob:
                 conv_outputs = await get_spark_job_outputs(helm_outputs)
+            case AppType.TextEmbeddingsInference:
+                labels = {"application": "tei"}
+                conv_outputs = await get_custom_deployment_outputs(
+                    helm_outputs, labels=labels
+                )
             case AppType.Fooocus:
                 labels = {"application": "fooocus"}
                 conv_outputs = await get_custom_deployment_outputs(
