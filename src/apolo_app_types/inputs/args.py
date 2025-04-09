@@ -18,6 +18,7 @@ from apolo_app_types.helm.apps import (
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.dockerhub import DockerHubModelChartValueProcessor
 from apolo_app_types.helm.apps.fooocus import FooocusChartValueProcessor
+from apolo_app_types.helm.apps.jupyter import JupyterChartValueProcessor
 from apolo_app_types.helm.apps.mlflow import MLFlowChartValueProcessor
 from apolo_app_types.helm.apps.postgres import PostgresValueProcessor
 from apolo_app_types.helm.apps.spark_job import SparkJobValueProcessor
@@ -48,6 +49,7 @@ async def app_type_to_vals(
         AppType.SparkJob: SparkJobValueProcessor,
         AppType.Fooocus: FooocusChartValueProcessor,
         AppType.MLFlow: MLFlowChartValueProcessor,
+        AppType.Jupyter: JupyterChartValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)
