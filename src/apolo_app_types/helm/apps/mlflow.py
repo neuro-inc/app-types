@@ -18,7 +18,8 @@ from apolo_app_types.protocols.common import (
 from apolo_app_types.protocols.custom_deployment import CustomDeploymentInputs
 from apolo_app_types.protocols.mlflow import (
     MLFlowAppInputs,
-    MLFlowStorageBackendEnum,
+    MLFlowMetadataPostgres,
+    MLFlowMetadataSQLite,
 )
 
 
@@ -61,35 +62,33 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
 
         envs: list[Env] = []
         backend_uri = ""
+        pvc_name = "mlflow-sqlite-storage"
+        use_sqlite = True
 
-        storage_backend = input_.mlflow_specific.storage_backend.database
-        if storage_backend == MLFlowStorageBackendEnum.SQLITE:
-            if not input_.mlflow_specific.sqlite_pvc:
-                error_msg = "SQLite chosen but no 'sqlite_pvc' provided."
-                raise ValueError(error_msg)
-
-            backend_uri = "sqlite:///mlflow-data/mlflow.db"
-        else:
-            postgres_uri = input_.mlflow_specific.postgres_uri
-            if postgres_uri and postgres_uri.uri:
-                backend_uri = postgres_uri.uri
-            else:
+        if isinstance(input_.metadata_storage, MLFlowMetadataPostgres):
+            if not input_.metadata_storage.postgres_uri.uri:
                 error_msg = "Postgres chosen but 'postgres_uri' not provided"
                 raise ValueError(error_msg)
+            backend_uri = input_.metadata_storage.postgres_uri.uri
+            use_sqlite = False
+        elif isinstance(input_.metadata_storage, MLFlowMetadataSQLite):
+            pvc_name = input_.metadata_storage.pvc_name
+        if use_sqlite:
+            backend_uri = "sqlite:///mlflow-data/mlflow.db"
 
         envs.append(Env(name="MLFLOW_TRACKING_URI", value=backend_uri))
 
         artifact_mounts: StorageMounts | None = None
         artifact_env_val = None
-        if input_.mlflow_specific.artifact_store:
+        if input_.artifact_store and input_.artifact_store.apolo_files:
             artifact_env_val = "file:///mlflow-artifacts"
             envs.append(Env(name="MLFLOW_ARTIFACT_ROOT", value=artifact_env_val))
 
-            if input_.mlflow_specific.artifact_store.path:
+            if input_.artifact_store.apolo_files:
                 artifact_mounts = StorageMounts(
                     mounts=[
                         ApoloFilesMount(
-                            storage_uri=input_.mlflow_specific.artifact_store.path,
+                            storage_uri=input_.artifact_store.apolo_files,
                             mount_path=MountPath(path="/mlflow-artifacts"),
                             mode=ApoloMountMode(mode="rw"),
                         )
@@ -128,10 +127,10 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
             namespace=namespace,
         )
 
-        if storage_backend == MLFlowStorageBackendEnum.SQLITE:
+        if use_sqlite:
             custom_vals["persistentVolumeClaims"] = [
                 {
-                    "name": "mlflow-sqlite-storage",
+                    "name": pvc_name,
                     "size": "5Gi",
                     "storageClassName": "standard",
                     "accessModes": ["ReadWriteOnce"],
@@ -141,7 +140,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
                 {
                     "name": "mlflow-db-pvc",
                     "persistentVolumeClaim": {
-                        "claimName": "mlflow-sqlite-storage",
+                        "claimName": pvc_name,
                     },
                 }
             ]
@@ -155,9 +154,5 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         merged_vals = {**base_vals, **custom_vals}
         merged_vals.setdefault("labels", {})
         merged_vals["labels"]["application"] = "mlflow"
-
-        if input_.mlflow_specific.http_auth.enabled:
-            merged_vals.setdefault("podAnnotations", {})
-            merged_vals["podAnnotations"]["platform.apolo.us/http-auth"] = "true"
 
         return merged_vals

@@ -1,4 +1,5 @@
 import enum
+from typing import Literal
 
 from pydantic import ConfigDict, Field
 
@@ -6,8 +7,10 @@ from apolo_app_types.protocols.common import (
     AbstractAppFieldType,
     ApoloFilesPath,
     AppInputs,
+    AppOutputs,
     Ingress,
     Preset,
+    RestAPI,
     SchemaExtraMetadata,
 )
 
@@ -36,24 +39,7 @@ class MLFlowStorageBackendConfig(AbstractAppFieldType):
     )
 
 
-class HttpAuthConfig(AbstractAppFieldType):
-    """Configuration for HTTP authentication."""
-
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="HTTP Auth",
-            description="HTTP authentication configuration",
-        ).as_json_schema_extra(),
-    )
-    enabled: bool = Field(
-        default=True,
-        description="Enable platform-level HTTP Basic Authentication?",
-        title="HTTP Auth",
-    )
-
-
-class PostgresURIConfig(AbstractAppFieldType):
+class PostgresURI(AbstractAppFieldType):
     """Configuration for the Postgres connection URI."""
 
     model_config = ConfigDict(
@@ -91,7 +77,11 @@ class SQLitePVCConfig(AbstractAppFieldType):
 
 
 class ArtifactStoreConfig(AbstractAppFieldType):
-    """Configuration for MLFlow artifact storage."""
+    """
+    Configuration for MLFlow artifact storage.
+    Use Apolo Files to store your MLFlow artifacts
+    (model binaries, dependency files, etc).
+    """
 
     model_config = ConfigDict(
         protected_namespaces=(),
@@ -100,59 +90,28 @@ class ArtifactStoreConfig(AbstractAppFieldType):
             description="Configuration for MLFlow artifact storage.",
         ).as_json_schema_extra(),
     )
-    path: ApoloFilesPath | None = Field(
+    apolo_files: ApoloFilesPath | None = Field(
         default=None,
         description=(
-            "Path to Apolo Files for MLFlow artifacts. "
+            "Use Apolo Files to store your MLFlow artifacts "
+            "(model binaries, dependency files, etc). "
             "E.g. 'storage://cluster/myorg/proj/mlflow-artifacts'"
         ),
         title="Storage Path",
     )
 
 
-class MLFlowSpecificInputs(AppInputs):
-    """MLFlow-specific configuration fields."""
+class MLFlowMetadataPostgres(AbstractAppFieldType):
+    type: Literal["postgres"] = "postgres"
+    postgres_uri: PostgresURI
 
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="MLFlow App",
-            description=(
-                "Configuration for deploying MLFlow with a local or Postgres DB, "
-                "plus artifacts on Apolo Files."
-            ),
-        ).as_json_schema_extra(),
-    )
 
-    http_auth: HttpAuthConfig = Field(
-        default_factory=HttpAuthConfig,
-        description="HTTP authentication configuration",
-        title="HTTP Auth",
-    )
+class MLFlowMetadataSQLite(AbstractAppFieldType):
+    type: Literal["sqlite"] = "sqlite"
+    pvc_name: str = "mlflow-sqlite-storage"
 
-    storage_backend: MLFlowStorageBackendConfig = Field(
-        default_factory=MLFlowStorageBackendConfig,
-        description="MLFlow storage backend configuration",
-        title="Storage Backend",
-    )
 
-    postgres_uri: PostgresURIConfig | None = Field(
-        default=None,
-        description="Postgres connection URI configuration",
-        title="Postgres URI",
-    )
-
-    sqlite_pvc: SQLitePVCConfig | None = Field(
-        default=None,
-        description="SQLite PVC configuration",
-        title="SQLite PVC",
-    )
-
-    artifact_store: ArtifactStoreConfig | None = Field(
-        default=None,
-        description="Artifact store configuration",
-        title="Artifact Store",
-    )
+MLFlowMetaStorage = MLFlowMetadataPostgres | MLFlowMetadataSQLite
 
 
 class MLFlowAppInputs(AppInputs):
@@ -165,4 +124,16 @@ class MLFlowAppInputs(AppInputs):
 
     preset: Preset
     ingress: Ingress
-    mlflow_specific: MLFlowSpecificInputs
+    metadata_storage: MLFlowMetaStorage | None = None
+    artifact_store: ArtifactStoreConfig | None = None
+
+
+class MLFlowAppOutputs(AppOutputs):
+    """
+    MLFlow outputs:
+      - internal_web_app_url
+      - external_web_app_url
+    """
+
+    internal_web_app_url: RestAPI | None = None
+    external_web_app_url: RestAPI | None = None
