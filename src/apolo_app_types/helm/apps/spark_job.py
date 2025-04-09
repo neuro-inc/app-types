@@ -37,7 +37,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         main_app_file_path = URL(
             input_.spark_application_config.main_application_file.path
         )
-        mount_path = "/opt/spark"
+        mount_path = "/opt/spark/app"
         main_app_file_mount = ApoloFilesMount(
             storage_uri=ApoloFilesPath(path=str(main_app_file_path.parent)),
             mount_path=MountPath(path=mount_path),
