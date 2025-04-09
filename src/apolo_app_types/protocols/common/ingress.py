@@ -18,6 +18,11 @@ class Ingress(AbstractAppFieldType):
             description="Configuration for Ingress.",
         ).as_json_schema_extra(),
     )
+    http_auth: bool = Field(
+        default=False,
+        title="Enable Platform Authentication",
+        description="Enable/disable HTTP authentication",
+    )
     enabled: bool = Field(
         ...,
         description="Indicates whether the ingress is enabled.",

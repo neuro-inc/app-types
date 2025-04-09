@@ -54,11 +54,7 @@ class CustomDeploymentInputs(AppInputs):
     autoscaling: AutoscalingHPA | None = None
     container: Container | None = None
     storage_mounts: StorageMounts | None = None
-    networking: NetworkingConfig = Field(
-        default_factory=lambda: NetworkingConfig(),
-        title="Networking Configuration",
-        description="Configuration for Custom Deployment Networking.",
-    )
+    networking: NetworkingConfig = Field(default_factory=lambda: NetworkingConfig())
 
 
 class CustomDeploymentOutputs(AppOutputs):
