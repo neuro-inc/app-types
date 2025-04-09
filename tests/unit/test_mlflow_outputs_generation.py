@@ -1,6 +1,6 @@
 import pytest
 
-from apolo_app_types.outputs.mlflow import get_mlflow_outputs
+from apolo_app_types.outputs.update_outputs import get_custom_deployment_outputs
 
 
 @pytest.mark.asyncio
@@ -21,23 +21,24 @@ async def test_mlflow_outputs_generation(
         return ("mlflow.example.com", 443)
 
     monkeypatch.setattr(
-        "apolo_app_types.outputs.mlflow.get_service_host_port",
+        "apolo_app_types.outputs.custom_deployment.get_service_host_port",
         mock_get_service_host_port,
     )
     monkeypatch.setattr(
-        "apolo_app_types.outputs.mlflow.get_ingress_host_port",
+        "apolo_app_types.outputs.custom_deployment.get_ingress_host_port",
         mock_get_ingress_host_port,
     )
 
     helm_values = {"labels": {"application": "mlflow"}}
 
-    result = await get_mlflow_outputs(helm_values)
+    result = await get_custom_deployment_outputs(helm_values)
     assert result["internal_web_app_url"] is not None
     assert (
-        result["internal_web_app_url"].host == "mlflow-deploy.default.svc.cluster.local"
+        result["internal_web_app_url"]["host"]
+        == "mlflow-deploy.default.svc.cluster.local"
     )
-    assert result["internal_web_app_url"].port == 5000
+    assert result["internal_web_app_url"]["port"] == 5000
 
     assert result["external_web_app_url"] is not None
-    assert result["external_web_app_url"].host == "mlflow.example.com"
-    assert result["external_web_app_url"].port == 443
+    assert result["external_web_app_url"]["host"] == "mlflow.example.com"
+    assert result["external_web_app_url"]["port"] == 443
