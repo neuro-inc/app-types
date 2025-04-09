@@ -35,3 +35,7 @@ push-hook-image:
 .PHONY: test-unit
 test-unit:
 	poetry run pytest -vv tests/unit --disable-pytest-warnings
+
+.PHONY: dist
+dist:
+	poetry build --clean

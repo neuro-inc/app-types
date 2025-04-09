@@ -6,7 +6,6 @@ from apolo_app_types import (
     ContainerImage,
     CustomDeploymentInputs,
     FooocusAppInputs,
-    Service,
 )
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
@@ -23,6 +22,8 @@ from apolo_app_types.protocols.common import (
     MountPath,
     StorageMounts,
 )
+from apolo_app_types.protocols.common.k8s import Port
+from apolo_app_types.protocols.custom_deployment import NetworkingConfig
 
 
 class FooocusChartValueProcessor(BaseChartValueProcessor[FooocusAppInputs]):
@@ -88,9 +89,14 @@ class FooocusChartValueProcessor(BaseChartValueProcessor[FooocusAppInputs]):
                 repository="ghcr.io/neuro-inc/fooocus",
                 tag="latest",
             ),
-            ingress=input_.ingress,
             container=Container(env=[Env(name=k, value=v) for k, v in env.items()]),
-            service=Service(port=7865),
+            networking=NetworkingConfig(
+                service_enabled=True,
+                ingress=input_.ingress,
+                ports=[
+                    Port(name="http", port=7865),
+                ],
+            ),
             storage_mounts=StorageMounts(
                 mounts=[
                     ApoloFilesMount(

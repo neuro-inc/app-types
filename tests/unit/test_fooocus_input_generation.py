@@ -44,7 +44,7 @@ async def test_fooocus_values_generation(setup_clients):
 
     assert helm_params["service"] == {
         "enabled": True,
-        "port": 7865,
+        "ports": [{"name": "http", "containerPort": 7865}],
     }
 
     assert "podAnnotations" in helm_params

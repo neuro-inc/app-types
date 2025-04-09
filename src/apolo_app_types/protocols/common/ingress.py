@@ -18,19 +18,14 @@ class Ingress(AbstractAppFieldType):
             description="Configuration for Ingress.",
         ).as_json_schema_extra(),
     )
-    enabled: bool = Field(
-        ...,
-        description="Indicates whether the ingress is enabled.",
-        title="Ingress Enabled",
-    )
-    clusterName: str = Field(  # noqa: N815
-        ...,
-        description="The name of the cluster where the ingress is deployed.",
-        title="Cluster Name",
-    )
-    grpc: IngressGrpc | None = Field(default=None, title="Enable GRPC")
     http_auth: bool = Field(
         default=False,
         title="Enable Platform Authentication",
         description="Enable/disable HTTP authentication",
     )
+    enabled: bool = Field(
+        ...,
+        description="Indicates whether the ingress is enabled.",
+        title="Ingress Enabled",
+    )
+    grpc: IngressGrpc | None = Field(default=None, title="Enable GRPC")

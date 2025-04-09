@@ -11,7 +11,7 @@ from .buckets import Bucket
 from .containers import ContainerImage
 from .hugging_face import HuggingFaceCache, HuggingFaceModel
 from .ingress import Ingress, IngressGrpc
-from .k8s import Container, DeploymentName, Env, Service
+from .k8s import Container, DeploymentName, Env
 from .networking import GraphQLAPI, GrpcAPI, RestAPI
 from .postgres import Postgres
 from .preset import Preset
@@ -63,7 +63,6 @@ __all__ = [
     "AutoscalingHPA",
     "StorageMounts",
     "DeploymentName",
-    "Service",
     "Env",
     "Container",
 ]
