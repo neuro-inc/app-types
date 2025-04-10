@@ -1,13 +1,14 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from yarl import URL
 
-from apolo_app_types import OptionalStrOrSecret
+from apolo_app_types import AppOutputs, OptionalStrOrSecret
 from apolo_app_types.protocols.common import (
     AppInputs,
     AppInputsDeployer,
     AppOutputsDeployer,
     Ingress,
     Preset,
+    RestAPI,
     SchemaExtraMetadata,
 )
 
@@ -47,6 +48,11 @@ class FooocusAppInputs(AppInputs):
     preset: Preset
     fooocus_specific: FooocusSpecificAppInputs
     ingress: Ingress
+
+
+class FooocusAppOutputs(AppOutputs):
+    internal_web_app_url: RestAPI | None = None
+    external_web_app_url: RestAPI | None = None
 
 
 class FooocusOutputs(AppOutputsDeployer):

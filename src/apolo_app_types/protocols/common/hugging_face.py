@@ -23,9 +23,6 @@ class HuggingFaceModel(AbstractAppFieldType):
         description="The name of the Hugging Face model.",
         title="Hugging Face Model Name",
     )
-    model_files: str | None = Field(  # noqa: N815
-        None, description="The path to the model files.", title="Model Files"
-    )
     hf_token: OptionalStrOrSecret = Field(  # noqa: N815
         default=None,
         description="The Hugging Face API token.",

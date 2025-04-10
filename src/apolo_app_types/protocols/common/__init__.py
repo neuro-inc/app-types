@@ -5,6 +5,7 @@ from .abc_ import (
     AppOutputs,
     AppOutputsDeployer,
 )
+from .apis import OpenAICompatibleEmbeddingsRestAPI
 from .auth import BasicAuth
 from .autoscaling import AutoscalingHPA
 from .buckets import Bucket
@@ -65,4 +66,5 @@ __all__ = [
     "DeploymentName",
     "Env",
     "Container",
+    "OpenAICompatibleEmbeddingsRestAPI",
 ]

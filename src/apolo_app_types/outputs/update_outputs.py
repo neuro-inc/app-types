@@ -6,13 +6,16 @@ import httpx
 from apolo_app_types.app_types import AppType
 from apolo_app_types.outputs.custom_deployment import get_custom_deployment_outputs
 from apolo_app_types.outputs.dockerhub import get_dockerhub_outputs
+from apolo_app_types.outputs.fooocus import get_fooocus_outputs
 from apolo_app_types.outputs.huggingface_cache import (
     get_app_outputs as get_huggingface_cache_outputs,
 )
 from apolo_app_types.outputs.llm import get_llm_inference_outputs
+from apolo_app_types.outputs.mlflow import get_mlflow_outputs
 from apolo_app_types.outputs.postgres import get_postgres_outputs
 from apolo_app_types.outputs.spark_job import get_spark_job_outputs
 from apolo_app_types.outputs.stable_diffusion import get_stable_diffusion_outputs
+from apolo_app_types.outputs.tei import get_tei_outputs
 from apolo_app_types.outputs.weaviate import get_weaviate_outputs
 
 
@@ -55,16 +58,12 @@ async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> bool:  # noqa: C
                 conv_outputs = await get_custom_deployment_outputs(helm_outputs)
             case AppType.SparkJob:
                 conv_outputs = await get_spark_job_outputs(helm_outputs)
+            case AppType.TextEmbeddingsInference:
+                conv_outputs = await get_tei_outputs(helm_outputs)
             case AppType.Fooocus:
-                labels = {"application": "fooocus"}
-                conv_outputs = await get_custom_deployment_outputs(
-                    helm_outputs, labels=labels
-                )
+                conv_outputs = await get_fooocus_outputs(helm_outputs)
             case AppType.MLFlow:
-                labels = {"application": "mlflow"}
-                conv_outputs = await get_custom_deployment_outputs(
-                    helm_outputs, labels=labels
-                )
+                conv_outputs = await get_mlflow_outputs(helm_outputs)
             case _:
                 err_msg = f"Unsupported app type: {app_type} for posting outputs"
                 raise ValueError(err_msg)
