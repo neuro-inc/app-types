@@ -42,6 +42,8 @@ from apolo_app_types.protocols.huggingface_cache import (
     HuggingFaceCacheOutputs,
 )
 from apolo_app_types.protocols.jupyter import (
+    JupyterAppInputs,
+    JupyterAppOutputs,
     JupyterInputs,
     JupyterOutputs,
     JupyterTypes,
@@ -154,4 +156,6 @@ __all__ = [
     "FooocusAppInputs",
     "ApoloFilesMount",
     "Bucket",
+    "JupyterAppInputs",
+    "JupyterAppOutputs",
 ]
