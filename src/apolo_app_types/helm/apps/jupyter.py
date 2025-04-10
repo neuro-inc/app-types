@@ -88,8 +88,15 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
                 tag="pipelines",
             ),
             container=Container(
-                command=[cmd],
-                args=[jupyter_args],
+                command=[
+                    (
+                        f'bash -c "(rsync -a --ignore-existing '
+                        "/var/notebooks/README.ipynb "
+                        f"{code_storage_mount.mount_path}) && "
+                        f"(jupyter {cmd} {jupyter_args} "
+                        f'--NotebookApp.default_url={code_storage_mount.mount_path}/README.ipynb)"'
+                    )
+                ]
             ),
             networking=NetworkingConfig(
                 service_enabled=True,
