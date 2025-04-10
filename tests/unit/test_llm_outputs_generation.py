@@ -17,7 +17,6 @@ async def test_llm(setup_clients, mock_kubernetes_client):
     )
     assert res["hf_model"] == {
         "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct",
-        "model_files": None,
         "hf_token": None,
     }
     assert res["llm_specific"] == {
@@ -46,7 +45,6 @@ async def test_llm_without_server_args(setup_clients, mock_kubernetes_client):
 
     assert res["hf_model"] == {
         "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct",
-        "model_files": None,
         "hf_token": None,
     }
     assert res["llm_specific"] == {

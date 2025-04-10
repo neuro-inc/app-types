@@ -34,6 +34,7 @@ from apolo_app_types.protocols.dockerhub import (
 )
 from apolo_app_types.protocols.fooocus import (
     FooocusAppInputs,
+    FooocusAppOutputs,
     FooocusInputs,
     FooocusOutputs,
 )
@@ -78,6 +79,8 @@ from apolo_app_types.protocols.stable_diffusion import (
     TextToImgAPI,
 )
 from apolo_app_types.protocols.text_embeddings import (
+    TextEmbeddingsInferenceAppInputs,
+    TextEmbeddingsInferenceAppOutputs,
     TextEmbeddingsInferenceInputs,
     TextEmbeddingsInferenceOutputs,
 )
@@ -154,8 +157,11 @@ __all__ = [
     "SparkJobInputs",
     "SparkJobOutputs",
     "FooocusAppInputs",
+    "FooocusAppOutputs",
     "ApoloFilesMount",
     "Bucket",
     "JupyterAppInputs",
     "JupyterAppOutputs",
+    "TextEmbeddingsInferenceAppInputs",
+    "TextEmbeddingsInferenceAppOutputs",
 ]
