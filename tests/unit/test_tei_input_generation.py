@@ -29,7 +29,7 @@ async def test_tei_values_generation(setup_clients):
         app_secrets_name=APP_SECRETS_NAME,
     )
     assert helm_params["image"] == {
-        "repository": "ghcr.io/apolo-ai/text-embeddings-inference",
+        "repository": "ghcr.io/huggingface/text-embeddings-inference",
         "tag": "1.6",
     }
 

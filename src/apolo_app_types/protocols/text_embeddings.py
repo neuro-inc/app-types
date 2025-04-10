@@ -22,7 +22,7 @@ class TextEmbeddingsInferenceAppInputs(AppInputs):
     model: HuggingFaceModel
     container_image: ContainerImage = Field(
         default=ContainerImage(
-            repository="ghcr.io/apolo-ai/text-embeddings-inference",
+            repository="ghcr.io/huggingface/text-embeddings-inference",
             tag="1.6",
         ),
         description="Container image for the text embeddings inference app.",

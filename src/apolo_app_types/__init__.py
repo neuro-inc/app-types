@@ -76,6 +76,7 @@ from apolo_app_types.protocols.stable_diffusion import (
     TextToImgAPI,
 )
 from apolo_app_types.protocols.text_embeddings import (
+    TextEmbeddingsInferenceAppInputs,
     TextEmbeddingsInferenceInputs,
     TextEmbeddingsInferenceOutputs,
 )
@@ -154,4 +155,5 @@ __all__ = [
     "FooocusAppInputs",
     "ApoloFilesMount",
     "Bucket",
+    "TextEmbeddingsInferenceAppInputs",
 ]
