@@ -9,6 +9,7 @@ from apolo_app_types.protocols.common import (
     Ingress,
     Preset,
 )
+from apolo_app_types.protocols.common.apis import OpenAICompatibleEmbeddingsRestAPI
 from apolo_app_types.protocols.llm import OpenAICompatibleEmbeddingsAPI
 
 
@@ -40,3 +41,8 @@ class TextEmbeddingsInferenceInputs(AppInputsDeployer):
 class TextEmbeddingsInferenceOutputs(AppOutputsDeployer):
     internal_api: OpenAICompatibleEmbeddingsAPI
     external_api: OpenAICompatibleEmbeddingsAPI | None = None
+
+
+class TextEmbeddingsInferenceAppOutputs(AppInputs):
+    internal_api: OpenAICompatibleEmbeddingsRestAPI | None = None
+    external_api: OpenAICompatibleEmbeddingsRestAPI | None = None
