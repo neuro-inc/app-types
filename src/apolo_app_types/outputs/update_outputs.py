@@ -16,6 +16,7 @@ from apolo_app_types.outputs.postgres import get_postgres_outputs
 from apolo_app_types.outputs.spark_job import get_spark_job_outputs
 from apolo_app_types.outputs.stable_diffusion import get_stable_diffusion_outputs
 from apolo_app_types.outputs.tei import get_tei_outputs
+from apolo_app_types.outputs.utils.discovery import load_app_postprocessor
 from apolo_app_types.outputs.weaviate import get_weaviate_outputs
 
 
@@ -65,8 +66,14 @@ async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> bool:  # noqa: C
             case AppType.MLFlow:
                 conv_outputs = await get_mlflow_outputs(helm_outputs)
             case _:
-                err_msg = f"Unsupported app type: {app_type} for posting outputs"
-                raise ValueError(err_msg)
+                # Try loading application postprocessor installed as plugin
+                postprocessor_class = load_app_postprocessor(app_type)
+                if not postprocessor_class:
+                    err_msg = f"Unsupported app type: {app_type} for posting outputs"
+                    raise ValueError(err_msg)
+                conv_outputs = await postprocessor_class().generate_outputs(
+                    helm_outputs
+                )
         logger.info("Outputs: %s", conv_outputs)
 
         await post_outputs(
