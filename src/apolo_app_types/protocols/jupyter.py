@@ -2,7 +2,7 @@ from enum import Enum
 
 from pydantic import ConfigDict, Field
 
-from apolo_app_types import AppInputsDeployer
+from apolo_app_types import AppInputsDeployer, AppOutputs
 from apolo_app_types.protocols.common import (
     AppInputs,
     AppOutputsDeployer,
@@ -60,3 +60,8 @@ class JupyterSpecificAppInputs(AbstractAppFieldType):
 class JupyterAppInputs(AppInputs):
     preset: Preset
     jupyter_specific: JupyterSpecificAppInputs
+
+
+class JupyterAppOutputs(AppOutputs):
+    internal_web_app_url: str
+    external_web_app_url: str
