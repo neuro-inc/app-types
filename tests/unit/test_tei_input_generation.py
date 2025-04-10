@@ -30,7 +30,7 @@ async def test_tei_values_generation(setup_clients):
     )
     assert helm_params["image"] == {
         "repository": "ghcr.io/huggingface/text-embeddings-inference",
-        "tag": "1.6",
+        "tag": "1.7",
     }
 
     assert helm_params["service"] == {
