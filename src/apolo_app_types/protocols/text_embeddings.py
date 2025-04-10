@@ -23,7 +23,7 @@ class TextEmbeddingsInferenceAppInputs(AppInputs):
     container_image: ContainerImage = Field(
         default=ContainerImage(
             repository="ghcr.io/huggingface/text-embeddings-inference",
-            tag="1.6",
+            tag="1.7",
         ),
         description="Container image for the text embeddings inference app.",
         title="Container Image",
