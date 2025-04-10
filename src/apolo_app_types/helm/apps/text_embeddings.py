@@ -1,7 +1,5 @@
 import typing as t
 
-from apolo_app_types.protocols.text_embeddings import TextEmbeddingsInferenceAppInputs
-
 from apolo_app_types import (
     CustomDeploymentInputs,
 )
@@ -9,12 +7,14 @@ from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.custom_deployment import (
     CustomDeploymentChartValueProcessor,
 )
-
 from apolo_app_types.protocols.common.k8s import Port
 from apolo_app_types.protocols.custom_deployment import NetworkingConfig
+from apolo_app_types.protocols.text_embeddings import TextEmbeddingsInferenceAppInputs
 
 
-class TextEmbeddingsChartValueProcessor(BaseChartValueProcessor[TextEmbeddingsInferenceAppInputs]):
+class TextEmbeddingsChartValueProcessor(
+    BaseChartValueProcessor[TextEmbeddingsInferenceAppInputs]
+):
     def __init__(self, *args: t.Any, **kwargs: t.Any):
         super().__init__(*args, **kwargs)
         self.custom_dep_val_processor = CustomDeploymentChartValueProcessor(
