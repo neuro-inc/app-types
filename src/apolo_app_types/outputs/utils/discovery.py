@@ -3,6 +3,7 @@ import inspect
 import logging
 import pkgutil
 
+from apolo_app_types import AppOutputs
 from apolo_app_types.outputs.base import BaseAppOutputsProcessor
 
 
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 def load_app_postprocessor(
     app_id: str,
     apolo_app_package_prefix: str = "apolo_apps_",
-) -> type[BaseAppOutputsProcessor] | None:
+) -> type[BaseAppOutputsProcessor[AppOutputs]] | None:
     package = None
     for _, name, _ in pkgutil.iter_modules():
         if not name.startswith(apolo_app_package_prefix):
