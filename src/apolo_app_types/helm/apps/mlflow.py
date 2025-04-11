@@ -101,12 +101,13 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         mlflow_cmd = ["mlflow"]
         mlflow_args = [
             "server",
-            f"--backend-store-uri={backend_uri}",
+            "--serve-artifacts",
             "--host=0.0.0.0",
             "--port=5000",
+            f"--backend-store-uri={backend_uri}",
         ]
         if artifact_env_val:
-            mlflow_args.append("--default-artifact-root=/mlflow-artifacts")
+            mlflow_args.append("--artifacts-destination=/mlflow-artifacts")
 
         cd_inputs = CustomDeploymentInputs(
             preset=input_.preset,
