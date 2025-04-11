@@ -148,7 +148,9 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             pypi_packages = input_.spark_application_config.dependencies.pypi_packages
             if isinstance(pypi_packages, list):
                 pkg_list: list[str] = pypi_packages
-                deps["pypi_packages"] = pkg_list
+                deps["pypi_packages"] = pkg_list + [
+                    "pyspark==3.5.5"
+                ]  # must install pyspark too
 
             pypi_packages_storage_path = (
                 get_app_data_files_path_url(
@@ -192,4 +194,4 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             values["spark"]["driver"]["env"] = [pyspark_env_var]
             values["spark"]["executor"]["env"] = [pyspark_env_var]
 
-        values["deps"] = deps
+        values["spark"]["deps"] = deps
