@@ -126,8 +126,7 @@ class PostgresURI(AbstractAppFieldType):
     uri: str | None = Field(
         default=None,
         description=(
-            "Full Postgres connection URI if using 'postgres'. "
-            "E.g. 'postgresql://user:pass@host:5432/db'"
+            "Full Postgres connection URI. E.g. 'postgresql://user:pass@host:5432/db'"
         ),
         title="URI",
     )
@@ -141,5 +140,14 @@ class PostgresUsers(AbstractAppFieldType):
     users: list[CrunchyPostgresUserCredentials]
 
 
+class PostgresUris(AbstractAppFieldType):
+    uris: list[PostgresURI] = Field(
+        default_factory=list,
+        description="List of Postgres URIs.",
+        title="Postgres URIs",
+    )
+
+
 class PostgresOutputs(AppOutputs):
     postgres_users: PostgresUsers | None = None
+    postgres_uris: PostgresUris | None = None
