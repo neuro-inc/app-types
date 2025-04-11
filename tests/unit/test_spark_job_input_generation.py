@@ -98,8 +98,8 @@ async def test_spark_job_values_generation(setup_clients):
     }
 
     # Dependencies configuration assertions
-    assert helm_params["deps"] == {
-        "pypi_packages": ["scikit-learn==1.0.2"],
+    assert helm_params["spark"]["deps"] == {
+        "pypi_packages": ["scikit-learn==1.0.2", "pyspark==3.5.5"],
         "packages": ["package1", "package2"],
         "repositories": None,
         "jars": None,
