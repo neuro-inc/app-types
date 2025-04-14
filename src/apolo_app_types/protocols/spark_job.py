@@ -24,10 +24,8 @@ class SparkApplicationType(StrEnum):
 class DriverConfig(AbstractAppFieldType):
     preset: Preset = Field(
         ...,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Driver Preset",
-            description="Preset configuration to be used by the driver",
-        ).as_json_schema_extra(),
+        title="Driver Preset",
+        description="Preset configuration to be used by the driver",
     )
 
 
@@ -37,10 +35,8 @@ class ExecutorConfig(AbstractAppFieldType):
     )
     preset: Preset = Field(
         ...,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Executor Preset",
-            description="Preset configuration to be used by the executor",
-        ).as_json_schema_extra(),
+        title="Executor Preset",
+        description="Preset configuration to be used by the executor",
     )
 
 
@@ -126,17 +122,13 @@ class SparkAutoScalingConfig(AbstractAppFieldType):
 class SparkApplicationConfig(AbstractAppFieldType):
     type: SparkApplicationType = Field(
         ...,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Spark Application type",
-            description="Choose the type of the Spark application",
-        ).as_json_schema_extra(),
+        title="Spark Application type",
+        description="Choose the type of the Spark application",
     )
     main_application_file: ApoloFilesFile = Field(
         ...,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Main Application File",
-            description="The main application file to be executed",
-        ).as_json_schema_extra(),
+        title="Main Application File",
+        description="The main application file to be executed",
     )
     arguments: list[str] | None = None
     main_class: str | None = Field(default=None, title="Main Class for Java Apps")
@@ -157,31 +149,21 @@ class SparkJobInputs(AppInputs):
     )
     spark_application_config: SparkApplicationConfig = Field(
         ...,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Application Configuration",
-            description="Configuration for the Spark application",
-        ).as_json_schema_extra(),
+        title="Application Configuration",
+        description="Configuration for the Spark application",
     )
     spark_auto_scaling_config: SparkAutoScalingConfig | None = Field(
         ...,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Spark Auto Scaling Configuration",
-            description="Configuration for the Spark auto scaling",
-        ).as_json_schema_extra(),
+        title="Spark Auto Scaling Configuration",
+        description="Configuration for the Spark auto scaling",
     )
     driver_config: DriverConfig = Field(
-        ...,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Driver Configuration",
-            description="Configuration for the driver",
-        ).as_json_schema_extra(),
+        ..., title="Driver Configuration", description="Configuration for the driver"
     )
     executor_config: ExecutorConfig = Field(
         ...,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Executor Configuration",
-            description="Configuration for the executor",
-        ).as_json_schema_extra(),
+        title="Executor Configuration",
+        description="Configuration for the executor",
     )
 
 

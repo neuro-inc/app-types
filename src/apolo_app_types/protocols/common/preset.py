@@ -11,8 +11,8 @@ class Preset(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Preset",
-            description="Configuration for Apolo presets.",
+            title="Resource Preset",
+            description="Select the resource preset used per service replica.",
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
