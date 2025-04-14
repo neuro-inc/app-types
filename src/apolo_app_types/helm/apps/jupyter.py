@@ -6,18 +6,12 @@ from apolo_app_types import (
     ContainerImage,
     CustomDeploymentInputs,
 )
-from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.custom_deployment import (
     CustomDeploymentChartValueProcessor,
 )
-from apolo_app_types.helm.utils.storage import get_app_data_files_path_url
 from apolo_app_types.protocols.common import (
-    ApoloFilesMount,
-    ApoloFilesPath,
-    ApoloMountMode,
     Container,
-    MountPath,
     StorageMounts,
 )
 from apolo_app_types.protocols.common.ingress import Ingress
@@ -49,17 +43,6 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
         """
 
         code_storage_mount = input_.jupyter_specific.code_storage_mount
-        if not code_storage_mount:
-            base_app_storage_path = get_app_data_files_path_url(
-                client=self.client, app_type=AppType.Jupyter, app_name=app_name
-            )
-            code_storage_mount = ApoloFilesMount(
-                storage_uri=ApoloFilesPath(
-                    path=str(base_app_storage_path / "code"),
-                ),
-                mount_path=MountPath(path=str(self._default_code_mount_path)),
-                mode=ApoloMountMode(mode="rw"),
-            )
         storage_mounts = input_.jupyter_specific.extra_storage_mounts or StorageMounts(
             mounts=[]
         )

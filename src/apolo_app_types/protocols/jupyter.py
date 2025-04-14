@@ -58,8 +58,11 @@ class JupyterSpecificAppInputs(AbstractAppFieldType):
     code_storage_mount: ApoloFilesMount | None = Field(
         default=ApoloFilesMount(
             storage_uri=ApoloFilesRelativePath(
-                relative_path=get_app_data_files_relative_path_url(
-                    app_type=AppType.Jupyter, app_name="jupyter"
+                relative_path=str(
+                    get_app_data_files_relative_path_url(
+                        app_type=AppType.Jupyter, app_name="jupyter"
+                    )
+                    / "code"
                 )
             ),
             mount_path="/root",

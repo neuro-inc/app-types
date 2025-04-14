@@ -235,7 +235,9 @@ def gen_apolo_storage_integration_labels(
 
 
 def append_apolo_storage_integration_annotations(
-    current_annotations: dict[str, t.Any], files_mounts: t.Sequence[ApoloFilesMount]
+    current_annotations: dict[str, t.Any],
+    files_mounts: t.Sequence[ApoloFilesMount],
+    client: apolo_sdk.Client | None = None,
 ) -> dict[str, str]:
     """
     Returns a new dict with the storage annotations appended to the current annotations.
@@ -247,7 +249,7 @@ def append_apolo_storage_integration_annotations(
     else:
         current_list = []
 
-    new_annotations = gen_apolo_storage_integration_annotations(files_mounts)
+    new_annotations = gen_apolo_storage_integration_annotations(files_mounts, client)
     current_list.extend(new_annotations)
     cur_annot[APOLO_STORAGE_LABEL] = json.dumps(current_list)
     return cur_annot
