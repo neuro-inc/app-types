@@ -152,7 +152,9 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
 
             pypi_packages_storage_path = (
                 get_app_data_files_path_url(
-                    client=self.client, app_type=AppType.SparkJob, app_name=app_name
+                    client=self.client,
+                    app_type_name=AppType.SparkJob.value,
+                    app_name=app_name,
                 )
                 / "spark"
                 / "deps"

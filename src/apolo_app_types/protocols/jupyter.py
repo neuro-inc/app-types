@@ -3,7 +3,6 @@ from enum import Enum
 from pydantic import ConfigDict, Field
 
 from apolo_app_types import AppInputsDeployer, AppOutputs
-from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.utils.storage import get_app_data_files_relative_path_url
 from apolo_app_types.protocols.common import (
     AppInputs,
@@ -18,6 +17,7 @@ from apolo_app_types.protocols.common.storage import (
     ApoloFilesRelativePath,
     ApoloMountMode,
     ApoloMountModes,
+    MountPath,
     StorageMounts,
 )
 
@@ -35,6 +35,16 @@ class JupyterInputs(AppInputsDeployer):
 
 class JupyterOutputs(AppOutputsDeployer):
     internal_web_app_url: str
+
+
+def _get_app_data_files_path_url() -> str:
+    # Passing app_type_name as string to avoid circular import
+    return str(
+        get_app_data_files_relative_path_url(
+            app_type_name="jupyter", app_name="jupyter-app"
+        )
+        / "code"
+    )
 
 
 class JupyterSpecificAppInputs(AbstractAppFieldType):
@@ -55,17 +65,12 @@ class JupyterSpecificAppInputs(AbstractAppFieldType):
         description="Whether to use HTTP authentication.",
         title="HTTP Authentication",
     )
-    code_storage_mount: ApoloFilesMount | None = Field(
+    code_storage_mount: ApoloFilesMount = Field(
         default=ApoloFilesMount(
             storage_uri=ApoloFilesRelativePath(
-                relative_path=str(
-                    get_app_data_files_relative_path_url(
-                        app_type=AppType.Jupyter, app_name="jupyter"
-                    )
-                    / "code"
-                )
+                relative_path=_get_app_data_files_path_url()
             ),
-            mount_path="/root",
+            mount_path=MountPath(path="/root/notebooks"),
             mode=ApoloMountMode(mode=ApoloMountModes.RW),
         ),
         title="Code Storage Mount",

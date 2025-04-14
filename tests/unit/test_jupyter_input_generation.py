@@ -20,7 +20,7 @@ from tests.unit.constants import (
 
 
 @pytest.mark.asyncio
-async def test_fooocus_values_generation(setup_clients):
+async def test_jupyter_values_generation(setup_clients):
     helm_args, helm_params = await app_type_to_vals(
         input_=JupyterAppInputs(
             preset=Preset(name="cpu-small"),

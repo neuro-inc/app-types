@@ -88,7 +88,7 @@ class ApoloFilesRelativePath(AbstractAppFieldType):
             err_msg = "Project is not set."
             raise ValueError(err_msg)
 
-        return ApoloFilesPath(path=f"storage://{org}/{cluster}/{project_part}/{path}")
+        return ApoloFilesPath(path=f"storage://{cluster}/{org}/{project_part}/{path}")
 
     @field_validator("relative_path", mode="before")
     def validate_storage_path(cls, value: str) -> str:  # noqa: N805
