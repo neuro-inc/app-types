@@ -3,6 +3,8 @@ from enum import Enum
 from pydantic import ConfigDict, Field
 
 from apolo_app_types import AppInputsDeployer, AppOutputs
+from apolo_app_types.app_types import AppType
+from apolo_app_types.helm.utils.storage import get_app_data_files_relative_path_url
 from apolo_app_types.protocols.common import (
     AppInputs,
     AppOutputsDeployer,
@@ -11,7 +13,13 @@ from apolo_app_types.protocols.common import (
 )
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.networking import RestAPI
-from apolo_app_types.protocols.common.storage import ApoloFilesMount, StorageMounts
+from apolo_app_types.protocols.common.storage import (
+    ApoloFilesMount,
+    ApoloFilesRelativePath,
+    ApoloMountMode,
+    ApoloMountModes,
+    StorageMounts,
+)
 
 
 class JupyterTypes(str, Enum):
@@ -48,7 +56,15 @@ class JupyterSpecificAppInputs(AbstractAppFieldType):
         title="HTTP Authentication",
     )
     code_storage_mount: ApoloFilesMount | None = Field(
-        default=None,
+        default=ApoloFilesMount(
+            storage_uri=ApoloFilesRelativePath(
+                relative_path=get_app_data_files_relative_path_url(
+                    app_type=AppType.Jupyter, app_name="jupyter"
+                )
+            ),
+            mount_path="/root",
+            mode=ApoloMountMode(mode=ApoloMountModes.RW),
+        ),
         title="Code Storage Mount",
         description=(
             "Configure Apolo Files mount within the application workloads. "
