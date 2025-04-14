@@ -13,6 +13,25 @@ from apolo_app_types.protocols.common import (
 )
 
 
+class PostgresURI(AbstractAppFieldType):
+    """Configuration for the Postgres connection URI."""
+
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Postgres URI",
+            description="Full Postgres connection URI configuration.",
+        ).as_json_schema_extra(),
+    )
+    uri: str | None = Field(
+        default=None,
+        description=(
+            "Full Postgres connection URI. E.g. 'postgresql://user:pass@host:5432/db'"
+        ),
+        title="URI",
+    )
+
+
 class PGBouncer(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
@@ -111,25 +130,7 @@ class CrunchyPostgresUserCredentials(AbstractAppFieldType):
     pgbouncer_jdbc_uri: str | None = None
     pgbouncer_uri: str | None = None
     uri: str | None = None
-
-
-class PostgresURI(AbstractAppFieldType):
-    """Configuration for the Postgres connection URI."""
-
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Postgres URI",
-            description="Full Postgres connection URI configuration.",
-        ).as_json_schema_extra(),
-    )
-    uri: str | None = Field(
-        default=None,
-        description=(
-            "Full Postgres connection URI. E.g. 'postgresql://user:pass@host:5432/db'"
-        ),
-        title="URI",
-    )
+    postgres_uri: PostgresURI | None = None
 
 
 class CrunchyPostgresOutputs(AppOutputsDeployer):
@@ -140,14 +141,5 @@ class PostgresUsers(AbstractAppFieldType):
     users: list[CrunchyPostgresUserCredentials]
 
 
-class PostgresUris(AbstractAppFieldType):
-    uris: list[PostgresURI] = Field(
-        default_factory=list,
-        description="List of Postgres URIs.",
-        title="Postgres URIs",
-    )
-
-
 class PostgresOutputs(AppOutputs):
     postgres_users: PostgresUsers | None = None
-    postgres_uris: PostgresUris | None = None

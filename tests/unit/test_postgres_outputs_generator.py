@@ -19,8 +19,8 @@ async def test_postgres_outputs(setup_clients, mock_kubernetes_client):
             "pgbouncer_jdbc_uri": "jdbc:postgresql://pgbouncer.example.com:6432/mydatabase",
             "pgbouncer_uri": "postgres://pgbouncer.example.com:6432/mydatabase",
             "uri": "postgres://db.example.com:5432/mydatabase",
+            "postgres_uri": {
+                "uri": "postgresql://admin:supersecret@pgbouncer.example.com:6432/mydatabase"
+            },
         }
-    ]
-    assert res["postgres_uris"]["uris"] == [
-        {"uri": "postgresql://admin:supersecret@pgbouncer.example.com:6432/mydatabase"}
     ]

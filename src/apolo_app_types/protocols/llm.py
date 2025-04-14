@@ -34,6 +34,7 @@ class LLMModel(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="LLM",
             description="Configuration for LLM.",
+            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     hugging_face_model: HuggingFaceModel = Field(  # noqa: N815
@@ -108,17 +109,16 @@ class VLLMOutputs(AppOutputsDeployer):
     embeddings_external_api: OpenAICompatibleEmbeddingsAPI | None
 
 
-class LLMSpecific(AbstractAppFieldType):
+class LLMApiKey(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="LLM Server Details",
-            description="Configuration details of the LLM server.",
+            title="LLM Integration API key",
+            description="Configuration for LLM Api key.",
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
-    tokenizer_name: str | None = None
-    api_key: str | None = None
+    key: str | None = None
 
 
 class VLLMOutputsV2(AppOutputs):
@@ -126,5 +126,5 @@ class VLLMOutputsV2(AppOutputs):
     chat_external_api: RestAPI | None = None
     embeddings_internal_api: RestAPI | None = None
     embeddings_external_api: RestAPI | None = None
-    hf_model: HuggingFaceModel | None = None
-    llm_specific: LLMSpecific | None = None
+    llm: LLMModel | None = None
+    llm_api_key: LLMApiKey | None = None

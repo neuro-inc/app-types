@@ -10,7 +10,6 @@ from apolo_app_types.clients.kube import get_secret
 from apolo_app_types.protocols.postgres import (
     PostgresOutputs,
     PostgresURI,
-    PostgresUris,
     PostgresUsers,
 )
 
@@ -22,7 +21,7 @@ MAX_SLEEP_SEC = 10
 
 def postgres_creds_from_kube_secret_data(
     secret_data: dict[str, str],
-) -> tuple[CrunchyPostgresUserCredentials, str]:
+) -> CrunchyPostgresUserCredentials:
     T = t.TypeVar("T", str, str | None)
 
     def _b64decode(s: T) -> T:
@@ -54,7 +53,8 @@ def postgres_creds_from_kube_secret_data(
         pgbouncer_jdbc_uri=_b64decode(secret_data.get("pgbouncer-jdbc-uri")),
         pgbouncer_uri=_b64decode(secret_data.get("pgbouncer-uri")),
         uri=_b64decode(secret_data.get("uri")),
-    ), postgres_conn_string
+        postgres_uri=PostgresURI(uri=postgres_conn_string),
+    )
 
 
 async def get_postgres_outputs(
@@ -74,16 +74,12 @@ async def get_postgres_outputs(
     else:
         msg = "Failed to get postgres outputs"
         raise Exception(msg)
-    users, postgres_uris = [], []
+    users = []
 
     for item in secrets.items:
-        user, postgres_uri = postgres_creds_from_kube_secret_data(item.data)
+        user = postgres_creds_from_kube_secret_data(item.data)
         users.append(user)
-        postgres_uris.append(postgres_uri)
 
     return PostgresOutputs(
         postgres_users=PostgresUsers(users=users),
-        postgres_uris=PostgresUris(
-            uris=[PostgresURI(uri=uri) for uri in postgres_uris]
-        ),
     ).model_dump()

@@ -15,13 +15,14 @@ async def test_llm(setup_clients, mock_kubernetes_client):
             "env": {"VLLM_API_KEY": "dummy"},
         }
     )
-    assert res["hf_model"] == {
+    assert res["llm"]["hugging_face_model"] == {
         "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct",
         "hf_token": None,
     }
-    assert res["llm_specific"] == {
-        "tokenizer_name": "meta-llama/Llama-3.1-8B-Instruct",
-        "api_key": "dummy-api-key",
+    assert res["llm"]["tokenizer_hf_name"] == "meta-llama/Llama-3.1-8B-Instruct"
+    assert res["llm"]["server_extra_args"] == ["--api-key dummy-api-key"]
+    assert res["llm_api_key"] == {
+        "key": "dummy-api-key",
     }
     assert res["chat_internal_api"]["host"] == "llm-inference.default-namespace"
     assert res["chat_internal_api"]["base_path"] == "/v1/chat"
@@ -43,13 +44,14 @@ async def test_llm_without_server_args(setup_clients, mock_kubernetes_client):
         }
     )
 
-    assert res["hf_model"] == {
+    assert res["llm"]["hugging_face_model"] == {
         "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct",
         "hf_token": None,
     }
-    assert res["llm_specific"] == {
-        "tokenizer_name": "meta-llama/Llama-3.1-8B-Instruct",
-        "api_key": "dummy-api-key",
+    assert res["llm"]["tokenizer_hf_name"] == "meta-llama/Llama-3.1-8B-Instruct"
+    assert not res["llm"]["server_extra_args"]
+    assert res["llm_api_key"] == {
+        "key": "dummy-api-key",
     }
     assert res["chat_internal_api"]["host"] == "llm-inference.default-namespace"
     assert res["chat_internal_api"]["base_path"] == "/v1/chat"
