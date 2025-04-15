@@ -43,9 +43,7 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
         """
 
         code_storage_mount = input_.jupyter_specific.code_storage_mount
-        storage_mounts = input_.jupyter_specific.extra_storage_mounts or StorageMounts(
-            mounts=[]
-        )
+        storage_mounts = input_.extra_storage_mounts or StorageMounts(mounts=[])
         storage_mounts.mounts.append(code_storage_mount)
 
         jupyter_args = (
@@ -83,7 +81,7 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
             ),
             networking=NetworkingConfig(
                 service_enabled=True,
-                ingress=Ingress(enabled=True),
+                ingress=Ingress(enabled=True, http_auth=input_.networking.http_auth),
                 ports=[
                     Port(name="http", port=self._jupyter_port),
                 ],

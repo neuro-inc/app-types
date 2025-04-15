@@ -47,6 +47,21 @@ def _get_app_data_files_path_url() -> str:
     )
 
 
+class Networking(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Networking Settings",
+            description="Network settings",
+        ).as_json_schema_extra(),
+    )
+    http_auth: bool = Field(
+        default=True,
+        description="Whether to use HTTP authentication.",
+        title="HTTP Authentication",
+    )
+
+
 class JupyterSpecificAppInputs(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
@@ -59,11 +74,6 @@ class JupyterSpecificAppInputs(AbstractAppFieldType):
         default=JupyterTypes.LAB,
         description="Type of Jupyter application (lab or notebook).",
         title="Jupyter Type",
-    )
-    http_auth: bool = Field(
-        default=True,
-        description="Whether to use HTTP authentication.",
-        title="HTTP Authentication",
     )
     code_storage_mount: ApoloFilesMount = Field(
         default=ApoloFilesMount(
@@ -79,12 +89,21 @@ class JupyterSpecificAppInputs(AbstractAppFieldType):
             "If not set, Apolo will automatically assign a mount to the storage."
         ),
     )
-    extra_storage_mounts: StorageMounts | None = None
 
 
 class JupyterAppInputs(AppInputs):
     preset: Preset
     jupyter_specific: JupyterSpecificAppInputs
+    extra_storage_mounts: StorageMounts | None = Field(
+        default=None,
+        title="Extra Storage Mounts",
+        description=("Additional storage mounts for the application."),
+    )
+    networking: Networking = Field(
+        default=Networking(http_auth=True),
+        title="Networking Settings",
+        description=("Network settings for the application."),
+    )
 
 
 class JupyterAppOutputs(AppOutputs):
