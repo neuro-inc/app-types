@@ -27,6 +27,7 @@ from apolo_app_types.helm.apps.weaviate import WeaviateChartValueProcessor
 from apolo_app_types.protocols.common import AppInputs
 from apolo_app_types.protocols.custom_deployment import CustomDeploymentInputs
 from apolo_app_types.protocols.dockerhub import DockerHubInputs
+from apolo_app_types.protocols.jupyter import JupyterAppInputs
 from apolo_app_types.protocols.mlflow import MLFlowAppInputs
 from apolo_app_types.protocols.spark_job import SparkJobInputs
 from apolo_app_types.protocols.text_embeddings import TextEmbeddingsInferenceAppInputs
@@ -90,6 +91,7 @@ async def get_installation_vals(
         AppType.SparkJob: SparkJobInputs,
         AppType.Fooocus: FooocusAppInputs,
         AppType.MLFlow: MLFlowAppInputs,
+        AppType.Jupyter: JupyterAppInputs,
         AppType.TextEmbeddingsInference: TextEmbeddingsInferenceAppInputs,
     }
 
