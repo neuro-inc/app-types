@@ -13,7 +13,6 @@ from apolo_sdk import Preset
 from apolo_app_types.helm.apps.ingress import get_ingress_values
 from apolo_app_types.protocols.common import (
     ApoloFilesMount,
-    ApoloFilesRelativePath,
     Ingress,
     Preset as PresetType,
 )
@@ -199,17 +198,16 @@ def gen_apolo_storage_integration_annotations(
 ) -> list[dict[str, str]]:
     storage_mount_annotations = []
     for storage_mount in files_mouts:
-        if isinstance(storage_mount.storage_uri, ApoloFilesRelativePath):
+        storage_uri = storage_mount.storage_uri
+        if not storage_uri.is_absolute():
             if not client:
                 err_msg = "You must pass client if mounts use relative paths"
                 raise ValueError(err_msg)
-            storage_uri = storage_mount.storage_uri.get_absolute_path(
+            storage_uri.set_absolute_path(
                 org=client.config.org_name,
                 cluster=client.config.cluster_name,
                 project=client.config.project_name,
             )
-        else:
-            storage_uri = storage_mount.storage_uri
         storage_mount_annotations.append(
             {
                 "storage_uri": storage_uri.path,

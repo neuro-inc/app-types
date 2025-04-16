@@ -14,7 +14,7 @@ from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.networking import RestAPI
 from apolo_app_types.protocols.common.storage import (
     ApoloFilesMount,
-    ApoloFilesRelativePath,
+    ApoloFilesPath,
     ApoloMountMode,
     ApoloMountModes,
     MountPath,
@@ -77,9 +77,7 @@ class JupyterSpecificAppInputs(AbstractAppFieldType):
     )
     code_storage_mount: ApoloFilesMount = Field(
         default=ApoloFilesMount(
-            storage_uri=ApoloFilesRelativePath(
-                relative_path=_get_app_data_files_path_url()
-            ),
+            storage_uri=ApoloFilesPath(path=_get_app_data_files_path_url()),
             mount_path=MountPath(path="/root/notebooks"),
             mode=ApoloMountMode(mode=ApoloMountModes.RW),
         ),
