@@ -7,7 +7,11 @@ from apolo_app_types import (
     CrunchyPostgresUserCredentials,
 )
 from apolo_app_types.clients.kube import get_secret
-from apolo_app_types.protocols.postgres import PostgresOutputs, PostgresUsers
+from apolo_app_types.protocols.postgres import (
+    PostgresOutputs,
+    PostgresURI,
+    PostgresUsers,
+)
 
 
 logger = logging.getLogger()
@@ -25,18 +29,31 @@ def postgres_creds_from_kube_secret_data(
             return s
         return base64.b64decode(s).decode()
 
+    user = _b64decode(secret_data["user"])
+    password = _b64decode(secret_data["password"])
+    host = _b64decode(secret_data["host"])
+    port = _b64decode(secret_data["port"])
+    pgbouncer_host = _b64decode(secret_data["pgbouncer-host"])
+    pgbouncer_port = _b64decode(secret_data["pgbouncer-port"])
+    dbname = _b64decode(secret_data.get("dbname"))
+
+    postgres_conn_string = (
+        f"postgresql://{user}:{password}@{pgbouncer_host}:{pgbouncer_port}/{dbname}"
+    )
+
     return CrunchyPostgresUserCredentials(
-        user=_b64decode(secret_data["user"]),
-        password=_b64decode(secret_data["password"]),
-        host=_b64decode(secret_data["host"]),
-        port=_b64decode(secret_data["port"]),
-        pgbouncer_host=_b64decode(secret_data["pgbouncer-host"]),
-        pgbouncer_port=_b64decode(secret_data["pgbouncer-port"]),
-        dbname=_b64decode(secret_data.get("dbname")),
+        user=user,
+        password=password,
+        host=host,
+        port=port,
+        pgbouncer_host=pgbouncer_host,
+        pgbouncer_port=pgbouncer_port,
+        dbname=dbname,
         jdbc_uri=_b64decode(secret_data.get("jdbc-uri")),
         pgbouncer_jdbc_uri=_b64decode(secret_data.get("pgbouncer-jdbc-uri")),
         pgbouncer_uri=_b64decode(secret_data.get("pgbouncer-uri")),
         uri=_b64decode(secret_data.get("uri")),
+        postgres_uri=PostgresURI(uri=postgres_conn_string),
     )
 
 
@@ -60,5 +77,9 @@ async def get_postgres_outputs(
     users = []
 
     for item in secrets.items:
-        users.append(postgres_creds_from_kube_secret_data(item.data))
-    return PostgresOutputs(postgres_users=PostgresUsers(users=users)).model_dump()
+        user = postgres_creds_from_kube_secret_data(item.data)
+        users.append(user)
+
+    return PostgresOutputs(
+        postgres_users=PostgresUsers(users=users),
+    ).model_dump()
