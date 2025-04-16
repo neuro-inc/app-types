@@ -2,6 +2,7 @@ import re
 import typing as t
 
 import apolo_sdk
+from yarl import URL
 
 from apolo_app_types.protocols.common import Ingress
 from apolo_app_types.protocols.common.k8s import Port
@@ -12,6 +13,10 @@ DOMAIN_SECTION_MAX_LENGTH = 63
 APP_NAME_PLACEHOLDER = "app_name"
 APP_NAME_F_STRING_EXPRESSION = f"{{{APP_NAME_PLACEHOLDER}}}"
 F_STRING_EXPRESSION_RE = re.compile(r"\{.+?\}")
+
+
+def _get_forward_auth_address(client: apolo_sdk.Client) -> URL:
+    return client.config.api_url.with_path("/oauth/authorize")
 
 
 async def _get_ingress_name_template(client: apolo_sdk.Client) -> str:
@@ -102,4 +107,15 @@ async def get_ingress_values(
                 "traefik.ingress.kubernetes.io/service.serversscheme": "h2c",
             },
         }
+    if ingress.http_auth:
+        forward_auth_config = {
+            "enabled": True,
+            "address": str(_get_forward_auth_address(apolo_client)),
+            "trustForwardHeader": True,
+            "authRequestHeaders": [
+                "Authorization",
+                "Cookie",
+            ],
+        }
+        ingress_vals["ingress"]["forwardAuth"] = forward_auth_config
     return ingress_vals
