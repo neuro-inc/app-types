@@ -54,7 +54,7 @@ class ApoloFilesPath(AbstractAppFieldType):
     def is_absolute(self) -> bool:
         return self.path.startswith("storage://")
 
-    def set_absolute_path(
+    def get_absolute_path_model(
         self, org: str, cluster: str, project: str | None
     ) -> "ApoloFilesPath":
         if self.is_absolute():
@@ -71,8 +71,7 @@ class ApoloFilesPath(AbstractAppFieldType):
             raise ValueError(err_msg)
 
         absolute_path = f"storage://{cluster}/{org}/{project_part}/{path}"
-        self.path = absolute_path
-        return self
+        return self.model_copy(update={"path": absolute_path})
 
 
 class MountPath(AbstractAppFieldType):

@@ -203,7 +203,7 @@ def gen_apolo_storage_integration_annotations(
             if not client:
                 err_msg = "You must pass client if mounts use relative paths"
                 raise ValueError(err_msg)
-            storage_uri.set_absolute_path(
+            storage_uri = storage_uri.get_absolute_path_model(
                 org=client.config.org_name,
                 cluster=client.config.cluster_name,
                 project=client.config.project_name,
