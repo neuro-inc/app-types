@@ -72,6 +72,7 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
         },
         "forwardAuth": {
             "enabled": True,
+            "name": f"{DEFAULT_NAMESPACE}-forwardauth",
             "address": ANY,
             "trustForwardHeader": True,
         },
@@ -194,6 +195,7 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
             },
             "forwardAuth": {
                 "enabled": True,
+                "name": f"{DEFAULT_NAMESPACE}-forwardauth",
                 "address": ANY,
                 "trustForwardHeader": True,
             },
@@ -263,6 +265,7 @@ async def test_values_llm_generation_cpu_apolo_secret(
         },
         "forwardAuth": {
             "enabled": True,
+            "name": f"{DEFAULT_NAMESPACE}-forwardauth",
             "address": ANY,
             "trustForwardHeader": True,
         },
