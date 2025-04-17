@@ -1,17 +1,25 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from yarl import URL
 
-from apolo_app_types import AppInputs, CrunchyPostgresUserCredentials
+from apolo_app_types import (
+    AppInputs,
+    AppOutputs,
+    CrunchyPostgresUserCredentials,
+    HuggingFaceModel,
+)
 from apolo_app_types.protocols.common import (
     AppInputsDeployer,
     AppOutputsDeployer,
+    Ingress,
     Preset,
     SchemaExtraMetadata,
 )
 from apolo_app_types.protocols.common.networking import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
+    RestAPI,
 )
+from apolo_app_types.protocols.llm import LLMModel
 
 
 class PrivateGPTInputs(AppInputsDeployer):
@@ -43,9 +51,12 @@ class PrivateGptSpecific(BaseModel):
 
 class PrivateGPTAppInputs(AppInputs):
     preset: Preset
+    ingress: Ingress
     llm_chat_api: OpenAICompatChatAPI
+    llm_details: LLMModel
     pgvector_user: CrunchyPostgresUserCredentials
     tei_api: OpenAICompatEmbeddingsAPI
+    tei_model: HuggingFaceModel
     private_gpt_specific: PrivateGptSpecific = Field(
         default_factory=lambda: PrivateGptSpecific(),
     )
@@ -58,3 +69,14 @@ class PrivateGPTOutputs(AppOutputsDeployer):
     external_api_url: str
     external_api_swagger_url: str
     external_authorization_required: bool
+
+
+class PrivateGPTAppOutputs(AppOutputs):
+    """
+    PrivateGPT outputs:
+      - internal_web_app_url
+      - external_web_app_url
+    """
+
+    internal_web_app_url: RestAPI | None = None
+    external_web_app_url: RestAPI | None = None
