@@ -87,7 +87,9 @@ async def get_ingress_values(
     namespace: str,
     port_configurations: list[Port] | None = None,
 ) -> dict[str, t.Any]:
-    ingress_vals: dict[str, t.Any] = {"ingress": {"grpc": {"enabled": False}}}
+    ingress_vals: dict[str, t.Any] = {
+        "ingress": {"grpc": {"enabled": False}, "annotations": {}}
+    }
     if not ingress.enabled:
         ingress_vals["ingress"]["enabled"] = False
         return ingress_vals
@@ -108,10 +110,16 @@ async def get_ingress_values(
             },
         }
     if ingress.http_auth:
+        forward_auth_name = f"{namespace}-forwardauth"
         forward_auth_config = {
             "enabled": True,
+            "name": forward_auth_name,
             "address": str(_get_forward_auth_address(apolo_client)),
             "trustForwardHeader": True,
         }
         ingress_vals["ingress"]["forwardAuth"] = forward_auth_config
+        ingress_vals["ingress"]["annotations"][
+            "traefik.ingress.kubernetes.io/router.middlewares"
+        ] = f"{forward_auth_name}@kubernetescrd"
+
     return ingress_vals
