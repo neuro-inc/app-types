@@ -110,7 +110,7 @@ async def get_ingress_values(
             },
         }
     if ingress.http_auth:
-        forward_auth_name = f"{namespace}-forwardauth"
+        forward_auth_name = "forwardauth"
         forward_auth_config = {
             "enabled": True,
             "name": forward_auth_name,
@@ -120,6 +120,6 @@ async def get_ingress_values(
         ingress_vals["ingress"]["forwardAuth"] = forward_auth_config
         ingress_vals["ingress"]["annotations"][
             "traefik.ingress.kubernetes.io/router.middlewares"
-        ] = f"{forward_auth_name}@kubernetescrd"
+        ] = f"{namespace}-{forward_auth_name}@kubernetescrd"
 
     return ingress_vals
