@@ -112,10 +112,6 @@ async def get_ingress_values(
             "enabled": True,
             "address": str(_get_forward_auth_address(apolo_client)),
             "trustForwardHeader": True,
-            "authRequestHeaders": [
-                "Authorization",
-                "Cookie",
-            ],
         }
         ingress_vals["ingress"]["forwardAuth"] = forward_auth_config
     return ingress_vals
