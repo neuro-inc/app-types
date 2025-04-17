@@ -12,7 +12,10 @@ from apolo_app_types.protocols.common import (
     SchemaExtraMetadata,
     SchemaMetaType,
 )
-from apolo_app_types.protocols.common.networking import RestAPI
+from apolo_app_types.protocols.common.networking import (
+    OpenAICompatChatAPI,
+    OpenAICompatEmbeddingsAPI,
+)
 
 
 class LLMApi(AbstractAppFieldType):
@@ -122,9 +125,9 @@ class LLMApiKey(AbstractAppFieldType):
 
 
 class VLLMOutputsV2(AppOutputs):
-    chat_internal_api: RestAPI | None = None
-    chat_external_api: RestAPI | None = None
-    embeddings_internal_api: RestAPI | None = None
-    embeddings_external_api: RestAPI | None = None
+    chat_internal_api: OpenAICompatChatAPI | None = None
+    chat_external_api: OpenAICompatChatAPI | None = None
+    embeddings_internal_api: OpenAICompatEmbeddingsAPI | None = None
+    embeddings_external_api: OpenAICompatEmbeddingsAPI | None = None
     llm: LLMModel | None = None
     llm_api_key: LLMApiKey | None = None

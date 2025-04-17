@@ -1,7 +1,25 @@
-from pydantic import field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from yarl import URL
 
-from apolo_app_types.protocols.common import AppInputsDeployer, AppOutputsDeployer
+from apolo_app_types import (
+    AppInputs,
+    AppOutputs,
+    CrunchyPostgresUserCredentials,
+    HuggingFaceModel,
+)
+from apolo_app_types.protocols.common import (
+    AppInputsDeployer,
+    AppOutputsDeployer,
+    Ingress,
+    Preset,
+    SchemaExtraMetadata,
+)
+from apolo_app_types.protocols.common.networking import (
+    OpenAICompatChatAPI,
+    OpenAICompatEmbeddingsAPI,
+    RestAPI,
+)
+from apolo_app_types.protocols.llm import LLMModel
 
 
 class PrivateGPTInputs(AppInputsDeployer):
@@ -20,6 +38,30 @@ class PrivateGPTInputs(AppInputsDeployer):
         return URL(raw)
 
 
+class PrivateGptSpecific(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="PrivateGPT Specific",
+            description="Configuration for PrivateGPT.",
+        ).as_json_schema_extra(),
+    )
+    llm_temperature: float = 0.1
+
+
+class PrivateGPTAppInputs(AppInputs):
+    preset: Preset
+    ingress: Ingress
+    llm_chat_api: OpenAICompatChatAPI
+    llm_details: LLMModel
+    pgvector_user: CrunchyPostgresUserCredentials
+    tei_api: OpenAICompatEmbeddingsAPI
+    tei_model: HuggingFaceModel
+    private_gpt_specific: PrivateGptSpecific = Field(
+        default_factory=lambda: PrivateGptSpecific(),
+    )
+
+
 class PrivateGPTOutputs(AppOutputsDeployer):
     internal_web_app_url: str
     internal_api_url: str
@@ -27,3 +69,14 @@ class PrivateGPTOutputs(AppOutputsDeployer):
     external_api_url: str
     external_api_swagger_url: str
     external_authorization_required: bool
+
+
+class PrivateGPTAppOutputs(AppOutputs):
+    """
+    PrivateGPT outputs:
+      - internal_web_app_url
+      - external_web_app_url
+    """
+
+    internal_web_app_url: RestAPI | None = None
+    external_web_app_url: RestAPI | None = None
