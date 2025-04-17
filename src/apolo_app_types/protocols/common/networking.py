@@ -26,7 +26,7 @@ class HttpApi(AbstractAppFieldType):
     timeout: float | None = Field(
         default=30.0, description="Connection timeout in seconds."
     )
-    base_path: str = ""
+    base_path: str = "/"
 
 
 class GraphQLAPI(HttpApi):
@@ -39,3 +39,29 @@ class RestAPI(HttpApi):
 
 class GrpcAPI(HttpApi):
     api_type: Literal["grpc"] = "grpc"
+
+
+class OpenAICompatChatAPI(RestAPI):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="OpenAI Compatible Chat API",
+            description="Configuration for OpenAI compatible chat API.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+    api_type: Literal["chat"] = "chat"
+    endpoint_url: str = "/v1/chat"
+
+
+class OpenAICompatEmbeddingsAPI(RestAPI):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="OpenAI Compatible Embeddings API",
+            description="Configuration for OpenAI compatible embeddings API.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+    api_type: Literal["embeddings"] = "embeddings"
+    endpoint_url: str = "/v1/embeddings"
