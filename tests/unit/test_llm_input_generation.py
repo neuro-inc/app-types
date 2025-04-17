@@ -1,3 +1,5 @@
+from unittest.mock import ANY
+
 from apolo_app_types import HuggingFaceModel, LLMInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import (
@@ -63,6 +65,11 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
                 "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
             }
         ],
+        "forwardAuth": {
+            "enabled": True,
+            "address": ANY,
+            "trustForwardHeader": True,
+        },
     }
     assert helm_params["tolerations"] == [
         {
@@ -175,6 +182,11 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
                     "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
                 }
             ],
+            "forwardAuth": {
+                "enabled": True,
+                "address": ANY,
+                "trustForwardHeader": True,
+            },
         },
         "podAnnotations": {},
         "podExtraLabels": {},
@@ -234,6 +246,11 @@ async def test_values_llm_generation_cpu_apolo_secret(
                 "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
             }
         ],
+        "forwardAuth": {
+            "enabled": True,
+            "address": ANY,
+            "trustForwardHeader": True,
+        },
     }
     assert helm_params["tolerations"] == [
         {
