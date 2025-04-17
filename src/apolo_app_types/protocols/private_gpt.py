@@ -1,7 +1,17 @@
-from pydantic import field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from yarl import URL
 
-from apolo_app_types.protocols.common import AppInputsDeployer, AppOutputsDeployer
+from apolo_app_types import AppInputs, CrunchyPostgresUserCredentials
+from apolo_app_types.protocols.common import (
+    AppInputsDeployer,
+    AppOutputsDeployer,
+    Preset,
+    SchemaExtraMetadata,
+)
+from apolo_app_types.protocols.common.networking import (
+    OpenAICompatChatAPI,
+    OpenAICompatEmbeddingsAPI,
+)
 
 
 class PrivateGPTInputs(AppInputsDeployer):
@@ -18,6 +28,27 @@ class PrivateGPTInputs(AppInputsDeployer):
     @classmethod
     def huggingface_token_secret_validator(cls, raw: str) -> URL:
         return URL(raw)
+
+
+class PrivateGptSpecific(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="PrivateGPT Specific",
+            description="Configuration for PrivateGPT.",
+        ).as_json_schema_extra(),
+    )
+    llm_temperature: float = 0.1
+
+
+class PrivateGPTAppInputs(AppInputs):
+    preset: Preset
+    llm_chat_api: OpenAICompatChatAPI
+    pgvector_user: CrunchyPostgresUserCredentials
+    tei_api: OpenAICompatEmbeddingsAPI
+    private_gpt_specific: PrivateGptSpecific = Field(
+        default_factory=lambda: PrivateGptSpecific(),
+    )
 
 
 class PrivateGPTOutputs(AppOutputsDeployer):

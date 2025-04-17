@@ -25,9 +25,9 @@ async def test_llm(setup_clients, mock_kubernetes_client):
         "key": "dummy-api-key",
     }
     assert res["chat_internal_api"]["host"] == "llm-inference.default-namespace"
-    assert res["chat_internal_api"]["base_path"] == "/v1/chat"
+    assert res["chat_internal_api"]["endpoint_url"] == "/v1/chat"
     assert res["embeddings_internal_api"]["host"] == "llm-inference.default-namespace"
-    assert res["embeddings_internal_api"]["base_path"] == "/v1/embeddings"
+    assert res["embeddings_internal_api"]["endpoint_url"] == "/v1/embeddings"
     assert res["chat_external_api"]["host"] == "example.com"
     assert res["embeddings_external_api"]["host"] == "example.com"
 
@@ -54,9 +54,9 @@ async def test_llm_without_server_args(setup_clients, mock_kubernetes_client):
         "key": "dummy-api-key",
     }
     assert res["chat_internal_api"]["host"] == "llm-inference.default-namespace"
-    assert res["chat_internal_api"]["base_path"] == "/v1/chat"
+    assert res["chat_internal_api"]["endpoint_url"] == "/v1/chat"
     assert res["embeddings_internal_api"]["host"] == "llm-inference.default-namespace"
-    assert res["embeddings_internal_api"]["base_path"] == "/v1/embeddings"
+    assert res["embeddings_internal_api"]["endpoint_url"] == "/v1/embeddings"
     assert res["chat_external_api"]["host"] == "example.com"
     assert res["embeddings_external_api"]["host"] == "example.com"
 
