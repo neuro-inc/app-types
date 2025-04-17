@@ -87,7 +87,9 @@ async def get_ingress_values(
     namespace: str,
     port_configurations: list[Port] | None = None,
 ) -> dict[str, t.Any]:
-    ingress_vals: dict[str, t.Any] = {"ingress": {"grpc": {"enabled": False}}}
+    ingress_vals: dict[str, t.Any] = {
+        "ingress": {"grpc": {"enabled": False}, "annotations": {}}
+    }
     if not ingress.enabled:
         ingress_vals["ingress"]["enabled"] = False
         return ingress_vals
