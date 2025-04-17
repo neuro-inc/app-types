@@ -28,6 +28,9 @@ class HttpApi(AbstractAppFieldType):
     )
     base_path: str = "/"
 
+    def get_api_base_url(self) -> str:
+        return f"{self.protocol}://{self.host}:{self.port}{self.base_path}"
+
 
 class GraphQLAPI(HttpApi):
     api_type: Literal["graphql"] = "graphql"
