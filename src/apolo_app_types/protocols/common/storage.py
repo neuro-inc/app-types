@@ -1,5 +1,6 @@
 import enum
 
+import apolo_sdk
 from pydantic import ConfigDict, Field, field_validator
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
@@ -54,24 +55,12 @@ class ApoloFilesPath(AbstractAppFieldType):
     def is_absolute(self) -> bool:
         return self.path.startswith("storage://")
 
-    def get_absolute_path_model(
-        self, org: str, cluster: str, project: str | None
-    ) -> "ApoloFilesPath":
+    def get_absolute_path_model(self, client: apolo_sdk.Client) -> "ApoloFilesPath":
         if self.is_absolute():
             return self
 
-        path = self.path.replace("storage:", "")
-        project_part = None
-        if path.startswith("/"):
-            project_part, path = path[1:].split("/", maxsplit=1)
-        project_part = project_part or project
-
-        if not project_part:
-            err_msg = "Project is not set."
-            raise ValueError(err_msg)
-
-        absolute_path = f"storage://{cluster}/{org}/{project_part}/{path}"
-        return self.model_copy(update={"path": absolute_path})
+        volume = client.parse.volume(f"{self.path}:rw")
+        return self.model_copy(update={"path": str(volume.storage_uri)})
 
 
 class MountPath(AbstractAppFieldType):
