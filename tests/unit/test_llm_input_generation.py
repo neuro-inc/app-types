@@ -65,6 +65,11 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
                 "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
             }
         ],
+        "annotations": {
+            "traefik.ingress.kubernetes.io/router.middlewares": (
+                f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd"
+            )
+        },
         "forwardAuth": {
             "enabled": True,
             "address": ANY,
@@ -182,6 +187,11 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
                     "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
                 }
             ],
+            "annotations": {
+                "traefik.ingress.kubernetes.io/router.middlewares": (
+                    f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd"
+                )
+            },
             "forwardAuth": {
                 "enabled": True,
                 "address": ANY,
@@ -246,6 +256,11 @@ async def test_values_llm_generation_cpu_apolo_secret(
                 "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
             }
         ],
+        "annotations": {
+            "traefik.ingress.kubernetes.io/router.middlewares": (
+                f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd"
+            )
+        },
         "forwardAuth": {
             "enabled": True,
             "address": ANY,
@@ -464,6 +479,7 @@ async def test_values_llm_generation__storage_integrated(
         },
         "ingress": {
             "grpc": {"enabled": False},
+            "annotations": {},
             "enabled": False,
         },
         "podAnnotations": {
