@@ -194,13 +194,19 @@ def sanitize_dict_string(
 
 
 def gen_apolo_storage_integration_annotations(
-    files_mouts: t.Sequence[ApoloFilesMount],
+    files_mouts: t.Sequence[ApoloFilesMount], client: apolo_sdk.Client
 ) -> list[dict[str, str]]:
     storage_mount_annotations = []
     for storage_mount in files_mouts:
+        storage_uri = storage_mount.storage_uri
+        if not storage_uri.is_absolute():
+            if not client:
+                err_msg = "You must pass client if mounts use relative paths"
+                raise ValueError(err_msg)
+            storage_uri = storage_uri.get_absolute_path_model(client=client)
         storage_mount_annotations.append(
             {
-                "storage_uri": storage_mount.storage_uri.path,
+                "storage_uri": storage_uri.path,
                 "mount_path": storage_mount.mount_path.path,
                 "mount_mode": storage_mount.mode.mode.value,
             }
@@ -223,7 +229,9 @@ def gen_apolo_storage_integration_labels(
 
 
 def append_apolo_storage_integration_annotations(
-    current_annotations: dict[str, t.Any], files_mounts: t.Sequence[ApoloFilesMount]
+    current_annotations: dict[str, t.Any],
+    files_mounts: t.Sequence[ApoloFilesMount],
+    client: apolo_sdk.Client,
 ) -> dict[str, str]:
     """
     Returns a new dict with the storage annotations appended to the current annotations.
@@ -235,7 +243,7 @@ def append_apolo_storage_integration_annotations(
     else:
         current_list = []
 
-    new_annotations = gen_apolo_storage_integration_annotations(files_mounts)
+    new_annotations = gen_apolo_storage_integration_annotations(files_mounts, client)
     current_list.extend(new_annotations)
     cur_annot[APOLO_STORAGE_LABEL] = json.dumps(current_list)
     return cur_annot

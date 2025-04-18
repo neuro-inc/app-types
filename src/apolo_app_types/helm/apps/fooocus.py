@@ -75,7 +75,7 @@ class FooocusChartValueProcessor(BaseChartValueProcessor[FooocusAppInputs]):
         """
 
         base_app_storage_path = get_app_data_files_path_url(
-            client=self.client, app_type=AppType.Fooocus, app_name=app_name
+            client=self.client, app_type_name=AppType.Fooocus.value, app_name=app_name
         )
         data_storage_path = base_app_storage_path / "data"
         data_container_dir = URL("/content/data")

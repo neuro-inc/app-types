@@ -43,6 +43,8 @@ from apolo_app_types.protocols.huggingface_cache import (
     HuggingFaceCacheOutputs,
 )
 from apolo_app_types.protocols.jupyter import (
+    JupyterAppInputs,
+    JupyterAppOutputs,
     JupyterInputs,
     JupyterOutputs,
     JupyterTypes,
@@ -158,6 +160,8 @@ __all__ = [
     "FooocusAppOutputs",
     "ApoloFilesMount",
     "Bucket",
+    "JupyterAppInputs",
+    "JupyterAppOutputs",
     "TextEmbeddingsInferenceAppInputs",
     "TextEmbeddingsInferenceAppOutputs",
 ]

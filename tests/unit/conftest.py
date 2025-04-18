@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 import apolo_sdk
 import pytest
 from apolo_sdk import AppsConfig
+from yarl import URL
 
 from tests.unit.constants import (
     DEFAULT_CLUSTER_NAME,
@@ -44,6 +45,27 @@ async def setup_clients():
                     name=image,
                 )
             )
+
+            def parse_volume(volume):
+                path = volume.replace("storage:", "")
+                path, read_write = path.split(":")
+                if path.startswith("//"):
+                    full_path = volume
+                elif path.startswith("/"):
+                    path = path[1:]
+                    full_path = (
+                        f"storage://{DEFAULT_CLUSTER_NAME}/{DEFAULT_ORG_NAME}/{path}"
+                    )
+                else:
+                    project = DEFAULT_PROJECT_NAME
+                    full_path = f"storage://{DEFAULT_CLUSTER_NAME}/{DEFAULT_ORG_NAME}/{project}/{path}"
+                return apolo_sdk.Volume(
+                    storage_uri=URL(full_path),
+                    container_path="/mock/storage",
+                    read_only=False,
+                )
+
+            mock_apolo_client.parse.volume = MagicMock(side_effect=parse_volume)
             mock_apolo_client.username = PropertyMock(return_value="test-user")
             mock_bucket = Bucket(
                 id="bucket-id",
