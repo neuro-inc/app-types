@@ -23,13 +23,17 @@ class HuggingFaceModel(AbstractAppFieldType):
     )
     model_hf_name: str = Field(  # noqa: N815
         ...,
-        description="The name of the Hugging Face model.",
-        title="Hugging Face Model Name",
+        json_schema_extra=SchemaExtraMetadata(
+            description="The name of the Hugging Face model.",
+            title="Hugging Face Model Name",
+        ).as_json_schema_extra(),
     )
     hf_token: OptionalStrOrSecret = Field(  # noqa: N815
         default=None,
-        description="The Hugging Face API token.",
-        title="Hugging Face Token",
+        json_schema_extra=SchemaExtraMetadata(
+            description="The Hugging Face API token.",
+            title="Hugging Face Token",
+        ).as_json_schema_extra(),
     )
 
 
@@ -44,6 +48,8 @@ class HuggingFaceCache(AbstractAppFieldType):
     )
     files_path: ApoloFilesPath = Field(
         ...,
-        description="The path to the Apolo Files directory where Hugging Face artifacts are cached.",  # noqa: E501
-        title="Files Path",
+        json_schema_extra=SchemaExtraMetadata(
+            description="The path to the Apolo Files directory where Hugging Face artifacts are cached.",  # noqa: E501
+            title="Files Path",
+        ).as_json_schema_extra(),
     )
