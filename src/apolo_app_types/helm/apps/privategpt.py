@@ -1,30 +1,34 @@
 import typing as t
 
-from apolo_app_types.protocols.common import StorageMounts, ApoloFilesPath, MountPath, ApoloMountMode
-from apolo_app_types.protocols.common.k8s import Port, Container, Env
-from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
-from apolo_app_types.protocols.custom_deployment import NetworkingConfig
 from yarl import URL
 
-from apolo_app_types import CustomDeploymentInputs, ContainerImage, ApoloFilesMount
+from apolo_app_types import ApoloFilesMount, ContainerImage, CustomDeploymentInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps import CustomDeploymentChartValueProcessor
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.utils.storage import get_app_data_files_path_url
-
+from apolo_app_types.protocols.common import (
+    ApoloFilesPath,
+    ApoloMountMode,
+    MountPath,
+    StorageMounts,
+)
+from apolo_app_types.protocols.common.k8s import Container, Env, Port
+from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
+from apolo_app_types.protocols.custom_deployment import NetworkingConfig
 from apolo_app_types.protocols.private_gpt import PrivateGPTAppInputs
 
 
-class PrivateGptChartValueProcessor(
-    BaseChartValueProcessor[PrivateGPTAppInputs]
-):
+class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]):
     def __init__(self, *args: t.Any, **kwargs: t.Any):
         super().__init__(*args, **kwargs)
         self.custom_dep_val_processor = CustomDeploymentChartValueProcessor(
             *args, **kwargs
         )
+
     async def _configure_env(
-        self, input_: PrivateGPTAppInputs,
+        self,
+        input_: PrivateGPTAppInputs,
         app_secrets_name: str,
     ) -> dict[str, str]:
         env_vars = {
@@ -32,7 +36,8 @@ class PrivateGptChartValueProcessor(
             "VLLM_API_BASE": input_.llm_chat_api.get_api_base_url(),
             "VLLM_MODEL": input_.llm_details.hugging_face_model.model_hf_name,
             "VLLM_TOKENIZER": (
-                input_.llm_details.tokenizer_hf_name or input_.llm_details.hugging_face_model.model_hf_name
+                input_.llm_details.tokenizer_hf_name
+                or input_.llm_details.hugging_face_model.model_hf_name
             ),
             # hardcoded for now, needs investigation,
             # limited by GPU memory and model size
@@ -51,11 +56,12 @@ class PrivateGptChartValueProcessor(
             "POSTGRES_USER": input_.pgvector_user.user,
             "POSTGRES_PASSWORD": input_.pgvector_user.password,
         }
-        env_vars = dict(map(lambda item: (item[0], str(item[1])), env_vars.items()))
+        env_vars = {key: str(value) for key, value in env_vars.items()}
         secret_envs = {}
         if input_.llm_details.hugging_face_model.hf_token:
             secret_envs["HUGGINGFACE_TOKEN"] = serialize_optional_secret(
-                input_.llm_details.hugging_face_model.hf_token, secret_name=app_secrets_name
+                input_.llm_details.hugging_face_model.hf_token,
+                secret_name=app_secrets_name,
             )
         env_vars.update(secret_envs)
 
