@@ -1,5 +1,6 @@
 import enum
 
+import apolo_sdk
 from pydantic import ConfigDict, Field, field_validator
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
@@ -46,12 +47,20 @@ class ApoloFilesPath(AbstractAppFieldType):
 
     @field_validator("path", mode="before")
     def validate_storage_path(cls, value: str) -> str:  # noqa: N805
-        if not value.startswith("storage://"):
-            err_msg = (
-                "Storage path must have `storage:` schema and be of absolute path."
-            )
+        if not value.startswith("storage:"):
+            err_msg = "Storage path must have `storage:` schema"
             raise ValueError(err_msg)
         return value
+
+    def is_absolute(self) -> bool:
+        return self.path.startswith("storage://")
+
+    def get_absolute_path_model(self, client: apolo_sdk.Client) -> "ApoloFilesPath":
+        if self.is_absolute():
+            return self
+
+        volume = client.parse.volume(f"{self.path}:rw")
+        return self.model_copy(update={"path": str(volume.storage_uri)})
 
 
 class MountPath(AbstractAppFieldType):

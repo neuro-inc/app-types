@@ -30,7 +30,7 @@ class CustomDeploymentChartValueProcessor(
         if not input_.storage_mounts:
             return {}
         return append_apolo_storage_integration_annotations(
-            {}, input_.storage_mounts.mounts
+            {}, input_.storage_mounts.mounts, client=self.client
         )
 
     def _configure_storage_labels(

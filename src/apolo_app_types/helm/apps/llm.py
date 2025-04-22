@@ -17,6 +17,7 @@ from apolo_app_types.protocols.common import (
     MountPath,
 )
 from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
+from apolo_app_types.protocols.common.storage import ApoloMountModes
 from apolo_app_types.protocols.llm import LLMModel
 
 
@@ -85,10 +86,10 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
             storage_mount = ApoloFilesMount(
                 storage_uri=input_.cache_config.files_path,
                 mount_path=MountPath(path="/root/.cache/huggingface"),
-                mode=ApoloMountMode(mode="rw"),
+                mode=ApoloMountMode(mode=ApoloMountModes.RW),
             )
             extra_annotations = append_apolo_storage_integration_annotations(
-                extra_annotations, [storage_mount]
+                extra_annotations, [storage_mount], self.client
             )
         return extra_annotations
 

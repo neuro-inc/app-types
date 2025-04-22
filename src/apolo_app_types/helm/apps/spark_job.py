@@ -15,6 +15,7 @@ from apolo_app_types.protocols.common.storage import (
     ApoloFilesMount,
     ApoloFilesPath,
     ApoloMountMode,
+    ApoloMountModes,
     MountPath,
 )
 
@@ -46,6 +47,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         extra_annotations = append_apolo_storage_integration_annotations(
             extra_annotations,
             [main_app_file_mount] + (input_.spark_application_config.volumes or []),
+            self.client,
         )
 
         main_application_file = f"local://{mount_path}/{main_app_file_path.name}"
@@ -154,7 +156,9 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
 
             pypi_packages_storage_path = (
                 get_app_data_files_path_url(
-                    client=self.client, app_type=AppType.SparkJob, app_name=app_name
+                    client=self.client,
+                    app_type_name=AppType.SparkJob.value,
+                    app_name=app_name,
                 )
                 / "spark"
                 / "deps"
@@ -163,10 +167,10 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             deps_mount = ApoloFilesMount(
                 storage_uri=ApoloFilesPath(path=str(pypi_packages_storage_path)),
                 mount_path=MountPath(path="/opt/spark/deps"),
-                mode=ApoloMountMode(mode="rw"),
+                mode=ApoloMountMode(mode=ApoloMountModes.RW),
             )
             deps_annotation = append_apolo_storage_integration_annotations(
-                {}, [deps_mount]
+                {}, [deps_mount], self.client
             )
             values["pyspark_dep_manager"] = {
                 "labels": gen_apolo_storage_integration_labels(
@@ -177,12 +181,14 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             # append to existing storage annotation
             values["spark"]["driver"]["annotations"] = (
                 append_apolo_storage_integration_annotations(
-                    values["spark"]["driver"]["annotations"], [deps_mount]
+                    values["spark"]["driver"]["annotations"], [deps_mount], self.client
                 )
             )
             values["spark"]["executor"]["annotations"] = (
                 append_apolo_storage_integration_annotations(
-                    values["spark"]["executor"]["annotations"], [deps_mount]
+                    values["spark"]["executor"]["annotations"],
+                    [deps_mount],
+                    self.client,
                 )
             )
 
