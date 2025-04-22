@@ -30,8 +30,15 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
         self,
         input_: PrivateGPTAppInputs,
         app_secrets_name: str,
-    ) -> dict[str, str]:
-        env_vars = {
+    ) -> dict[str, t.Any]:
+        if not input_.llm_chat_api.hf_model:
+            err_msg = "llm_chat_api.hf_model is required"
+            raise ValueError(err_msg)
+        if not input_.embeddings_api.hf_model:
+            err_msg = "embeddings_api.hf_model is required"
+            raise ValueError(err_msg)
+
+        env_vars: dict[str, t.Any] = {
             "PGPT_PROFILES": "app, pgvector",
             "VLLM_API_BASE": input_.llm_chat_api.get_api_base_url(),
             "VLLM_MODEL": input_.llm_chat_api.hf_model.model_hf_name,
@@ -49,18 +56,15 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
             "EMBEDDING_DIM": "768",  # hardcoded for now, need introspection
             "POSTGRES_HOST": input_.pgvector_user.pgbouncer_host,
             "POSTGRES_PORT": input_.pgvector_user.pgbouncer_port,
-            "POSTGRES_DB": input_.pgvector_user.dbname,
+            "POSTGRES_DB": input_.pgvector_user.dbname or "postgres",
             "POSTGRES_USER": input_.pgvector_user.user,
             "POSTGRES_PASSWORD": input_.pgvector_user.password,
         }
-        env_vars = {key: str(value) for key, value in env_vars.items()}
-        secret_envs = {}
         if input_.llm_chat_api.hf_model.hf_token:
-            secret_envs["HUGGINGFACE_TOKEN"] = serialize_optional_secret(
+            env_vars["HUGGINGFACE_TOKEN"] = serialize_optional_secret(
                 input_.llm_chat_api.hf_model.hf_token,
                 secret_name=app_secrets_name,
             )
-        env_vars.update(secret_envs)
 
         return env_vars
 
@@ -74,7 +78,9 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
         base_app_storage_path = get_app_data_files_path_url(
-            client=self.client, app_type=AppType.PrivateGPT, app_name=app_name
+            client=self.client,
+            app_type_name=str(AppType.PrivateGPT.value),
+            app_name=app_name,
         )
         data_storage_path = base_app_storage_path / "data"
         data_container_dir = URL("/home/worker/app/local_data")

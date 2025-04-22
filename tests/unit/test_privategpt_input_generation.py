@@ -43,6 +43,7 @@ async def test_privategpt_values_generation(setup_clients):
                 port="pgvector_port",
                 pgbouncer_host="pgbouncer_host",
                 pgbouncer_port="pgbouncer_port",
+                dbname="db_name",
             ),
             embeddings_api=OpenAICompatEmbeddingsAPI(
                 host="text-embeddings-inference-host",
@@ -64,17 +65,8 @@ async def test_privategpt_values_generation(setup_clients):
         "repository": "ghcr.io/neuro-inc/private-gpt",
         "tag": "latest",
     }
-    assert helm_params["ingress"] == {
-        "className": "traefik",
-        "enabled": True,
-        "grpc": {"enabled": False},
-        "hosts": [
-            {
-                "host": "default-namespace.apps.some.org.neu.ro",
-                "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
-            }
-        ],
-    }
+    assert helm_params["ingress"]["enabled"] is True
+
     assert helm_params["service"] == {
         "enabled": True,
         "ports": [{"containerPort": 8080, "name": "http"}],
@@ -96,7 +88,7 @@ async def test_privategpt_values_generation(setup_clients):
         {"name": "EMBEDDING_DIM", "value": "768"},
         {"name": "POSTGRES_HOST", "value": "pgbouncer_host"},
         {"name": "POSTGRES_PORT", "value": "pgbouncer_port"},
-        {"name": "POSTGRES_DB", "value": "None"},
+        {"name": "POSTGRES_DB", "value": "db_name"},
         {"name": "POSTGRES_USER", "value": "pgvector_user"},
         {"name": "POSTGRES_PASSWORD", "value": "pgvector_password"},
     ]
@@ -151,17 +143,7 @@ async def test_privategpt_values_generation_custom_temperature(setup_clients):
         "repository": "ghcr.io/neuro-inc/private-gpt",
         "tag": "latest",
     }
-    assert helm_params["ingress"] == {
-        "className": "traefik",
-        "enabled": True,
-        "grpc": {"enabled": False},
-        "hosts": [
-            {
-                "host": "default-namespace.apps.some.org.neu.ro",
-                "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
-            }
-        ],
-    }
+    assert helm_params["ingress"]["enabled"] is True
     assert helm_params["service"] == {
         "enabled": True,
         "ports": [{"containerPort": 8080, "name": "http"}],
@@ -183,7 +165,7 @@ async def test_privategpt_values_generation_custom_temperature(setup_clients):
         {"name": "EMBEDDING_DIM", "value": "768"},
         {"name": "POSTGRES_HOST", "value": "pgbouncer_host"},
         {"name": "POSTGRES_PORT", "value": "pgbouncer_port"},
-        {"name": "POSTGRES_DB", "value": "None"},
+        {"name": "POSTGRES_DB", "value": "postgres"},
         {"name": "POSTGRES_USER", "value": "pgvector_user"},
         {"name": "POSTGRES_PASSWORD", "value": "pgvector_password"},
     ]

@@ -75,7 +75,7 @@ class OpenAICompatChatAPI(RestAPI):
         ).as_json_schema_extra(),
     )
     # used to distinguish between different types of APIs (chat, embeddings, etc)
-    api_type: Literal["chat"] = "chat"
+    openai_api_type: Literal["chat"] = "chat"
     endpoint_url: Literal["/v1/chat"] = "/v1/chat"
     hf_model: HuggingFaceModel | None = Field(
         default=None,
@@ -93,7 +93,7 @@ class OpenAICompatEmbeddingsAPI(RestAPI):
         ).as_json_schema_extra(),
     )
     # used to distinguish between different types of APIs (chat, embeddings, etc)
-    api_type: Literal["embeddings"] = "embeddings"
+    openai_api_type: Literal["embeddings"] = "embeddings"
     endpoint_url: Literal["/v1/embeddings"] = "/v1/embeddings"
     hf_model: HuggingFaceModel | None = Field(
         default=None,
