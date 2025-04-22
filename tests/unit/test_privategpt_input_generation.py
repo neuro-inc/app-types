@@ -28,10 +28,8 @@ async def test_privategpt_values_generation(setup_clients):
                 enabled=True,
             ),
             llm_chat_api=OpenAICompatChatAPI(
-                host="llm-host", port=8000, protocol="https", base_path="/"
-            ),
-            llm_details=LLMModel(
-                hugging_face_model=HuggingFaceModel(
+                host="llm-host", port=8000, protocol="https", base_path="/",
+                hf_model=HuggingFaceModel(
                     model_hf_name="llm-model",
                     tokenizer_hf_name="llm-tokenizer",
                 )
@@ -44,14 +42,14 @@ async def test_privategpt_values_generation(setup_clients):
                 pgbouncer_host="pgbouncer_host",
                 pgbouncer_port="pgbouncer_port",
             ),
-            tei_api=OpenAICompatEmbeddingsAPI(
+            embeddings_api=OpenAICompatEmbeddingsAPI(
                 host="text-embeddings-inference-host",
                 port=3000,
                 protocol="https",
                 base_path="/",
-            ),
-            tei_model=HuggingFaceModel(
-                model_hf_name="text-embeddings-inference-model",
+                hf_model=HuggingFaceModel(
+                    model_hf_name="text-embeddings-inference-model",
+                )
             ),
         ),
         apolo_client=setup_clients,
@@ -111,10 +109,8 @@ async def test_privategpt_values_generation_custom_temperature(setup_clients):
                 enabled=True,
             ),
             llm_chat_api=OpenAICompatChatAPI(
-                host="llm-host", port=8000, protocol="https", base_path="/"
-            ),
-            llm_details=LLMModel(
-                hugging_face_model=HuggingFaceModel(
+                host="llm-host", port=8000, protocol="https", base_path="/",
+                hf_model=HuggingFaceModel(
                     model_hf_name="llm-model",
                     tokenizer_hf_name="llm-tokenizer",
                 )
@@ -127,14 +123,14 @@ async def test_privategpt_values_generation_custom_temperature(setup_clients):
                 pgbouncer_host="pgbouncer_host",
                 pgbouncer_port="pgbouncer_port",
             ),
-            tei_api=OpenAICompatEmbeddingsAPI(
+            embeddings_api=OpenAICompatEmbeddingsAPI(
                 host="text-embeddings-inference-host",
                 port=3000,
                 protocol="https",
                 base_path="/",
-            ),
-            tei_model=HuggingFaceModel(
-                model_hf_name="text-embeddings-inference-model",
+                hf_model=HuggingFaceModel(
+                    model_hf_name="text-embeddings-inference-model",
+                )
             ),
             private_gpt_specific=PrivateGptSpecific(
                 llm_temperature=0.5,

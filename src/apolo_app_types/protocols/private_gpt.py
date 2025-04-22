@@ -5,7 +5,6 @@ from apolo_app_types import (
     AppInputs,
     AppOutputs,
     CrunchyPostgresUserCredentials,
-    HuggingFaceModel,
 )
 from apolo_app_types.protocols.common import (
     AppInputsDeployer,
@@ -19,7 +18,6 @@ from apolo_app_types.protocols.common.networking import (
     OpenAICompatEmbeddingsAPI,
     RestAPI,
 )
-from apolo_app_types.protocols.llm import LLMModel
 
 
 class PrivateGPTInputs(AppInputsDeployer):
@@ -43,20 +41,25 @@ class PrivateGptSpecific(BaseModel):
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
             title="PrivateGPT Specific",
-            description="Configuration for PrivateGPT.",
+            description="Configure PrivateGPT application.",
         ).as_json_schema_extra(),
     )
-    llm_temperature: float = 0.1
+    llm_temperature: float = Field(
+        default=0.1,
+        json_schema_extra=SchemaExtraMetadata(
+            title="LLM Temperature",
+            description="Configure temperature for LLM inference.",
+        ).as_json_schema_extra(),
+    )
 
 
 class PrivateGPTAppInputs(AppInputs):
     preset: Preset
     ingress: Ingress
-    llm_chat_api: OpenAICompatChatAPI
-    llm_details: LLMModel
+
     pgvector_user: CrunchyPostgresUserCredentials
-    tei_api: OpenAICompatEmbeddingsAPI
-    tei_model: HuggingFaceModel
+    embeddings_api: OpenAICompatEmbeddingsAPI
+    llm_chat_api: OpenAICompatChatAPI
     private_gpt_specific: PrivateGptSpecific = Field(
         default_factory=lambda: PrivateGptSpecific(),
     )

@@ -34,11 +34,8 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
         env_vars = {
             "PGPT_PROFILES": "app, pgvector",
             "VLLM_API_BASE": input_.llm_chat_api.get_api_base_url(),
-            "VLLM_MODEL": input_.llm_details.hugging_face_model.model_hf_name,
-            "VLLM_TOKENIZER": (
-                input_.llm_details.tokenizer_hf_name
-                or input_.llm_details.hugging_face_model.model_hf_name
-            ),
+            "VLLM_MODEL": input_.llm_chat_api.hf_model.model_hf_name,
+            "VLLM_TOKENIZER": (input_.llm_chat_api.hf_model.model_hf_name),
             # hardcoded for now, needs investigation,
             # limited by GPU memory and model size
             "VLLM_MAX_NEW_TOKENS": "5000",
@@ -47,8 +44,8 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
             "VLLM_CONTEXT_WINDOW": "8192",
             "VLLM_TEMPERATURE": str(input_.private_gpt_specific.llm_temperature),
             # FIX TEI API
-            "EMBEDDING_API_BASE": input_.tei_api.get_api_base_url(),
-            "EMBEDDING_MODEL": input_.tei_model.model_hf_name,
+            "EMBEDDING_API_BASE": input_.embeddings_api.get_api_base_url(),
+            "EMBEDDING_MODEL": input_.embeddings_api.hf_model.model_hf_name,
             "EMBEDDING_DIM": "768",  # hardcoded for now, need introspection
             "POSTGRES_HOST": input_.pgvector_user.pgbouncer_host,
             "POSTGRES_PORT": input_.pgvector_user.pgbouncer_port,
@@ -58,9 +55,9 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
         }
         env_vars = {key: str(value) for key, value in env_vars.items()}
         secret_envs = {}
-        if input_.llm_details.hugging_face_model.hf_token:
+        if input_.llm_chat_api.hf_model.hf_token:
             secret_envs["HUGGINGFACE_TOKEN"] = serialize_optional_secret(
-                input_.llm_details.hugging_face_model.hf_token,
+                input_.llm_chat_api.hf_model.hf_token,
                 secret_name=app_secrets_name,
             )
         env_vars.update(secret_envs)

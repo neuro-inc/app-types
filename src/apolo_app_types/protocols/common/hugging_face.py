@@ -9,14 +9,17 @@ from apolo_app_types.protocols.common.secrets_ import OptionalStrOrSecret
 from apolo_app_types.protocols.common.storage import ApoloFilesPath
 
 
+HF_SCHEMA_EXTRA = SchemaExtraMetadata(
+    title="Hugging Face Model",
+    description="Hugging Face Model Configuration.",
+    meta_type=SchemaMetaType.INTEGRATION,
+)
+
+
 class HuggingFaceModel(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Hugging Face Model",
-            description="Hugging Face Model Configuration.",
-            meta_type=SchemaMetaType.INTEGRATION,
-        ).as_json_schema_extra(),
+        json_schema_extra=HF_SCHEMA_EXTRA.as_json_schema_extra(),
     )
     model_hf_name: str = Field(  # noqa: N815
         ...,

@@ -3,6 +3,7 @@ from typing import Literal
 from pydantic import ConfigDict, Field
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
+from apolo_app_types.protocols.common.hugging_face import HF_SCHEMA_EXTRA, HuggingFaceModel
 from apolo_app_types.protocols.common.schema_extra import (
     SchemaExtraMetadata,
     SchemaMetaType,
@@ -55,6 +56,10 @@ class OpenAICompatChatAPI(RestAPI):
     )
     api_type: Literal["chat"] = "chat"
     endpoint_url: str = "/v1/chat"
+    hf_model: HuggingFaceModel | None = Field(
+        default=None,
+        json_schema_extra=HF_SCHEMA_EXTRA.as_json_schema_extra(),
+    )
 
 
 class OpenAICompatEmbeddingsAPI(RestAPI):
@@ -66,5 +71,10 @@ class OpenAICompatEmbeddingsAPI(RestAPI):
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
+    # used to distinguish between different types of APIs (chat, embeddings, etc)
     api_type: Literal["embeddings"] = "embeddings"
-    endpoint_url: str = "/v1/embeddings"
+    endpoint_url: Literal["/v1/embeddings"] = "/v1/embeddings"
+    hf_model: HuggingFaceModel | None = Field(
+        default=None,
+        json_schema_extra=HF_SCHEMA_EXTRA.as_json_schema_extra(),
+    )
