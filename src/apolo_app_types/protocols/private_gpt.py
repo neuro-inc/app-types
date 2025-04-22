@@ -56,7 +56,6 @@ class PrivateGptSpecific(BaseModel):
 class PrivateGPTAppInputs(AppInputs):
     preset: Preset
     ingress: Ingress
-
     pgvector_user: CrunchyPostgresUserCredentials
     embeddings_api: OpenAICompatEmbeddingsAPI
     llm_chat_api: OpenAICompatChatAPI

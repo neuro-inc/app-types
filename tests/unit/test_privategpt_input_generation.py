@@ -8,7 +8,6 @@ from apolo_app_types.protocols.common.networking import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
 )
-from apolo_app_types.protocols.llm import LLMModel
 from apolo_app_types.protocols.private_gpt import (
     PrivateGPTAppInputs,
     PrivateGptSpecific,
@@ -28,11 +27,14 @@ async def test_privategpt_values_generation(setup_clients):
                 enabled=True,
             ),
             llm_chat_api=OpenAICompatChatAPI(
-                host="llm-host", port=8000, protocol="https", base_path="/",
+                host="llm-host",
+                port=8000,
+                protocol="https",
+                base_path="/",
                 hf_model=HuggingFaceModel(
                     model_hf_name="llm-model",
                     tokenizer_hf_name="llm-tokenizer",
-                )
+                ),
             ),
             pgvector_user=CrunchyPostgresUserCredentials(
                 user="pgvector_user",
@@ -49,7 +51,7 @@ async def test_privategpt_values_generation(setup_clients):
                 base_path="/",
                 hf_model=HuggingFaceModel(
                     model_hf_name="text-embeddings-inference-model",
-                )
+                ),
             ),
         ),
         apolo_client=setup_clients,
@@ -109,11 +111,14 @@ async def test_privategpt_values_generation_custom_temperature(setup_clients):
                 enabled=True,
             ),
             llm_chat_api=OpenAICompatChatAPI(
-                host="llm-host", port=8000, protocol="https", base_path="/",
+                host="llm-host",
+                port=8000,
+                protocol="https",
+                base_path="/",
                 hf_model=HuggingFaceModel(
                     model_hf_name="llm-model",
                     tokenizer_hf_name="llm-tokenizer",
-                )
+                ),
             ),
             pgvector_user=CrunchyPostgresUserCredentials(
                 user="pgvector_user",
@@ -130,7 +135,7 @@ async def test_privategpt_values_generation_custom_temperature(setup_clients):
                 base_path="/",
                 hf_model=HuggingFaceModel(
                     model_hf_name="text-embeddings-inference-model",
-                )
+                ),
             ),
             private_gpt_specific=PrivateGptSpecific(
                 llm_temperature=0.5,
