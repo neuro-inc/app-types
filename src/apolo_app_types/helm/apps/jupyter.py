@@ -10,10 +10,7 @@ from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.custom_deployment import (
     CustomDeploymentChartValueProcessor,
 )
-from apolo_app_types.protocols.common import (
-    Container,
-    StorageMounts,
-)
+from apolo_app_types.protocols.common import Container, Env, StorageMounts
 from apolo_app_types.protocols.common.ingress import Ingress
 from apolo_app_types.protocols.common.k8s import Port
 from apolo_app_types.protocols.custom_deployment import NetworkingConfig
@@ -62,6 +59,15 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
         if input_.jupyter_specific.jupyter_type == JupyterTypes.NOTEBOOK:
             cmd = "notebook"
 
+        env_vars = []
+        if input_.mlflow_integration:
+            env_vars.append(
+                Env(
+                    name="MLFLOW_TRACKING_URI",
+                    value=f"http://{input_.mlflow_integration.internal_web_app_url}",
+                )
+            )
+
         custom_deployment = CustomDeploymentInputs(
             preset=input_.preset,
             image=ContainerImage(
@@ -77,7 +83,8 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
                         f"(jupyter {cmd} {jupyter_args} "
                         f'--NotebookApp.default_url={code_storage_mount.mount_path}/README.ipynb)"'
                     )
-                ]
+                ],
+                env=env_vars,
             ),
             networking=NetworkingConfig(
                 service_enabled=True,

@@ -20,6 +20,7 @@ from apolo_app_types.protocols.common.storage import (
     MountPath,
     StorageMounts,
 )
+from apolo_app_types.protocols.mlflow import MLFlowAppOutputs
 
 
 class JupyterTypes(str, Enum):
@@ -101,6 +102,14 @@ class JupyterAppInputs(AppInputs):
         default=Networking(http_auth=True),
         title="Networking Settings",
         description=("Network settings for the application."),
+    )
+    mlflow_integration: MLFlowAppOutputs | None = Field(
+        default=None,
+        title="MLFlow Integration",
+        description=(
+            "MLFlow integration settings for the application. "
+            "If not set, MLFlow integration will not be enabled."
+        ),
     )
 
 
