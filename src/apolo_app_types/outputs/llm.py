@@ -8,7 +8,10 @@ from apolo_app_types import (
 from apolo_app_types.clients.kube import get_service_host_port
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
 from apolo_app_types.outputs.utils.parsing import parse_cli_args
-from apolo_app_types.protocols.common.networking import RestAPI
+from apolo_app_types.protocols.common.openai_compat import (
+    OpenAICompatChatAPI,
+    OpenAICompatEmbeddingsAPI,
+)
 from apolo_app_types.protocols.llm import LLMApiKey, LLMModel
 
 
@@ -28,16 +31,14 @@ async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> dict[str, 
     model_name = helm_values["model"]["modelHFName"]
     tokenizer_name = helm_values["model"].get("tokenizerHFName", "")
 
-    chat_internal_api = RestAPI(
+    chat_internal_api = OpenAICompatChatAPI(
         host=internal_host,
         port=int(internal_port),
-        base_path="/v1/chat",
         protocol="http",
     )
-    embeddings_internal_api = RestAPI(
+    embeddings_internal_api = OpenAICompatEmbeddingsAPI(
         host=internal_host,
         port=int(internal_port),
-        base_path="/v1/embeddings",
         protocol="http",
     )
 
@@ -47,16 +48,14 @@ async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> dict[str, 
     chat_external_api = None
     embeddings_external_api = None
     if ingress_host_port:
-        chat_external_api = RestAPI(
+        chat_external_api = OpenAICompatChatAPI(
             host=ingress_host_port[0],
             port=int(ingress_host_port[1]),
-            base_path="/v1/chat",
             protocol="https",
         )
-        embeddings_external_api = RestAPI(
+        embeddings_external_api = OpenAICompatEmbeddingsAPI(
             host=ingress_host_port[0],
             port=int(ingress_host_port[1]),
-            base_path="/v1/embeddings",
             protocol="https",
         )
 
