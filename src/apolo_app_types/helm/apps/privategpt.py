@@ -14,7 +14,7 @@ from apolo_app_types.protocols.common import (
     StorageMounts,
 )
 from apolo_app_types.protocols.common.k8s import Container, Env, Port
-from apolo_app_types.protocols.common.networking import get_api_base_url
+from apolo_app_types.protocols.common.openai_compat import get_api_base_url
 from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
 from apolo_app_types.protocols.custom_deployment import NetworkingConfig
 from apolo_app_types.protocols.private_gpt import PrivateGPTAppInputs

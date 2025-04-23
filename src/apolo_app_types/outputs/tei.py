@@ -3,7 +3,7 @@ import typing as t
 from apolo_app_types import HuggingFaceModel
 from apolo_app_types.clients.kube import get_service_host_port
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
-from apolo_app_types.protocols.common.networking import OpenAICompatEmbeddingsAPI
+from apolo_app_types.protocols.common.openai_compat import OpenAICompatEmbeddingsAPI
 from apolo_app_types.protocols.text_embeddings import TextEmbeddingsInferenceAppOutputs
 
 

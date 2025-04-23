@@ -9,7 +9,7 @@ from apolo_app_types.protocols.common import (
     Ingress,
     Preset,
 )
-from apolo_app_types.protocols.common.networking import OpenAICompatEmbeddingsAPI
+from apolo_app_types.protocols.common.openai_compat import OpenAICompatEmbeddingsAPI
 from apolo_app_types.protocols.llm import OpenAICompatibleEmbeddingsAPI
 
 

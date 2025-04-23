@@ -12,7 +12,7 @@ from apolo_app_types.protocols.common import (
     SchemaExtraMetadata,
     SchemaMetaType,
 )
-from apolo_app_types.protocols.common.networking import (
+from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
 )

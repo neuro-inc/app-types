@@ -4,7 +4,7 @@ from apolo_app_types import CrunchyPostgresUserCredentials, HuggingFaceModel
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import Ingress, Preset
-from apolo_app_types.protocols.common.networking import (
+from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
 )

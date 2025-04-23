@@ -14,9 +14,11 @@ from apolo_app_types.protocols.common import (
     SchemaExtraMetadata,
 )
 from apolo_app_types.protocols.common.networking import (
+    RestAPI,
+)
+from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
-    RestAPI,
 )
 
 
