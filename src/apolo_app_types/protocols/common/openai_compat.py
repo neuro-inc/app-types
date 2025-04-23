@@ -2,9 +2,15 @@ from typing import Literal
 
 from pydantic import ConfigDict, Field
 
-from apolo_app_types.protocols.common.hugging_face import HuggingFaceModel
-from apolo_app_types.protocols.common.networking import RestAPI, SchemaExtraMetadata, SchemaMetaType
-from apolo_app_types.protocols.common.hugging_face import HF_SCHEMA_EXTRA
+from apolo_app_types.protocols.common.hugging_face import (
+    HF_SCHEMA_EXTRA,
+    HuggingFaceModel,
+)
+from apolo_app_types.protocols.common.networking import (
+    RestAPI,
+    SchemaExtraMetadata,
+    SchemaMetaType,
+)
 
 
 class OpenAICompatChatAPI(RestAPI):
