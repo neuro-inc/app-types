@@ -14,6 +14,7 @@ from .hugging_face import HuggingFaceCache, HuggingFaceModel
 from .ingress import Ingress, IngressGrpc
 from .k8s import Container, DeploymentName, Env
 from .networking import GraphQLAPI, GrpcAPI, RestAPI
+from .openai_compat import OpenAICompatChatAPI, OpenAICompatEmbeddingsAPI
 from .postgres import Postgres
 from .preset import Preset
 from .redis import Redis, RedisMaster
@@ -67,4 +68,6 @@ __all__ = [
     "Env",
     "Container",
     "OpenAICompatibleEmbeddingsRestAPI",
+    "OpenAICompatChatAPI",
+    "OpenAICompatEmbeddingsAPI",
 ]

@@ -10,6 +10,8 @@ from apolo_app_types.protocols.common import (
     Bucket,
     Env,
     HuggingFaceModel,
+    OpenAICompatChatAPI,
+    OpenAICompatEmbeddingsAPI,
     OptionalStrOrSecret,
     StrOrSecret,
 )
@@ -171,4 +173,6 @@ __all__ = [
     "JupyterAppOutputs",
     "TextEmbeddingsInferenceAppInputs",
     "TextEmbeddingsInferenceAppOutputs",
+    "OpenAICompatChatAPI",
+    "OpenAICompatEmbeddingsAPI",
 ]

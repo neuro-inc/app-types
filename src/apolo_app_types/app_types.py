@@ -6,6 +6,7 @@ from apolo_app_types.protocols.dockerhub import DockerHubInputs
 from apolo_app_types.protocols.huggingface_cache import (
     HuggingFaceCacheInputs,
 )
+from apolo_app_types.protocols.jupyter import JupyterAppInputs
 from apolo_app_types.protocols.llm import LLMInputs
 from apolo_app_types.protocols.mlflow import MLFlowAppInputs
 from apolo_app_types.protocols.spark_job import SparkJobInputs
@@ -72,6 +73,8 @@ class AppType(enum.StrEnum):
                 return AppType.MLFlow
             case VSCodeAppInputs():
                 return AppType.VSCode
+            case JupyterAppInputs():
+                return AppType.Jupyter
 
         error_message = f"Unsupported input type: {type(inputs).__name__}"
         raise ValueError(error_message)
