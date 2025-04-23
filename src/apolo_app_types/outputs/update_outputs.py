@@ -17,6 +17,7 @@ from apolo_app_types.outputs.postgres import get_postgres_outputs
 from apolo_app_types.outputs.spark_job import get_spark_job_outputs
 from apolo_app_types.outputs.stable_diffusion import get_stable_diffusion_outputs
 from apolo_app_types.outputs.tei import get_tei_outputs
+from apolo_app_types.outputs.vscode import get_vscode_outputs
 from apolo_app_types.outputs.weaviate import get_weaviate_outputs
 
 
@@ -67,6 +68,8 @@ async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> bool:  # noqa: C
                 conv_outputs = await get_mlflow_outputs(helm_outputs)
             case AppType.Jupyter:
                 conv_outputs = await get_jupyter_outputs(helm_outputs)
+            case AppType.VSCode:
+                conv_outputs = await get_vscode_outputs(helm_outputs)
             case _:
                 err_msg = f"Unsupported app type: {app_type} for posting outputs"
                 raise ValueError(err_msg)
