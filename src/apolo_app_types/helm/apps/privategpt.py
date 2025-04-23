@@ -14,6 +14,7 @@ from apolo_app_types.protocols.common import (
     StorageMounts,
 )
 from apolo_app_types.protocols.common.k8s import Container, Env, Port
+from apolo_app_types.protocols.common.networking import get_api_base_url
 from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
 from apolo_app_types.protocols.custom_deployment import NetworkingConfig
 from apolo_app_types.protocols.private_gpt import PrivateGPTAppInputs
@@ -40,7 +41,7 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
 
         env_vars: dict[str, t.Any] = {
             "PGPT_PROFILES": "app, pgvector",
-            "VLLM_API_BASE": input_.llm_chat_api.get_api_base_url(),
+            "VLLM_API_BASE": get_api_base_url(input_.llm_chat_api),
             "VLLM_MODEL": input_.llm_chat_api.hf_model.model_hf_name,
             "VLLM_TOKENIZER": (input_.llm_chat_api.hf_model.model_hf_name),
             # hardcoded for now, needs investigation,
@@ -51,7 +52,7 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
             "VLLM_CONTEXT_WINDOW": "8192",
             "VLLM_TEMPERATURE": str(input_.private_gpt_specific.llm_temperature),
             # FIX TEI API
-            "EMBEDDING_API_BASE": input_.embeddings_api.get_api_base_url(),
+            "EMBEDDING_API_BASE": get_api_base_url(input_.embeddings_api),
             "EMBEDDING_MODEL": input_.embeddings_api.hf_model.model_hf_name,
             "EMBEDDING_DIM": "768",  # hardcoded for now, need introspection
             "POSTGRES_HOST": input_.pgvector_user.pgbouncer_host,

@@ -74,7 +74,7 @@ async def test_privategpt_values_generation(setup_clients):
     assert helm_params["labels"] == {"application": "privategpt"}
     assert helm_params["container"]["env"] == [
         {"name": "PGPT_PROFILES", "value": "app, pgvector"},
-        {"name": "VLLM_API_BASE", "value": "https://llm-host:8000/"},
+        {"name": "VLLM_API_BASE", "value": "https://llm-host:8000/v1"},
         {"name": "VLLM_MODEL", "value": "llm-model"},
         {"name": "VLLM_TOKENIZER", "value": "llm-model"},
         {"name": "VLLM_MAX_NEW_TOKENS", "value": "5000"},
@@ -82,7 +82,7 @@ async def test_privategpt_values_generation(setup_clients):
         {"name": "VLLM_TEMPERATURE", "value": "0.1"},
         {
             "name": "EMBEDDING_API_BASE",
-            "value": "https://text-embeddings-inference-host:3000/",
+            "value": "https://text-embeddings-inference-host:3000/v1",
         },
         {"name": "EMBEDDING_MODEL", "value": "text-embeddings-inference-model"},
         {"name": "EMBEDDING_DIM", "value": "768"},
@@ -151,7 +151,7 @@ async def test_privategpt_values_generation_custom_temperature(setup_clients):
     assert helm_params["labels"] == {"application": "privategpt"}
     assert helm_params["container"]["env"] == [
         {"name": "PGPT_PROFILES", "value": "app, pgvector"},
-        {"name": "VLLM_API_BASE", "value": "https://llm-host:8000/"},
+        {"name": "VLLM_API_BASE", "value": "https://llm-host:8000/v1"},
         {"name": "VLLM_MODEL", "value": "llm-model"},
         {"name": "VLLM_TOKENIZER", "value": "llm-model"},
         {"name": "VLLM_MAX_NEW_TOKENS", "value": "5000"},
@@ -159,7 +159,7 @@ async def test_privategpt_values_generation_custom_temperature(setup_clients):
         {"name": "VLLM_TEMPERATURE", "value": "0.5"},
         {
             "name": "EMBEDDING_API_BASE",
-            "value": "https://text-embeddings-inference-host:3000/",
+            "value": "https://text-embeddings-inference-host:3000/v1",
         },
         {"name": "EMBEDDING_MODEL", "value": "text-embeddings-inference-model"},
         {"name": "EMBEDDING_DIM", "value": "768"},

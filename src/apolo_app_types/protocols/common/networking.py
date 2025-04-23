@@ -49,9 +49,6 @@ class HttpApi(AbstractAppFieldType):
     )
     base_path: str = "/"
 
-    def get_api_base_url(self) -> str:
-        return f"{self.protocol}://{self.host}:{self.port}{self.base_path}"
-
 
 class GraphQLAPI(HttpApi):
     api_type: Literal["graphql"] = "graphql"
@@ -74,10 +71,10 @@ class OpenAICompatChatAPI(RestAPI):
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
-    base_path = "/v1"
+    api_base_path: str = "/v1"
     # used to distinguish between different types of APIs (chat, embeddings, etc)
     openai_api_type: Literal["chat"] = "chat"
-    endpoint_url: Literal["/v1/chat"] = "/chat"
+    endpoint_url: Literal["/v1/chat"] = "/v1/chat"
     hf_model: HuggingFaceModel | None = Field(
         default=None,
         json_schema_extra=HF_SCHEMA_EXTRA.as_json_schema_extra(),
@@ -93,11 +90,15 @@ class OpenAICompatEmbeddingsAPI(RestAPI):
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
-    base_path = "/v1"
+    api_base_path: str = "/v1"
     # used to distinguish between different types of APIs (chat, embeddings, etc)
     openai_api_type: Literal["embeddings"] = "embeddings"
-    endpoint_url: Literal["/v1/embeddings"] = "/embeddings"
+    endpoint_url: Literal["/v1/embeddings"] = "/v1/embeddings"
     hf_model: HuggingFaceModel | None = Field(
         default=None,
         json_schema_extra=HF_SCHEMA_EXTRA.as_json_schema_extra(),
     )
+
+
+def get_api_base_url(api: OpenAICompatChatAPI | OpenAICompatEmbeddingsAPI) -> str:
+    return f"{api.protocol}://{api.host}:{api.port}{api.api_base_path}"
