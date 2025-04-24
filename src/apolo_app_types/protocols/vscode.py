@@ -31,7 +31,7 @@ def _get_app_data_files_path_url() -> str:
     # Passing app_type_name as string to avoid circular import
     return str(
         get_app_data_files_relative_path_url(
-            app_type_name="jupyter", app_name="jupyter-app"
+            app_type_name="vscode", app_name="vscode-app"
         )
         / "code"
     )
@@ -56,14 +56,14 @@ class VSCodeSpecificAppInputs(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Jupyter App",
-            description="Jupyter App configuration.",
+            title="VSCode App",
+            description="VSCode App configuration.",
         ).as_json_schema_extra(),
     )
     code_storage_mount: ApoloFilesMount = Field(
         default=ApoloFilesMount(
             storage_uri=ApoloFilesPath(path=_get_app_data_files_path_url()),
-            mount_path=MountPath(path="/root/notebooks"),
+            mount_path=MountPath(path="/home/coder/project"),
             mode=ApoloMountMode(mode=ApoloMountModes.RW),
         ),
         title="Code Storage Mount",
@@ -76,7 +76,7 @@ class VSCodeSpecificAppInputs(AbstractAppFieldType):
 
 class VSCodeAppInputs(AppInputs):
     preset: Preset
-    code_specific: VSCodeSpecificAppInputs
+    vscode_specific: VSCodeSpecificAppInputs
     extra_storage_mounts: StorageMounts | None = Field(
         default=None,
         title="Extra Storage Mounts",

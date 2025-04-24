@@ -24,6 +24,7 @@ from apolo_app_types.helm.apps.postgres import PostgresValueProcessor
 from apolo_app_types.helm.apps.privategpt import PrivateGptChartValueProcessor
 from apolo_app_types.helm.apps.spark_job import SparkJobValueProcessor
 from apolo_app_types.helm.apps.text_embeddings import TextEmbeddingsChartValueProcessor
+from apolo_app_types.helm.apps.vscode import VSCodeChartValueProcessor
 from apolo_app_types.helm.apps.weaviate import WeaviateChartValueProcessor
 from apolo_app_types.protocols.common import AppInputs
 from apolo_app_types.protocols.custom_deployment import CustomDeploymentInputs
@@ -33,6 +34,7 @@ from apolo_app_types.protocols.mlflow import MLFlowAppInputs
 from apolo_app_types.protocols.private_gpt import PrivateGPTAppInputs
 from apolo_app_types.protocols.spark_job import SparkJobInputs
 from apolo_app_types.protocols.text_embeddings import TextEmbeddingsInferenceAppInputs
+from apolo_app_types.protocols.vscode import VSCodeAppInputs
 
 
 async def app_type_to_vals(
@@ -57,6 +59,7 @@ async def app_type_to_vals(
         AppType.Jupyter: JupyterChartValueProcessor,
         AppType.TextEmbeddingsInference: TextEmbeddingsChartValueProcessor,
         AppType.PrivateGPT: PrivateGptChartValueProcessor,
+        AppType.VSCode: VSCodeChartValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)
@@ -97,6 +100,7 @@ async def get_installation_vals(
         AppType.Jupyter: JupyterAppInputs,
         AppType.TextEmbeddingsInference: TextEmbeddingsInferenceAppInputs,
         AppType.PrivateGPT: PrivateGPTAppInputs,
+        AppType.VSCode: VSCodeAppInputs,
     }
 
     if app_type not in input_type_map:
