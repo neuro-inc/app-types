@@ -58,8 +58,6 @@ class VSCodeChartValueProcessor(BaseChartValueProcessor[VSCodeAppInputs]):
                 tag="4.99.3-ubuntu",
             ),
             container=Container(
-                command=["/opt/coder"],
-                args=["server"],
                 env=env_vars,
             ),
             networking=NetworkingConfig(
