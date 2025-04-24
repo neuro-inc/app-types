@@ -40,9 +40,9 @@ async def test_privategpt_values_generation(setup_clients):
                 user="pgvector_user",
                 password="pgvector_password",
                 host="pgvector_host",
-                port="pgvector_port",
+                port=5432,
                 pgbouncer_host="pgbouncer_host",
-                pgbouncer_port="pgbouncer_port",
+                pgbouncer_port=4321,
                 dbname="db_name",
             ),
             embeddings_api=OpenAICompatEmbeddingsAPI(
@@ -116,9 +116,9 @@ async def test_privategpt_values_generation_custom_temperature(setup_clients):
                 user="pgvector_user",
                 password="pgvector_password",
                 host="pgvector_host",
-                port="pgvector_port",
+                port=5432,
                 pgbouncer_host="pgbouncer_host",
-                pgbouncer_port="pgbouncer_port",
+                pgbouncer_port=4321,
             ),
             embeddings_api=OpenAICompatEmbeddingsAPI(
                 host="text-embeddings-inference-host",
