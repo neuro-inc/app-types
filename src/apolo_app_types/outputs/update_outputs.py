@@ -18,6 +18,7 @@ from apolo_app_types.outputs.privategpt import get_privategpt_outputs
 from apolo_app_types.outputs.spark_job import get_spark_job_outputs
 from apolo_app_types.outputs.stable_diffusion import get_stable_diffusion_outputs
 from apolo_app_types.outputs.tei import get_tei_outputs
+from apolo_app_types.outputs.utils.discovery import load_app_postprocessor
 from apolo_app_types.outputs.weaviate import get_weaviate_outputs
 
 
@@ -38,10 +39,16 @@ async def post_outputs(api_url: str, api_token: str, outputs: dict[str, t.Any]) 
         )
 
 
-async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> bool:  # noqa: C901
-    app_type = helm_outputs["PLATFORM_APPS_APP_TYPE"]
-    platform_apps_url = helm_outputs["PLATFORM_APPS_URL"]
-    platform_apps_token = helm_outputs["PLATFORM_APPS_TOKEN"]
+async def update_app_outputs(  # noqa: C901
+    helm_outputs: dict[str, t.Any],
+    app_output_processor_type: str | None = None,
+    apolo_apps_url: str | None = None,
+    apolo_apps_token: str | None = None,
+    apolo_app_type: str | None = None,
+) -> bool:
+    app_type = apolo_app_type or helm_outputs["PLATFORM_APPS_APP_TYPE"]
+    platform_apps_url = apolo_apps_url or helm_outputs["PLATFORM_APPS_URL"]
+    platform_apps_token = apolo_apps_token or helm_outputs["PLATFORM_APPS_TOKEN"]
     try:
         match app_type:
             case AppType.LLMInference:
@@ -71,8 +78,18 @@ async def update_app_outputs(helm_outputs: dict[str, t.Any]) -> bool:  # noqa: C
             case AppType.PrivateGPT:
                 conv_outputs = await get_privategpt_outputs(helm_outputs)
             case _:
-                err_msg = f"Unsupported app type: {app_type} for posting outputs"
-                raise ValueError(err_msg)
+                # Try loading application postprocessor defined in the app repo
+                postprocessor = load_app_postprocessor(
+                    app_id=app_type,
+                    exact_type_name=app_output_processor_type,
+                )
+                if not postprocessor:
+                    err_msg = (
+                        f"Unsupported app type: {app_type} "
+                        f"({app_output_processor_type}) for posting outputs"
+                    )
+                    raise ValueError(err_msg)
+                conv_outputs = await postprocessor().generate_outputs(helm_outputs)
         logger.info("Outputs: %s", conv_outputs)
 
         await post_outputs(
