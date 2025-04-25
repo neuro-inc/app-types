@@ -54,8 +54,8 @@ class VSCodeChartValueProcessor(BaseChartValueProcessor[VSCodeAppInputs]):
         custom_deployment = CustomDeploymentInputs(
             preset=input_.preset,
             image=ContainerImage(
-                repository="ghcr.io/coder/code-server",
-                tag="4.99.3-ubuntu",
+                repository="ghcr.io/neuro-inc/vscode-server",
+                tag="development",
             ),
             container=Container(
                 env=env_vars,
