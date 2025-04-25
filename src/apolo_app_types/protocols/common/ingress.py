@@ -25,6 +25,10 @@ class IngressHttp(AbstractAppFieldType):
     )
     http_auth: bool = Field(
         default=True,
+        description="Require credentials with "
+        "permissions to access this application"
+        " for all incoming HTTPS requests.",
+        title="Enable Authentication and Authorization",
         json_schema_extra=SchemaExtraMetadata(
             title="Enable Authentication and Authorization",
             description="Require credentials with "
