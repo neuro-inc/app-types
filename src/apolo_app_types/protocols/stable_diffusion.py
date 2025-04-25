@@ -7,7 +7,7 @@ from apolo_app_types.protocols.common import (
     AppOutputs,
     AppOutputsDeployer,
     HuggingFaceModel,
-    Ingress,
+    IngressHttp,
     Preset,
     RestAPI,
     SchemaExtraMetadata,
@@ -41,7 +41,10 @@ class StableDiffusionParams(AbstractAppFieldType):
 
 
 class StableDiffusionInputs(AppInputs):
-    ingress: Ingress
+    ingress_http: IngressHttp | None = Field(
+        default=None,
+        title="Enable HTTP Ingress",
+    )
     preset: Preset
     stable_diffusion: StableDiffusionParams
 

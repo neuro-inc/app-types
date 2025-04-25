@@ -8,7 +8,7 @@ from apolo_app_types.protocols.common import (
     ApoloFilesPath,
     AppInputs,
     AppOutputs,
-    Ingress,
+    IngressHttp,
     Preset,
     RestAPI,
     SchemaExtraMetadata,
@@ -66,10 +66,6 @@ class ArtifactStoreConfig(AbstractAppFieldType):
 
     model_config = ConfigDict(
         protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Artifact Store",
-            description="Configuration for MLFlow artifact storage.",
-        ).as_json_schema_extra(),
     )
     apolo_files: ApoloFilesPath | None = Field(
         default=None,
@@ -83,11 +79,25 @@ class ArtifactStoreConfig(AbstractAppFieldType):
 
 
 class MLFlowMetadataPostgres(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Postgres",
+            description="MLFlow backend on Postgres.",
+        ).as_json_schema_extra(),
+    )
     type: Literal["postgres"] = "postgres"
     postgres_uri: PostgresURI
 
 
 class MLFlowMetadataSQLite(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="SQLite",
+            description="MLFlow backend on local SQLite.",
+        ).as_json_schema_extra(),
+    )
     type: Literal["sqlite"] = "sqlite"
     pvc_name: str = "mlflow-sqlite-storage"
     internal_web_app_url: RestAPI | None = None
@@ -106,9 +116,9 @@ class MLFlowAppInputs(AppInputs):
     """
 
     preset: Preset
-    ingress: Ingress
-    metadata_storage: MLFlowMetaStorage | None = None
-    artifact_store: ArtifactStoreConfig | None = None
+    ingress_http: IngressHttp | None
+    metadata_storage: MLFlowMetaStorage | None
+    artifact_store: ArtifactStoreConfig | None
 
 
 class MLFlowAppOutputs(AppOutputs):

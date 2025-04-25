@@ -7,7 +7,7 @@ from apolo_app_types.protocols.common import (
     Bucket,
     GraphQLAPI,
     GrpcAPI,
-    Ingress,
+    IngressHttp,
     Preset,
     RestAPI,
     StorageGB,
@@ -23,7 +23,10 @@ class WeaviateInputs(AppInputs):
         default_factory=lambda: StorageGB(size=WEAVIATE_MIN_GB_STORAGE)
     )
     backup_bucket: Bucket | None = None
-    ingress: Ingress
+    ingress_http: IngressHttp | None = Field(
+        default=None,
+        title="Enable HTTP Ingress",
+    )
     cluster_api: BasicAuth | None = None  # noqa: N815
 
     @field_validator("persistence")
