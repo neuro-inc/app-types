@@ -58,7 +58,7 @@ def load_app_postprocessor(
     app_id: str,
     exact_type_name: str | None = None,
     apolo_app_package_prefix: str = "apolo_apps_",
-) -> type[BaseAppOutputsProcessor] | None:
+) -> type[BaseAppOutputsProcessor] | None:  # type: ignore
     return load_app_component(
         app_id, BaseAppOutputsProcessor, exact_type_name, apolo_app_package_prefix
     )
@@ -68,7 +68,7 @@ def load_app_preprocessor(
     app_id: str,
     exact_type_name: str | None = None,
     apolo_app_package_prefix: str = "apolo_apps_",
-) -> type[BaseChartValueProcessor] | None:
+) -> type[BaseChartValueProcessor] | None:  # type: ignore
     return load_app_component(
         app_id, BaseChartValueProcessor, exact_type_name, apolo_app_package_prefix
     )

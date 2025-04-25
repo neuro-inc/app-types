@@ -1,4 +1,3 @@
-from apolo_app_types.clients.apps_api import AppsApiClient
 from apolo_app_types.protocols.apolo_deploy import ApoloDeployInputs, ApoloDeployOutputs
 from apolo_app_types.protocols.common import (
     ApoloFilesMount,
@@ -162,7 +161,6 @@ __all__ = [
     "FooocusAppInputs",
     "FooocusAppOutputs",
     "ApoloFilesMount",
-    "AppsApiClient",
     "Bucket",
     "JupyterAppInputs",
     "JupyterAppOutputs",
