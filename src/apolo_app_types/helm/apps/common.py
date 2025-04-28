@@ -13,7 +13,8 @@ from apolo_sdk import Preset
 from apolo_app_types.helm.apps.ingress import get_ingress_values
 from apolo_app_types.protocols.common import (
     ApoloFilesMount,
-    Ingress,
+    IngressGrpc,
+    IngressHttp,
     Preset as PresetType,
 )
 from apolo_app_types.protocols.common.k8s import Port
@@ -252,7 +253,8 @@ def append_apolo_storage_integration_annotations(
 async def gen_extra_values(
     apolo_client: apolo_sdk.Client,
     preset_type: PresetType,
-    ingress: Ingress | None = None,
+    ingress_http: IngressHttp | None = None,
+    ingress_grpc: IngressGrpc | None = None,
     namespace: str | None = None,
     port_configurations: list[Port] | None = None,
 ) -> dict[str, t.Any]:
@@ -266,12 +268,12 @@ async def gen_extra_values(
     affinity_vals = preset_to_affinity(preset)
     resources_vals = preset_to_resources(preset)
     ingress_vals: dict[str, t.Any] = {}
-    if ingress:
+    if ingress_http or ingress_grpc:
         if not namespace:
             exception_msg = "Namespace is required when ingress is provided."
             raise ValueError(exception_msg)
         ingress_vals = await get_ingress_values(
-            apolo_client, ingress, namespace, port_configurations
+            apolo_client, ingress_http, ingress_grpc, namespace, port_configurations
         )
 
     return {

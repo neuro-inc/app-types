@@ -108,7 +108,11 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
 
         # Get base values
         values = await gen_extra_values(
-            self.client, input_.preset, input_.ingress, namespace
+            apolo_client=self.client,
+            preset_type=input_.preset,
+            ingress_http=input_.ingress_http,
+            ingress_grpc=input_.ingress_grpc,
+            namespace=namespace,
         )
 
         # Add authentication values

@@ -11,7 +11,7 @@ from apolo_app_types.helm.apps.custom_deployment import (
     CustomDeploymentChartValueProcessor,
 )
 from apolo_app_types.protocols.common import Container, Env, StorageMounts
-from apolo_app_types.protocols.common.ingress import Ingress
+from apolo_app_types.protocols.common.ingress import IngressHttp
 from apolo_app_types.protocols.common.k8s import Port
 from apolo_app_types.protocols.custom_deployment import NetworkingConfig
 from apolo_app_types.protocols.jupyter import JupyterAppInputs, JupyterTypes
@@ -88,7 +88,7 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
             ),
             networking=NetworkingConfig(
                 service_enabled=True,
-                ingress=Ingress(enabled=True, http_auth=input_.networking.http_auth),
+                ingress_http=IngressHttp(http_auth=input_.networking.http_auth),
                 ports=[
                     Port(name="http", port=self._jupyter_port),
                 ],

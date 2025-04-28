@@ -7,6 +7,7 @@ from apolo_app_types.protocols.common import (
     Bucket,
     GraphQLAPI,
     GrpcAPI,
+    IngressGrpc,
     IngressHttp,
     Preset,
     RestAPI,
@@ -26,6 +27,10 @@ class WeaviateInputs(AppInputs):
     ingress_http: IngressHttp | None = Field(
         default=None,
         title="Enable HTTP Ingress",
+    )
+    ingress_grpc: IngressGrpc | None = Field(
+        default=None,
+        title="Enable GRPC Ingress",
     )
     cluster_api: BasicAuth | None = None  # noqa: N815
 

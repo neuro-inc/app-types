@@ -38,7 +38,7 @@ class TextEmbeddingsChartValueProcessor(
             image=input_.container_image,
             networking=NetworkingConfig(
                 service_enabled=True,
-                ingress=input_.ingress,
+                ingress_http=input_.ingress_http,
                 ports=[
                     Port(name="http", port=3000),
                 ],

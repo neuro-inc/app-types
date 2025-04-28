@@ -9,9 +9,6 @@ from apolo_app_types.helm.apps.common import (
     get_component_values,
     get_preset,
 )
-from apolo_app_types.helm.apps.ingress import (
-    get_ingress_values,
-)
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
 
 
@@ -49,16 +46,10 @@ class StableDiffusionChartValueProcessor(
     ) -> dict[str, t.Any]:
         preset_name = input_.preset.name
         generic_vals = await gen_extra_values(
-            self.client, input_.preset, input_.ingress, namespace
+            self.client, input_.preset, input_.ingress_http, None, namespace
         )
 
         preset = get_preset(self.client, preset_name)
-
-        ingress_api = await get_ingress_values(
-            self.client,
-            input_.ingress,
-            namespace,
-        )
 
         component_vals = get_component_values(preset, preset_name)
         api_vars = self._get_env_vars(preset)
@@ -75,7 +66,6 @@ class StableDiffusionChartValueProcessor(
                 model_vals,
                 {
                     "api": {
-                        **ingress_api,
                         **component_vals,
                         "env": api_vars,
                         "image": {

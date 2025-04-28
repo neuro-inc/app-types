@@ -4,7 +4,7 @@ import typing as t
 import apolo_sdk
 from yarl import URL
 
-from apolo_app_types.protocols.common import Ingress
+from apolo_app_types.protocols.common import IngressGrpc, IngressHttp
 from apolo_app_types.protocols.common.k8s import Port
 
 
@@ -83,20 +83,38 @@ async def _generate_ingress_config(
 
 async def get_ingress_values(
     apolo_client: apolo_sdk.Client,
-    ingress: Ingress,
+    ingress_http: IngressHttp | None,
+    ingress_grpc: IngressGrpc | None,
     namespace: str,
     port_configurations: list[Port] | None = None,
 ) -> dict[str, t.Any]:
     ingress_vals: dict[str, t.Any] = {
-        "ingress": {"grpc": {"enabled": False}, "annotations": {}}
+        "ingress": {
+            "enabled": False,
+            "grpc": {"enabled": False},
+            "annotations": {},
+        }
     }
-    if not ingress.enabled:
-        ingress_vals["ingress"]["enabled"] = False
-        return ingress_vals
 
-    res = await _generate_ingress_config(apolo_client, namespace, port_configurations)
-    ingress_vals["ingress"].update(res)
-    if ingress.grpc and ingress.grpc.enabled:
+    if ingress_http:
+        http_ingress_config = await _generate_ingress_config(
+            apolo_client, namespace, port_configurations
+        )
+        ingress_vals["ingress"].update(http_ingress_config)
+        if ingress_http.http_auth:
+            forward_auth_name = "forwardauth"
+            forward_auth_config = {
+                "enabled": True,
+                "name": forward_auth_name,
+                "address": str(_get_forward_auth_address(apolo_client)),
+                "trustForwardHeader": True,
+            }
+            ingress_vals["ingress"]["forwardAuth"] = forward_auth_config
+            ingress_vals["ingress"]["annotations"][
+                "traefik.ingress.kubernetes.io/router.middlewares"
+            ] = f"{namespace}-{forward_auth_name}@kubernetescrd"
+
+    if ingress_grpc:
         grpc_ingress_config = await _generate_ingress_config(
             apolo_client, namespace, port_configurations, namespace_suffix="-grpc"
         )
@@ -109,17 +127,8 @@ async def get_ingress_values(
                 "traefik.ingress.kubernetes.io/service.serversscheme": "h2c",
             },
         }
-    if ingress.http_auth:
-        forward_auth_name = "forwardauth"
-        forward_auth_config = {
-            "enabled": True,
-            "name": forward_auth_name,
-            "address": str(_get_forward_auth_address(apolo_client)),
-            "trustForwardHeader": True,
-        }
-        ingress_vals["ingress"]["forwardAuth"] = forward_auth_config
-        ingress_vals["ingress"]["annotations"][
-            "traefik.ingress.kubernetes.io/router.middlewares"
-        ] = f"{namespace}-{forward_auth_name}@kubernetescrd"
+
+    if ingress_http or ingress_grpc:
+        ingress_vals["ingress"]["enabled"] = True
 
     return ingress_vals
