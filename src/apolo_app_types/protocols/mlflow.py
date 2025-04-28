@@ -57,27 +57,6 @@ class SQLitePVCConfig(AbstractAppFieldType):
     )
 
 
-class ArtifactStoreConfig(AbstractAppFieldType):
-    """
-    Configuration for MLFlow artifact storage.
-    Use Apolo Files to store your MLFlow artifacts
-    (model binaries, dependency files, etc).
-    """
-
-    model_config = ConfigDict(
-        protected_namespaces=(),
-    )
-    apolo_files: ApoloFilesPath | None = Field(
-        default=None,
-        description=(
-            "Use Apolo Files to store your MLFlow artifacts "
-            "(model binaries, dependency files, etc). "
-            "E.g. 'storage://cluster/myorg/proj/mlflow-artifacts'"
-        ),
-        title="Storage Path",
-    )
-
-
 class MLFlowMetadataPostgres(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
@@ -100,11 +79,9 @@ class MLFlowMetadataSQLite(AbstractAppFieldType):
     )
     type: Literal["sqlite"] = "sqlite"
     pvc_name: str = "mlflow-sqlite-storage"
-    internal_web_app_url: RestAPI | None = None
-    external_web_app_url: RestAPI | None = None
 
 
-MLFlowMetaStorage = MLFlowMetadataPostgres | MLFlowMetadataSQLite
+MLFlowMetaStorage = MLFlowMetadataSQLite | MLFlowMetadataPostgres
 
 
 class MLFlowAppInputs(AppInputs):
@@ -117,8 +94,16 @@ class MLFlowAppInputs(AppInputs):
 
     preset: Preset
     ingress_http: IngressHttp | None
-    metadata_storage: MLFlowMetaStorage | None
-    artifact_store: ArtifactStoreConfig | None
+    metadata_storage: MLFlowMetaStorage
+    artifact_store: ApoloFilesPath | None = Field(
+        default=None,
+        description=(
+            "Use Apolo Files to store your MLFlow artifacts "
+            "(model binaries, dependency files, etc). "
+            "E.g. 'storage://cluster/myorg/proj/mlflow-artifacts'"
+        ),
+        title="Artifact Store",
+    )
 
 
 class MLFlowAppOutputs(AppOutputs):
