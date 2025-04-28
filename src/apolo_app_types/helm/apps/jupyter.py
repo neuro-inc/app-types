@@ -72,7 +72,7 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
             preset=input_.preset,
             image=ContainerImage(
                 repository="ghcr.io/neuro-inc/base",
-                tag="pipelines",
+                tag="v25.3.0-runtime",
             ),
             container=Container(
                 command=[
