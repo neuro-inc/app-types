@@ -146,6 +146,9 @@ async def test_values_weaviate_generation_with_ingress(
     assert helm_params["ingress"]["grpc"]["annotations"] == {
         "traefik.ingress.kubernetes.io/router.entrypoints": "websecure",
         "traefik.ingress.kubernetes.io/service.serversscheme": "h2c",
+        "traefik.ingress.kubernetes.io/router.middlewares": (
+            f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd"
+        ),
     }
 
 

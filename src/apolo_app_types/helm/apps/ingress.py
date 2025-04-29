@@ -140,6 +140,18 @@ async def get_ingress_values(
                 "traefik.ingress.kubernetes.io/service.serversscheme": "h2c",
             },
         }
+        if ingress_grpc.http_auth:
+            forward_auth_name = "forwardauth"
+            ingress_vals["ingress"]["grpc"]["auth"] = {
+                "enabled": True,
+                "name": forward_auth_name,
+                "address": str(_get_forward_auth_address(apolo_client)),
+                "trustForwardHeader": True,
+            }
+        ingress_vals["ingress"]["grpc"].setdefault("annotations", {})
+        ingress_vals["ingress"]["grpc"]["annotations"][
+            "traefik.ingress.kubernetes.io/router.middlewares"
+        ] = f"{namespace}-{forward_auth_name}@kubernetescrd"
 
     # Set the overall ingress enabled flag if either http or grpc was configured
     if http_configured or grpc_configured:
