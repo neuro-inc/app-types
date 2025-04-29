@@ -7,25 +7,44 @@ from apolo_app_types.protocols.common.schema_extra import (
 
 
 class IngressGrpc(AbstractAppFieldType):
-    enabled: bool
+    enabled: bool = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Enabled",
+            description="If GRPC is enabled.",
+        ).as_json_schema_extra(),
+    )
 
 
 class Ingress(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Ingress",
-            description="Configuration for Ingress.",
+            title="Public HTTP Ingress",
+            description="Enable access to your "
+            "application over the internet using HTTPS.",
         ).as_json_schema_extra(),
     )
     http_auth: bool = Field(
         default=True,
-        title="Enable Platform Authentication",
-        description="Enable/disable HTTP authentication",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Apolo Authorization",
+            description="Require credentials with "
+            "permissions to access this application"
+            " for all incoming HTTPS requests.",
+        ).as_json_schema_extra(),
     )
     enabled: bool = Field(
         ...,
-        description="Indicates whether the ingress is enabled.",
-        title="Ingress Enabled",
+        json_schema_extra=SchemaExtraMetadata(
+            description="Enable Ingress.",
+            title="Ingress Enabled",
+        ).as_json_schema_extra(),
     )
-    grpc: IngressGrpc | None = Field(default=None, title="Enable GRPC")
+    grpc: IngressGrpc | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Enable GRPC",
+            description="Enable and configure GRPC support for the ingress.",
+        ).as_json_schema_extra(),
+    )
