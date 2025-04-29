@@ -30,7 +30,7 @@ class WeaviateInputs(AppInputs):
     )
     ingress_grpc: IngressGrpc | None = Field(
         default=None,
-        title="Enable GRPC Ingress",
+        title="Enable gRPC Ingress",
     )
     # cluster_api: BasicAuth | None = None
 

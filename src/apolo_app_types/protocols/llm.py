@@ -7,7 +7,6 @@ from apolo_app_types.protocols.common import (
     AppOutputsDeployer,
     HuggingFaceCache,
     HuggingFaceModel,
-    IngressGrpc,
     IngressHttp,
     Preset,
     SchemaExtraMetadata,
@@ -77,10 +76,6 @@ class LLMInputs(AppInputs):
     ingress_http: IngressHttp | None = Field(
         default=None,
         title="Enable HTTP Ingress",
-    )
-    ingress_grpc: IngressGrpc | None = Field(
-        default=None,
-        title="Enable GRPC Ingress",
     )
     llm: LLMModel
     cache_config: HuggingFaceCache | None = None
