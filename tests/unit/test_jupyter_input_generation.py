@@ -37,7 +37,7 @@ async def test_jupyter_values_generation(setup_clients):
     )
     assert helm_params["image"] == {
         "repository": "ghcr.io/neuro-inc/base",
-        "tag": "pipelines",
+        "tag": "v25.3.0-runtime",
     }
 
     assert helm_params["service"] == {

@@ -51,6 +51,7 @@ class CustomDeploymentChartValueProcessor(
         input_: CustomDeploymentInputs,
         app_name: str,
         namespace: str,
+        app_secrets_name: str,
         *_: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -83,7 +84,7 @@ class CustomDeploymentChartValueProcessor(
                 "command": input_.container.command,
                 "args": input_.container.args,
                 "env": [
-                    {"name": env.name, "value": env.value}
+                    {"name": env.name, "value": env.deserialize_value(app_secrets_name)}
                     for env in input_.container.env
                 ],
             }

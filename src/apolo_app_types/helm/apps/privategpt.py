@@ -2,7 +2,12 @@ import typing as t
 
 from yarl import URL
 
-from apolo_app_types import ApoloFilesMount, ContainerImage, CustomDeploymentInputs
+from apolo_app_types import (
+    ApoloFilesMount,
+    ApoloSecret,
+    ContainerImage,
+    CustomDeploymentInputs,
+)
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps import CustomDeploymentChartValueProcessor
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
@@ -15,7 +20,6 @@ from apolo_app_types.protocols.common import (
 )
 from apolo_app_types.protocols.common.k8s import Container, Env, Port
 from apolo_app_types.protocols.common.openai_compat import get_api_base_url
-from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
 from apolo_app_types.protocols.custom_deployment import NetworkingConfig
 from apolo_app_types.protocols.private_gpt import PrivateGPTAppInputs
 
@@ -28,10 +32,8 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
         )
 
     async def _configure_env(
-        self,
-        input_: PrivateGPTAppInputs,
-        app_secrets_name: str,
-    ) -> dict[str, t.Any]:
+        self, input_: PrivateGPTAppInputs
+    ) -> dict[str, str | int | ApoloSecret | None]:
         if not input_.llm_chat_api.hf_model:
             err_msg = "llm_chat_api.hf_model is required"
             raise ValueError(err_msg)
@@ -39,7 +41,7 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
             err_msg = "embeddings_api.hf_model is required"
             raise ValueError(err_msg)
 
-        env_vars: dict[str, t.Any] = {
+        return {
             "PGPT_PROFILES": "app, pgvector",
             "VLLM_API_BASE": get_api_base_url(input_.llm_chat_api),
             "VLLM_MODEL": input_.llm_chat_api.hf_model.model_hf_name,
@@ -60,14 +62,8 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
             "POSTGRES_DB": input_.pgvector_user.dbname or "postgres",
             "POSTGRES_USER": input_.pgvector_user.user,
             "POSTGRES_PASSWORD": input_.pgvector_user.password,
+            "HUGGINGFACE_TOKEN": input_.llm_chat_api.hf_model.hf_token,
         }
-        if input_.llm_chat_api.hf_model.hf_token:
-            env_vars["HUGGINGFACE_TOKEN"] = serialize_optional_secret(
-                input_.llm_chat_api.hf_model.hf_token,
-                secret_name=app_secrets_name,
-            )
-
-        return env_vars
 
     async def gen_extra_values(
         self,
@@ -88,7 +84,7 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
         outputs_storage_path = base_app_storage_path / "tiktoken_cache"
         outputs_container_dir = URL("/home/worker/app/tiktoken_cache")
 
-        env = await self._configure_env(input_, app_secrets_name)
+        env = await self._configure_env(input_)
         custom_deployment = CustomDeploymentInputs(
             preset=input_.preset,
             image=ContainerImage(
@@ -127,5 +123,6 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
             input_=custom_deployment,
             app_name=app_name,
             namespace=namespace,
+            app_secrets_name=app_secrets_name,
         )
         return {**custom_app_vals, "labels": {"application": "privategpt"}}

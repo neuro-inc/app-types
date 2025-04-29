@@ -32,6 +32,7 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
         input_: JupyterAppInputs,
         app_name: str,
         namespace: str,
+        app_secrets_name: str,
         *args: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -103,5 +104,6 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
             input_=custom_deployment,
             app_name=app_name,
             namespace=namespace,
+            app_secrets_name=app_secrets_name,
         )
         return {**custom_app_vals, "labels": {"application": "jupyter"}}
