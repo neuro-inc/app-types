@@ -2,6 +2,10 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
+from apolo_app_types.protocols.common.secrets_ import (
+    ApoloSecret,
+    serialize_optional_secret,
+)
 
 
 class DeploymentName(AbstractAppFieldType):
@@ -28,7 +32,20 @@ class Env(AbstractAppFieldType):
         ).as_json_schema_extra(),
     )
     name: str
-    value: str
+    value: str | int | ApoloSecret | None
+
+    def deserialize_value(self, secret_name: str) -> str | int | dict:
+        if self.value is None:
+            return ""
+        if isinstance(self.value, str | int):
+            return self.value
+        if isinstance(self.value, ApoloSecret):
+            return serialize_optional_secret(
+                self.value,
+                secret_name=secret_name,
+            )
+        err_msg = f"Unsupported type for env var value: {type(self.value)}"
+        raise ValueError(err_msg)
 
 
 class Container(AbstractAppFieldType):

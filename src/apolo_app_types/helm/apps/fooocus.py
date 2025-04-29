@@ -67,6 +67,7 @@ class FooocusChartValueProcessor(BaseChartValueProcessor[FooocusAppInputs]):
         input_: FooocusAppInputs,
         app_name: str,
         namespace: str,
+        app_secrets_name: str,
         *args: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -123,5 +124,6 @@ class FooocusChartValueProcessor(BaseChartValueProcessor[FooocusAppInputs]):
             input_=custom_deployment,
             app_name=app_name,
             namespace=namespace,
+            app_secrets_name=app_secrets_name,
         )
         return {**custom_app_vals, "labels": {"application": "fooocus"}}
