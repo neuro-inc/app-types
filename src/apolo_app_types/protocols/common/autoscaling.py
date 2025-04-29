@@ -1,4 +1,6 @@
-from pydantic import ConfigDict
+from typing import Literal
+
+from pydantic import ConfigDict, Field
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
@@ -6,9 +8,20 @@ from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
 
 class AutoscalingBase(AbstractAppFieldType):
     type: str
-    enabled: bool | None = None
-    min_replicas: int | None = None
-    max_replicas: int | None = None
+    min_replicas: int = Field(
+        default=1,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Minimum Replicas",
+            description="Minimum number of replicas for autoscaling.",
+        ).as_json_schema_extra(),
+    )
+    max_replicas: int = Field(
+        default=100,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Maximum Replicas",
+            description="Maximum number of replicas for autoscaling.",
+        ).as_json_schema_extra(),
+    )
 
 
 class AutoscalingHPA(AutoscalingBase):
@@ -19,6 +32,18 @@ class AutoscalingHPA(AutoscalingBase):
             description="Autoscaling configuration for Horizontal Pod Autoscaler.",
         ).as_json_schema_extra(),
     )
-    type: str = "HPA"
-    target_cpu_utilization_percentage: int | None = None
-    target_memory_utilization_percentage: int | None = None
+    type: Literal["HPA"] = "HPA"
+    target_cpu_utilization_percentage: int = Field(
+        default=80,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Target CPU Utilization Percentage",
+            description="Choose target CPU utilization percentage for autoscaling.",
+        ).as_json_schema_extra(),
+    )
+    target_memory_utilization_percentage: int | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Target Memory Utilization Percentage",
+            description="Choose target memory utilization percentage for autoscaling.",
+        ).as_json_schema_extra(),
+    )
