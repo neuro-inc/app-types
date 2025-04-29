@@ -102,10 +102,9 @@ class CustomDeploymentChartValueProcessor(
         if input_.name_override:
             values["nameOverride"] = input_.name_override.name
 
-        if input_.autoscaling and input_.autoscaling.enabled:
+        if input_.autoscaling:
             values["autoscaling"] = {
                 "enabled": True,
-                "type": input_.autoscaling.type,
                 "min_replicas": input_.autoscaling.min_replicas,
                 "max_replicas": input_.autoscaling.max_replicas,
                 "target_cpu_utilization_percentage": (
