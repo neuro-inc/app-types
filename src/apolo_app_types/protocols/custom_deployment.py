@@ -49,11 +49,38 @@ class CustomDeploymentInputs(AppInputs):
         ).as_json_schema_extra(),
     )
     preset: Preset
-    name_override: DeploymentName | None = None
+    name_override: DeploymentName | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Deployment Name Override",
+            description="Override the default deployment name.",
+        ).as_json_schema_extra(),
+    )
     image: ContainerImage
-    autoscaling: AutoscalingHPA | None = None
-    container: Container | None = None
-    storage_mounts: StorageMounts | None = None
+    autoscaling: AutoscalingHPA | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Autoscaling",
+            description="Enable Autoscaling and configure it.",
+            is_advanced_field=True,
+        ).as_json_schema_extra(),
+    )
+    container: Container | None = Field(
+        None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Container",
+            description="Enable Container configuration.",
+            is_advanced_field=True,
+        ).as_json_schema_extra(),
+    )
+    storage_mounts: StorageMounts | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Storage Mounts",
+            description="Enable Storage mounts configuration.",
+            is_advanced_field=True,
+        ).as_json_schema_extra(),
+    )
     networking: NetworkingConfig = Field(default_factory=lambda: NetworkingConfig())
 
 

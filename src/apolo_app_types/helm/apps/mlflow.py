@@ -48,6 +48,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         input_: MLFlowAppInputs,
         app_name: str,
         namespace: str,
+        app_secrets_name: str,
         *args: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -134,6 +135,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
             input_=cd_inputs,
             app_name=app_name,
             namespace=namespace,
+            app_secrets_name=app_secrets_name,
         )
 
         if use_sqlite:

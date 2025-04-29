@@ -32,6 +32,7 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
         input_: JupyterAppInputs,
         app_name: str,
         namespace: str,
+        app_secrets_name: str,
         *args: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -49,7 +50,7 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
             f"--port {self._jupyter_port} "
             "--allow-root "
             "--NotebookApp.token= "
-            f"--notebook-dir={code_storage_mount.mount_path} "
+            f"--notebook-dir={code_storage_mount.mount_path.path} "
             # "--NotebookApp.shutdown_no_activity_timeout=7200 "
             # "--MappingKernelManager.cull_idle_timeout=7200 "
             # "--MappingKernelManager.cull_connected=True"
@@ -72,17 +73,20 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
             preset=input_.preset,
             image=ContainerImage(
                 repository="ghcr.io/neuro-inc/base",
-                tag="pipelines",
+                tag="v25.3.0-runtime",
             ),
             container=Container(
                 command=[
+                    "bash",
+                    "-c",
                     (
-                        f'bash -c "(rsync -a --ignore-existing '
+                        f"(mkdir -p {code_storage_mount.mount_path.path}) && "
+                        "(rsync -a --ignore-existing "
                         "/var/notebooks/README.ipynb "
-                        f"{code_storage_mount.mount_path}) && "
+                        f"{code_storage_mount.mount_path.path}) && "
                         f"(jupyter {cmd} {jupyter_args} "
-                        f'--NotebookApp.default_url={code_storage_mount.mount_path}/README.ipynb)"'
-                    )
+                        f"--NotebookApp.default_url={code_storage_mount.mount_path.path}/README.ipynb)"
+                    ),
                 ],
                 env=env_vars,
             ),
@@ -100,5 +104,6 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
             input_=custom_deployment,
             app_name=app_name,
             namespace=namespace,
+            app_secrets_name=app_secrets_name,
         )
         return {**custom_app_vals, "labels": {"application": "jupyter"}}

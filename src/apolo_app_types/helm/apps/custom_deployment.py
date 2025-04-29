@@ -51,6 +51,7 @@ class CustomDeploymentChartValueProcessor(
         input_: CustomDeploymentInputs,
         app_name: str,
         namespace: str,
+        app_secrets_name: str,
         *_: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -84,7 +85,7 @@ class CustomDeploymentChartValueProcessor(
                 "command": input_.container.command,
                 "args": input_.container.args,
                 "env": [
-                    {"name": env.name, "value": env.value}
+                    {"name": env.name, "value": env.deserialize_value(app_secrets_name)}
                     for env in input_.container.env
                 ],
             }
@@ -103,10 +104,9 @@ class CustomDeploymentChartValueProcessor(
         if input_.name_override:
             values["nameOverride"] = input_.name_override.name
 
-        if input_.autoscaling and input_.autoscaling.enabled:
+        if input_.autoscaling:
             values["autoscaling"] = {
                 "enabled": True,
-                "type": input_.autoscaling.type,
                 "min_replicas": input_.autoscaling.min_replicas,
                 "max_replicas": input_.autoscaling.max_replicas,
                 "target_cpu_utilization_percentage": (

@@ -38,9 +38,9 @@ async def test_privategpt_values_generation(setup_clients):
                 user="pgvector_user",
                 password="pgvector_password",
                 host="pgvector_host",
-                port="pgvector_port",
+                port=5432,
                 pgbouncer_host="pgbouncer_host",
-                pgbouncer_port="pgbouncer_port",
+                pgbouncer_port=4321,
                 dbname="db_name",
             ),
             embeddings_api=OpenAICompatEmbeddingsAPI(
@@ -85,10 +85,11 @@ async def test_privategpt_values_generation(setup_clients):
         {"name": "EMBEDDING_MODEL", "value": "text-embeddings-inference-model"},
         {"name": "EMBEDDING_DIM", "value": "768"},
         {"name": "POSTGRES_HOST", "value": "pgbouncer_host"},
-        {"name": "POSTGRES_PORT", "value": "pgbouncer_port"},
+        {"name": "POSTGRES_PORT", "value": 4321},
         {"name": "POSTGRES_DB", "value": "db_name"},
         {"name": "POSTGRES_USER", "value": "pgvector_user"},
         {"name": "POSTGRES_PASSWORD", "value": "pgvector_password"},
+        {"name": "HUGGINGFACE_TOKEN", "value": ""},
     ]
 
 
@@ -112,9 +113,9 @@ async def test_privategpt_values_generation_custom_temperature(setup_clients):
                 user="pgvector_user",
                 password="pgvector_password",
                 host="pgvector_host",
-                port="pgvector_port",
+                port=5432,
                 pgbouncer_host="pgbouncer_host",
-                pgbouncer_port="pgbouncer_port",
+                pgbouncer_port=4321,
             ),
             embeddings_api=OpenAICompatEmbeddingsAPI(
                 host="text-embeddings-inference-host",
@@ -160,8 +161,9 @@ async def test_privategpt_values_generation_custom_temperature(setup_clients):
         {"name": "EMBEDDING_MODEL", "value": "text-embeddings-inference-model"},
         {"name": "EMBEDDING_DIM", "value": "768"},
         {"name": "POSTGRES_HOST", "value": "pgbouncer_host"},
-        {"name": "POSTGRES_PORT", "value": "pgbouncer_port"},
+        {"name": "POSTGRES_PORT", "value": 4321},
         {"name": "POSTGRES_DB", "value": "postgres"},
         {"name": "POSTGRES_USER", "value": "pgvector_user"},
         {"name": "POSTGRES_PASSWORD", "value": "pgvector_password"},
+        {"name": "HUGGINGFACE_TOKEN", "value": ""},
     ]

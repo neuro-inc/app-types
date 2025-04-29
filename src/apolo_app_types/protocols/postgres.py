@@ -122,9 +122,9 @@ class CrunchyPostgresUserCredentials(AbstractAppFieldType):
     user: str
     password: str
     host: str
-    port: str
+    port: int
     pgbouncer_host: str
-    pgbouncer_port: str
+    pgbouncer_port: int
     dbname: str | None = None
     jdbc_uri: str | None = None
     pgbouncer_jdbc_uri: str | None = None
