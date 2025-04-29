@@ -107,8 +107,8 @@ async def get_ingress_values(
         )
         # Update only relevant http fields, keep base structure
         ingress_vals["ingress"].update(http_ingress_config)
-        # Handle http_auth based on its presence in the input object
-        if ingress_http.http_auth:
+        # Handle auth based on its presence in the input object
+        if ingress_http.auth:
             forward_auth_name = "forwardauth"
             forward_auth_config = {
                 "enabled": True,
@@ -140,7 +140,7 @@ async def get_ingress_values(
                 "traefik.ingress.kubernetes.io/service.serversscheme": "h2c",
             },
         }
-        if ingress_grpc.http_auth:
+        if ingress_grpc.auth:
             forward_auth_name = "forwardauth"
             ingress_vals["ingress"]["grpc"]["auth"] = {
                 "enabled": True,

@@ -12,7 +12,7 @@ class IngressGrpc(AbstractAppFieldType):
             description="Enable access to your service over the internet using gRPC.",
         ).as_json_schema_extra(),
     )
-    http_auth: bool = Field(
+    auth: bool = Field(
         default=True,
         description="Require credentials with "
         "permissions to access this application"
@@ -36,7 +36,7 @@ class IngressHttp(AbstractAppFieldType):
             "application over the internet using HTTPS.",
         ).as_json_schema_extra(),
     )
-    http_auth: bool = Field(
+    auth: bool = Field(
         default=True,
         description="Require credentials with "
         "permissions to access this application"

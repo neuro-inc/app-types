@@ -88,7 +88,7 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
             ),
             networking=NetworkingConfig(
                 service_enabled=True,
-                ingress_http=IngressHttp(http_auth=input_.networking.http_auth),
+                ingress_http=IngressHttp(auth=input_.networking.http_auth),
                 ports=[
                     Port(name="http", port=self._jupyter_port),
                 ],
