@@ -1,5 +1,4 @@
 import enum
-from typing import Literal
 
 from pydantic import ConfigDict, Field
 
@@ -65,7 +64,6 @@ class MLFlowMetadataPostgres(AbstractAppFieldType):
             description="MLFlow backend on Postgres.",
         ).as_json_schema_extra(),
     )
-    type: Literal["postgres"] = "postgres"
     postgres_uri: PostgresURI
 
 
@@ -77,7 +75,6 @@ class MLFlowMetadataSQLite(AbstractAppFieldType):
             description="MLFlow backend on local SQLite.",
         ).as_json_schema_extra(),
     )
-    type: Literal["sqlite"] = "sqlite"
     pvc_name: str = "mlflow-sqlite-storage"
 
 
