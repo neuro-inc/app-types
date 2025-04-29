@@ -91,7 +91,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
             artifact_mounts = StorageMounts(
                 mounts=[
                     ApoloFilesMount(
-                        storage_uri=input_.artifact_store.path,
+                        storage_uri=input_.artifact_store,
                         mount_path=MountPath(path="/mlflow-artifacts"),
                         mode=ApoloMountMode(mode="rw"),
                     )
