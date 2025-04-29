@@ -3,7 +3,7 @@ import pytest
 from apolo_app_types import HuggingFaceModel
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
-from apolo_app_types.protocols.common import Ingress, Preset
+from apolo_app_types.protocols.common import IngressHttp, Preset
 from apolo_app_types.protocols.text_embeddings import TextEmbeddingsInferenceAppInputs
 
 from tests.unit.constants import (
@@ -16,8 +16,7 @@ async def test_tei_values_generation(setup_clients):
     helm_args, helm_params = await app_type_to_vals(
         input_=TextEmbeddingsInferenceAppInputs(
             preset=Preset(name="cpu-small"),
-            ingress=Ingress(
-                enabled=True,
+            ingress_http=IngressHttp(
                 clusterName="default",
             ),
             model=HuggingFaceModel(model_hf_name="random/name"),

@@ -4,7 +4,7 @@ import pytest
 
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
-from apolo_app_types.protocols.common import Ingress, Preset
+from apolo_app_types.protocols.common import IngressHttp, Preset
 from apolo_app_types.protocols.fooocus import (
     FooocusAppInputs,
     FooocusSpecificAppInputs,
@@ -23,8 +23,7 @@ async def test_fooocus_values_generation(setup_clients):
     helm_args, helm_params = await app_type_to_vals(
         input_=FooocusAppInputs(
             preset=Preset(name="cpu-small"),
-            ingress=Ingress(
-                enabled=True,
+            ingress_http=IngressHttp(
                 clusterName="default",
             ),
             fooocus_specific=FooocusSpecificAppInputs(

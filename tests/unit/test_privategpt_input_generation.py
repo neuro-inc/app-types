@@ -3,7 +3,7 @@ import pytest
 from apolo_app_types import CrunchyPostgresUserCredentials, HuggingFaceModel
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
-from apolo_app_types.protocols.common import Ingress, Preset
+from apolo_app_types.protocols.common import IngressHttp, Preset
 from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
@@ -23,9 +23,7 @@ async def test_privategpt_values_generation(setup_clients):
     helm_args, helm_params = await app_type_to_vals(
         input_=PrivateGPTAppInputs(
             preset=Preset(name="cpu-small"),
-            ingress=Ingress(
-                enabled=True,
-            ),
+            ingress_http=IngressHttp(),
             llm_chat_api=OpenAICompatChatAPI(
                 host="llm-host",
                 port=8000,
@@ -99,9 +97,7 @@ async def test_privategpt_values_generation_custom_temperature(setup_clients):
     helm_args, helm_params = await app_type_to_vals(
         input_=PrivateGPTAppInputs(
             preset=Preset(name="cpu-small"),
-            ingress=Ingress(
-                enabled=True,
-            ),
+            ingress_http=IngressHttp(),
             llm_chat_api=OpenAICompatChatAPI(
                 host="llm-host",
                 port=8000,

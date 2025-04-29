@@ -3,7 +3,7 @@ import pytest
 from apolo_app_types import BasicAuth, Bucket, WeaviateInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import _get_match_expressions
-from apolo_app_types.protocols.common import Ingress, IngressGrpc, Preset, StorageGB
+from apolo_app_types.protocols.common import IngressGrpc, IngressHttp, Preset, StorageGB
 from apolo_app_types.protocols.common.buckets import (
     BucketProvider,
     CredentialsType,
@@ -40,8 +40,7 @@ async def test_values_weaviate_generation_basic(setup_clients, mock_get_preset_c
                 ],
                 bucket_provider=BucketProvider.AWS,
             ),
-            ingress=Ingress(
-                enabled=False,
+            ingress_http=IngressHttp(
                 clusterName="test",
             ),
             cluster_api=BasicAuth(  # noqa: N815
@@ -81,7 +80,9 @@ async def test_values_weaviate_generation_basic(setup_clients, mock_get_preset_c
         "requiredDuringSchedulingIgnoredDuringExecution"
     ]["nodeSelectorTerms"][0]["matchExpressions"]
     assert match_expressions == _get_match_expressions(["cpu_pool"])
-    assert helm_params["ingress"]["enabled"] is False
+    # Check that ingress key is present and enabled because IngressHttp was provided
+    assert "ingress" in helm_params
+    assert helm_params["ingress"]["enabled"] is True
     assert helm_params["ingress"]["grpc"]["enabled"] is False
 
 
@@ -114,11 +115,10 @@ async def test_values_weaviate_generation_with_ingress(
                 ],
                 bucket_provider=BucketProvider.AWS,
             ),
-            ingress=Ingress(
-                enabled=True,
+            ingress_http=IngressHttp(
                 clusterName="test-cluster",
-                grpc=IngressGrpc(enabled=True),
             ),
+            ingress_grpc=IngressGrpc(enabled=True),
             cluster_api=BasicAuth(  # noqa: N815
                 username="testuser",
                 password="testpass",
@@ -160,8 +160,7 @@ async def test_values_weaviate_generation_with_auth(setup_clients, mock_get_pres
                 name="cpu-large",
             ),
             persistence=StorageGB(size=64),
-            ingress=Ingress(
-                enabled=True,
+            ingress_http=IngressHttp(
                 clusterName="test-cluster",
                 grpc=IngressGrpc(enabled=True),
             ),
@@ -219,8 +218,7 @@ async def test_values_weaviate_generation_with_backup(
                 ],
                 bucket_provider=BucketProvider.AWS,
             ),
-            ingress=Ingress(
-                enabled=True,
+            ingress_http=IngressHttp(
                 clusterName="test-cluster",
                 grpc=IngressGrpc(enabled=True),
             ),

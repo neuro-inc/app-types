@@ -88,6 +88,7 @@ async def get_ingress_values(
     namespace: str,
     port_configurations: list[Port] | None = None,
 ) -> dict[str, t.Any]:
+    # Initialize with disabled state
     ingress_vals: dict[str, t.Any] = {
         "ingress": {
             "enabled": False,
@@ -95,12 +96,18 @@ async def get_ingress_values(
             "annotations": {},
         }
     }
+    http_configured = False
+    grpc_configured = False
 
-    if ingress_http:
+    # Process HTTP only if ingress_http object is provided
+    if ingress_http:  # Check for presence instead of ingress_http.enabled
+        http_configured = True
         http_ingress_config = await _generate_ingress_config(
             apolo_client, namespace, port_configurations
         )
+        # Update only relevant http fields, keep base structure
         ingress_vals["ingress"].update(http_ingress_config)
+        # Handle http_auth based on its presence in the input object
         if ingress_http.http_auth:
             forward_auth_name = "forwardauth"
             forward_auth_config = {
@@ -110,14 +117,20 @@ async def get_ingress_values(
                 "trustForwardHeader": True,
             }
             ingress_vals["ingress"]["forwardAuth"] = forward_auth_config
+            ingress_vals["ingress"].setdefault(
+                "annotations", {}
+            )  # Ensure annotations key exists
             ingress_vals["ingress"]["annotations"][
                 "traefik.ingress.kubernetes.io/router.middlewares"
             ] = f"{namespace}-{forward_auth_name}@kubernetescrd"
 
-    if ingress_grpc:
+    # Process gRPC only if ingress_grpc object is provided
+    if ingress_grpc:  # Check for presence (assuming IngressGrpc was also changed)
+        grpc_configured = True
         grpc_ingress_config = await _generate_ingress_config(
             apolo_client, namespace, port_configurations, namespace_suffix="-grpc"
         )
+        # Update only the grpc sub-section
         ingress_vals["ingress"]["grpc"] = {
             "enabled": True,
             "className": "traefik",
@@ -128,7 +141,9 @@ async def get_ingress_values(
             },
         }
 
-    if ingress_http or ingress_grpc:
+    # Set the overall ingress enabled flag if either http or grpc was configured
+    if http_configured or grpc_configured:
         ingress_vals["ingress"]["enabled"] = True
+    # If neither is configured, the initial ingress_vals with enabled=False is returned
 
     return ingress_vals

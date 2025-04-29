@@ -4,11 +4,10 @@ from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import (
     ApoloFilesPath,
-    Ingress,
+    IngressHttp,
     Preset,
 )
 from apolo_app_types.protocols.mlflow import (
-    ArtifactStoreConfig,
     MLFlowAppInputs,
     MLFlowMetadataPostgres,
     MLFlowMetadataSQLite,
@@ -28,12 +27,10 @@ async def test_values_mlflow_generation_default_sqlite(
     """
     input_data = MLFlowAppInputs(
         preset=Preset(name="cpu-small"),
-        ingress=Ingress(enabled=True, clusterName="test"),
-        metadata_storage=None,
-        artifact_store=ArtifactStoreConfig(
-            apolo_files=ApoloFilesPath(
-                path="storage://test-cluster/myorg/proj/mlflow-artifacts"
-            )
+        ingress_http=IngressHttp(clusterName="test"),
+        metadata_storage=MLFlowMetadataSQLite(),
+        artifact_store=ApoloFilesPath(
+            path="storage://test-cluster/myorg/proj/mlflow-artifacts"
         ),
     )
 
@@ -90,7 +87,7 @@ async def test_values_mlflow_generation_sqlite_explicit_no_pvc_name(
     """
     input_data = MLFlowAppInputs(
         preset=Preset(name="cpu-small"),
-        ingress=Ingress(enabled=True, clusterName="test"),
+        ingress_http=IngressHttp(clusterName="test"),
         metadata_storage=MLFlowMetadataSQLite(),
         artifact_store=None,
     )
@@ -129,7 +126,7 @@ async def test_values_mlflow_generation_sqlite_explicit_custom_pvc_name(
     custom_pvc_name = "my-custom-pvc"
     input_data = MLFlowAppInputs(
         preset=Preset(name="cpu-small"),
-        ingress=Ingress(enabled=True, clusterName="test"),
+        ingress_http=IngressHttp(clusterName="test"),
         metadata_storage=MLFlowMetadataSQLite(pvc_name=custom_pvc_name),
         artifact_store=None,
     )
@@ -167,16 +164,14 @@ async def test_values_mlflow_generation_postgres_uri(
     """
     input_data = MLFlowAppInputs(
         preset=Preset(name="cpu-small"),
-        ingress=Ingress(enabled=False, clusterName="test-cluster"),
+        ingress_http=IngressHttp(clusterName="test-cluster"),
         metadata_storage=MLFlowMetadataPostgres(
             postgres_uri=PostgresURI(
                 uri="postgresql://user:pass@custom-host:5432/mlflow"
             ),
         ),
-        artifact_store=ArtifactStoreConfig(
-            apolo_files=ApoloFilesPath(
-                path="storage://test-cluster/myorg/proj/mlflow-artifacts"
-            )
+        artifact_store=ApoloFilesPath(
+            path="storage://test-cluster/myorg/proj/mlflow-artifacts"
         ),
     )
 
