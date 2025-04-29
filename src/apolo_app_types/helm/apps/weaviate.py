@@ -115,11 +115,13 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
             namespace=namespace,
         )
 
-        # Add authentication values
-        if input_.cluster_api:
-            auth_vals = await self._get_auth_values(input_.cluster_api)
-        else:
-            auth_vals = {}
+        # TODO: temporarily removed cluster_api from WeaviateInputs and
+        # relying on ingress_http and ingress_grpc auth level.
+        # Will make it available again later.
+        # if input_.cluster_api:
+        #     auth_vals = await self._get_auth_values(input_.cluster_api)
+        # else:
+        #     auth_vals = {}
 
         # Configure backups if enabled
         if input_.backup_bucket:
@@ -131,7 +133,7 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
         return merge_list_of_dicts(
             [
                 values,
-                auth_vals,
+                # auth_vals,
                 {"storage": {"size": f"{input_.persistence.size}Gi"}},
             ]
         )

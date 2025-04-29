@@ -1,6 +1,6 @@
 import pytest
 
-from apolo_app_types import BasicAuth, Bucket, WeaviateInputs
+from apolo_app_types import Bucket, WeaviateInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import _get_match_expressions
 from apolo_app_types.protocols.common import IngressGrpc, IngressHttp, Preset, StorageGB
@@ -43,10 +43,10 @@ async def test_values_weaviate_generation_basic(setup_clients, mock_get_preset_c
             ingress_http=IngressHttp(
                 clusterName="test",
             ),
-            cluster_api=BasicAuth(  # noqa: N815
-                username="testuser",
-                password="testpass",
-            ),
+            # cluster_api=BasicAuth(  # noqa: N815
+            #     username="testuser",
+            #     password="testpass",
+            # ),
         ),
         apolo_client=apolo_client,
         app_type=AppType.Weaviate,
@@ -119,10 +119,10 @@ async def test_values_weaviate_generation_with_ingress(
                 clusterName="test-cluster",
             ),
             ingress_grpc=IngressGrpc(enabled=True),
-            cluster_api=BasicAuth(  # noqa: N815
-                username="testuser",
-                password="testpass",
-            ),
+            # cluster_api=BasicAuth(  # noqa: N815
+            #     username="testuser",
+            #     password="testpass",
+            # ),
         ),
         apolo_client=apolo_client,
         app_type=AppType.Weaviate,
@@ -162,11 +162,13 @@ async def test_values_weaviate_generation_with_auth(setup_clients, mock_get_pres
             persistence=StorageGB(size=64),
             ingress_http=IngressHttp(
                 clusterName="test-cluster",
-                grpc=IngressGrpc(enabled=True),
             ),
-            cluster_api=BasicAuth(  # noqa: N815
-                username="testuser",
-                password="testpass",
+            # cluster_api=BasicAuth(  # noqa: N815
+            #     username="testuser",
+            #     password="testpass",
+            # ),
+            ingress_grpc=IngressGrpc(
+                clusterName="test-cluster",
             ),
         ),
         apolo_client=apolo_client,
@@ -176,17 +178,17 @@ async def test_values_weaviate_generation_with_auth(setup_clients, mock_get_pres
         app_secrets_name=APP_SECRETS_NAME,
     )
 
-    assert helm_params["clusterApi"]["username"] == "testuser"
-    assert helm_params["clusterApi"]["password"] == "testpass"
-    assert helm_params["authentication"]["anonymous_access"]["enabled"] is False
-    assert helm_params["authentication"]["apikey"]["enabled"] is True
-    assert helm_params["authentication"]["apikey"]["allowed_keys"] == ["testpass"]
-    assert helm_params["authentication"]["apikey"]["users"] == ["testuser"]
-    assert helm_params["authorization"]["admin_list"]["enabled"] is True
-    assert helm_params["authorization"]["admin_list"]["users"] == ["testuser"]
-    assert helm_params["env"]["AUTHENTICATION_APIKEY_ENABLED"] is True
-    assert helm_params["env"]["AUTHENTICATION_APIKEY_ALLOWED_KEYS"] == "testpass"
-    assert helm_params["env"]["AUTHENTICATION_APIKEY_USERS"] == "testuser"
+    # assert helm_params["clusterApi"]["username"] == "testuser"
+    # assert helm_params["clusterApi"]["password"] == "testpass"
+    # assert helm_params["authentication"]["anonymous_access"]["enabled"] is False
+    # assert helm_params["authentication"]["apikey"]["enabled"] is True
+    # assert helm_params["authentication"]["apikey"]["allowed_keys"] == ["testpass"]
+    # assert helm_params["authentication"]["apikey"]["users"] == ["testuser"]
+    # assert helm_params["authorization"]["admin_list"]["enabled"] is True
+    # assert helm_params["authorization"]["admin_list"]["users"] == ["testuser"]
+    # assert helm_params["env"]["AUTHENTICATION_APIKEY_ENABLED"] is True
+    # assert helm_params["env"]["AUTHENTICATION_APIKEY_ALLOWED_KEYS"] == "testpass"
+    # assert helm_params["env"]["AUTHENTICATION_APIKEY_USERS"] == "testuser"
 
 
 @pytest.mark.asyncio
@@ -220,11 +222,13 @@ async def test_values_weaviate_generation_with_backup(
             ),
             ingress_http=IngressHttp(
                 clusterName="test-cluster",
-                grpc=IngressGrpc(enabled=True),
             ),
-            clusterApi=BasicAuth(  # noqa: N815
-                username="testuser",
-                password="testpass",
+            # clusterApi=BasicAuth(  # noqa: N815
+            #     username="testuser",
+            #     password="testpass",
+            # ),
+            ingress_grpc=IngressGrpc(
+                clusterName="test-cluster",
             ),
         ),
         apolo_client=apolo_client,

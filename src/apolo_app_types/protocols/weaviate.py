@@ -32,7 +32,7 @@ class WeaviateInputs(AppInputs):
         default=None,
         title="Enable GRPC Ingress",
     )
-    cluster_api: BasicAuth | None = None  # noqa: N815
+    # cluster_api: BasicAuth | None = None
 
     @field_validator("persistence")
     def validate_storage_size(cls, value: StorageGB) -> StorageGB:  # noqa: N805

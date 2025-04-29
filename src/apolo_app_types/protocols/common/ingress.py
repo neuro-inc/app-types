@@ -8,8 +8,21 @@ class IngressGrpc(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Enable GRPC Ingress",
-            description="Enable access to your service over the internet usingGRPC.",
+            title="Enable gRPC Ingress",
+            description="Enable access to your service over the internet using gRPC.",
+        ).as_json_schema_extra(),
+    )
+    http_auth: bool = Field(
+        default=True,
+        description="Require credentials with "
+        "permissions to access this application"
+        " for all incoming gRPC requests.",
+        title="Enable Authentication and Authorization",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Enable Authentication and Authorization",
+            description="Require credentials with "
+            "permissions to access this application"
+            " for all incoming gRPC requests.",
         ).as_json_schema_extra(),
     )
 
