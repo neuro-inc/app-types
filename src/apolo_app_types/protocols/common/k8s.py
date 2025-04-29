@@ -1,3 +1,5 @@
+import typing
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
@@ -34,7 +36,7 @@ class Env(AbstractAppFieldType):
     name: str
     value: str | int | ApoloSecret | None
 
-    def deserialize_value(self, secret_name: str) -> str | int | dict:
+    def deserialize_value(self, secret_name: str) -> str | int | dict[str, typing.Any]:
         if self.value is None:
             return ""
         if isinstance(self.value, str | int):
