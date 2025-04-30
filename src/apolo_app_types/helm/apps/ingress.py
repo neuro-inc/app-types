@@ -81,81 +81,68 @@ async def _generate_ingress_config(
     }
 
 
-async def get_ingress_values(
+async def get_http_ingress_values(
     apolo_client: apolo_sdk.Client,
-    ingress_http: IngressHttp | None,
-    ingress_grpc: IngressGrpc | None,
+    ingress_http: IngressHttp,
     namespace: str,
     port_configurations: list[Port] | None = None,
 ) -> dict[str, t.Any]:
-    # Initialize with disabled state
+    http_ingress_config = await _generate_ingress_config(
+        apolo_client, namespace, port_configurations
+    )
     ingress_vals: dict[str, t.Any] = {
-        "ingress": {
-            "enabled": False,
-            "grpc": {"enabled": False},
-            "annotations": {},
-        }
+        "enabled": True,
+        **http_ingress_config,  # Merge the generated config directly
     }
-    http_configured = False
-    grpc_configured = False
 
-    # Process HTTP only if ingress_http object is provided
-    if ingress_http:  # Check for presence instead of ingress_http.enabled
-        http_configured = True
-        http_ingress_config = await _generate_ingress_config(
-            apolo_client, namespace, port_configurations
-        )
-        # Update only relevant http fields, keep base structure
-        ingress_vals["ingress"].update(http_ingress_config)
-        # Handle auth based on its presence in the input object
-        if ingress_http.auth:
-            forward_auth_name = "forwardauth"
-            forward_auth_config = {
-                "enabled": True,
-                "name": forward_auth_name,
-                "address": str(_get_forward_auth_address(apolo_client)),
-                "trustForwardHeader": True,
-            }
-            ingress_vals["ingress"]["forwardAuth"] = forward_auth_config
-            ingress_vals["ingress"].setdefault(
-                "annotations", {}
-            )  # Ensure annotations key exists
-            ingress_vals["ingress"]["annotations"][
-                "traefik.ingress.kubernetes.io/router.middlewares"
-            ] = f"{namespace}-{forward_auth_name}@kubernetescrd"
-
-    # Process gRPC only if ingress_grpc object is provided
-    if ingress_grpc:  # Check for presence (assuming IngressGrpc was also changed)
-        grpc_configured = True
-        grpc_ingress_config = await _generate_ingress_config(
-            apolo_client, namespace, port_configurations, namespace_suffix="-grpc"
-        )
-        # Update only the grpc sub-section
-        ingress_vals["ingress"]["grpc"] = {
+    # Handle auth based on its presence in the input object
+    if ingress_http.auth:
+        forward_auth_name = "forwardauth"
+        forward_auth_config = {
             "enabled": True,
-            "className": "traefik",
-            "hosts": grpc_ingress_config["hosts"],
-            "annotations": {
-                "traefik.ingress.kubernetes.io/router.entrypoints": "websecure",
-                "traefik.ingress.kubernetes.io/service.serversscheme": "h2c",
-            },
+            "name": forward_auth_name,
+            "address": str(_get_forward_auth_address(apolo_client)),
+            "trustForwardHeader": True,
         }
-        if ingress_grpc.auth:
-            forward_auth_name = "forwardauth"
-            ingress_vals["ingress"]["grpc"]["auth"] = {
-                "enabled": True,
-                "name": forward_auth_name,
-                "address": str(_get_forward_auth_address(apolo_client)),
-                "trustForwardHeader": True,
-            }
-        ingress_vals["ingress"]["grpc"].setdefault("annotations", {})
-        ingress_vals["ingress"]["grpc"]["annotations"][
+        ingress_vals["forwardAuth"] = forward_auth_config
+        ingress_vals.setdefault("annotations", {})  # Ensure annotations key exists
+        ingress_vals["annotations"][
             "traefik.ingress.kubernetes.io/router.middlewares"
         ] = f"{namespace}-{forward_auth_name}@kubernetescrd"
 
-    # Set the overall ingress enabled flag if either http or grpc was configured
-    if http_configured or grpc_configured:
-        ingress_vals["ingress"]["enabled"] = True
-    # If neither is configured, the initial ingress_vals with enabled=False is returned
-
     return ingress_vals
+
+
+async def get_grpc_ingress_values(
+    apolo_client: apolo_sdk.Client,
+    ingress_grpc: IngressGrpc,
+    namespace: str,
+    port_configurations: list[Port] | None = None,
+) -> dict[str, t.Any]:
+    grpc_ingress_config = await _generate_ingress_config(
+        apolo_client, namespace, port_configurations, namespace_suffix="-grpc"
+    )
+    grpc_vals: dict[str, t.Any] = {
+        "enabled": True,
+        "className": "traefik",
+        "hosts": grpc_ingress_config["hosts"],
+        "annotations": {
+            "traefik.ingress.kubernetes.io/router.entrypoints": "websecure",
+            "traefik.ingress.kubernetes.io/service.serversscheme": "h2c",
+        },
+    }
+
+    if ingress_grpc.auth:
+        forward_auth_name = "forwardauth"
+        grpc_vals["auth"] = {
+            "enabled": True,
+            "name": forward_auth_name,
+            "address": str(_get_forward_auth_address(apolo_client)),
+            "trustForwardHeader": True,
+        }
+        grpc_vals.setdefault("annotations", {})  # Ensure annotations key exists
+        grpc_vals["annotations"]["traefik.ingress.kubernetes.io/router.middlewares"] = (
+            f"{namespace}-{forward_auth_name}@kubernetescrd"
+        )
+
+    return grpc_vals
