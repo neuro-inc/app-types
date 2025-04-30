@@ -53,6 +53,36 @@ class PrivateGptSpecific(BaseModel):
             description="Configure temperature for LLM inference.",
         ).as_json_schema_extra(),
     )
+    embeddings_dimension: int = Field(
+        default=768,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Embeddings Dimension",
+            description="Configure dimension of embeddings.",
+        ).as_json_schema_extra(),
+    )
+    llm_max_new_tokens: int = Field(
+        default=5000,
+        json_schema_extra=SchemaExtraMetadata(
+            title="LLM Max New Tokens",
+            description="Configure maximum number of new tokens "
+            "(limited by GPU memory and model size).",
+        ).as_json_schema_extra(),
+    )
+    llm_context_window: int = Field(
+        default=8192,
+        json_schema_extra=SchemaExtraMetadata(
+            title="LLM Context Window",
+            description="Configure context window for LLM inference "
+            "(defined by model architecture).",
+        ).as_json_schema_extra(),
+    )
+    llm_tokenizer_name: str | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="LLM Tokenizer Name",
+            description="Configure tokenizer name for LLM inference.",
+        ).as_json_schema_extra(),
+    )
 
 
 class PrivateGPTAppInputs(AppInputs):
