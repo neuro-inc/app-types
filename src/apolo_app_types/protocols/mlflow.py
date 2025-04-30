@@ -90,7 +90,7 @@ class MLFlowAppInputs(AppInputs):
     """
 
     preset: Preset
-    ingress_http: IngressHttp | None
+    ingress_http: IngressHttp
     metadata_storage: MLFlowMetaStorage
     artifact_store: ApoloFilesPath | None = Field(
         default=None,

@@ -44,9 +44,7 @@ async def test_custom_deployment_values_generation(setup_clients):
                 ports=[
                     Port(name="http", port=8080),
                 ],
-                ingress_http=IngressHttp(
-                    clusterName="default",
-                ),
+                ingress_http=IngressHttp(),
             ),
         ),
         apolo_client=setup_clients,
@@ -97,9 +95,7 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
                 ports=[
                     Port(name="http", port=8080),
                 ],
-                ingress_http=IngressHttp(
-                    clusterName="default",
-                ),
+                ingress_http=IngressHttp(),
             ),
             storage_mounts=StorageMounts(
                 mounts=[
@@ -187,9 +183,7 @@ async def test_custom_deployment_values_generation_with_multiport_exposure(
                 Port(name="http1", port=8000, path="/path_prefix1"),
                 Port(name="http2", port=9000, path="/path_prefix2"),
             ],
-            ingress_http=IngressHttp(
-                clusterName="default",
-            ),
+            ingress_http=IngressHttp(),
         ),
     )
     helm_args, helm_params = await app_type_to_vals(

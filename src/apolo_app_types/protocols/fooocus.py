@@ -47,10 +47,7 @@ class FooocusSpecificAppInputs(BaseModel):
 class FooocusAppInputs(AppInputs):
     preset: Preset
     fooocus_specific: FooocusSpecificAppInputs
-    ingress_http: IngressHttp | None = Field(
-        default=None,
-        title="Enable HTTP Ingress",
-    )
+    ingress_http: IngressHttp
 
 
 class FooocusAppOutputs(AppOutputs):

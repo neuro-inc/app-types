@@ -57,10 +57,7 @@ class PrivateGptSpecific(BaseModel):
 
 class PrivateGPTAppInputs(AppInputs):
     preset: Preset
-    ingress_http: IngressHttp | None = Field(
-        default=None,
-        title="Enable HTTP Ingress",
-    )
+    ingress_http: IngressHttp
     pgvector_user: CrunchyPostgresUserCredentials
     embeddings_api: OpenAICompatEmbeddingsAPI
     llm_chat_api: OpenAICompatChatAPI

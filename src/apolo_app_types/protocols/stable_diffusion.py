@@ -41,10 +41,7 @@ class StableDiffusionParams(AbstractAppFieldType):
 
 
 class StableDiffusionInputs(AppInputs):
-    ingress_http: IngressHttp | None = Field(
-        default=None,
-        title="Enable HTTP Ingress",
-    )
+    ingress_http: IngressHttp
     preset: Preset
     stable_diffusion: StableDiffusionParams
 
