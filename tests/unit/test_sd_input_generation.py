@@ -19,7 +19,7 @@ async def test_values_sd_generation(setup_clients, mock_get_preset_cpu):
             preset=Preset(
                 name="cpu-large",
             ),
-            ingress=IngressHttp(
+            ingress_http=IngressHttp(
                 enabled=True,
                 clusterName="test",
             ),
@@ -81,7 +81,7 @@ async def test_values_sd_generation_with_gpu(setup_clients, mock_get_preset_gpu)
             preset=Preset(
                 name="gpu_preset",
             ),
-            ingress=IngressHttp(
+            ingress_http=IngressHttp(
                 enabled=True,
                 clusterName="test",
             ),
