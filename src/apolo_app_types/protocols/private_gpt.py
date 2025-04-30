@@ -9,7 +9,7 @@ from apolo_app_types import (
 from apolo_app_types.protocols.common import (
     AppInputsDeployer,
     AppOutputsDeployer,
-    Ingress,
+    IngressHttp,
     Preset,
     SchemaExtraMetadata,
 )
@@ -57,7 +57,7 @@ class PrivateGptSpecific(BaseModel):
 
 class PrivateGPTAppInputs(AppInputs):
     preset: Preset
-    ingress: Ingress
+    ingress_http: IngressHttp
     pgvector_user: CrunchyPostgresUserCredentials
     embeddings_api: OpenAICompatEmbeddingsAPI
     llm_chat_api: OpenAICompatChatAPI

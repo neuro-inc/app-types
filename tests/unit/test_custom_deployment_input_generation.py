@@ -9,7 +9,7 @@ from apolo_app_types import (
 )
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
-from apolo_app_types.protocols.common import Ingress, Preset
+from apolo_app_types.protocols.common import IngressHttp, Preset
 from apolo_app_types.protocols.common.k8s import Port
 from apolo_app_types.protocols.common.storage import (
     ApoloFilesMount,
@@ -44,10 +44,7 @@ async def test_custom_deployment_values_generation(setup_clients):
                 ports=[
                     Port(name="http", port=8080),
                 ],
-                ingress=Ingress(
-                    enabled=True,
-                    clusterName="default",
-                ),
+                ingress_http=IngressHttp(),
             ),
         ),
         apolo_client=setup_clients,
@@ -98,10 +95,7 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
                 ports=[
                     Port(name="http", port=8080),
                 ],
-                ingress=Ingress(
-                    enabled=True,
-                    clusterName="default",
-                ),
+                ingress_http=IngressHttp(),
             ),
             storage_mounts=StorageMounts(
                 mounts=[
@@ -189,10 +183,7 @@ async def test_custom_deployment_values_generation_with_multiport_exposure(
                 Port(name="http1", port=8000, path="/path_prefix1"),
                 Port(name="http2", port=9000, path="/path_prefix2"),
             ],
-            ingress=Ingress(
-                enabled=True,
-                clusterName="default",
-            ),
+            ingress_http=IngressHttp(),
         ),
     )
     helm_args, helm_params = await app_type_to_vals(
@@ -251,9 +242,7 @@ async def test_custom_deployment_values_generation_path_port_not_supplied(
             ports=[
                 Port(name="http", port=8080),
             ],
-            ingress=Ingress(
-                enabled=True,
-            ),
+            ingress_http=IngressHttp(),
         ),
     )
     helm_args, helm_params = await app_type_to_vals(

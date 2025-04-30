@@ -1,5 +1,4 @@
 import enum
-from typing import Literal
 
 from pydantic import ConfigDict, Field
 
@@ -8,7 +7,7 @@ from apolo_app_types.protocols.common import (
     ApoloFilesPath,
     AppInputs,
     AppOutputs,
-    Ingress,
+    IngressHttp,
     Preset,
     RestAPI,
     SchemaExtraMetadata,
@@ -57,44 +56,31 @@ class SQLitePVCConfig(AbstractAppFieldType):
     )
 
 
-class ArtifactStoreConfig(AbstractAppFieldType):
-    """
-    Configuration for MLFlow artifact storage.
-    Use Apolo Files to store your MLFlow artifacts
-    (model binaries, dependency files, etc).
-    """
-
+class MLFlowMetadataPostgres(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Artifact Store",
-            description="Configuration for MLFlow artifact storage.",
+            title="Postgres",
+            description="Use PostgreSQL server as metadata storage for MLFlow.",
         ).as_json_schema_extra(),
     )
-    apolo_files: ApoloFilesPath | None = Field(
-        default=None,
-        description=(
-            "Use Apolo Files to store your MLFlow artifacts "
-            "(model binaries, dependency files, etc). "
-            "E.g. 'storage://cluster/myorg/proj/mlflow-artifacts'"
-        ),
-        title="Storage Path",
-    )
-
-
-class MLFlowMetadataPostgres(AbstractAppFieldType):
-    type: Literal["postgres"] = "postgres"
     postgres_uri: PostgresURI
 
 
 class MLFlowMetadataSQLite(AbstractAppFieldType):
-    type: Literal["sqlite"] = "sqlite"
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="SQLite",
+            description=(
+                "Use SQLite on a dedicated block device as metadata store for MLFlow."
+            ),
+        ).as_json_schema_extra(),
+    )
     pvc_name: str = "mlflow-sqlite-storage"
-    internal_web_app_url: RestAPI | None = None
-    external_web_app_url: RestAPI | None = None
 
 
-MLFlowMetaStorage = MLFlowMetadataPostgres | MLFlowMetadataSQLite
+MLFlowMetaStorage = MLFlowMetadataSQLite | MLFlowMetadataPostgres
 
 
 class MLFlowAppInputs(AppInputs):
@@ -106,9 +92,16 @@ class MLFlowAppInputs(AppInputs):
     """
 
     preset: Preset
-    ingress: Ingress
-    metadata_storage: MLFlowMetaStorage | None = None
-    artifact_store: ArtifactStoreConfig | None = None
+    ingress_http: IngressHttp
+    metadata_storage: MLFlowMetaStorage
+    artifact_store: ApoloFilesPath = Field(
+        description=(
+            "Use Apolo Files to store your MLFlow artifacts "
+            "(model binaries, dependency files, etc). "
+            "E.g. 'storage://cluster/myorg/proj/mlflow-artifacts'"
+        ),
+        title="Artifact Store",
+    )
 
 
 class MLFlowAppOutputs(AppOutputs):

@@ -6,7 +6,7 @@ from apolo_app_types.protocols.common import (
     AppInputsDeployer,
     AppOutputsDeployer,
     HuggingFaceModel,
-    Ingress,
+    IngressHttp,
     Preset,
 )
 from apolo_app_types.protocols.common.openai_compat import OpenAICompatEmbeddingsAPI
@@ -19,7 +19,10 @@ class Image(AbstractAppFieldType):
 
 class TextEmbeddingsInferenceAppInputs(AppInputs):
     preset: Preset
-    ingress: Ingress
+    ingress_http: IngressHttp | None = Field(
+        default=None,
+        title="Enable HTTP Ingress",
+    )
     model: HuggingFaceModel
     container_image: ContainerImage = Field(
         default=ContainerImage(
@@ -33,7 +36,10 @@ class TextEmbeddingsInferenceAppInputs(AppInputs):
 
 class TextEmbeddingsInferenceInputs(AppInputsDeployer):
     preset_name: str
-    ingress: Ingress
+    ingress_http: IngressHttp | None = Field(
+        default=None,
+        title="Enable HTTP Ingress",
+    )
     model: HuggingFaceModel
     image: Image
 

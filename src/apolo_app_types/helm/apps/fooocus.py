@@ -95,7 +95,7 @@ class FooocusChartValueProcessor(BaseChartValueProcessor[FooocusAppInputs]):
             container=Container(env=[Env(name=k, value=v) for k, v in env.items()]),
             networking=NetworkingConfig(
                 service_enabled=True,
-                ingress=input_.ingress,
+                ingress_http=input_.ingress_http,
                 ports=[
                     Port(name="http", port=7865),
                 ],

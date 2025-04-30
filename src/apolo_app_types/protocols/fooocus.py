@@ -6,7 +6,7 @@ from apolo_app_types.protocols.common import (
     AppInputs,
     AppInputsDeployer,
     AppOutputsDeployer,
-    Ingress,
+    IngressHttp,
     Preset,
     RestAPI,
     SchemaExtraMetadata,
@@ -47,7 +47,7 @@ class FooocusSpecificAppInputs(BaseModel):
 class FooocusAppInputs(AppInputs):
     preset: Preset
     fooocus_specific: FooocusSpecificAppInputs
-    ingress: Ingress
+    ingress_http: IngressHttp
 
 
 class FooocusAppOutputs(AppOutputs):

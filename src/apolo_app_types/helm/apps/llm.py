@@ -142,7 +142,8 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
         values = await gen_extra_values(
             self.client,
             input_.preset,
-            input_.ingress,
+            input_.ingress_http,
+            None,
             namespace,
         )
         values["podAnnotations"] = self._configure_extra_annotations(input_)

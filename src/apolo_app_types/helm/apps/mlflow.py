@@ -60,7 +60,8 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         base_vals = await gen_extra_values(
             apolo_client=self.client,
             preset_type=input_.preset,
-            ingress=input_.ingress,
+            ingress_http=input_.ingress_http,
+            ingress_grpc=None,
             namespace=namespace,
         )
 
@@ -84,20 +85,19 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
 
         artifact_mounts: StorageMounts | None = None
         artifact_env_val = None
-        if input_.artifact_store and input_.artifact_store.apolo_files:
+        if input_.artifact_store:
             artifact_env_val = "file:///mlflow-artifacts"
             envs.append(Env(name="MLFLOW_ARTIFACT_ROOT", value=artifact_env_val))
 
-            if input_.artifact_store.apolo_files:
-                artifact_mounts = StorageMounts(
-                    mounts=[
-                        ApoloFilesMount(
-                            storage_uri=input_.artifact_store.apolo_files,
-                            mount_path=MountPath(path="/mlflow-artifacts"),
-                            mode=ApoloMountMode(mode="rw"),
-                        )
-                    ]
-                )
+            artifact_mounts = StorageMounts(
+                mounts=[
+                    ApoloFilesMount(
+                        storage_uri=input_.artifact_store,
+                        mount_path=MountPath(path="/mlflow-artifacts"),
+                        mode=ApoloMountMode(mode="rw"),
+                    )
+                ]
+            )
 
         mlflow_cmd = ["mlflow"]
         mlflow_args = [
@@ -116,7 +116,6 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
                 repository="ghcr.io/apolo-actions/mlflow",
                 tag="v2.19.0",
             ),
-            ingress=input_.ingress,
             container=Container(
                 command=mlflow_cmd,
                 args=mlflow_args,
@@ -124,7 +123,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
             ),
             networking=NetworkingConfig(
                 service_enabled=True,
-                ingress=input_.ingress,
+                ingress_http=input_.ingress_http,
                 ports=[
                     Port(name="http", port=5000),
                 ],

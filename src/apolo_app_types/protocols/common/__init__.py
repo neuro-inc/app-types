@@ -11,7 +11,7 @@ from .autoscaling import AutoscalingHPA
 from .buckets import Bucket
 from .containers import ContainerImage
 from .hugging_face import HuggingFaceCache, HuggingFaceModel
-from .ingress import Ingress, IngressGrpc
+from .ingress import IngressGrpc, IngressHttp
 from .k8s import Container, DeploymentName, Env
 from .networking import GraphQLAPI, GrpcAPI, RestAPI
 from .openai_compat import OpenAICompatChatAPI, OpenAICompatEmbeddingsAPI
@@ -34,7 +34,7 @@ from .storage import (
 __all__ = [
     "AppInputsDeployer",
     "AppOutputs",
-    "Ingress",
+    "IngressHttp",
     "IngressGrpc",
     "Postgres",
     "Redis",

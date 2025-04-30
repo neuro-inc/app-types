@@ -62,7 +62,8 @@ class CustomDeploymentChartValueProcessor(
             apolo_client=self.client,
             preset_type=input_.preset,
             namespace=namespace,
-            ingress=input_.networking.ingress,
+            ingress_http=input_.networking.ingress_http,
+            ingress_grpc=None,
             port_configurations=input_.networking.ports,
         )
         image_docker_url = await get_image_docker_url(

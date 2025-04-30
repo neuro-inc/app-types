@@ -7,7 +7,7 @@ from apolo_app_types.protocols.common import (
     Container,
     ContainerImage,
     DeploymentName,
-    Ingress,
+    IngressHttp,
     Preset,
     RestAPI,
     SchemaExtraMetadata,
@@ -31,7 +31,7 @@ class NetworkingConfig(BaseModel):
         description="Whether to enable the service.",
     )
 
-    ingress: Ingress = Field(default_factory=lambda: Ingress(enabled=True))
+    ingress_http: IngressHttp | None = Field(default_factory=lambda: IngressHttp())
 
     ports: list[Port] = Field(
         default_factory=lambda: [Port()],

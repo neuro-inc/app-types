@@ -4,7 +4,7 @@ import typing as t
 import apolo_sdk
 from yarl import URL
 
-from apolo_app_types.protocols.common import Ingress
+from apolo_app_types.protocols.common import IngressGrpc, IngressHttp
 from apolo_app_types.protocols.common.k8s import Port
 
 
@@ -81,35 +81,22 @@ async def _generate_ingress_config(
     }
 
 
-async def get_ingress_values(
+async def get_http_ingress_values(
     apolo_client: apolo_sdk.Client,
-    ingress: Ingress,
+    ingress_http: IngressHttp,
     namespace: str,
     port_configurations: list[Port] | None = None,
 ) -> dict[str, t.Any]:
+    http_ingress_config = await _generate_ingress_config(
+        apolo_client, namespace, port_configurations
+    )
     ingress_vals: dict[str, t.Any] = {
-        "ingress": {"grpc": {"enabled": False}, "annotations": {}}
+        "enabled": True,
+        **http_ingress_config,  # Merge the generated config directly
     }
-    if not ingress.enabled:
-        ingress_vals["ingress"]["enabled"] = False
-        return ingress_vals
 
-    res = await _generate_ingress_config(apolo_client, namespace, port_configurations)
-    ingress_vals["ingress"].update(res)
-    if ingress.grpc and ingress.grpc.enabled:
-        grpc_ingress_config = await _generate_ingress_config(
-            apolo_client, namespace, port_configurations, namespace_suffix="-grpc"
-        )
-        ingress_vals["ingress"]["grpc"] = {
-            "enabled": True,
-            "className": "traefik",
-            "hosts": grpc_ingress_config["hosts"],
-            "annotations": {
-                "traefik.ingress.kubernetes.io/router.entrypoints": "websecure",
-                "traefik.ingress.kubernetes.io/service.serversscheme": "h2c",
-            },
-        }
-    if ingress.http_auth:
+    # Handle auth based on its presence in the input object
+    if ingress_http.auth:
         forward_auth_name = "forwardauth"
         forward_auth_config = {
             "enabled": True,
@@ -117,9 +104,45 @@ async def get_ingress_values(
             "address": str(_get_forward_auth_address(apolo_client)),
             "trustForwardHeader": True,
         }
-        ingress_vals["ingress"]["forwardAuth"] = forward_auth_config
-        ingress_vals["ingress"]["annotations"][
+        ingress_vals["forwardAuth"] = forward_auth_config
+        ingress_vals.setdefault("annotations", {})  # Ensure annotations key exists
+        ingress_vals["annotations"][
             "traefik.ingress.kubernetes.io/router.middlewares"
         ] = f"{namespace}-{forward_auth_name}@kubernetescrd"
 
     return ingress_vals
+
+
+async def get_grpc_ingress_values(
+    apolo_client: apolo_sdk.Client,
+    ingress_grpc: IngressGrpc,
+    namespace: str,
+    port_configurations: list[Port] | None = None,
+) -> dict[str, t.Any]:
+    grpc_ingress_config = await _generate_ingress_config(
+        apolo_client, namespace, port_configurations, namespace_suffix="-grpc"
+    )
+    grpc_vals: dict[str, t.Any] = {
+        "enabled": True,
+        "className": "traefik",
+        "hosts": grpc_ingress_config["hosts"],
+        "annotations": {
+            "traefik.ingress.kubernetes.io/router.entrypoints": "websecure",
+            "traefik.ingress.kubernetes.io/service.serversscheme": "h2c",
+        },
+    }
+
+    if ingress_grpc.auth:
+        forward_auth_name = "forwardauth"
+        grpc_vals["auth"] = {
+            "enabled": True,
+            "name": forward_auth_name,
+            "address": str(_get_forward_auth_address(apolo_client)),
+            "trustForwardHeader": True,
+        }
+        grpc_vals.setdefault("annotations", {})  # Ensure annotations key exists
+        grpc_vals["annotations"]["traefik.ingress.kubernetes.io/router.middlewares"] = (
+            f"{namespace}-{forward_auth_name}@kubernetescrd"
+        )
+
+    return grpc_vals
