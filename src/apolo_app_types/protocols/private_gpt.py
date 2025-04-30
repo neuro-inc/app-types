@@ -57,7 +57,9 @@ class PrivateGptSpecific(BaseModel):
         default=768,
         json_schema_extra=SchemaExtraMetadata(
             title="Embeddings Dimension",
-            description="Configure dimension of embeddings.",
+            description="Configure dimension of embeddings."
+            "The number can be found on the Hugging Face model card "
+            "or model configuration file.",
         ).as_json_schema_extra(),
     )
     llm_max_new_tokens: int = Field(
