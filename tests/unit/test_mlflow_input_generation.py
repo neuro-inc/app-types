@@ -89,7 +89,7 @@ async def test_values_mlflow_generation_sqlite_explicit_no_pvc_name(
         preset=Preset(name="cpu-small"),
         ingress_http=IngressHttp(clusterName="test"),
         metadata_storage=MLFlowMetadataSQLite(),
-        artifact_store=None,
+        artifact_store=ApoloFilesPath(path="storage://foo/bar/baz"),
     )
 
     helm_args, helm_params = await app_type_to_vals(
@@ -128,7 +128,7 @@ async def test_values_mlflow_generation_sqlite_explicit_custom_pvc_name(
         preset=Preset(name="cpu-small"),
         ingress_http=IngressHttp(clusterName="test"),
         metadata_storage=MLFlowMetadataSQLite(pvc_name=custom_pvc_name),
-        artifact_store=None,
+        artifact_store=ApoloFilesPath(path="storage://foo/bar/baz"),
     )
 
     helm_args, helm_params = await app_type_to_vals(

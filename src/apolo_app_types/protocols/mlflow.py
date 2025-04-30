@@ -61,7 +61,7 @@ class MLFlowMetadataPostgres(AbstractAppFieldType):
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
             title="Postgres",
-            description="MLFlow backend on Postgres.",
+            description="Use PostgreSQL server as metadata storage for MLFlow.",
         ).as_json_schema_extra(),
     )
     postgres_uri: PostgresURI
@@ -72,7 +72,9 @@ class MLFlowMetadataSQLite(AbstractAppFieldType):
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
             title="SQLite",
-            description="MLFlow backend on local SQLite.",
+            description=(
+                "Use SQLite on a dedicated block device as metadata store for MLFlow."
+            ),
         ).as_json_schema_extra(),
     )
     pvc_name: str = "mlflow-sqlite-storage"
@@ -92,8 +94,7 @@ class MLFlowAppInputs(AppInputs):
     preset: Preset
     ingress_http: IngressHttp
     metadata_storage: MLFlowMetaStorage
-    artifact_store: ApoloFilesPath | None = Field(
-        default=None,
+    artifact_store: ApoloFilesPath = Field(
         description=(
             "Use Apolo Files to store your MLFlow artifacts "
             "(model binaries, dependency files, etc). "
