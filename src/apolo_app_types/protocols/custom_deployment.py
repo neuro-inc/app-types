@@ -31,7 +31,7 @@ class NetworkingConfig(BaseModel):
         description="Whether to enable the service.",
     )
 
-    ingress_http: IngressHttp = Field(default_factory=lambda: IngressHttp())
+    ingress_http: IngressHttp | None = Field(default_factory=lambda: IngressHttp())
 
     ports: list[Port] = Field(
         default_factory=lambda: [Port()],
