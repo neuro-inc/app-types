@@ -13,6 +13,10 @@ from apolo_app_types.protocols.common import (
     RestAPI,
     StorageGB,
 )
+from apolo_app_types.protocols.common.ingress import (
+    INGRESS_GRPC_SCHEMA_EXTRA,
+    INGRESS_HTTP_SCHEMA_EXTRA,
+)
 
 
 WEAVIATE_MIN_GB_STORAGE = 32
@@ -25,14 +29,11 @@ class WeaviateInputs(AppInputs):
     )
     backup_bucket: Bucket | None = None
     ingress_http: IngressHttp | None = Field(
-        default=None,
-        title="Enable HTTP Ingress",
+        default=None, json_schema_extra=INGRESS_HTTP_SCHEMA_EXTRA.as_json_schema_extra()
     )
     ingress_grpc: IngressGrpc | None = Field(
-        default=None,
-        title="Enable gRPC Ingress",
+        default=None, json_schema_extra=INGRESS_GRPC_SCHEMA_EXTRA.as_json_schema_extra()
     )
-    # cluster_api: BasicAuth | None = None
 
     @field_validator("persistence")
     def validate_storage_size(cls, value: StorageGB) -> StorageGB:  # noqa: N805

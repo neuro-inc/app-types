@@ -13,6 +13,7 @@ from apolo_app_types.protocols.common import (
     SchemaExtraMetadata,
     SchemaMetaType,
 )
+from apolo_app_types.protocols.common.hugging_face import HF_SCHEMA_EXTRA
 
 
 class StableStudio(AppInputsDeployer):
@@ -25,19 +26,20 @@ class StableDiffusionParams(AbstractAppFieldType):
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
             title="Stable Diffusion",
-            description="Configuration for Stable Diffusion.",
+            description="Configure the deployment settings"
+            " and model selection for Stable Diffusion.",
         ).as_json_schema_extra(),
     )
+
     replica_count: int = Field(
         default=1,
-        description="The number of replicas to deploy.",
-        title="Replica Count",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Replica Count",
+            description="Set the number of replicas to "
+            "deploy for handling concurrent image generation requests.",
+        ).as_json_schema_extra(),
     )
-    hugging_face_model: HuggingFaceModel = Field(
-        ...,
-        description="The name of the Hugging Face model.",
-        title="Hugging Face Model Name",
-    )
+    hugging_face_model: HuggingFaceModel
 
 
 class StableDiffusionInputs(AppInputs):
@@ -78,4 +80,7 @@ class SDOutputs(AppOutputsDeployer):
 class StableDiffusionOutputs(AppOutputs):
     internal_api: RestAPI | None = None
     external_api: RestAPI | None = None
-    hf_model: HuggingFaceModel | None = None
+    hf_model: HuggingFaceModel | None = Field(
+        default=None,
+        json_schema_extra=HF_SCHEMA_EXTRA.as_json_schema_extra(),
+    )

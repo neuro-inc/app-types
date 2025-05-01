@@ -21,22 +21,36 @@ class NetworkingConfig(BaseModel):
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
             title="Network Configuration",
-            description="Configuration for Custom Deployment Networking.",
+            description="Configure custom networking "
+            "options for your deployment, including ports and ingress settings.",
             is_advanced_field=True,
         ).as_json_schema_extra(),
     )
+
     service_enabled: bool = Field(
         default=True,
-        title="Service Enabled",
-        description="Whether to enable the service.",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Service Enabled",
+            description="Enable or disable the internal "
+            "network service for the deployment.",
+        ).as_json_schema_extra(),
     )
 
-    ingress_http: IngressHttp | None = Field(default_factory=lambda: IngressHttp())
+    ingress_http: IngressHttp | None = Field(
+        default_factory=lambda: IngressHttp(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="HTTP Ingress",
+            description="Define HTTP ingress configuration"
+            " for exposing services over the web.",
+        ).as_json_schema_extra(),
+    )
 
     ports: list[Port] = Field(
         default_factory=lambda: [Port()],
-        title="Ports",
-        description="List of ports to expose.",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Exposed Ports",
+            description="Specify which ports should be exposed by the application.",
+        ).as_json_schema_extra(),
     )
 
 

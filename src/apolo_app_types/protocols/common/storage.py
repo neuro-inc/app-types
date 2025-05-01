@@ -15,19 +15,26 @@ class StorageGB(AbstractAppFieldType):
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
             title="Storage",
-            description="Storage configuration.",
+            description="Define the storage size and class for your application.",
         ).as_json_schema_extra(),
     )
+
     size: int = Field(
         ...,
-        description="The size of the storage in GB.",
-        title="Storage size",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Storage Size (GB)",
+            description="Specify the size of the storage volume in gigabytes.",
+        ).as_json_schema_extra(),
     )
+
     # TODO: should be an enum
     storageClassName: str | None = Field(  # noqa: N815
         default=None,
-        description="The storage class name.",
-        title="Storage class name",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Storage Class Name",
+            description="Provide the name of the storage class "
+            "to control how the storage is provisioned.",
+        ).as_json_schema_extra(),
     )
 
 
@@ -35,14 +42,19 @@ class ApoloFilesPath(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Apolo Files path",
-            description="Path within Apolo Files application to use.",
+            title="Apolo Files Path",
+            description="Specify the path within the Apolo "
+            "Files application to read from or write to.",
         ).as_json_schema_extra(),
     )
+
     path: str = Field(
         ...,
-        description="The path to the Apolo Storage.",
-        title="Storage path",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Storage Path",
+            description="Provide the Apolo Storage path starting"
+            " with `storage:` to locate your files.",
+        ).as_json_schema_extra(),
     )
 
     @field_validator("path", mode="before")
@@ -64,10 +76,20 @@ class ApoloFilesPath(AbstractAppFieldType):
 
 
 class MountPath(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Mount Path",
+            description="Specify the absolute path.",
+        ).as_json_schema_extra(),
+    )
     path: str = Field(
         ...,
-        description="The path within a container.",
-        title="Mount path",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Path",
+            description="Specify the absolute path inside the "
+            "container where the volume should be mounted.",
+        ).as_json_schema_extra(),
     )
 
     @field_validator("path", mode="before")
@@ -84,10 +106,23 @@ class ApoloMountModes(enum.StrEnum):
 
 
 class ApoloMountMode(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Apolo Files Mount",
+            description="Configure how Apolo Files should be "
+            "mounted into the application’s workload environment.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+
     mode: ApoloMountModes = Field(
         default=ApoloMountModes.RW,
-        description="The mode of the mount.",
-        title="Mount mode",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Mount Mode",
+            description="Select the access mode for the mount,"
+            " such as read-only or read-write.",
+        ).as_json_schema_extra(),
     )
 
 
@@ -100,20 +135,10 @@ class ApoloFilesMount(AbstractAppFieldType):
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
-    storage_uri: ApoloFilesPath = Field(
-        ...,
-        description="The path to the Apolo Files.",
-        title="Storage path",
-    )
-    mount_path: MountPath = Field(
-        ...,
-        description="The path within a container.",
-        title="Mount path",
-    )
+    storage_uri: ApoloFilesPath
+    mount_path: MountPath
     mode: ApoloMountMode = Field(
         default=ApoloMountMode(),
-        description="The mode of the mount.",
-        title="Mount mode",
     )
 
 

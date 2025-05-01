@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Any
 
 from pydantic import ConfigDict
 
@@ -19,7 +19,6 @@ class ApoloSecret(AbstractAppFieldType):
         ).as_json_schema_extra(),
     )
     key: str
-    type: Literal["apolo-secret"] = "apolo-secret"
 
 
 StrOrSecret = str | ApoloSecret

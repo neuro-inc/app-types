@@ -43,7 +43,7 @@ class PrivateGptSpecific(BaseModel):
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
             title="PrivateGPT Specific",
-            description="Configure PrivateGPT application.",
+            description="Configure PrivateGPT additional parameters.",
         ).as_json_schema_extra(),
     )
     llm_temperature: float = Field(

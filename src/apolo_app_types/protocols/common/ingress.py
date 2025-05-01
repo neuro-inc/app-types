@@ -4,13 +4,21 @@ from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
 
 
+INGRESS_GRPC_SCHEMA_EXTRA = SchemaExtraMetadata(
+    title="Enable gRPC Ingress",
+    description="Enable access to your service over the internet using gRPC.",
+)
+
+INGRESS_HTTP_SCHEMA_EXTRA = SchemaExtraMetadata(
+    title="Enable HTTP Ingress",
+    description="Enable access to your application over the internet using HTTPS.",
+)
+
+
 class IngressGrpc(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Enable gRPC Ingress",
-            description="Enable access to your service over the internet using gRPC.",
-        ).as_json_schema_extra(),
+        json_schema_extra=INGRESS_GRPC_SCHEMA_EXTRA.as_json_schema_extra(),
     )
     auth: bool = Field(
         default=True,
@@ -30,11 +38,7 @@ class IngressGrpc(AbstractAppFieldType):
 class IngressHttp(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Enable HTTP Ingress",
-            description="Enable access to your "
-            "application over the internet using HTTPS.",
-        ).as_json_schema_extra(),
+        json_schema_extra=INGRESS_HTTP_SCHEMA_EXTRA.as_json_schema_extra(),
     )
     auth: bool = Field(
         default=True,

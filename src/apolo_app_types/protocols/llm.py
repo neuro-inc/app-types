@@ -36,7 +36,7 @@ class LLMModel(AbstractAppFieldType):
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
             title="LLM",
-            description="Configuration for LLM.",
+            description="Configure VLLM.",
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
@@ -44,7 +44,7 @@ class LLMModel(AbstractAppFieldType):
     tokenizer_hf_name: str = Field(  # noqa: N815
         "",
         json_schema_extra=SchemaExtraMetadata(
-            description="The name of the tokenizer "
+            description="Set the name of the tokenizer "
             "associated with the Hugging Face model.",
             title="Hugging Face Tokenizer Name",
         ).as_json_schema_extra(),
@@ -53,7 +53,8 @@ class LLMModel(AbstractAppFieldType):
         default_factory=list,
         json_schema_extra=SchemaExtraMetadata(
             title="Server Extra Arguments",
-            description="Extra arguments to pass to the server.",
+            description="Configure extra arguments "
+            "to pass to the server (see VLLM doc).",
         ).as_json_schema_extra(),
     )
 
@@ -76,13 +77,17 @@ class LLMInputs(AppInputs):
     preset: Preset
     ingress_http: IngressHttp | None = Field(
         default=None,
-        title="Enable HTTP Ingress",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Public HTTP Ingress",
+            description="Enable access to your application"
+            " over the internet using HTTPS.",
+        ).as_json_schema_extra(),
     )
     llm: LLMModel
     cache_config: HuggingFaceCache | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="Cache Config", description="Configuration for Hugging Face cache"
+            title="Cache Config", description="Configure Hugging Face cache."
         ).as_json_schema_extra(),
     )
 
