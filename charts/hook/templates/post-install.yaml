@@ -20,6 +20,5 @@ spec:
         image: {{ .Values.appTypesImage.repository }}:{{ .Values.appTypesImage.tag }}
         args:
         - "update-outputs"
-        - >
-          {{ include "filterNonEmptyAndConvertToJson" .Values | squote }}
+        - {{ include "filterNonEmptyAndConvertToJson" .Values | squote }}
         imagePullPolicy: {{ .Values.appTypesImage.pullPolicy }}
