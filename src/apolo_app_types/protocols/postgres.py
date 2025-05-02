@@ -25,10 +25,12 @@ class PostgresURI(AbstractAppFieldType):
     )
     uri: str | None = Field(
         default=None,
-        description=(
-            "Full Postgres connection URI. E.g. 'postgresql://user:pass@host:5432/db'"
-        ),
-        title="URI",
+        json_schema_extra=SchemaExtraMetadata(
+            title="URI",
+            description=(
+                "Specify full Postgres connection URI. E.g. 'postgresql://user:pass@host:5432/db'"
+            ),
+        ).as_json_schema_extra(),
     )
 
 

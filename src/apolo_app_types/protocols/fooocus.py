@@ -32,15 +32,23 @@ class FooocusSpecificAppInputs(BaseModel):
             description="Fooocus App configuration.",
         ).as_json_schema_extra(),
     )
+
     http_auth: bool = Field(
         default=True,
-        description="Whether to use HTTP authentication.",
-        title="HTTP Authentication",
+        json_schema_extra=SchemaExtraMetadata(
+            title="HTTP Authentication",
+            description="Enable HTTP authentication to "
+            "restrict access to the Fooocus app.",
+        ).as_json_schema_extra(),
     )
+
     huggingface_token_secret: OptionalStrOrSecret = Field(  # noqa: N815
         default=None,
-        description="The Hugging Face API token.",
-        title="Hugging Face Token",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Hugging Face Token",
+            description="Provide the Hugging Face API token"
+            " for model access and integration.",
+        ).as_json_schema_extra(),
     )
 
 

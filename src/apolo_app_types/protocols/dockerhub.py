@@ -17,23 +17,34 @@ class DockerHubModel(AbstractAppFieldType):
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
             title="DockerHub",
-            description="Configuration for DockerHub.",
+            description="Configure access to DockerHub for pulling container images.",
         ).as_json_schema_extra(),
     )
+
     registry_url: str = Field(  # noqa: N815
         default="https://index.docker.io/v1/",
-        description="The URL of the registry where the container images is stored.",
-        title="Registry URL",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Registry URL",
+            description="Set the Docker registry URL to pull container images from.",
+        ).as_json_schema_extra(),
     )
+
     username: str = Field(  # noqa: N815
         ...,
-        description="The username to access the registry.",
-        title="Username",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Username",
+            description="Provide the DockerHub username used"
+            " to authenticate with the registry.",
+        ).as_json_schema_extra(),
     )
+
     password: StrOrSecret = Field(  # noqa: N815
         ...,
-        description="The password to access the registry.",
-        title="Password",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Password",
+            description="Enter the password or secret used"
+            " to authenticate with DockerHub.",
+        ).as_json_schema_extra(),
     )
 
 
@@ -52,8 +63,10 @@ class DockerConfigModel(AbstractAppFieldType):
     )
     filecontents: str = Field(
         ...,
-        title="Docker config file contents",
-        description="The contents of the Docker config file.",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Docker Config File Contents",
+            description="The contents of the Docker config file.",
+        ).as_json_schema_extra(),
     )
 
 
