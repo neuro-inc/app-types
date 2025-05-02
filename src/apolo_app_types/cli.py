@@ -49,6 +49,9 @@ def update_outputs(
 ) -> None:
     try:
         logger.info("Helm input: %s", helm_outputs_json)
+        if helm_outputs_json.startswith("'") and helm_outputs_json.endswith("'"):
+            logger.info("Single quotes detected, removing them")
+            helm_outputs_json = helm_outputs_json[1:-1]
         helm_outputs_dict = json.loads(helm_outputs_json)
         logger.info("Helm outputs: %s", helm_outputs_dict)
         result = asyncio.run(
