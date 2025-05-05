@@ -12,17 +12,22 @@ from apolo_app_types.helm.apps.custom_deployment import (
     CustomDeploymentChartValueProcessor,
 )
 from apolo_app_types.helm.utils.storage import get_app_data_files_path_url
-from apolo_app_types.protocols.common import Container, Env, StorageMounts, ApoloFilesPath, MountPath, ApoloMountMode, \
-    ApoloFilesMount
+from apolo_app_types.protocols.common import (
+    ApoloFilesMount,
+    ApoloFilesPath,
+    ApoloMountMode,
+    Container,
+    Env,
+    MountPath,
+    StorageMounts,
+)
 from apolo_app_types.protocols.common.ingress import IngressHttp
 from apolo_app_types.protocols.common.k8s import Port
 from apolo_app_types.protocols.custom_deployment import NetworkingConfig
-from apolo_app_types.protocols.jupyter import JupyterAppInputs, JupyterTypes
 from apolo_app_types.protocols.shell import ShellAppInputs
 
 
 class ShellChartValueProcessor(BaseChartValueProcessor[ShellAppInputs]):
-
     def __init__(self, *args: t.Any, **kwargs: t.Any):
         super().__init__(*args, **kwargs)
         self.custom_dep_val_processor = CustomDeploymentChartValueProcessor(
@@ -65,10 +70,7 @@ class ShellChartValueProcessor(BaseChartValueProcessor[ShellAppInputs]):
                 tag="pipelines",
             ),
             container=Container(
-                env=[
-                    Env(name=k, value=v)
-                    for k, v in env_vars.items()
-                ],
+                env=[Env(name=k, value=v) for k, v in env_vars.items()],
             ),
             networking=NetworkingConfig(
                 service_enabled=True,

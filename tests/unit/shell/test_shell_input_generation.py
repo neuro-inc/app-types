@@ -5,14 +5,14 @@ import pytest
 from apolo_app_types import ShellAppInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
-from apolo_app_types.protocols.common import IngressHttp, Preset
-
+from apolo_app_types.protocols.common import Preset
 
 from tests.unit.constants import (
     APP_SECRETS_NAME,
     DEFAULT_CLUSTER_NAME,
+    DEFAULT_NAMESPACE,
     DEFAULT_ORG_NAME,
-    DEFAULT_PROJECT_NAME, DEFAULT_NAMESPACE,
+    DEFAULT_PROJECT_NAME,
 )
 
 
@@ -28,9 +28,15 @@ async def test_shell_values_generation(setup_clients):
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
     )
-    assert helm_params["image"] == {'repository': 'ghcr.io/neuro-inc/web-shell', 'tag': 'pipelines'}
+    assert helm_params["image"] == {
+        "repository": "ghcr.io/neuro-inc/web-shell",
+        "tag": "pipelines",
+    }
 
-    assert helm_params["service"] == {'enabled': True, 'ports': [{'containerPort': 7681, 'name': 'http'}]}
+    assert helm_params["service"] == {
+        "enabled": True,
+        "ports": [{"containerPort": 7681, "name": "http"}],
+    }
 
     assert "podAnnotations" in helm_params
     annotations = helm_params["podAnnotations"]

@@ -8,7 +8,9 @@ async def get_shell_outputs(
     helm_values: dict[str, t.Any],
 ) -> dict[str, t.Any]:
     labels = {"application": "mlflow"}
-    internal_web_app_url, external_web_app_url = await get_internal_external_web_urls(labels)
+    internal_web_app_url, external_web_app_url = await get_internal_external_web_urls(
+        labels
+    )
 
     return ShellAppOutputs(
         internal_web_app_url=internal_web_app_url,
