@@ -35,3 +35,4 @@ class ShellAppInputs(AppInputs):
 
 class ShellAppOutputs(AppOutputs):
     internal_web_app_url: RestAPI
+    external_web_app_url: RestAPI
