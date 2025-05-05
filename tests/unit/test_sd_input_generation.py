@@ -3,7 +3,7 @@ import pytest
 from apolo_app_types import HuggingFaceModel, StableDiffusionInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import _get_match_expressions
-from apolo_app_types.protocols.common import Ingress, Preset
+from apolo_app_types.protocols.common import IngressHttp, Preset
 from apolo_app_types.protocols.stable_diffusion import StableDiffusionParams
 
 from tests.unit.constants import APP_SECRETS_NAME, CPU_POOL, DEFAULT_NAMESPACE
@@ -19,10 +19,7 @@ async def test_values_sd_generation(setup_clients, mock_get_preset_cpu):
             preset=Preset(
                 name="cpu-large",
             ),
-            ingress=Ingress(
-                enabled=True,
-                clusterName="test",
-            ),
+            ingress_http=IngressHttp(),
             stable_diffusion=StableDiffusionParams(
                 replica_count=1,
                 stablestudio=None,
@@ -81,10 +78,7 @@ async def test_values_sd_generation_with_gpu(setup_clients, mock_get_preset_gpu)
             preset=Preset(
                 name="gpu_preset",
             ),
-            ingress=Ingress(
-                enabled=True,
-                clusterName="test",
-            ),
+            ingress_http=IngressHttp(),
             stable_diffusion=StableDiffusionParams(
                 replicaCount=1,
                 stablestudio=None,

@@ -25,10 +25,12 @@ class PostgresURI(AbstractAppFieldType):
     )
     uri: str | None = Field(
         default=None,
-        description=(
-            "Full Postgres connection URI. E.g. 'postgresql://user:pass@host:5432/db'"
-        ),
-        title="URI",
+        json_schema_extra=SchemaExtraMetadata(
+            title="URI",
+            description=(
+                "Specify full Postgres connection URI. E.g. 'postgresql://user:pass@host:5432/db'"
+            ),
+        ).as_json_schema_extra(),
     )
 
 
@@ -122,9 +124,9 @@ class CrunchyPostgresUserCredentials(AbstractAppFieldType):
     user: str
     password: str
     host: str
-    port: str
+    port: int
     pgbouncer_host: str
-    pgbouncer_port: str
+    pgbouncer_port: int
     dbname: str | None = None
     jdbc_uri: str | None = None
     pgbouncer_jdbc_uri: str | None = None

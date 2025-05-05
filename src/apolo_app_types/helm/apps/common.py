@@ -10,10 +10,14 @@ import apolo_sdk
 import yaml
 from apolo_sdk import Preset
 
-from apolo_app_types.helm.apps.ingress import get_ingress_values
+from apolo_app_types.helm.apps.ingress import (
+    get_grpc_ingress_values,
+    get_http_ingress_values,
+)
 from apolo_app_types.protocols.common import (
     ApoloFilesMount,
-    Ingress,
+    IngressGrpc,
+    IngressHttp,
     Preset as PresetType,
 )
 from apolo_app_types.protocols.common.k8s import Port
@@ -252,7 +256,8 @@ def append_apolo_storage_integration_annotations(
 async def gen_extra_values(
     apolo_client: apolo_sdk.Client,
     preset_type: PresetType,
-    ingress: Ingress | None = None,
+    ingress_http: IngressHttp | None = None,
+    ingress_grpc: IngressGrpc | None = None,
     namespace: str | None = None,
     port_configurations: list[Port] | None = None,
 ) -> dict[str, t.Any]:
@@ -266,13 +271,35 @@ async def gen_extra_values(
     affinity_vals = preset_to_affinity(preset)
     resources_vals = preset_to_resources(preset)
     ingress_vals: dict[str, t.Any] = {}
-    if ingress:
+    http_ingress_conf: dict[str, t.Any] | None = None
+    grpc_ingress_conf: dict[str, t.Any] | None = None
+
+    if ingress_http or ingress_grpc:
         if not namespace:
             exception_msg = "Namespace is required when ingress is provided."
             raise ValueError(exception_msg)
-        ingress_vals = await get_ingress_values(
-            apolo_client, ingress, namespace, port_configurations
-        )
+        if ingress_http:
+            http_ingress_conf = await get_http_ingress_values(
+                apolo_client, ingress_http, namespace, port_configurations
+            )
+        if ingress_grpc:
+            grpc_ingress_conf = await get_grpc_ingress_values(
+                apolo_client, ingress_grpc, namespace, port_configurations
+            )
+
+    # Construct the final ingress values dictionary
+    if http_ingress_conf or grpc_ingress_conf:
+        ingress_vals["ingress"] = {
+            "enabled": True,  # Enable if either HTTP or gRPC is configured
+            **(http_ingress_conf or {}),  # Spread HTTP config if exists
+            "grpc": (
+                grpc_ingress_conf or {"enabled": False}
+            ),  # Add gRPC config under 'grpc' key
+        }
+        # Ensure annotations dict exists at the top level if http added it,
+        # otherwise initialize if only grpc is present.
+        if "annotations" not in ingress_vals["ingress"] and grpc_ingress_conf:
+            ingress_vals["ingress"]["annotations"] = {}
 
     return {
         "preset_name": preset_name,

@@ -13,8 +13,24 @@ class ContainerImage(AbstractAppFieldType):
             description="Container image to be used in application",
         ).as_json_schema_extra(),
     )
-    repository: str
-    tag: str | None = None
+    repository: str = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Container Image Repository",
+            description="Choose a repository for the container image.",
+        ).as_json_schema_extra(),
+    )
+    tag: str | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Container Image Tag",
+            description="Choose a tag for the container image.",
+        ).as_json_schema_extra(),
+    )
     dockerconfigjson: DockerConfigModel | None = Field(
-        default=None, title="ImagePullSecrets for DockerHub"
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="ImagePullSecrets for DockerHub",
+            description="ImagePullSecrets for DockerHub",
+        ).as_json_schema_extra(),
     )

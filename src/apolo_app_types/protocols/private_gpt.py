@@ -9,7 +9,7 @@ from apolo_app_types import (
 from apolo_app_types.protocols.common import (
     AppInputsDeployer,
     AppOutputsDeployer,
-    Ingress,
+    IngressHttp,
     Preset,
     SchemaExtraMetadata,
 )
@@ -43,7 +43,7 @@ class PrivateGptSpecific(BaseModel):
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
             title="PrivateGPT Specific",
-            description="Configure PrivateGPT application.",
+            description="Configure PrivateGPT additional parameters.",
         ).as_json_schema_extra(),
     )
     llm_temperature: float = Field(
@@ -53,11 +53,43 @@ class PrivateGptSpecific(BaseModel):
             description="Configure temperature for LLM inference.",
         ).as_json_schema_extra(),
     )
+    embeddings_dimension: int = Field(
+        default=768,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Embeddings Dimension",
+            description="Configure dimension of embeddings."
+            "The number can be found on the Hugging Face model card "
+            "or model configuration file.",
+        ).as_json_schema_extra(),
+    )
+    llm_max_new_tokens: int = Field(
+        default=5000,
+        json_schema_extra=SchemaExtraMetadata(
+            title="LLM Max New Tokens",
+            description="Configure maximum number of new tokens "
+            "(limited by GPU memory and model size).",
+        ).as_json_schema_extra(),
+    )
+    llm_context_window: int = Field(
+        default=8192,
+        json_schema_extra=SchemaExtraMetadata(
+            title="LLM Context Window",
+            description="Configure context window for LLM inference "
+            "(defined by model architecture).",
+        ).as_json_schema_extra(),
+    )
+    llm_tokenizer_name: str | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="LLM Tokenizer Name",
+            description="Configure tokenizer name for LLM inference.",
+        ).as_json_schema_extra(),
+    )
 
 
 class PrivateGPTAppInputs(AppInputs):
     preset: Preset
-    ingress: Ingress
+    ingress_http: IngressHttp
     pgvector_user: CrunchyPostgresUserCredentials
     embeddings_api: OpenAICompatEmbeddingsAPI
     llm_chat_api: OpenAICompatChatAPI

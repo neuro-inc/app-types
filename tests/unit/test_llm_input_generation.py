@@ -9,7 +9,7 @@ from apolo_app_types.helm.apps.common import (
     _get_match_expressions,
 )
 from apolo_app_types.inputs.args import app_type_to_vals
-from apolo_app_types.protocols.common import ApoloFilesPath, Ingress, Preset
+from apolo_app_types.protocols.common import ApoloFilesPath, IngressHttp, Preset
 from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 from apolo_app_types.protocols.huggingface_cache import (
     HuggingFaceCache,
@@ -27,8 +27,7 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
             preset=Preset(
                 name="cpu-large",
             ),
-            ingress=Ingress(
-                enabled=True,
+            ingress_http=IngressHttp(
                 clusterName="test",
             ),
             llm=LLMModel(
@@ -108,8 +107,7 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
             preset=Preset(
                 name="gpu-small",
             ),
-            ingress=Ingress(
-                enabled=True,
+            ingress_http=IngressHttp(
                 clusterName="test",
             ),
             llm=LLMModel(
@@ -217,8 +215,7 @@ async def test_values_llm_generation_cpu_apolo_secret(
             preset=Preset(
                 name="cpu-large",
             ),
-            ingress=Ingress(
-                enabled=True,
+            ingress_http=IngressHttp(
                 clusterName="test",
             ),
             llm=LLMModel(
@@ -300,7 +297,7 @@ async def test_values_llm_generation_gpu_4x(setup_clients, mock_get_preset_gpu):
     _, helm_params = await app_type_to_vals(
         input_=LLMInputs(
             preset=Preset(name="gpu-large"),  # triggers nvidia_gpu=4 in conftest
-            ingress=Ingress(enabled=True, clusterName="test"),
+            ingress_http=IngressHttp(clusterName="test"),
             llm=LLMModel(
                 hugging_face_model=HuggingFaceModel(
                     model_hf_name="test", hf_token="xxx"
@@ -323,7 +320,7 @@ async def test_values_llm_generation_gpu_8x(setup_clients, mock_get_preset_gpu):
     _, helm_params = await app_type_to_vals(
         input_=LLMInputs(
             preset=Preset(name="gpu-xlarge"),  # triggers nvidia_gpu=8 in conftest
-            ingress=Ingress(enabled=True, clusterName="test"),
+            ingress_http=IngressHttp(clusterName="test"),
             llm=LLMModel(
                 hugging_face_model=HuggingFaceModel(
                     model_hf_name="test2", hf_token="yyy"
@@ -346,7 +343,7 @@ async def test_values_llm_generation_gpu_8x_pps(setup_clients, mock_get_preset_g
     _, helm_params = await app_type_to_vals(
         input_=LLMInputs(
             preset=Preset(name="gpu-xlarge"),  # triggers nvidia_gpu=8 in conftest
-            ingress=Ingress(enabled=True, clusterName="test"),
+            ingress_http=IngressHttp(clusterName="test"),
             llm=LLMModel(
                 hugging_face_model=HuggingFaceModel(
                     model_hf_name="test2", hf_token="yyy"
@@ -371,7 +368,7 @@ async def test_values_llm_generation_gpu_8x_pps_and_tps(
     _, helm_params = await app_type_to_vals(
         input_=LLMInputs(
             preset=Preset(name="gpu-xlarge"),  # triggers nvidia_gpu=8 in conftest
-            ingress=Ingress(enabled=True, clusterName="test"),
+            ingress_http=IngressHttp(clusterName="test"),
             llm=LLMModel(
                 hugging_face_model=HuggingFaceModel(
                     model_hf_name="test2",
@@ -407,8 +404,7 @@ async def test_values_llm_generation__storage_integrated(
             preset=Preset(
                 name="gpu-small",
             ),
-            ingress=Ingress(
-                enabled=False,
+            ingress_http=IngressHttp(
                 clusterName="",
             ),
             llm=LLMModel(
@@ -481,9 +477,26 @@ async def test_values_llm_generation__storage_integrated(
             }
         },
         "ingress": {
+            "enabled": True,
             "grpc": {"enabled": False},
-            "annotations": {},
-            "enabled": False,
+            "annotations": {
+                "traefik.ingress.kubernetes.io/router.middlewares": (
+                    f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd"
+                )
+            },
+            "className": "traefik",
+            "hosts": [
+                {
+                    "host": "default.apps.some.org.neu.ro",
+                    "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
+                }
+            ],
+            "forwardAuth": {
+                "enabled": True,
+                "name": "forwardauth",
+                "address": ANY,
+                "trustForwardHeader": True,
+            },
         },
         "podAnnotations": {
             APOLO_STORAGE_LABEL: '[{"storage_uri": "storage://some-cluster/some-org/some-proj/some-folder", "mount_path": "/root/.cache/huggingface", "mount_mode": "rw"}]'  # noqa: E501

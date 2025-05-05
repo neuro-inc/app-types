@@ -7,7 +7,7 @@ from apolo_app_types.protocols.common import (
     Container,
     ContainerImage,
     DeploymentName,
-    Ingress,
+    IngressHttp,
     Preset,
     RestAPI,
     SchemaExtraMetadata,
@@ -21,22 +21,36 @@ class NetworkingConfig(BaseModel):
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
             title="Network Configuration",
-            description="Configuration for Custom Deployment Networking.",
+            description="Configure custom networking "
+            "options for your deployment, including ports and ingress settings.",
             is_advanced_field=True,
         ).as_json_schema_extra(),
     )
+
     service_enabled: bool = Field(
         default=True,
-        title="Service Enabled",
-        description="Whether to enable the service.",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Service Enabled",
+            description="Enable or disable the internal "
+            "network service for the deployment.",
+        ).as_json_schema_extra(),
     )
 
-    ingress: Ingress = Field(default_factory=lambda: Ingress(enabled=True))
+    ingress_http: IngressHttp | None = Field(
+        default_factory=lambda: IngressHttp(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="HTTP Ingress",
+            description="Define HTTP ingress configuration"
+            " for exposing services over the web.",
+        ).as_json_schema_extra(),
+    )
 
     ports: list[Port] = Field(
         default_factory=lambda: [Port()],
-        title="Ports",
-        description="List of ports to expose.",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Exposed Ports",
+            description="Specify which ports should be exposed by the application.",
+        ).as_json_schema_extra(),
     )
 
 
@@ -49,11 +63,38 @@ class CustomDeploymentInputs(AppInputs):
         ).as_json_schema_extra(),
     )
     preset: Preset
-    name_override: DeploymentName | None = None
+    name_override: DeploymentName | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Deployment Name Override",
+            description="Override the default deployment name.",
+        ).as_json_schema_extra(),
+    )
     image: ContainerImage
-    autoscaling: AutoscalingHPA | None = None
-    container: Container | None = None
-    storage_mounts: StorageMounts | None = None
+    autoscaling: AutoscalingHPA | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Autoscaling",
+            description="Enable Autoscaling and configure it.",
+            is_advanced_field=True,
+        ).as_json_schema_extra(),
+    )
+    container: Container | None = Field(
+        None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Container",
+            description="Enable Container configuration.",
+            is_advanced_field=True,
+        ).as_json_schema_extra(),
+    )
+    storage_mounts: StorageMounts | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Storage Mounts",
+            description="Enable Storage mounts configuration.",
+            is_advanced_field=True,
+        ).as_json_schema_extra(),
+    )
     networking: NetworkingConfig = Field(default_factory=lambda: NetworkingConfig())
 
 
