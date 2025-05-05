@@ -37,7 +37,7 @@ async def _get_service_endpoints(
 
 
 async def get_weaviate_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any]:
-    release_name = helm_values.get("nameOverride", "weaviate")
+    release_name = "weaviate"
     cluster_api = helm_values.get("clusterApi", {})
 
     try:
