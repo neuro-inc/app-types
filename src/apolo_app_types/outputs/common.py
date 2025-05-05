@@ -5,7 +5,7 @@ from apolo_app_types.protocols.common import RestAPI
 
 async def get_internal_external_web_urls(
     labels: dict[str, str],
-) -> tuple[RestAPI, RestAPI]:
+) -> tuple[RestAPI | None, RestAPI | None]:
     internal_host, internal_port = await get_service_host_port(match_labels=labels)
     internal_web_app_url = None
     if internal_host:
