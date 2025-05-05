@@ -9,7 +9,7 @@ from apolo_app_types.helm.apps.custom_deployment import (
     CustomDeploymentChartValueProcessor,
 )
 from apolo_app_types.protocols.common import Container, Env, StorageMounts
-from apolo_app_types.protocols.common.ingress import Ingress
+from apolo_app_types.protocols.common.ingress import IngressHttp
 from apolo_app_types.protocols.common.k8s import Port
 from apolo_app_types.protocols.custom_deployment import NetworkingConfig
 from apolo_app_types.protocols.vscode import VSCodeAppInputs
@@ -29,6 +29,7 @@ class VSCodeChartValueProcessor(BaseChartValueProcessor[VSCodeAppInputs]):
         input_: VSCodeAppInputs,
         app_name: str,
         namespace: str,
+        app_secrets_name: str,
         *args: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -62,7 +63,7 @@ class VSCodeChartValueProcessor(BaseChartValueProcessor[VSCodeAppInputs]):
             ),
             networking=NetworkingConfig(
                 service_enabled=True,
-                ingress=Ingress(enabled=True, http_auth=input_.networking.http_auth),
+                ingress=IngressHttp(http_auth=input_.networking.http_auth),
                 ports=[
                     Port(name="http", port=self._port),
                 ],
@@ -74,5 +75,6 @@ class VSCodeChartValueProcessor(BaseChartValueProcessor[VSCodeAppInputs]):
             input_=custom_deployment,
             app_name=app_name,
             namespace=namespace,
+            app_secrets_name=app_secrets_name,
         )
         return {**custom_app_vals, "labels": {"application": "vscode"}}
