@@ -41,7 +41,7 @@ class VSCodeChartValueProcessor(BaseChartValueProcessor[VSCodeAppInputs]):
         storage_mounts.mounts.append(code_storage_mount)
 
         env_vars = [
-            Env(name="CODER_HTTP_ADDRESS", value="0.0.0.0:8080"),
+            Env(name="CODER_HTTP_ADDRESS", value=f"0.0.0.0:{self._port}"),
         ]
         if input_.mlflow_integration:
             env_vars.append(
