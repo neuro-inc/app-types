@@ -10,6 +10,7 @@ from apolo_app_types.protocols.jupyter import JupyterAppInputs
 from apolo_app_types.protocols.llm import LLMInputs
 from apolo_app_types.protocols.mlflow import MLFlowAppInputs
 from apolo_app_types.protocols.spark_job import SparkJobInputs
+from apolo_app_types.protocols.vscode import VSCodeAppInputs
 from apolo_app_types.protocols.weaviate import WeaviateInputs
 
 
@@ -55,21 +56,25 @@ class AppType(enum.StrEnum):
 
     @classmethod
     def from_app_inputs(cls, inputs: AppInputs) -> "AppType":
-        if isinstance(inputs, LLMInputs):
-            return AppType.LLMInference
-        if isinstance(inputs, WeaviateInputs):
-            return AppType.Weaviate
-        if isinstance(inputs, StableDiffusionInputs):
-            return AppType.StableDiffusion
-        if isinstance(inputs, DockerHubInputs):
-            return AppType.DockerHub
-        if isinstance(inputs, HuggingFaceCacheInputs):
-            return AppType.HuggingFaceCache
-        if isinstance(inputs, SparkJobInputs):
-            return AppType.SparkJob
-        if isinstance(inputs, MLFlowAppInputs):
-            return AppType.MLFlow
-        if isinstance(inputs, JupyterAppInputs):
-            return AppType.Jupyter
+        match inputs:
+            case LLMInputs():
+                return AppType.LLMInference
+            case WeaviateInputs():
+                return AppType.Weaviate
+            case StableDiffusionInputs():
+                return AppType.StableDiffusion
+            case DockerHubInputs():
+                return AppType.DockerHub
+            case HuggingFaceCacheInputs():
+                return AppType.HuggingFaceCache
+            case SparkJobInputs():
+                return AppType.SparkJob
+            case MLFlowAppInputs():
+                return AppType.MLFlow
+            case VSCodeAppInputs():
+                return AppType.VSCode
+            case JupyterAppInputs():
+                return AppType.Jupyter
+
         error_message = f"Unsupported input type: {type(inputs).__name__}"
         raise ValueError(error_message)

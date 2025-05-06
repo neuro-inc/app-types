@@ -91,7 +91,12 @@ from apolo_app_types.protocols.text_embeddings import (
     TextEmbeddingsInferenceInputs,
     TextEmbeddingsInferenceOutputs,
 )
-from apolo_app_types.protocols.vscode import VSCodeInputs, VSCodeOutputs
+from apolo_app_types.protocols.vscode import (
+    VSCodeAppInputs,
+    VSCodeAppOutputs,
+    VSCodeInputs,
+    VSCodeOutputs,
+)
 from apolo_app_types.protocols.weaviate import WeaviateInputs, WeaviateOutputs
 
 
@@ -108,6 +113,8 @@ __all__ = [
     "PycharmOutputs",
     "VSCodeInputs",
     "VSCodeOutputs",
+    "VSCodeAppInputs",
+    "VSCodeAppOutputs",
     "FooocusInputs",
     "FooocusOutputs",
     "JupyterInputs",

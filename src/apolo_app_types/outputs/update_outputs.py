@@ -20,6 +20,7 @@ from apolo_app_types.outputs.spark_job import get_spark_job_outputs
 from apolo_app_types.outputs.stable_diffusion import get_stable_diffusion_outputs
 from apolo_app_types.outputs.tei import get_tei_outputs
 from apolo_app_types.outputs.utils.discovery import load_app_postprocessor
+from apolo_app_types.outputs.vscode import get_vscode_outputs
 from apolo_app_types.outputs.weaviate import get_weaviate_outputs
 
 
@@ -76,6 +77,8 @@ async def update_app_outputs(  # noqa: C901
                 conv_outputs = await get_mlflow_outputs(helm_outputs)
             case AppType.Jupyter:
                 conv_outputs = await get_jupyter_outputs(helm_outputs)
+            case AppType.VSCode:
+                conv_outputs = await get_vscode_outputs(helm_outputs)
             case AppType.PrivateGPT:
                 conv_outputs = await get_privategpt_outputs(helm_outputs)
             case AppType.Shell:
