@@ -22,6 +22,7 @@ from apolo_app_types.helm.apps.jupyter import JupyterChartValueProcessor
 from apolo_app_types.helm.apps.mlflow import MLFlowChartValueProcessor
 from apolo_app_types.helm.apps.postgres import PostgresValueProcessor
 from apolo_app_types.helm.apps.privategpt import PrivateGptChartValueProcessor
+from apolo_app_types.helm.apps.shell import ShellChartValueProcessor
 from apolo_app_types.helm.apps.spark_job import SparkJobValueProcessor
 from apolo_app_types.helm.apps.text_embeddings import TextEmbeddingsChartValueProcessor
 from apolo_app_types.helm.apps.weaviate import WeaviateChartValueProcessor
@@ -57,6 +58,7 @@ async def app_type_to_vals(
         AppType.Jupyter: JupyterChartValueProcessor,
         AppType.TextEmbeddingsInference: TextEmbeddingsChartValueProcessor,
         AppType.PrivateGPT: PrivateGptChartValueProcessor,
+        AppType.Shell: ShellChartValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)

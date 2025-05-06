@@ -21,11 +21,11 @@ async def test_mlflow_outputs_generation(
         return ("mlflow.example.com", 443)
 
     monkeypatch.setattr(
-        "apolo_app_types.outputs.custom_deployment.get_service_host_port",
+        "apolo_app_types.outputs.common.get_service_host_port",
         mock_get_service_host_port,
     )
     monkeypatch.setattr(
-        "apolo_app_types.outputs.custom_deployment.get_ingress_host_port",
+        "apolo_app_types.outputs.common.get_ingress_host_port",
         mock_get_ingress_host_port,
     )
 

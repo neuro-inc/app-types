@@ -11,7 +11,7 @@ async def test_custom_deployment_outputs_generation_with_ingress(
         return ("custom-deployment.default.svc.cluster.local", 80)
 
     monkeypatch.setattr(
-        "apolo_app_types.outputs.custom_deployment.get_service_host_port",
+        "apolo_app_types.outputs.common.get_service_host_port",
         mock_get_service_host_port,
     )
 
@@ -19,7 +19,7 @@ async def test_custom_deployment_outputs_generation_with_ingress(
         return ("custom-deployment.example.com", 443)
 
     monkeypatch.setattr(
-        "apolo_app_types.outputs.custom_deployment.get_ingress_host_port",
+        "apolo_app_types.outputs.common.get_ingress_host_port",
         mock_get_ingress_host_port,
     )
 
