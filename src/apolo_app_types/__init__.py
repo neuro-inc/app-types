@@ -71,7 +71,12 @@ from apolo_app_types.protocols.postgres import (
 )
 from apolo_app_types.protocols.private_gpt import PrivateGPTInputs, PrivateGPTOutputs
 from apolo_app_types.protocols.pycharm import PycharmInputs, PycharmOutputs
-from apolo_app_types.protocols.shell import ShellInputs, ShellOutputs
+from apolo_app_types.protocols.shell import (
+    ShellAppInputs,
+    ShellAppOutputs,
+    ShellInputs,
+    ShellOutputs,
+)
 from apolo_app_types.protocols.spark_job import SparkJobInputs, SparkJobOutputs
 from apolo_app_types.protocols.stable_diffusion import (
     SDModel,
@@ -175,4 +180,6 @@ __all__ = [
     "TextEmbeddingsInferenceAppOutputs",
     "OpenAICompatChatAPI",
     "OpenAICompatEmbeddingsAPI",
+    "ShellAppInputs",
+    "ShellAppOutputs",
 ]

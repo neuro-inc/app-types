@@ -37,7 +37,7 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
         """
-        Generate extra Helm values for Foocus configuration.
+        Generate extra Helm values for Jupyter configuration.
         """
 
         code_storage_mount = input_.jupyter_specific.code_storage_mount
