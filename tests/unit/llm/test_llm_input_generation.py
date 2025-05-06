@@ -74,6 +74,7 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
             "name": "forwardauth",
             "address": ANY,
             "trustForwardHeader": True,
+            "authResponseHeaders": [],
         },
     }
     assert helm_params["tolerations"] == [
@@ -196,6 +197,7 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
                 "name": "forwardauth",
                 "address": ANY,
                 "trustForwardHeader": True,
+                "authResponseHeaders": [],
             },
         },
         "podAnnotations": {},
@@ -265,6 +267,7 @@ async def test_values_llm_generation_cpu_apolo_secret(
             "name": "forwardauth",
             "address": ANY,
             "trustForwardHeader": True,
+            "authResponseHeaders": [],
         },
     }
     assert helm_params["tolerations"] == [
@@ -496,6 +499,7 @@ async def test_values_llm_generation__storage_integrated(
                 "name": "forwardauth",
                 "address": ANY,
                 "trustForwardHeader": True,
+                "authResponseHeaders": [],
             },
         },
         "podAnnotations": {
