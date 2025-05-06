@@ -123,6 +123,11 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
         # else:
         #     auth_vals = {}
 
+        auth_vals = {
+            "authentication": {
+                "anonymous_access": {"enabled": True},
+            }
+        }
         # Configure backups if enabled
         if input_.backup_bucket:
             values["backups"] = await self._get_backup_values(
@@ -133,7 +138,7 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
         return merge_list_of_dicts(
             [
                 values,
-                # auth_vals,
+                auth_vals,
                 {"storage": {"size": f"{input_.persistence.size}Gi"}},
             ]
         )
