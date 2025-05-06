@@ -103,7 +103,7 @@ async def get_http_ingress_values(
             "name": forward_auth_name,
             "address": str(_get_forward_auth_address(apolo_client)),
             "trustForwardHeader": True,
-            "authRequestHeaders": [],
+            "authResponseHeaders": [],
         }
         ingress_vals["forwardAuth"] = forward_auth_config
         ingress_vals.setdefault("annotations", {})  # Ensure annotations key exists
@@ -140,7 +140,7 @@ async def get_grpc_ingress_values(
             "name": forward_auth_name,
             "address": str(_get_forward_auth_address(apolo_client)),
             "trustForwardHeader": True,
-            "authRequestHeaders": [],
+            "authResponseHeaders": [],
         }
         grpc_vals.setdefault("annotations", {})  # Ensure annotations key exists
         grpc_vals["annotations"]["traefik.ingress.kubernetes.io/router.middlewares"] = (
