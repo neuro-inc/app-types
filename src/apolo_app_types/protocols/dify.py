@@ -1,10 +1,20 @@
+from pydantic import BaseModel, ConfigDict, Field
+
 from apolo_app_types.protocols.common import (
     AbstractAppFieldType,
+    AppInputs,
     AppInputsDeployer,
+    AppOutputs,
     AppOutputsDeployer,
+    Bucket,
+    IngressHttp,
     Postgres,
+    Preset,
     Redis,
+    SchemaExtraMetadata,
+    SchemaMetaType,
 )
+from apolo_app_types.protocols.postgres import CrunchyPostgresUserCredentials
 
 
 class DifyApi(AbstractAppFieldType):
@@ -42,3 +52,171 @@ class DifyOutputs(AppOutputsDeployer):
     internal_api_url: str
     external_api_url: str | None
     init_password: str
+
+
+class DifyAppApi(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Dify API",
+            description="Configure Dify Api.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+    replicas: int = Field(
+        default=1,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Replicas Count",
+            description="Configure Replicas count.",
+        ).as_json_schema_extra(),
+    )
+    preset: Preset
+    title: str = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Title",
+            description="Configure Title.",
+        ).as_json_schema_extra(),
+    )
+
+
+class DifyAppWorker(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Dify Worker",
+            description="Configure Dify Worker.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+    replicas: int = Field(
+        default=1,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Replicas Count",
+            description="Configure Replicas count.",
+        ).as_json_schema_extra(),
+    )
+    preset: Preset
+
+
+class DifyAppProxy(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Dify Proxy",
+            description="Configure Dify Proxy.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+    preset: Preset
+
+
+class DifyAppWeb(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Dify Web",
+            description="Configure Dify Web.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+    replicas: int = Field(
+        default=1,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Replicas Count",
+            description="Configure Replicas count.",
+        ).as_json_schema_extra(),
+    )
+    preset: Preset
+
+
+class DifyAppRedis(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Dify Redis",
+            description="Configure Dify Redis.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+    master_preset: Preset = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Master Preset",
+            description="Configure Master Preset.",
+        ).as_json_schema_extra(),
+    )
+
+
+class DifyAppInputs(AppInputs):
+    ingress_http: IngressHttp | None = Field(
+        default_factory=lambda: IngressHttp(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="HTTP Ingress",
+            description="Define HTTP ingress configuration"
+            " for exposing services over the web.",
+        ).as_json_schema_extra(),
+    )
+    api: DifyAppApi
+    worker: DifyAppWorker
+    proxy: DifyAppProxy
+    web: DifyAppWeb
+    redis: DifyAppRedis
+    bucket: Bucket = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Bucket",
+            description="Configure Dify Blob Storage (Bucket).",
+        ).as_json_schema_extra(),
+    )
+    external_postgres: CrunchyPostgresUserCredentials
+    external_pgvector: CrunchyPostgresUserCredentials
+
+
+class DifySpecificOutputs(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Dify Specific Outputs",
+            description="Configure Dify Specific Outputs.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+    init_password: str = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Init Password",
+            description="The initial password for the Dify application.",
+        ).as_json_schema_extra(),
+    )
+
+
+class DifyAppOutputs(AppOutputs):
+    internal_web_app_url: str = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Internal Web App URL",
+            description="The URL of the internal web app.",
+        ).as_json_schema_extra(),
+    )
+    internal_api_url: str = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Internal API URL",
+            description="The URL of the internal API.",
+        ).as_json_schema_extra(),
+    )
+    external_api_url: str | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="External API URL",
+            description="The URL of the external API.",
+        ).as_json_schema_extra(),
+    )
+    dify_specific: DifySpecificOutputs | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Dify Specific Outputs",
+            description="The URL of the external API.",
+        ).as_json_schema_extra(),
+    )
