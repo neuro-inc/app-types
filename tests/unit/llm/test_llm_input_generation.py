@@ -205,6 +205,10 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
         "modelDownload": {"hookEnabled": False, "initEnabled": True},
         "cache": {"enabled": True},
         "gpuProvider": "nvidia",
+        "podLabels": {
+            "platform.apolo.us/component": 'app',
+            "platform.apolo.us/preset": 'gpu-small',
+        },
     }
 
 
@@ -513,4 +517,8 @@ async def test_values_llm_generation__storage_integrated(
         "modelDownload": {"hookEnabled": True, "initEnabled": False},
         "cache": {"enabled": False},
         "gpuProvider": "nvidia",
+        "podLabels": {
+            "platform.apolo.us/component": 'app',
+            "platform.apolo.us/preset": 'gpu-small',
+        },
     }
