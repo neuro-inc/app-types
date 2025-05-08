@@ -1,10 +1,9 @@
 import secrets
 import typing as t
 
-from apolo_app_types.helm.apps.ingress import get_http_ingress_values
-
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import gen_extra_values
+from apolo_app_types.helm.apps.ingress import get_http_ingress_values
 from apolo_app_types.protocols.common.buckets import BucketProvider
 from apolo_app_types.protocols.dify import DifyAppInputs
 
@@ -15,14 +14,15 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
     ) -> dict[str, t.Any]:
         # dify chart supports External S3 / Azure / OSS (Alibaba)
         # Otherwise, dify needs ReadWriteMany PVC, which will be supported later
-        bucket_credentials_name = bucket_name = input_.bucket.id
+        bucket_name = input_.bucket.id
 
         if input_.bucket.bucket_provider not in (
             BucketProvider.AWS,
             BucketProvider.MINIO,
         ):
             msg = (
-                f"Unsupported bucket provider {input_.bucket.bucket_provider} for Dify installation."
+                f"Unsupported bucket provider {input_.bucket.bucket_provider} "
+                f"for Dify installation."
                 "Please contact support team describing your use-case."
             )
             raise RuntimeError(msg)
@@ -30,16 +30,14 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
         return {
             "externalS3": {
                 "enabled": True,
-                "endpoint": bucket_credentials.endpoint_url,
-                "accessKey": bucket_credentials.access_key_id,
-                "secretKey": bucket_credentials.secret_access_key,
+                "endpoint": bucket_credentials.endpoint_url,  # type: ignore[union-attr]
+                "accessKey": bucket_credentials.access_key_id,  # type: ignore[union-attr]
+                "secretKey": bucket_credentials.secret_access_key,  # type: ignore[union-attr]
                 "bucketName": bucket_name,
             }
         }
 
-    async def _get_dify_pg_values(
-        self, input_: DifyAppInputs
-    ) -> dict[str, t.Any]:
+    async def _get_dify_pg_values(self, input_: DifyAppInputs) -> dict[str, t.Any]:
         """Get Dify values to integrate with pgvector and postgres DB"""
 
         postgres_values = {
@@ -57,7 +55,7 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
             "dbName": input_.external_postgres.dbname,
         }
 
-        return  {
+        return {
             "externalPostgres": postgres_values,
             "externalPgvector": pgvector_values,
         }
@@ -65,18 +63,18 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
     async def _get_dify_redis_values(
         self, input_: DifyAppInputs, namespace: str
     ) -> dict[str, t.Any]:
-        return {"redis": {
-            "auth": {
-                "password": secrets.token_urlsafe(16)
-            },
-            "architecture": "standalone",
-            "master": await gen_extra_values(
-                self.client,
-                input_.redis.master_preset,
-                namespace=namespace,
-                component_name="redis_master"
-            )
-        }}
+        return {
+            "redis": {
+                "auth": {"password": secrets.token_urlsafe(16)},
+                "architecture": "standalone",
+                "master": await gen_extra_values(
+                    self.client,
+                    input_.redis.master_preset,
+                    namespace=namespace,
+                    component_name="redis_master",
+                ),
+            }
+        }
 
     async def gen_extra_values(
         self,
@@ -95,22 +93,20 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
             ("api", input_.api),
             ("worker", input_.worker),
             ("proxy", input_.proxy),
-            ("web", input_.web)
+            ("web", input_.web),
         ]:
             values[component_name] = await gen_extra_values(
                 self.client,
-                component.preset,  # noqa
+                component.preset,  # type: ignore[attr-defined]
                 namespace=namespace,
-                component_name=component_name
+                component_name=component_name,
             )
 
         values["api"]["secretKey"] = secrets.token_urlsafe(32)
         values["api"]["initPassword"] = secrets.token_urlsafe(16)
 
         values.update(await self._get_dify_pg_values(input_))
-        values.update(
-            await self._get_or_create_dify_blob_storage_values(input_)
-        )
+        values.update(await self._get_or_create_dify_blob_storage_values(input_))
         values.update(await self._get_dify_redis_values(input_, namespace))
         ingress: dict[str, t.Any] = {"ingress": {}}
         if input_.ingress_http:
@@ -119,7 +115,4 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
             )
             ingress["ingress"] = http_ingress_conf
 
-        return {
-            **ingress,
-            **values
-        }
+        return {**ingress, **values}

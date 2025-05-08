@@ -9,13 +9,27 @@ from apolo_app_types.protocols.dify import DifyAppOutputs, DifySpecificOutputs
 async def get_dify_outputs(
     helm_values: dict[str, t.Any],
 ) -> dict[str, t.Any]:
-    labels = {"application": "dify", "component": "api"}
-    internal_host, internal_port = await get_service_host_port(match_labels=labels)
+    api_labels = {"application": "dify", "component": "api"}
+    api_internal_host, api_internal_port = await get_service_host_port(
+        match_labels=api_labels
+    )
+    internal_api_url = None
+    if api_internal_host:
+        internal_api_url = RestAPI(
+            host=api_internal_host,
+            port=int(api_internal_port),
+            base_path="/",
+            protocol="http",
+        )
+    web_labels = {"application": "dify", "component": "web"}
+    web_internal_host, web_internal_port = await get_service_host_port(
+        match_labels=web_labels
+    )
     internal_web_app_url = None
-    if internal_host:
+    if web_internal_host:
         internal_web_app_url = RestAPI(
-            host=internal_host,
-            port=int(internal_port),
+            host=web_internal_host,
+            port=int(web_internal_port),
             base_path="/",
             protocol="http",
         )
@@ -30,12 +44,19 @@ async def get_dify_outputs(
             base_path="/",
             protocol="https",
         )
+
     init_password = helm_values.get("api", {}).get("initPassword", "")
     outputs = DifyAppOutputs(
         internal_web_app_url=internal_web_app_url,
         external_web_app_url=external_web_app_url,
+        internal_api_url=internal_api_url,
+        external_api_url=external_web_app_url.model_copy(
+            update={"base_path": external_web_app_url.base_path + "/v1"}
+        )
+        if external_web_app_url
+        else None,
         dify_specific=DifySpecificOutputs(
             init_password=init_password,
-        )
+        ),
     )
     return outputs.model_dump()

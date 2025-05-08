@@ -1,15 +1,20 @@
 import pytest
 
-from apolo_app_types import CrunchyPostgresUserCredentials, Bucket
+from apolo_app_types import Bucket, CrunchyPostgresUserCredentials
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import IngressHttp, Preset
-from apolo_app_types.protocols.common.buckets import S3BucketCredentials, BucketProvider
-from apolo_app_types.protocols.dify import DifyAppInputs, DifyAppApi, DifyAppWorker, DifyAppProxy, DifyAppRedis, \
-    DifyAppWeb
-from tests.unit.constants import (
-    APP_SECRETS_NAME, DEFAULT_NAMESPACE
+from apolo_app_types.protocols.common.buckets import BucketProvider, S3BucketCredentials
+from apolo_app_types.protocols.dify import (
+    DifyAppApi,
+    DifyAppInputs,
+    DifyAppProxy,
+    DifyAppRedis,
+    DifyAppWeb,
+    DifyAppWorker,
 )
+
+from tests.unit.constants import APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
 
 @pytest.mark.asyncio
