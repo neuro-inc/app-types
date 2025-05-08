@@ -47,8 +47,10 @@ class Networking(AbstractAppFieldType):
     )
     http_auth: bool = Field(
         default=True,
-        description="Whether to use HTTP authentication.",
-        title="HTTP Authentication",
+        json_schema_extra=SchemaExtraMetadata(
+            description="Whether to use HTTP authentication.",
+            title="HTTP Authentication",
+        ).as_json_schema_extra(),
     )
 
 
@@ -66,11 +68,13 @@ class VSCodeSpecificAppInputs(AbstractAppFieldType):
             mount_path=MountPath(path="/home/coder/project"),
             mode=ApoloMountMode(mode=ApoloMountModes.RW),
         ),
-        title="Code Storage Mount",
-        description=(
-            "Configure Apolo Files mount within the application workloads. "
-            "If not set, Apolo will automatically assign a mount to the storage."
-        ),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Code Storage Mount",
+            description=(
+                "Configure Apolo Files mount within the application workloads. "
+                "If not set, Apolo will automatically assign a mount to the storage."
+            ),
+        ).as_json_schema_extra(),
     )
 
 
