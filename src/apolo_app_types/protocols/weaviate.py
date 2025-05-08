@@ -7,14 +7,12 @@ from apolo_app_types.protocols.common import (
     Bucket,
     GraphQLAPI,
     GrpcAPI,
-    IngressGrpc,
     IngressHttp,
     Preset,
     RestAPI,
     StorageGB,
 )
 from apolo_app_types.protocols.common.ingress import (
-    INGRESS_GRPC_SCHEMA_EXTRA,
     INGRESS_HTTP_SCHEMA_EXTRA,
 )
 
@@ -31,9 +29,11 @@ class WeaviateInputs(AppInputs):
     ingress_http: IngressHttp | None = Field(
         default=None, json_schema_extra=INGRESS_HTTP_SCHEMA_EXTRA.as_json_schema_extra()
     )
-    ingress_grpc: IngressGrpc | None = Field(
-        default=None, json_schema_extra=INGRESS_GRPC_SCHEMA_EXTRA.as_json_schema_extra()
-    )
+    ## TODO: add this back when we make it work with platform auth
+    # ingress_grpc: IngressGrpc | None = Field(
+    #     default=None,
+    #     json_schema_extra=INGRESS_GRPC_SCHEMA_EXTRA.as_json_schema_extra()
+    # )
 
     @field_validator("persistence")
     def validate_storage_size(cls, value: StorageGB) -> StorageGB:  # noqa: N805
@@ -61,11 +61,12 @@ class WeaviateOutputs(AppOutputs):
         description="The external REST endpoint.",
         title="External REST endpoint",
     )
-    external_grpc_endpoint: GrpcAPI | None = Field(
-        default=None,
-        description="The external GRPC endpoint.",
-        title="External GRPC endpoint",
-    )
+    ## TODO: add this back when we make it work with platform auth
+    # external_grpc_endpoint: GrpcAPI | None = Field(
+    #     default=None,
+    #     description="The external GRPC endpoint.",
+    #     title="External GRPC endpoint",
+    # )
     internal_graphql_endpoint: GraphQLAPI | None = Field(
         default=None,
         description="The internal GraphQL endpoint.",
