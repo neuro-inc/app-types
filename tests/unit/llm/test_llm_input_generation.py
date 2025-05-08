@@ -66,7 +66,7 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
         ],
         "annotations": {
             "traefik.ingress.kubernetes.io/router.middlewares": (
-                f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd"
+                f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd,{DEFAULT_NAMESPACE}-strip-headers@kubernetescrd"
             )
         },
         "forwardAuth": {
@@ -189,7 +189,7 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
             ],
             "annotations": {
                 "traefik.ingress.kubernetes.io/router.middlewares": (
-                    f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd"
+                    f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd,{DEFAULT_NAMESPACE}-strip-headers@kubernetescrd"
                 )
             },
             "forwardAuth": {
@@ -259,7 +259,7 @@ async def test_values_llm_generation_cpu_apolo_secret(
         ],
         "annotations": {
             "traefik.ingress.kubernetes.io/router.middlewares": (
-                f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd"
+                f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd,{DEFAULT_NAMESPACE}-strip-headers@kubernetescrd"
             )
         },
         "forwardAuth": {
@@ -484,7 +484,7 @@ async def test_values_llm_generation__storage_integrated(
             "grpc": {"enabled": False},
             "annotations": {
                 "traefik.ingress.kubernetes.io/router.middlewares": (
-                    f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd"
+                    f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd,{DEFAULT_NAMESPACE}-strip-headers@kubernetescrd"
                 )
             },
             "className": "traefik",
