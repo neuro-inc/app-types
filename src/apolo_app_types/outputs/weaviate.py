@@ -55,7 +55,7 @@ async def get_weaviate_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any
     rest_internal = RestAPI(host=internal_http_host, base_path="/v1", protocol="http")
     grpc_internal = GrpcAPI(host=grpc_host, port=grpc_port, protocol="http")
     ingress_config = helm_values.get("ingress", {})
-    grpc_external = None
+    # grpc_external = None
     rest_external = None
     graphql_external = None
     if ingress_config.get("enabled"):
@@ -88,7 +88,8 @@ async def get_weaviate_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any
         internal_graphql_endpoint=graphql_internal,
         external_rest_endpoint=rest_external,
         internal_rest_endpoint=rest_internal,
-        external_grpc_endpoint=grpc_external,
+        # TODO: disabled for now till we fix grpc
+        # external_grpc_endpoint=grpc_external,
         internal_grpc_endpoint=grpc_internal,
         auth=auth,
     ).model_dump()
