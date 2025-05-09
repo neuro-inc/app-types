@@ -111,7 +111,7 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
             apolo_client=self.client,
             preset_type=input_.preset,
             ingress_http=input_.ingress_http,
-            ingress_grpc=input_.ingress_grpc,
+            # ingress_grpc=input_.ingress_grpc,
             namespace=namespace,
         )
 

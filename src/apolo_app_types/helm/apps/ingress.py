@@ -109,7 +109,10 @@ async def get_http_ingress_values(
         ingress_vals.setdefault("annotations", {})  # Ensure annotations key exists
         ingress_vals["annotations"][
             "traefik.ingress.kubernetes.io/router.middlewares"
-        ] = f"{namespace}-{forward_auth_name}@kubernetescrd"
+        ] = (
+            f"{namespace}-{forward_auth_name}@kubernetescrd,"
+            f"{namespace}-strip-headers@kubernetescrd"
+        )
 
     return ingress_vals
 
@@ -142,9 +145,9 @@ async def get_grpc_ingress_values(
             "trustForwardHeader": True,
             "authResponseHeaders": [],
         }
-        grpc_vals.setdefault("annotations", {})  # Ensure annotations key exists
+        grpc_vals.setdefault("annotations", {})
         grpc_vals["annotations"]["traefik.ingress.kubernetes.io/router.middlewares"] = (
-            f"{namespace}-{forward_auth_name}@kubernetescrd"
+            f"{namespace}-{forward_auth_name}@kubernetescrd,{namespace}-strip-headers@kubernetescrd"
         )
 
     return grpc_vals
