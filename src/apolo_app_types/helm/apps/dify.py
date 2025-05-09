@@ -48,11 +48,11 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
             "dbName": input_.external_postgres.dbname,
         }
         pgvector_values = {
-            "username": input_.external_postgres.user,
-            "password": input_.external_postgres.password,
-            "address": input_.external_postgres.pgbouncer_host,
-            "port": input_.external_postgres.pgbouncer_port,
-            "dbName": input_.external_postgres.dbname,
+            "username": input_.external_pgvector.user,
+            "password": input_.external_pgvector.password,
+            "address": input_.external_pgvector.pgbouncer_host,
+            "port": input_.external_pgvector.pgbouncer_port,
+            "dbName": input_.external_pgvector.dbname,
         }
 
         return {

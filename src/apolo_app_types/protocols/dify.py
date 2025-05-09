@@ -72,13 +72,6 @@ class DifyAppApi(BaseModel):
         ).as_json_schema_extra(),
     )
     preset: Preset
-    title: str = Field(
-        ...,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Title",
-            description="Configure Title.",
-        ).as_json_schema_extra(),
-    )
 
 
 class DifyAppWorker(BaseModel):
@@ -221,10 +214,4 @@ class DifyAppOutputs(AppOutputs):
             description="The URL of the external API.",
         ).as_json_schema_extra(),
     )
-    dify_specific: DifySpecificOutputs | None = Field(
-        default=None,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Dify Specific Outputs",
-            description="The URL of the external API.",
-        ).as_json_schema_extra(),
-    )
+    dify_specific: DifySpecificOutputs
