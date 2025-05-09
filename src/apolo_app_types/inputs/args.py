@@ -16,6 +16,7 @@ from apolo_app_types.helm.apps import (
     StableDiffusionChartValueProcessor,
 )
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
+from apolo_app_types.helm.apps.dify import DifyChartValueProcessor
 from apolo_app_types.helm.apps.dockerhub import DockerHubModelChartValueProcessor
 from apolo_app_types.helm.apps.fooocus import FooocusChartValueProcessor
 from apolo_app_types.helm.apps.jupyter import JupyterChartValueProcessor
@@ -29,6 +30,7 @@ from apolo_app_types.helm.apps.vscode import VSCodeChartValueProcessor
 from apolo_app_types.helm.apps.weaviate import WeaviateChartValueProcessor
 from apolo_app_types.protocols.common import AppInputs
 from apolo_app_types.protocols.custom_deployment import CustomDeploymentInputs
+from apolo_app_types.protocols.dify import DifyAppInputs
 from apolo_app_types.protocols.dockerhub import DockerHubInputs
 from apolo_app_types.protocols.jupyter import JupyterAppInputs
 from apolo_app_types.protocols.mlflow import MLFlowAppInputs
@@ -62,6 +64,7 @@ async def app_type_to_vals(
         AppType.PrivateGPT: PrivateGptChartValueProcessor,
         AppType.VSCode: VSCodeChartValueProcessor,
         AppType.Shell: ShellChartValueProcessor,
+        AppType.Dify: DifyChartValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)
@@ -102,6 +105,7 @@ async def get_installation_vals(
         AppType.Jupyter: JupyterAppInputs,
         AppType.TextEmbeddingsInference: TextEmbeddingsInferenceAppInputs,
         AppType.PrivateGPT: PrivateGPTAppInputs,
+        AppType.Dify: DifyAppInputs,
         AppType.VSCode: VSCodeAppInputs,
     }
 

@@ -260,6 +260,7 @@ async def gen_extra_values(
     ingress_grpc: IngressGrpc | None = None,
     namespace: str | None = None,
     port_configurations: list[Port] | None = None,
+    component_name: str | None = None,
 ) -> dict[str, t.Any]:
     preset_name = preset_type.name
     if not preset_name:
@@ -287,8 +288,6 @@ async def gen_extra_values(
                 apolo_client, ingress_grpc, namespace, port_configurations
             )
 
-    # Construct the final ingress values dictionary
-    if http_ingress_conf or grpc_ingress_conf:
         ingress_vals["ingress"] = {
             "enabled": True,  # Enable if either HTTP or gRPC is configured
             **(http_ingress_conf or {}),  # Spread HTTP config if exists
@@ -306,5 +305,9 @@ async def gen_extra_values(
         "resources": resources_vals,
         "tolerations": tolerations_vals,
         "affinity": affinity_vals,
+        "podLabels": {
+            "platform.apolo.us/component": component_name or "app",
+            "platform.apolo.us/preset": preset_name,
+        },
         **ingress_vals,
     }

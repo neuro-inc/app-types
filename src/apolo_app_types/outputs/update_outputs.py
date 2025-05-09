@@ -5,6 +5,7 @@ import httpx
 
 from apolo_app_types.app_types import AppType
 from apolo_app_types.outputs.custom_deployment import get_custom_deployment_outputs
+from apolo_app_types.outputs.dify import get_dify_outputs
 from apolo_app_types.outputs.dockerhub import get_dockerhub_outputs
 from apolo_app_types.outputs.fooocus import get_fooocus_outputs
 from apolo_app_types.outputs.huggingface_cache import (
@@ -83,6 +84,8 @@ async def update_app_outputs(  # noqa: C901
                 conv_outputs = await get_privategpt_outputs(helm_outputs)
             case AppType.Shell:
                 conv_outputs = await get_shell_outputs(helm_outputs)
+            case AppType.Dify:
+                conv_outputs = await get_dify_outputs(helm_outputs)
             case _:
                 # Try loading application postprocessor defined in the app repo
                 postprocessor = load_app_postprocessor(
