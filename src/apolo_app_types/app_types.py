@@ -32,6 +32,7 @@ class AppType(enum.StrEnum):
     DockerHub = "dockerhub"
     HuggingFaceCache = "huggingface-cache"
     CustomDeployment = "custom-deployment"
+    ServiceDeployment = "service-deployment"
     SparkJob = "spark-job"
 
     def __repr__(self) -> str:
