@@ -19,7 +19,6 @@ from apolo_app_types.protocols.common.storage import (
 )
 from apolo_app_types.protocols.custom_deployment import (
     CustomDeploymentInputs,
-    DeploymentName,
     NetworkingConfig,
     StorageMounts,
 )
@@ -32,7 +31,6 @@ async def test_custom_deployment_values_generation(setup_clients):
     helm_args, helm_params = await app_type_to_vals(
         input_=CustomDeploymentInputs(
             preset=Preset(name="cpu-small"),
-            name_override=DeploymentName(name="custom-deployment"),
             image=ContainerImage(repository="myrepo/custom-deployment", tag="v1.2.3"),
             container=Container(
                 command=["python", "app.py"],
@@ -80,7 +78,6 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
     helm_args, helm_params = await app_type_to_vals(
         input_=CustomDeploymentInputs(
             preset=Preset(name="cpu-small"),
-            name_override=DeploymentName(name="custom-deployment"),
             image=ContainerImage(
                 repository="myrepo/custom-deployment",
                 tag="v1.2.3",
@@ -167,7 +164,6 @@ async def test_custom_deployment_values_generation_with_multiport_exposure(
     """
     custom_deploy_inputs = CustomDeploymentInputs(
         preset=Preset(name="cpu-small"),
-        name_override=DeploymentName(name="custom-deployment"),
         image=ContainerImage(
             repository="multiport",
             tag="latest",
@@ -227,7 +223,6 @@ async def test_custom_deployment_values_generation_path_port_not_supplied(
     """
     custom_deploy_inputs = CustomDeploymentInputs(
         preset=Preset(name="cpu-small"),
-        name_override=DeploymentName(name="custom-deployment"),
         image=ContainerImage(
             repository="any",
             tag="latest",
@@ -284,7 +279,6 @@ async def test_custom_deployment_values_generation_network_not_supplied(
     """
     custom_deploy_inputs = CustomDeploymentInputs(
         preset=Preset(name="cpu-small"),
-        name_override=DeploymentName(name="custom-deployment"),
         image=ContainerImage(
             repository="any",
             tag="latest",

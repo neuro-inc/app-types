@@ -1,5 +1,4 @@
 import typing as t
-from datetime import datetime
 
 from apolo_app_types import CustomDeploymentInputs, DockerConfigModel
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
@@ -101,9 +100,6 @@ class CustomDeploymentChartValueProcessor(
                 ],
             }
 
-        if input_.name_override:
-            values["nameOverride"] = input_.name_override.name
-
         if input_.autoscaling:
             values["autoscaling"] = {
                 "enabled": True,
@@ -128,12 +124,7 @@ class CustomDeploymentChartValueProcessor(
         dockerconfig: DockerConfigModel | None = input_.image.dockerconfigjson
 
         if input_.image.repository.startswith("image:"):
-            sa_suffix = (
-                input_.name_override.name
-                if input_.name_override
-                else datetime.now().strftime("%Y%m%d%H%M%S")
-            )
-            sa_name = f"custom-deployment-{sa_suffix}"
+            sa_name = f"custom-deployment-{app_name}"
             dockerconfig = await get_apolo_registry_secrets_value(
                 client=self.client, sa_name=sa_name
             )
