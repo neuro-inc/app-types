@@ -6,6 +6,7 @@ from apolo_app_types import (
     FooocusAppInputs,
     LLMInputs,
     PostgresInputs,
+    ShellAppInputs,
     StableDiffusionInputs,
     WeaviateInputs,
 )
@@ -107,6 +108,7 @@ async def get_installation_vals(
         AppType.PrivateGPT: PrivateGPTAppInputs,
         AppType.Dify: DifyAppInputs,
         AppType.VSCode: VSCodeAppInputs,
+        AppType.Shell: ShellAppInputs,
     }
 
     if app_type not in input_type_map:
