@@ -94,6 +94,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
                 {
                     "name": db_user.name,
                     "password": {"type": "AlphaNumeric"},
+                    "databases": db_user.db_names,
                 }
             )
         return users_config
