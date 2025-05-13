@@ -80,7 +80,11 @@ async def test_values_postgresql_generation(setup_clients, mock_get_preset_cpu):
     assert "podAntiAffinity" in helm_params["instances"][0]["affinity"]
     assert helm_params["users"] == [
         {"name": "postgres"},
-        {"name": "some_name", "password": {"type": "AlphaNumeric"}},
+        {
+            "name": "some_name",
+            "password": {"type": "AlphaNumeric"},
+            "databases": ["some_db"],
+        },
     ]
 
 
