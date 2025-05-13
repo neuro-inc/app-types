@@ -45,6 +45,11 @@ class HttpApi(AbstractAppFieldType):
     )
     base_path: str = "/"
 
+    @property
+    def complete_url(self) -> str:
+        protocol = self.protocol or "http"
+        return f"{protocol}://{self.host}:{self.port}{self.base_path}"
+
 
 class GraphQLAPI(HttpApi):
     api_type: Literal["graphql"] = "graphql"
