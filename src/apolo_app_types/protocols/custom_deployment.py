@@ -6,7 +6,6 @@ from apolo_app_types.protocols.common import (
     AutoscalingHPA,
     Container,
     ContainerImage,
-    DeploymentName,
     IngressHttp,
     Preset,
     RestAPI,
@@ -63,13 +62,6 @@ class CustomDeploymentInputs(AppInputs):
         ).as_json_schema_extra(),
     )
     preset: Preset
-    name_override: DeploymentName | None = Field(
-        default=None,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Deployment Name Override",
-            description="Override the default deployment name.",
-        ).as_json_schema_extra(),
-    )
     image: ContainerImage
     autoscaling: AutoscalingHPA | None = Field(
         default=None,
