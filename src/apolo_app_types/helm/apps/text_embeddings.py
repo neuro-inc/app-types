@@ -1,6 +1,7 @@
 import typing as t
 
 from apolo_app_types import (
+    ContainerImage,
     CustomDeploymentInputs,
 )
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
@@ -36,13 +37,16 @@ class TextEmbeddingsChartValueProcessor(
 
         custom_deployment = CustomDeploymentInputs(
             preset=input_.preset,
-            image=input_.container_image,
             networking=NetworkingConfig(
                 service_enabled=True,
                 ingress_http=input_.ingress_http,
                 ports=[
                     Port(name="http", port=3000),
                 ],
+            ),
+            image=ContainerImage(
+                repository="ghcr.io/huggingface/text-embeddings-inference",
+                tag="1.7",
             ),
         )
 
