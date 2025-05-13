@@ -91,5 +91,25 @@ class CustomDeploymentInputs(AppInputs):
 
 
 class CustomDeploymentOutputs(AppOutputs):
-    internal_web_app_url: RestAPI | None = None
-    external_web_app_url: RestAPI | None = None
+    internal_web_app_url: RestAPI | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Web App inter-cluster URL",
+            description=(
+                "Use this endpoint to reach out to your app via internal network "
+                "within the cluster. Platform authorization is not applied here "
+                "but only the workloads from the same project can access it."
+            ),
+        ).as_json_schema_extra(),
+    )
+    external_web_app_url: RestAPI | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="External Web App URL",
+            description=(
+                "Use this endpoint to reach out to your app via public network "
+                "from outside the cluster. Platform authorization is applied "
+                "here if you enabled it during the deployment."
+            ),
+        ).as_json_schema_extra(),
+    )
