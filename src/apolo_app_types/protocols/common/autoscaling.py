@@ -40,8 +40,8 @@ class AutoscalingHPA(AutoscalingBase):
             description="Choose target CPU utilization percentage for autoscaling.",
         ).as_json_schema_extra(),
     )
-    target_memory_utilization_percentage: int | None = Field(
-        default=None,
+    target_memory_utilization_percentage: int = Field(
+        default=80,
         json_schema_extra=SchemaExtraMetadata(
             title="Target Memory Utilization Percentage",
             description="Choose target memory utilization percentage for autoscaling.",
