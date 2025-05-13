@@ -61,11 +61,11 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
             cmd = "notebook"
 
         env_vars = []
-        if input_.mlflow_integration:
+        if input_.mlflow_integration and input_.mlflow_integration.internal_web_app_url:
             env_vars.append(
                 Env(
                     name="MLFLOW_TRACKING_URI",
-                    value=f"http://{input_.mlflow_integration.internal_web_app_url}",
+                    value=input_.mlflow_integration.internal_web_app_url.complete_url,
                 )
             )
 
