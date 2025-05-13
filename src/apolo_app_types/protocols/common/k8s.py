@@ -1,6 +1,7 @@
 import typing
+from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
@@ -106,7 +107,13 @@ class Container(AbstractAppFieldType):
     )
 
 
-class Port(BaseModel):
+class IngressPathTypeEnum(StrEnum):
+    PREFIX = "Prefix"
+    EXACT = "Exact"
+    IMPLEMENTATION_SPECIFIC = "ImplementationSpecific"
+
+
+class Port(AbstractAppFieldType):
     name: str = Field(
         default="http",
         json_schema_extra=SchemaExtraMetadata(
@@ -124,8 +131,8 @@ class Port(BaseModel):
         ).as_json_schema_extra(),
     )
 
-    path_type: str = Field(
-        default="Prefix",
+    path_type: IngressPathTypeEnum = Field(
+        default=IngressPathTypeEnum.PREFIX,
         json_schema_extra=SchemaExtraMetadata(
             title="Path Type",
             description="Define how the path should be matched "
