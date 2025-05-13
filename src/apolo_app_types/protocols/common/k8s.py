@@ -117,8 +117,8 @@ class Port(AbstractAppFieldType):
     name: str = Field(
         default="http",
         json_schema_extra=SchemaExtraMetadata(
-            title="Port Name",
-            description="Specify a name for the port "
+            title="HTTP Port Name",
+            description="Specify a name for the HTTP port "
             "(e.g., 'http', 'grpc') to identify it in the service.",
         ).as_json_schema_extra(),
     )
@@ -126,8 +126,13 @@ class Port(AbstractAppFieldType):
     port: int = Field(
         default=80,
         json_schema_extra=SchemaExtraMetadata(
-            title="Port Number",
-            description="Set the port number to expose from the container.",
+            title="HTTP Port",
+            description=(
+                "Set the HTTP port number that will be exposed from the container. "
+                "Please note: platform currently does not allow to expose "
+                "multiple ports for a single app on a single domain name. "
+                "Please reach us describing your use-case if you need it."
+            ),
         ).as_json_schema_extra(),
     )
 
