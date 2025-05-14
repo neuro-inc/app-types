@@ -10,7 +10,7 @@ from apolo_app_types.protocols.text_embeddings import TextEmbeddingsInferenceApp
 async def get_tei_outputs(
     helm_values: dict[str, t.Any],
 ) -> dict[str, t.Any]:
-    labels = {"application": "tei"}
+    labels = {"application": "text-embeddings-inference"}
     internal_host, internal_port = await get_service_host_port(match_labels=labels)
     internal_api = None
     hf_model = helm_values.get("model")
