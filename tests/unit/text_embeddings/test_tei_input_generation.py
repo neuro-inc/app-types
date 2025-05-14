@@ -19,8 +19,9 @@ async def test_tei_values_generation(setup_clients):
             ingress_http=IngressHttp(
                 clusterName="default",
             ),
-            model=HuggingFaceModel(model_hf_name="random/name",
-                                   hf_token="random-token"),
+            model=HuggingFaceModel(
+                model_hf_name="random/name", hf_token="random-token"
+            ),
         ),
         apolo_client=setup_clients,
         app_type=AppType.TextEmbeddingsInference,
