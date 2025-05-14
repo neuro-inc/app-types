@@ -1,15 +1,12 @@
 import typing as t
 
-from apolo_app_types import (
-    ContainerImage,
-    CustomDeploymentInputs,
-)
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
+from apolo_app_types.helm.apps.common import gen_extra_values
 from apolo_app_types.helm.apps.custom_deployment import (
     CustomDeploymentChartValueProcessor,
 )
-from apolo_app_types.protocols.common.k8s import Port
-from apolo_app_types.protocols.custom_deployment import NetworkingConfig
+from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
+from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
 from apolo_app_types.protocols.text_embeddings import TextEmbeddingsInferenceAppInputs
 
 
@@ -21,6 +18,30 @@ class TextEmbeddingsChartValueProcessor(
         self.custom_dep_val_processor = CustomDeploymentChartValueProcessor(
             *args, **kwargs
         )
+
+    def _configure_model_download(
+        self, input_: TextEmbeddingsInferenceAppInputs
+    ) -> dict[str, t.Any]:
+        return {
+            "modelHFName": input_.model.model_hf_name,
+        }
+
+    def _get_image_params(
+        self, input_: TextEmbeddingsInferenceAppInputs
+    ) -> dict[str, t.Any]:
+        return {
+            "repository": "ghcr.io/huggingface/text-embeddings-inference",
+            "tag": "1.7",
+        }
+
+    def _configure_env(
+        self, tei: TextEmbeddingsInferenceAppInputs, app_secrets_name: str
+    ) -> dict[str, t.Any]:
+        return {
+            "HUGGING_FACE_HUB_TOKEN": serialize_optional_secret(
+                tei.model.hf_token, secret_name=app_secrets_name
+            )
+        }
 
     async def gen_extra_values(
         self,
@@ -34,26 +55,23 @@ class TextEmbeddingsChartValueProcessor(
         """
         Generate extra Helm values for TEI configuration.
         """
-
-        custom_deployment = CustomDeploymentInputs(
-            preset=input_.preset,
-            networking=NetworkingConfig(
-                service_enabled=True,
-                ingress_http=input_.ingress_http,
-                ports=[
-                    Port(name="http", port=3000),
-                ],
-            ),
-            image=ContainerImage(
-                repository="ghcr.io/huggingface/text-embeddings-inference",
-                tag="1.7",
-            ),
+        values = await gen_extra_values(
+            self.client,
+            input_.preset,
+            input_.ingress_http,
+            None,
+            namespace,
         )
-
-        custom_app_vals = await self.custom_dep_val_processor.gen_extra_values(
-            input_=custom_deployment,
-            app_name=app_name,
-            namespace=namespace,
-            app_secrets_name=app_secrets_name,
+        model = self._configure_model_download(input_)
+        image = self._get_image_params(input_)
+        env = self._configure_env(input_, app_secrets_name)
+        return merge_list_of_dicts(
+            [
+                {
+                    "model": model,
+                    "image": image,
+                    "env": env,
+                },
+                values,
+            ]
         )
-        return {**custom_app_vals, "labels": {"application": "tei"}}
