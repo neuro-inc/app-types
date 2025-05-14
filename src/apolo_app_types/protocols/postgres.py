@@ -2,7 +2,7 @@ import enum
 
 from pydantic import ConfigDict, Field
 
-from apolo_app_types import AppInputs, Bucket
+from apolo_app_types import AppInputs
 from apolo_app_types.protocols.common import (
     AbstractAppFieldType,
     AppOutputs,
@@ -105,11 +105,31 @@ class PostgresConfig(AbstractAppFieldType):
     )
 
 
+class PGBackupConfig(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Backup configuration",
+            description="Set up backup configuration for your Postgres cluster.",
+        ).as_json_schema_extra(),
+    )
+    enable: bool = Field(
+        default=True,
+        title="Enable backups",
+        description=(
+            "Enable backups for the Postgres cluster. "
+            "We automatically create and configure the corresponding backup "
+            "bucket for you."
+        ),
+    )
+    # backup_bucket: Bucket
+
+
 class PostgresInputs(AppInputs):
     preset: Preset
     postgres_config: PostgresConfig
     pg_bouncer: PGBouncer
-    backup_bucket: Bucket
+    backup: PGBackupConfig
 
 
 class CrunchyPostgresUserCredentials(AbstractAppFieldType):
