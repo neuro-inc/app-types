@@ -13,13 +13,17 @@ async def get_tei_outputs(
     labels = {"application": "text-embeddings-inference"}
     internal_host, internal_port = await get_service_host_port(match_labels=labels)
     internal_api = None
-    hf_model = helm_values.get("model")
+    model_prop = helm_values.get("model")
+    if model_prop:
+        hf_model = HuggingFaceModel(model_hf_name=model_prop.get("modelHFName"))
+    else:
+        hf_model = None
     if internal_host:
         internal_api = OpenAICompatEmbeddingsAPI(
             host=internal_host,
             port=int(internal_port),
             protocol="http",
-            hf_model=HuggingFaceModel.model_validate(hf_model) if hf_model else None,
+            hf_model=hf_model,
         )
 
     host_port = await get_ingress_host_port(match_labels=labels)
@@ -27,10 +31,7 @@ async def get_tei_outputs(
     if host_port:
         host, port = host_port
         external_api = OpenAICompatEmbeddingsAPI(
-            host=host,
-            port=int(port),
-            protocol="https",
-            hf_model=HuggingFaceModel.model_validate(hf_model) if hf_model else None,
+            host=host, port=int(port), protocol="https", hf_model=hf_model
         )
     outputs = TextEmbeddingsInferenceAppOutputs(
         internal_api=internal_api,
