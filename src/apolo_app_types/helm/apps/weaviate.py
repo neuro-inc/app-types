@@ -1,4 +1,5 @@
 import logging
+import secrets
 import typing as t
 
 import apolo_sdk
@@ -87,6 +88,15 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
             }
         }
 
+    async def _generate_user_credentials(self) -> dict[str, t.Any]:
+        """Generate user credentials for Weaviate, using a random password."""
+        values: dict[str, t.Any] = {}
+        values["clusterApi"] = {
+            "username": "admin",
+            "password": secrets.token_urlsafe(16),
+        }
+        return values
+
     async def gen_extra_values(
         self,
         input_: WeaviateInputs,
@@ -115,6 +125,7 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
         # else:
         #     auth_vals = {}
 
+        auth_vals = await self._generate_user_credentials()
         # Configure backups if enabled
         if input_.persistence.enable_backups:
             values["backups"] = await self._get_backup_values(app_name)
@@ -123,7 +134,7 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
         return merge_list_of_dicts(
             [
                 values,
-                # auth_vals,
+                auth_vals,
                 {"storage": {"size": f"{input_.persistence.size}Gi"}},
             ]
         )
