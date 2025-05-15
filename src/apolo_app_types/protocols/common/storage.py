@@ -27,16 +27,6 @@ class StorageGB(AbstractAppFieldType):
         ).as_json_schema_extra(),
     )
 
-    # TODO: should be an enum
-    storageClassName: str | None = Field(  # noqa: N815
-        default=None,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Storage Class Name",
-            description="Provide the name of the storage class "
-            "to control how the storage is provisioned.",
-        ).as_json_schema_extra(),
-    )
-
 
 class ApoloFilesPath(AbstractAppFieldType):
     model_config = ConfigDict(
