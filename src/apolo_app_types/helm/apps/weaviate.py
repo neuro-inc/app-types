@@ -1,4 +1,5 @@
 import logging
+import secrets
 import typing as t
 
 from apolo_app_types import BasicAuth, Bucket, WeaviateInputs
@@ -20,11 +21,6 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
         """Configure authentication values for Weaviate."""
         values: dict[str, t.Any] = {}
 
-        values["clusterApi"] = {
-            "username": cluster_api.username,
-            "password": cluster_api.password,
-        }
-
         values["authentication"] = {
             "anonymous_access": {"enabled": False},
             "apikey": {
@@ -45,6 +41,15 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
             }
         }
 
+        return values
+
+    async def _generate_user_credentials(self) -> dict[str, t.Any]:
+        """Generate user credentials for Weaviate, using a random password."""
+        values: dict[str, t.Any] = {}
+        values["clusterApi"] = {
+            "username": "admin",
+            "password": secrets.token_urlsafe(16),
+        }
         return values
 
     async def _get_backup_values(
@@ -123,6 +128,8 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
         # else:
         #     auth_vals = {}
 
+        auth_vals = await self._generate_user_credentials()
+
         # Configure backups if enabled
         if input_.backup_bucket:
             values["backups"] = await self._get_backup_values(
@@ -133,7 +140,7 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
         return merge_list_of_dicts(
             [
                 values,
-                # auth_vals,
+                auth_vals,
                 {"storage": {"size": f"{input_.persistence.size}Gi"}},
             ]
         )
