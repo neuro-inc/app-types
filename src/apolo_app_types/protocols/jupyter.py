@@ -59,7 +59,7 @@ class Networking(AbstractAppFieldType):
     http_auth: bool = Field(
         default=True,
         json_schema_extra=SchemaExtraMetadata(
-            description="Whether to use HTTP authentication.",
+            description="Enable platform provided HTTP authentication.",
             title="HTTP Authentication",
         ).as_json_schema_extra(),
     )
