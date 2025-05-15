@@ -36,7 +36,7 @@ class WeaviateBackupConfig(AbstractAppFieldType):
             "Enable backups for the Weaviate cluster. "
             "We automatically create and configure the corresponding backup "
             "bucket for you. "
-            "Note: this bucket will not be automaticaly removed when you remove "
+            "Note: this bucket will not be automatically removed when you remove "
             "the app."
         ),
     )
