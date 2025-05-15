@@ -1,14 +1,14 @@
+from datetime import datetime
+from unittest.mock import AsyncMock
+
+import apolo_sdk
 import pytest
 
-from apolo_app_types import Bucket, WeaviateInputs
+from apolo_app_types import WeaviateInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import _get_match_expressions
-from apolo_app_types.protocols.common import IngressGrpc, IngressHttp, Preset, StorageGB
-from apolo_app_types.protocols.common.buckets import (
-    BucketProvider,
-    CredentialsType,
-    S3BucketCredentials,
-)
+from apolo_app_types.protocols.common import IngressGrpc, IngressHttp, Preset
+from apolo_app_types.protocols.weaviate import WeaviatePersistence
 
 from tests.unit.constants import APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
@@ -23,23 +23,7 @@ async def test_values_weaviate_generation_basic(setup_clients, mock_get_preset_c
             preset=Preset(
                 name="cpu-large",
             ),
-            persistence=StorageGB(size=64),
-            backup_bucket=Bucket(
-                id="weaviate-backup",
-                owner="owner",
-                details={},
-                credentials=[
-                    S3BucketCredentials(
-                        name="name",
-                        type=CredentialsType.READ_ONLY,
-                        access_key_id="access_key_id",
-                        secret_access_key="access_secret",
-                        endpoint_url="https://s3-endpoint.com",
-                        region_name="us-east-1",
-                    )
-                ],
-                bucket_provider=BucketProvider.AWS,
-            ),
+            persistence=WeaviatePersistence(size=64, enable_backups=False),
             ingress_http=IngressHttp(
                 clusterName="test",
             ),
@@ -98,23 +82,7 @@ async def test_values_weaviate_generation_with_ingress(
             preset=Preset(
                 name="cpu-large",
             ),
-            persistence=StorageGB(size=64),
-            backup_bucket=Bucket(
-                id="weaviate-backup",
-                owner="owner",
-                details={},
-                credentials=[
-                    S3BucketCredentials(
-                        name="name",
-                        type=CredentialsType.READ_ONLY,
-                        access_key_id="access_key_id",
-                        secret_access_key="access_secret",
-                        endpoint_url="https://s3-endpoint.com",
-                        region_name="us-east-1",
-                    )
-                ],
-                bucket_provider=BucketProvider.AWS,
-            ),
+            persistence=WeaviatePersistence(size=64, enable_backups=False),
             ingress_http=IngressHttp(
                 clusterName="test-cluster",
             ),
@@ -165,7 +133,7 @@ async def test_values_weaviate_generation_with_auth(setup_clients, mock_get_pres
             preset=Preset(
                 name="cpu-large",
             ),
-            persistence=StorageGB(size=64),
+            persistence=WeaviatePersistence(size=64, enable_backups=False),
             ingress_http=IngressHttp(
                 clusterName="test-cluster",
             ),
@@ -204,28 +172,49 @@ async def test_values_weaviate_generation_with_backup(
     from apolo_app_types.inputs.args import app_type_to_vals
 
     apolo_client = setup_clients
+    mock_bucket = apolo_sdk.Bucket(
+        id="bucket-id",
+        owner="owner",
+        cluster_name="cluster",
+        org_name="test-org",
+        project_name="test-project",
+        provider=apolo_sdk.Bucket.Provider.MINIO,
+        created_at=datetime.today(),
+        imported=False,
+        name="test-bucket",
+    )
+    apolo_client.buckets.get = AsyncMock(return_value=mock_bucket)
+
+    p_credentials = apolo_sdk.PersistentBucketCredentials(
+        id="cred-id",
+        owner="owner",
+        cluster_name="cluster",
+        name="test-creds",
+        read_only=False,
+        credentials=[
+            apolo_sdk.BucketCredentials(
+                bucket_id="bucket-id",
+                provider=apolo_sdk.Bucket.Provider.MINIO,
+                credentials={
+                    "bucket_name": "test-bucket",
+                    "endpoint_url": "test-endpoint.apolo.us",
+                    "region_name": "us-east-1",
+                    "access_key_id": "access_key_id",
+                    "secret_access_key": "access_secret",
+                },
+            ),
+        ],
+    )
+    apolo_client.buckets.persistent_credentials_get = AsyncMock(
+        return_value=p_credentials
+    )
+
     helm_args, helm_params = await app_type_to_vals(
         input_=WeaviateInputs(
             preset=Preset(
                 name="cpu-large",
             ),
-            persistence=StorageGB(size=64),
-            backup_bucket=Bucket(
-                id="weaviate-backup",
-                owner="owner",
-                details={},
-                credentials=[
-                    S3BucketCredentials(
-                        name="name",
-                        type=CredentialsType.READ_ONLY,
-                        access_key_id="access_key_id",
-                        secret_access_key="access_secret",
-                        endpoint_url="https://storage.test-cluster.org.neu.ro",
-                        region_name="us-east-1",
-                    )
-                ],
-                bucket_provider=BucketProvider.AWS,
-            ),
+            persistence=WeaviatePersistence(size=64, enable_backups=True),
             ingress_http=IngressHttp(
                 clusterName="test-cluster",
             ),
@@ -246,12 +235,11 @@ async def test_values_weaviate_generation_with_backup(
 
     assert helm_params["backups"]["s3"]["enabled"] is True
     assert (
-        helm_params["backups"]["s3"]["envconfig"]["BACKUP_S3_BUCKET"]
-        == "weaviate-backup"
+        helm_params["backups"]["s3"]["envconfig"]["BACKUP_S3_BUCKET"] == "test-bucket"
     )
     assert (
         helm_params["backups"]["s3"]["envconfig"]["BACKUP_S3_ENDPOINT"]
-        == "storage.test-cluster.org.neu.ro"
+        == "test-endpoint.apolo.us"
     )
     assert helm_params["backups"]["s3"]["envconfig"]["BACKUP_S3_REGION"] == "us-east-1"
     assert (

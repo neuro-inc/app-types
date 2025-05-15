@@ -1,41 +1,72 @@
 import secrets
 import typing as t
 
+import apolo_sdk
+
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import gen_extra_values
 from apolo_app_types.helm.apps.ingress import get_http_ingress_values
-from apolo_app_types.protocols.common.buckets import BucketProvider
+from apolo_app_types.helm.utils.buckets import get_or_create_bucket_credentials
 from apolo_app_types.protocols.dify import DifyAppInputs
 
 
 class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
     async def _get_or_create_dify_blob_storage_values(
-        self, input_: DifyAppInputs
+        self, input_: DifyAppInputs, app_name: str
     ) -> dict[str, t.Any]:
         # dify chart supports External S3 / Azure / OSS (Alibaba)
         # Otherwise, dify needs ReadWriteMany PVC, which will be supported later
-        bucket_name = input_.bucket.id
 
-        if input_.bucket.bucket_provider not in (
-            BucketProvider.AWS,
-            BucketProvider.MINIO,
-        ):
-            msg = (
-                f"Unsupported bucket provider {input_.bucket.bucket_provider} "
-                f"for Dify installation."
-                "Please contact support team describing your use-case."
-            )
-            raise RuntimeError(msg)
-        bucket_credentials = input_.bucket.credentials[0]
+        name = f"app-dify-{app_name}"
+        bucket_credentials = await get_or_create_bucket_credentials(
+            client=self.client,
+            bucket_name=name,
+            credentials_name=name,
+            supported_providers=[
+                apolo_sdk.Bucket.Provider.AWS,
+                apolo_sdk.Bucket.Provider.MINIO,
+            ],
+        )
         return {
             "externalS3": {
                 "enabled": True,
-                "endpoint": bucket_credentials.endpoint_url,  # type: ignore[union-attr]
-                "accessKey": bucket_credentials.access_key_id,  # type: ignore[union-attr]
-                "secretKey": bucket_credentials.secret_access_key,  # type: ignore[union-attr]
-                "bucketName": bucket_name,
+                "endpoint": bucket_credentials.credentials[0].credentials[
+                    "endpoint_url"
+                ],
+                "accessKey": bucket_credentials.credentials[0].credentials[
+                    "access_key_id"
+                ],
+                "secretKey": bucket_credentials.credentials[0].credentials[
+                    "secret_access_key"
+                ],
+                "bucketName": bucket_credentials.credentials[0].credentials[
+                    "bucket_name"
+                ],
             }
         }
+
+        # bucket_name = input_.bucket.id
+
+        # if input_.bucket.bucket_provider not in (
+        #     BucketProvider.AWS,
+        #     BucketProvider.MINIO,
+        # ):
+        #     msg = (
+        #         f"Unsupported bucket provider {input_.bucket.bucket_provider} "
+        #         f"for Dify installation."
+        #         "Please contact support team describing your use-case."
+        #     )
+        #     raise RuntimeError(msg)
+        # bucket_credentials = input_.bucket.credentials[0]
+        # return {
+        #     "externalS3": {
+        #         "enabled": True,
+        #         "endpoint": bucket_credentials.endpoint_url,
+        #         "accessKey": bucket_credentials.access_key_id,
+        #         "secretKey": bucket_credentials.secret_access_key,
+        #         "bucketName": bucket_name,
+        #     }
+        # }
 
     async def _get_dify_pg_values(self, input_: DifyAppInputs) -> dict[str, t.Any]:
         """Get Dify values to integrate with pgvector and postgres DB"""
@@ -106,7 +137,10 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
         values["api"]["initPassword"] = secrets.token_urlsafe(16)
 
         values.update(await self._get_dify_pg_values(input_))
-        values.update(await self._get_or_create_dify_blob_storage_values(input_))
+        if input_.api.use_object_store:
+            values.update(
+                await self._get_or_create_dify_blob_storage_values(input_, app_name)
+            )
         values.update(await self._get_dify_redis_values(input_, namespace))
         ingress: dict[str, t.Any] = {"ingress": {}}
         if input_.ingress_http:

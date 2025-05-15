@@ -10,34 +10,6 @@ from apolo_app_types.protocols.common.schema_extra import (
 )
 
 
-class StorageGB(AbstractAppFieldType):
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Storage",
-            description="Define the storage size and class for your application.",
-        ).as_json_schema_extra(),
-    )
-
-    size: int = Field(
-        ...,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Storage Size (GB)",
-            description="Specify the size of the storage volume in gigabytes.",
-        ).as_json_schema_extra(),
-    )
-
-    # TODO: should be an enum
-    storageClassName: str | None = Field(  # noqa: N815
-        default=None,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Storage Class Name",
-            description="Provide the name of the storage class "
-            "to control how the storage is provisioned.",
-        ).as_json_schema_extra(),
-    )
-
-
 class ApoloFilesPath(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
