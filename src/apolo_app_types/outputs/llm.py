@@ -30,16 +30,20 @@ async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> dict[str, 
 
     model_name = helm_values["model"]["modelHFName"]
     tokenizer_name = helm_values["model"].get("tokenizerHFName", "")
-
+    hf_model = HuggingFaceModel(
+        model_hf_name=model_name,
+    )
     chat_internal_api = OpenAICompatChatAPI(
         host=internal_host,
         port=int(internal_port),
         protocol="http",
+        hf_model=hf_model,
     )
     embeddings_internal_api = OpenAICompatEmbeddingsAPI(
         host=internal_host,
         port=int(internal_port),
         protocol="http",
+        hf_model=hf_model,
     )
 
     ingress_host_port = await get_ingress_host_port(
@@ -52,11 +56,13 @@ async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> dict[str, 
             host=ingress_host_port[0],
             port=int(ingress_host_port[1]),
             protocol="https",
+            hf_model=hf_model,
         )
         embeddings_external_api = OpenAICompatEmbeddingsAPI(
             host=ingress_host_port[0],
             port=int(ingress_host_port[1]),
             protocol="https",
+            hf_model=hf_model,
         )
 
     vllm_outputs = VLLMOutputsV2(
@@ -65,7 +71,7 @@ async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> dict[str, 
         embeddings_internal_api=embeddings_internal_api,
         embeddings_external_api=embeddings_external_api,
         llm=LLMModel(
-            hugging_face_model=HuggingFaceModel(model_hf_name=model_name),
+            hugging_face_model=hf_model,
             tokenizer_hf_name=tokenizer_name,
             server_extra_args=server_extra_args,
         ),

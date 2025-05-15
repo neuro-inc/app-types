@@ -142,7 +142,9 @@ class VLLMOutputsV2(AppOutputs):
     chat_internal_api: OpenAICompatChatAPI | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="Chat Internal API", description="Chat Internal API "
+            title="Chat Internal API",
+            description="Chat Internal API ",
+            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     chat_external_api: OpenAICompatChatAPI | None = Field(
@@ -150,6 +152,7 @@ class VLLMOutputsV2(AppOutputs):
         json_schema_extra=SchemaExtraMetadata(
             title="Chat External API",
             description="Chat External API description",
+            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     embeddings_internal_api: OpenAICompatEmbeddingsAPI | None = Field(
@@ -157,12 +160,15 @@ class VLLMOutputsV2(AppOutputs):
         json_schema_extra=SchemaExtraMetadata(
             title="Embeddings Internal API",
             description="Embeddings Internal API description",
+            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     embeddings_external_api: OpenAICompatEmbeddingsAPI | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="Embeddings External API", description="Embeddings External API"
+            title="Embeddings External API",
+            description="Embeddings External API",
+            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     llm: LLMModel | None = Field(
@@ -170,11 +176,14 @@ class VLLMOutputsV2(AppOutputs):
         json_schema_extra=SchemaExtraMetadata(
             title="LLM Model Details",
             description="LLM Model Details",
+            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     llm_api_key: LLMApiKey | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="LLM Api Key", description="LLM Key for the API"
+            title="LLM Api Key",
+            description="LLM Key for the API",
+            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
