@@ -2,15 +2,13 @@ import logging
 import secrets
 import typing as t
 
-from apolo_app_types import BasicAuth, Bucket, WeaviateInputs
+import apolo_sdk
+
+from apolo_app_types import BasicAuth, WeaviateInputs
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import gen_extra_values
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
-from apolo_app_types.protocols.common.buckets import BucketProvider, S3BucketCredentials
 from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
-
-
-WEAVIATE_BUCKET_NAME = "weaviate-backup"
 
 
 logger = logging.getLogger(__name__)
@@ -53,50 +51,119 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
         return values
 
     async def _get_backup_values(
-        self, backup_bucket: Bucket, app_secrets_name: str
+        self, input_: WeaviateInputs, app_name: str, app_secrets_name: str
     ) -> dict[str, t.Any]:
-        """Configure backup values for Weaviate using Apolo Blob Storage."""
+        """Configure backup values for Weaviate using Apolo Blob Storage.
+        Creates the bucket and credentials if they don't exist.
+        """
+        if not input_.backup_bucket.enable:
+            return {}
 
-        if backup_bucket.bucket_provider is not BucketProvider.AWS:
-            msg = "Only AWS is supported for Weaviate backups."
+        bucket_name = f"weaviate-backup-{app_name}"
+        credentials_name = (
+            bucket_name  # Use the same name for credentials for simplicity
+        )
+
+        try:
+            # Ensure bucket exists
+            try:
+                bucket = await self.client.buckets.get(bucket_id_or_name=bucket_name)
+                logger.info(
+                    "Found existing bucket %s, using it as a backup target",
+                    bucket_name,
+                )
+            except apolo_sdk.ResourceNotFound:
+                bucket = await self.client.buckets.create(name=bucket_name)
+                logger.info("Created new bucket %s for backups", bucket_name)
+
+            # Ensure persistent credentials exist
+            try:
+                sdk_bucket_credentials = (
+                    await self.client.buckets.persistent_credentials_get(
+                        credential_id_or_name=credentials_name,
+                    )
+                )
+                logger.info("Found existing bucket credentials %s", credentials_name)
+            except apolo_sdk.ResourceNotFound:
+                sdk_bucket_credentials = (
+                    await self.client.buckets.persistent_credentials_create(
+                        bucket_ids=[bucket.id],
+                        name=credentials_name,
+                        read_only=False,
+                    )
+                )
+                logger.info("Created new bucket credentials %s", credentials_name)
+
+        except Exception as e:
+            logger.error(
+                "Failed to ensure bucket/credentials for %s: %s", bucket_name, e
+            )
+            msg = f"Failed to set up backup bucket {bucket_name}: {e}"
+            raise Exception(msg) from e
+
+        # We expect one set of credentials for the newly created/fetched ones.
+        if not sdk_bucket_credentials.credentials:
+            msg = f"No credentials found or created for bucket {bucket_name}."
             raise Exception(msg)
 
-        bucket_credentials = backup_bucket.credentials[0]
-        if not isinstance(bucket_credentials, S3BucketCredentials):
-            msg = "Only S3 bucket credentials are supported for Weaviate backups."
+        # Use the first set of credentials
+        # (persistent_credentials_create can associate with multiple buckets,
+        # but here we create for one)
+        cred_detail = sdk_bucket_credentials.credentials[0]
+        provider = cred_detail.provider
+        creds_dict = cred_detail.credentials
+
+        if provider not in (
+            apolo_sdk.Bucket.Provider.AWS,
+            apolo_sdk.Bucket.Provider.MINIO,
+        ):
+            msg = (
+                f"Only AWS and Minio providers are supported for Weaviate backups. "
+                f"Found: {provider}"
+            )
             raise Exception(msg)
 
-        s3_endpoint = bucket_credentials.endpoint_url.replace("https://", "")
+        s3_bucket_name = creds_dict.get("bucket_name")
+        s3_endpoint = str(creds_dict.get("endpoint_url", "")).replace("https://", "")
+        s3_region = creds_dict.get("region_name")
+        s3_access_key_id = creds_dict.get("access_key_id")
+        s3_secret_access_key = creds_dict.get("secret_access_key")
 
         if not all(
             [
-                bucket_credentials.name,
-                bucket_credentials.access_key_id,
-                bucket_credentials.secret_access_key,
+                s3_bucket_name,
+                s3_access_key_id,
+                s3_secret_access_key,
                 s3_endpoint,
-                bucket_credentials.region_name,
+                s3_region,
             ]
         ):
-            msg = "Missing required args for setting up Apolo Blob Storage"
+            msg = (
+                f"Missing required S3 credentials details for bucket {bucket_name} "
+                f"after fetching/creating. "
+                f"Check bucket credentials '{credentials_name}'."
+            )
             raise Exception(msg)
 
         return {
-            "s3": {
-                "enabled": True,
-                "envconfig": {
-                    "BACKUP_S3_BUCKET": backup_bucket.id,
-                    "BACKUP_S3_ENDPOINT": s3_endpoint,
-                    "BACKUP_S3_REGION": bucket_credentials.region_name,
-                },
-                "secrets": {
-                    "AWS_ACCESS_KEY_ID": serialize_optional_secret(
-                        bucket_credentials.access_key_id, secret_name=app_secrets_name
-                    ),
-                    "AWS_SECRET_ACCESS_KEY": serialize_optional_secret(
-                        bucket_credentials.secret_access_key,
-                        secret_name=app_secrets_name,
-                    ),
-                },
+            "backups": {
+                "s3": {
+                    "enabled": True,
+                    "envconfig": {
+                        "BACKUP_S3_BUCKET": s3_bucket_name,
+                        "BACKUP_S3_ENDPOINT": s3_endpoint,
+                        "BACKUP_S3_REGION": s3_region,
+                    },
+                    "secrets": {
+                        "AWS_ACCESS_KEY_ID": serialize_optional_secret(
+                            s3_access_key_id, secret_name=app_secrets_name
+                        ),
+                        "AWS_SECRET_ACCESS_KEY": serialize_optional_secret(
+                            s3_secret_access_key,
+                            secret_name=app_secrets_name,
+                        ),
+                    },
+                }
             }
         }
 
@@ -116,31 +183,30 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
             apolo_client=self.client,
             preset_type=input_.preset,
             ingress_http=input_.ingress_http,
-            # ingress_grpc=input_.ingress_grpc,
             namespace=namespace,
         )
 
-        # TODO: temporarily removed cluster_api from WeaviateInputs and
-        # relying on ingress_http and ingress_grpc auth level.
-        # Will make it available again later.
-        # if input_.cluster_api:
-        #     auth_vals = await self._get_auth_values(input_.cluster_api)
-        # else:
-        #     auth_vals = {}
-
         auth_vals = await self._generate_user_credentials()
 
-        # Configure backups if enabled
-        if input_.backup_bucket:
-            values["backups"] = await self._get_backup_values(
-                input_.backup_bucket, app_secrets_name
-            )
+        # Configure backups if enabled (logic moved into _get_backup_values)
+        backup_config_values = await self._get_backup_values(
+            input_, app_name, app_secrets_name
+        )  # backup_config_values will be {} if not enabled or an error occurs
 
-        logger.debug("Generated extra Weaviate values: %s", values)
-        return merge_list_of_dicts(
+        logger.debug(
+            "Generated extra Weaviate values (pre-merge): base=%s, auth=%s, backup=%s",
+            values,
+            auth_vals,
+            backup_config_values,
+        )
+
+        final_values = merge_list_of_dicts(
             [
                 values,
                 auth_vals,
                 {"storage": {"size": f"{input_.persistence.size}Gi"}},
+                backup_config_values,  # Merging the backup config values here
             ]
         )
+        logger.debug("Final merged Weaviate values: %s", final_values)
+        return final_values

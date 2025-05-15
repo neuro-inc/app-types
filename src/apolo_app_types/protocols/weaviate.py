@@ -1,10 +1,10 @@
-from pydantic import Field, field_validator
+from pydantic import ConfigDict, Field, field_validator
 
 from apolo_app_types import AppInputs
 from apolo_app_types.protocols.common import (
+    AbstractAppFieldType,
     AppOutputs,
     BasicAuth,
-    Bucket,
     GraphQLAPI,
     GrpcAPI,
     IngressHttp,
@@ -15,9 +15,31 @@ from apolo_app_types.protocols.common import (
 from apolo_app_types.protocols.common.ingress import (
     INGRESS_HTTP_SCHEMA_EXTRA,
 )
+from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
 
 
 WEAVIATE_MIN_GB_STORAGE = 32
+
+
+class WeaviateBackupConfig(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Backup configuration",
+            description="Set up backup configuration for your Weaviate cluster.",
+        ).as_json_schema_extra(),
+    )
+    enable: bool = Field(
+        default=True,
+        title="Enable backups",
+        description=(
+            "Enable backups for the Weaviate cluster. "
+            "We automatically create and configure the corresponding backup "
+            "bucket for you. "
+            "Note: this bucket will not be automaticaly removed when you remove "
+            "the app."
+        ),
+    )
 
 
 class WeaviateInputs(AppInputs):
@@ -25,7 +47,7 @@ class WeaviateInputs(AppInputs):
     persistence: StorageGB = Field(
         default_factory=lambda: StorageGB(size=WEAVIATE_MIN_GB_STORAGE)
     )
-    backup_bucket: Bucket | None = None
+    backup_bucket: WeaviateBackupConfig
     ingress_http: IngressHttp | None = Field(
         default=None, json_schema_extra=INGRESS_HTTP_SCHEMA_EXTRA.as_json_schema_extra()
     )
