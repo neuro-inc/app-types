@@ -1,6 +1,9 @@
+import base64
+import logging
 import typing as t
 
-from apolo_app_types import Bucket
+import apolo_sdk
+
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
     get_preset,
@@ -9,14 +12,10 @@ from apolo_app_types.helm.apps.common import (
     preset_to_tolerations,
 )
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
-from apolo_app_types.protocols.common.buckets import (
-    BucketProvider,
-    GCPBucketCredentials,
-    MinioBucketCredentials,
-    S3BucketCredentials,
-)
-from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
 from apolo_app_types.protocols.postgres import PostgresDBUser, PostgresInputs
+
+
+logger = logging.getLogger(__name__)
 
 
 class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
@@ -149,42 +148,59 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
             "tolerations": tolerations,
         }
 
-    def _get_backup_config(
-        self, bucket: Bucket, app_secrets_name: str
+    async def _get_backup_config(
+        self, input_: PostgresInputs, app_name: str
     ) -> dict[str, t.Any]:
-        if bucket.bucket_provider in (
-            BucketProvider.MINIO,
-            BucketProvider.AWS,
-        ):
-            s3_like_bucket_creds: S3BucketCredentials | MinioBucketCredentials = (
-                bucket.credentials[0]  # type: ignore
-            )
+        if not input_.backup.enable:
+            return {}
 
-            backup_config = {
-                "bucket": bucket.id,
-                "endpoint": s3_like_bucket_creds.endpoint_url,
-                "region": s3_like_bucket_creds.region_name,
-                "key": serialize_optional_secret(
-                    s3_like_bucket_creds.access_key_id, secret_name=app_secrets_name
-                ),
-                "keySecret": serialize_optional_secret(
-                    s3_like_bucket_creds.secret_access_key, secret_name=app_secrets_name
-                ),
-            }
-            return {"s3": backup_config}
-        if bucket.bucket_provider == BucketProvider.GCP:
-            bucket_creds: GCPBucketCredentials = bucket.credentials[0]  # type: ignore
-            key = serialize_optional_secret(
-                bucket_creds.key_data, secret_name=app_secrets_name
+        name = f"pg-backup-{app_name}"
+
+        try:
+            bucket = await self.client.buckets.get(bucket_id_or_name=name)
+            logger.info("Found existing bucket %s, using it as a backup target", name)
+        except apolo_sdk.ResourceNotFound:
+            bucket = await self.client.buckets.create(name=name)
+            logger.info("Created new bucket %s for backups", name)
+        try:
+            bucket_credentials = await self.client.buckets.persistent_credentials_get(
+                credential_id_or_name=name,
             )
-            backup_config = {
-                "bucket": bucket.id,
-                "key": key,
+            logger.info("Found existing bucket credentials %s", name)
+        except apolo_sdk.ResourceNotFound:
+            bucket_credentials = (
+                await self.client.buckets.persistent_credentials_create(
+                    bucket_ids=[bucket.id],
+                    name=name,
+                    read_only=False,
+                )
+            )
+            logger.info("Created new bucket credentials %s", name)
+
+        provider = bucket_credentials.credentials[0].provider
+        credentials = bucket_credentials.credentials[0].credentials
+
+        values = {}
+        if provider in (apolo_sdk.Bucket.Provider.AWS, apolo_sdk.Bucket.Provider.MINIO):
+            values["s3"] = {
+                "bucket": credentials["bucket_name"],
+                "endpoint": credentials["endpoint_url"],
+                "region": credentials["region_name"],
+                "key": credentials["access_key_id"],
+                "keySecret": credentials["secret_access_key"],
             }
-            return {"gcs": backup_config}
+        elif provider == apolo_sdk.Bucket.Provider.GCP:
+            values["gcs"] = {
+                "bucket": credentials["bucket_name"],
+                "key": base64.b64decode(credentials["key_data"]).decode("utf-8"),
+            }
         # For Azure, we need to return a bit more data from API
-        exception_description = f"Unsupported bucket provider: {bucket.bucket_provider}"
-        raise ValueError(exception_description)
+        else:
+            # For Azure, we need to return a bit more data from API
+            # OpenStack is not supported in PGO yet
+            error = "Unsupported bucket provider, unable configure backups"
+            raise ValueError(error)
+        return values
 
     async def gen_extra_values(
         self,
@@ -227,6 +243,6 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
         if users_config:
             values["users"] = users_config
 
-        backup_config = self._get_backup_config(input_.backup_bucket, app_secrets_name)
+        backup_values = await self._get_backup_config(input_, app_name)
 
-        return merge_list_of_dicts([backup_config, values])
+        return merge_list_of_dicts([backup_values, values])
