@@ -50,6 +50,39 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
         }
         return values
 
+    async def _get_or_create_bucket_and_credentials(
+        self, bucket_name: str, credentials_name: str
+    ) -> apolo_sdk.PersistentBucketCredentials:
+        """Gets or creates a bucket and its persistent credentials."""
+        try:
+            bucket = await self.client.buckets.get(bucket_id_or_name=bucket_name)
+            logger.info(
+                "Found existing bucket %s, using it as a backup target",
+                bucket_name,
+            )
+        except apolo_sdk.ResourceNotFound:
+            bucket = await self.client.buckets.create(name=bucket_name)
+            logger.info("Created new bucket %s for backups", bucket_name)
+
+        try:
+            sdk_bucket_credentials = (
+                await self.client.buckets.persistent_credentials_get(
+                    credential_id_or_name=credentials_name,
+                )
+            )
+            logger.info("Found existing bucket credentials %s", credentials_name)
+        except apolo_sdk.ResourceNotFound:
+            sdk_bucket_credentials = (
+                await self.client.buckets.persistent_credentials_create(
+                    bucket_ids=[bucket.id],
+                    name=credentials_name,
+                    read_only=False,
+                )
+            )
+            logger.info("Created new bucket credentials %s", credentials_name)
+
+        return sdk_bucket_credentials
+
     async def _get_backup_values(
         self, input_: WeaviateInputs, app_name: str, app_secrets_name: str
     ) -> dict[str, t.Any]:
@@ -65,35 +98,9 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
         )
 
         try:
-            # Ensure bucket exists
-            try:
-                bucket = await self.client.buckets.get(bucket_id_or_name=bucket_name)
-                logger.info(
-                    "Found existing bucket %s, using it as a backup target",
-                    bucket_name,
-                )
-            except apolo_sdk.ResourceNotFound:
-                bucket = await self.client.buckets.create(name=bucket_name)
-                logger.info("Created new bucket %s for backups", bucket_name)
-
-            # Ensure persistent credentials exist
-            try:
-                sdk_bucket_credentials = (
-                    await self.client.buckets.persistent_credentials_get(
-                        credential_id_or_name=credentials_name,
-                    )
-                )
-                logger.info("Found existing bucket credentials %s", credentials_name)
-            except apolo_sdk.ResourceNotFound:
-                sdk_bucket_credentials = (
-                    await self.client.buckets.persistent_credentials_create(
-                        bucket_ids=[bucket.id],
-                        name=credentials_name,
-                        read_only=False,
-                    )
-                )
-                logger.info("Created new bucket credentials %s", credentials_name)
-
+            sdk_bucket_credentials = await self._get_or_create_bucket_and_credentials(
+                bucket_name, credentials_name
+            )
         except Exception as e:
             logger.error(
                 "Failed to ensure bucket/credentials for %s: %s", bucket_name, e
