@@ -97,7 +97,11 @@ from apolo_app_types.protocols.vscode import (
     VSCodeInputs,
     VSCodeOutputs,
 )
-from apolo_app_types.protocols.weaviate import WeaviateInputs, WeaviateOutputs
+from apolo_app_types.protocols.weaviate import (
+    WeaviateBackupConfig,
+    WeaviateInputs,
+    WeaviateOutputs,
+)
 
 
 __all__ = [
@@ -133,6 +137,7 @@ __all__ = [
     "TextEmbeddingsInferenceOutputs",
     "WeaviateInputs",
     "WeaviateOutputs",
+    "WeaviateBackupConfig",
     "OpenAICompatibleEmbeddingsAPI",
     "OpenAICompatibleAPI",
     "OpenAICompatibleChatAPI",

@@ -1,16 +1,33 @@
+from unittest.mock import AsyncMock, MagicMock
+
+import apolo_sdk
 import pytest
 
-from apolo_app_types import Bucket, WeaviateInputs
+from apolo_app_types import WeaviateBackupConfig, WeaviateInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import _get_match_expressions
 from apolo_app_types.protocols.common import IngressGrpc, IngressHttp, Preset, StorageGB
-from apolo_app_types.protocols.common.buckets import (
-    BucketProvider,
-    CredentialsType,
-    S3BucketCredentials,
-)
 
 from tests.unit.constants import APP_SECRETS_NAME, DEFAULT_NAMESPACE
+
+
+def _get_mock_s3_credentials() -> apolo_sdk.PersistentBucketCredentials:
+    """Helper to create a mock S3 persistent bucket credentials object."""
+    mock_credentials_detail = MagicMock(spec=apolo_sdk.BucketCredentials)
+    mock_credentials_detail.provider = (
+        apolo_sdk.Bucket.Provider.AWS
+    )  # Ensure AWS provider
+    mock_credentials_detail.credentials = {
+        "bucket_name": "test-weaviate-backup-bucket",
+        "endpoint_url": "https://s3.amazonaws.com",
+        "region_name": "us-east-1",
+        "access_key_id": "test-access-key",
+        "secret_access_key": "test-secret-key",
+    }
+
+    mock_sdk_bucket_credentials = MagicMock(spec=apolo_sdk.PersistentBucketCredentials)
+    mock_sdk_bucket_credentials.credentials = [mock_credentials_detail]
+    return mock_sdk_bucket_credentials
 
 
 @pytest.mark.asyncio
@@ -18,28 +35,30 @@ async def test_values_weaviate_generation_basic(setup_clients, mock_get_preset_c
     from apolo_app_types.inputs.args import app_type_to_vals
 
     apolo_client = setup_clients
+
+    # Configure mock for bucket operations to return AWS S3 credentials
+    # This assumes setup_clients provides a client with mockable 'buckets' attribute
+    mock_s3_creds = _get_mock_s3_credentials()
+    apolo_client.buckets.get = AsyncMock(
+        return_value=MagicMock(id="test-bucket-id")
+    )  # Mock for bucket get
+    apolo_client.buckets.create = AsyncMock(
+        return_value=MagicMock(id="test-bucket-id")
+    )  # Mock for bucket create
+    apolo_client.buckets.persistent_credentials_get = AsyncMock(
+        return_value=mock_s3_creds
+    )
+    apolo_client.buckets.persistent_credentials_create = AsyncMock(
+        return_value=mock_s3_creds
+    )
+
     helm_args, helm_params = await app_type_to_vals(
         input_=WeaviateInputs(
             preset=Preset(
                 name="cpu-large",
             ),
             persistence=StorageGB(size=64),
-            backup_bucket=Bucket(
-                id="weaviate-backup",
-                owner="owner",
-                details={},
-                credentials=[
-                    S3BucketCredentials(
-                        name="name",
-                        type=CredentialsType.READ_ONLY,
-                        access_key_id="access_key_id",
-                        secret_access_key="access_secret",
-                        endpoint_url="https://s3-endpoint.com",
-                        region_name="us-east-1",
-                    )
-                ],
-                bucket_provider=BucketProvider.AWS,
-            ),
+            backup_bucket=WeaviateBackupConfig(enable=True),
             ingress_http=IngressHttp(
                 clusterName="test",
             ),
@@ -93,28 +112,25 @@ async def test_values_weaviate_generation_with_ingress(
     from apolo_app_types.inputs.args import app_type_to_vals
 
     apolo_client = setup_clients
+
+    # Configure mock for bucket operations
+    mock_s3_creds = _get_mock_s3_credentials()
+    apolo_client.buckets.get = AsyncMock(return_value=MagicMock(id="test-bucket-id"))
+    apolo_client.buckets.create = AsyncMock(return_value=MagicMock(id="test-bucket-id"))
+    apolo_client.buckets.persistent_credentials_get = AsyncMock(
+        return_value=mock_s3_creds
+    )
+    apolo_client.buckets.persistent_credentials_create = AsyncMock(
+        return_value=mock_s3_creds
+    )
+
     helm_args, helm_params = await app_type_to_vals(
         input_=WeaviateInputs(
             preset=Preset(
                 name="cpu-large",
             ),
             persistence=StorageGB(size=64),
-            backup_bucket=Bucket(
-                id="weaviate-backup",
-                owner="owner",
-                details={},
-                credentials=[
-                    S3BucketCredentials(
-                        name="name",
-                        type=CredentialsType.READ_ONLY,
-                        access_key_id="access_key_id",
-                        secret_access_key="access_secret",
-                        endpoint_url="https://s3-endpoint.com",
-                        region_name="us-east-1",
-                    )
-                ],
-                bucket_provider=BucketProvider.AWS,
-            ),
+            backup_bucket=WeaviateBackupConfig(enable=True),
             ingress_http=IngressHttp(
                 clusterName="test-cluster",
             ),
@@ -160,12 +176,25 @@ async def test_values_weaviate_generation_with_auth(setup_clients, mock_get_pres
     from apolo_app_types.inputs.args import app_type_to_vals
 
     apolo_client = setup_clients
+
+    # Configure mock for bucket operations
+    mock_s3_creds = _get_mock_s3_credentials()
+    apolo_client.buckets.get = AsyncMock(return_value=MagicMock(id="test-bucket-id"))
+    apolo_client.buckets.create = AsyncMock(return_value=MagicMock(id="test-bucket-id"))
+    apolo_client.buckets.persistent_credentials_get = AsyncMock(
+        return_value=mock_s3_creds
+    )
+    apolo_client.buckets.persistent_credentials_create = AsyncMock(
+        return_value=mock_s3_creds
+    )
+
     helm_args, helm_params = await app_type_to_vals(
         input_=WeaviateInputs(
             preset=Preset(
                 name="cpu-large",
             ),
             persistence=StorageGB(size=64),
+            backup_bucket=WeaviateBackupConfig(enable=True),
             ingress_http=IngressHttp(
                 clusterName="test-cluster",
             ),
@@ -204,28 +233,25 @@ async def test_values_weaviate_generation_with_backup(
     from apolo_app_types.inputs.args import app_type_to_vals
 
     apolo_client = setup_clients
+
+    # Configure mock for bucket operations
+    mock_s3_creds = _get_mock_s3_credentials()
+    apolo_client.buckets.get = AsyncMock(return_value=MagicMock(id="test-bucket-id"))
+    apolo_client.buckets.create = AsyncMock(return_value=MagicMock(id="test-bucket-id"))
+    apolo_client.buckets.persistent_credentials_get = AsyncMock(
+        return_value=mock_s3_creds
+    )
+    apolo_client.buckets.persistent_credentials_create = AsyncMock(
+        return_value=mock_s3_creds
+    )
+
     helm_args, helm_params = await app_type_to_vals(
         input_=WeaviateInputs(
             preset=Preset(
                 name="cpu-large",
             ),
             persistence=StorageGB(size=64),
-            backup_bucket=Bucket(
-                id="weaviate-backup",
-                owner="owner",
-                details={},
-                credentials=[
-                    S3BucketCredentials(
-                        name="name",
-                        type=CredentialsType.READ_ONLY,
-                        access_key_id="access_key_id",
-                        secret_access_key="access_secret",
-                        endpoint_url="https://storage.test-cluster.org.neu.ro",
-                        region_name="us-east-1",
-                    )
-                ],
-                bucket_provider=BucketProvider.AWS,
-            ),
+            backup_bucket=WeaviateBackupConfig(enable=True),
             ingress_http=IngressHttp(
                 clusterName="test-cluster",
             ),
@@ -247,17 +273,18 @@ async def test_values_weaviate_generation_with_backup(
     assert helm_params["backups"]["s3"]["enabled"] is True
     assert (
         helm_params["backups"]["s3"]["envconfig"]["BACKUP_S3_BUCKET"]
-        == "weaviate-backup"
+        == "test-weaviate-backup-bucket"
     )
     assert (
         helm_params["backups"]["s3"]["envconfig"]["BACKUP_S3_ENDPOINT"]
-        == "storage.test-cluster.org.neu.ro"
+        == "s3.amazonaws.com"
     )
     assert helm_params["backups"]["s3"]["envconfig"]["BACKUP_S3_REGION"] == "us-east-1"
     assert (
-        helm_params["backups"]["s3"]["secrets"]["AWS_ACCESS_KEY_ID"] == "access_key_id"
+        helm_params["backups"]["s3"]["secrets"]["AWS_ACCESS_KEY_ID"]
+        == "test-access-key"
     )
     assert (
         helm_params["backups"]["s3"]["secrets"]["AWS_SECRET_ACCESS_KEY"]
-        == "access_secret"
+        == "test-secret-key"
     )
