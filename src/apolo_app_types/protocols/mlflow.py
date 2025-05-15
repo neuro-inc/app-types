@@ -71,11 +71,23 @@ class MLFlowAppInputs(AppInputs):
 
 
 class MLFlowAppOutputs(AppOutputs):
-    """
-    MLFlow outputs:
-      - internal_web_app_url
-      - external_web_app_url
-    """
-
-    internal_web_app_url: RestAPI | None = None
-    external_web_app_url: RestAPI | None = None
+    internal_web_app_url: RestAPI | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Internal MLFlow URL",
+            description=(
+                "Internal URL to access the MLFlow web "
+                "app and API from inside the cluster."
+            ),
+        ).as_json_schema_extra(),
+    )
+    external_web_app_url: RestAPI | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="External MLFlow URL",
+            description=(
+                "External URL to access the MLFlow web "
+                "app and API from outside the cluster."
+            ),
+        ).as_json_schema_extra(),
+    )

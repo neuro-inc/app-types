@@ -22,6 +22,13 @@ class SparkApplicationType(StrEnum):
 
 
 class DriverConfig(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Driver Configuration",
+            description="Configure resources and environment for the Spark driver.",
+        ).as_json_schema_extra(),
+    )
     preset: Preset = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
@@ -32,6 +39,15 @@ class DriverConfig(AbstractAppFieldType):
 
 
 class ExecutorConfig(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Executor Configuration",
+            description=(
+                "Define the compute resources and behavior for Spark executors."
+            ),
+        ).as_json_schema_extra(),
+    )
     instances: int = Field(
         default=1,
         json_schema_extra=SchemaExtraMetadata(
@@ -137,14 +153,6 @@ class SparkAutoScalingConfig(AbstractAppFieldType):
         ).as_json_schema_extra(),
     )
 
-    enabled: bool = Field(
-        default=False,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Auto Scaling Enabled",
-            description="Enable or disable automatic scaling of Spark executors.",
-        ).as_json_schema_extra(),
-    )
-
     initial_executors: int | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
@@ -183,6 +191,13 @@ class SparkAutoScalingConfig(AbstractAppFieldType):
 
 
 class SparkApplicationConfig(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="App Settings",
+            description="Configure the main application file, type, and arguments.",
+        ).as_json_schema_extra(),
+    )
     type: SparkApplicationType = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
