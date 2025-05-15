@@ -14,6 +14,9 @@ from apolo_app_types.protocols.common import (
 )
 
 
+_SPARK_DEFAULT_IMAGE = ("spark", "3.5.3")
+
+
 class SparkApplicationType(StrEnum):
     PYTHON = "Python"
     SCALA = "Scala"
@@ -194,7 +197,7 @@ class SparkApplicationConfig(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="App Settings",
+            title="Spark App Settings",
             description="Configure the main application file, type, and arguments.",
         ).as_json_schema_extra(),
     )
@@ -263,15 +266,6 @@ class SparkJobInputs(AppInputs):
         ).as_json_schema_extra(),
     )
 
-    image: ContainerImage = Field(
-        default=ContainerImage(repository="spark", tag="3.5.3"),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Container Image",
-            description="Specify the container image "
-            "to run your Spark job. Defaults to the latest Spark version.",
-        ).as_json_schema_extra(),
-    )
-
     spark_application_config: SparkApplicationConfig = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
@@ -290,11 +284,25 @@ class SparkJobInputs(AppInputs):
         ).as_json_schema_extra(),
     )
 
+    image: ContainerImage = Field(
+        default=ContainerImage(
+            repository=_SPARK_DEFAULT_IMAGE[0], tag=_SPARK_DEFAULT_IMAGE[1]
+        ),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Spark Container Image",
+            description="Modify this to select the container image used "
+            "to run your Spark job. Defaults to "
+            "{_SPARK_DEFAULT_IMAGE[0]}:{_SPARK_DEFAULT_IMAGE[1]}.",
+            is_advanced_field=True,
+        ).as_json_schema_extra(),
+    )
+
     driver_config: DriverConfig = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
             title="Driver Configuration",
             description="Configure resources and environment for the Spark driver.",
+            is_advanced_field=True,
         ).as_json_schema_extra(),
     )
 
@@ -304,6 +312,7 @@ class SparkJobInputs(AppInputs):
             title="Executor Configuration",
             description="Define the compute resources "
             "and behavior for Spark executors.",
+            is_advanced_field=True,
         ).as_json_schema_extra(),
     )
 
