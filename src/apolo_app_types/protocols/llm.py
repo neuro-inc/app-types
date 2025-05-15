@@ -54,7 +54,7 @@ class LLMModel(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Server Extra Arguments",
             description="Configure extra arguments "
-            "to pass to the server (see VLLM doc).",
+            "to pass to the server (see VLLM doc, e.g. --max-model-len=131072).",
         ).as_json_schema_extra(),
     )
 
