@@ -125,7 +125,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
     ) -> None:
         if input_.spark_auto_scaling_config:
             dynamic_allocation: dict[str, t.Any] = {
-                "enabled": (input_.spark_auto_scaling_config.enabled),
+                "enabled": True,
                 "initialExecutors": input_.spark_auto_scaling_config.initial_executors,  # noqa: E501
                 "minExecutors": input_.spark_auto_scaling_config.min_executors,  # noqa: E501
                 "maxExecutors": input_.spark_auto_scaling_config.max_executors,  # noqa: E501

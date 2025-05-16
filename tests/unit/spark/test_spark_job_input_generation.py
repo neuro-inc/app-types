@@ -43,7 +43,6 @@ async def test_spark_job_values_generation(setup_clients):
             ),
             image=ContainerImage(repository="myrepo/spark-job", tag="v1.2.3"),
             spark_auto_scaling_config=SparkAutoScalingConfig(
-                enabled=True,
                 initial_executors=2,
                 min_executors=1,
                 max_executors=5,
