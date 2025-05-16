@@ -64,8 +64,7 @@ class MLFlowAppInputs(AppInputs):
                 "Use Apolo Files to store your MLFlow artifacts "
                 "(model binaries, dependency files, etc). "
                 "E.g. 'storage://cluster/myorg/proj/mlflow-artifacts'"
-                "or relative to the current working "
-                "directory: 'storage:mlflow-artifacts'"
+                "or relative path E.g. 'storage:mlflow-artifacts'"
             ),
             title="Artifact Store",
         ).as_json_schema_extra(),
