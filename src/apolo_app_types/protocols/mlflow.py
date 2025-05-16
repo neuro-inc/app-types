@@ -58,12 +58,14 @@ class MLFlowAppInputs(AppInputs):
     ingress_http: IngressHttp
     metadata_storage: MLFlowMetaStorage
     artifact_store: ApoloFilesPath = Field(
-        ...,
+        default=ApoloFilesPath(path="storage:mlflow-artifacts"),
         json_schema_extra=SchemaExtraMetadata(
             description=(
                 "Use Apolo Files to store your MLFlow artifacts "
                 "(model binaries, dependency files, etc). "
                 "E.g. 'storage://cluster/myorg/proj/mlflow-artifacts'"
+                "or relative to the current working "
+                "directory: 'storage:mlflow-artifacts'"
             ),
             title="Artifact Store",
         ).as_json_schema_extra(),
