@@ -23,13 +23,6 @@ class AppInputsDeployer(BaseModel):
 
 class AppInputs(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, protected_namespaces=())
-    #
-    # def __init_subclass__(cls: type["AppInputs"],
-    # **kwargs: Unpack[ConfigDict]) -> None:
-    #     """Validate field types at class definition time."""
-    #     super().__init_subclass__()
-    #
-    #     validate_complex_type_prop(cls)
 
 
 class AppOutputsDeployer(BaseModel):
@@ -44,11 +37,3 @@ class AppOutputsDeployer(BaseModel):
 
 class AppOutputs(BaseModel):
     model_config = ConfigDict(protected_namespaces=())
-
-    # def __init_subclass__(
-    #     cls: type["AppOutputs"], **kwargs: Unpack[ConfigDict]
-    # ) -> None:
-    #     """Validate field types at class definition time."""
-    #     super().__init_subclass__()
-    #
-    #     validate_complex_type_prop(cls)
