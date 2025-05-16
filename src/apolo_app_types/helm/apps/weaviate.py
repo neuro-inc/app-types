@@ -1,15 +1,14 @@
 import logging
+import secrets
 import typing as t
 
-from apolo_app_types import BasicAuth, Bucket, WeaviateInputs
+import apolo_sdk
+
+from apolo_app_types import BasicAuth, WeaviateInputs
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import gen_extra_values
+from apolo_app_types.helm.utils.buckets import get_or_create_bucket_credentials
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
-from apolo_app_types.protocols.common.buckets import BucketProvider, S3BucketCredentials
-from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
-
-
-WEAVIATE_BUCKET_NAME = "weaviate-backup"
 
 
 logger = logging.getLogger(__name__)
@@ -47,53 +46,56 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
 
         return values
 
-    async def _get_backup_values(
-        self, backup_bucket: Bucket, app_secrets_name: str
-    ) -> dict[str, t.Any]:
+    async def _get_backup_values(self, app_name: str) -> dict[str, t.Any]:
         """Configure backup values for Weaviate using Apolo Blob Storage."""
 
-        if backup_bucket.bucket_provider is not BucketProvider.AWS:
-            msg = "Only AWS is supported for Weaviate backups."
-            raise Exception(msg)
+        name = f"app-weaviate-backup-{app_name}"
 
-        bucket_credentials = backup_bucket.credentials[0]
-        if not isinstance(bucket_credentials, S3BucketCredentials):
-            msg = "Only S3 bucket credentials are supported for Weaviate backups."
-            raise Exception(msg)
+        bucket_credentials = await get_or_create_bucket_credentials(
+            client=self.client,
+            bucket_name=name,
+            credentials_name=name,
+            supported_providers=[
+                apolo_sdk.Bucket.Provider.AWS,
+                apolo_sdk.Bucket.Provider.MINIO,
+            ],
+        )
 
-        s3_endpoint = bucket_credentials.endpoint_url.replace("https://", "")
-
-        if not all(
-            [
-                bucket_credentials.name,
-                bucket_credentials.access_key_id,
-                bucket_credentials.secret_access_key,
-                s3_endpoint,
-                bucket_credentials.region_name,
-            ]
-        ):
-            msg = "Missing required args for setting up Apolo Blob Storage"
-            raise Exception(msg)
+        s3_endpoint = (
+            bucket_credentials.credentials[0]
+            .credentials["endpoint_url"]
+            .replace("https://", "")
+        )
+        bucket_name = bucket_credentials.credentials[0].credentials["bucket_name"]
+        access_key_id = bucket_credentials.credentials[0].credentials["access_key_id"]
+        secret_access_key = bucket_credentials.credentials[0].credentials[
+            "secret_access_key"
+        ]
+        region_name = bucket_credentials.credentials[0].credentials["region_name"]
 
         return {
             "s3": {
                 "enabled": True,
                 "envconfig": {
-                    "BACKUP_S3_BUCKET": backup_bucket.id,
+                    "BACKUP_S3_BUCKET": bucket_name,
                     "BACKUP_S3_ENDPOINT": s3_endpoint,
-                    "BACKUP_S3_REGION": bucket_credentials.region_name,
+                    "BACKUP_S3_REGION": region_name,
                 },
                 "secrets": {
-                    "AWS_ACCESS_KEY_ID": serialize_optional_secret(
-                        bucket_credentials.access_key_id, secret_name=app_secrets_name
-                    ),
-                    "AWS_SECRET_ACCESS_KEY": serialize_optional_secret(
-                        bucket_credentials.secret_access_key,
-                        secret_name=app_secrets_name,
-                    ),
+                    "AWS_ACCESS_KEY_ID": access_key_id,
+                    "AWS_SECRET_ACCESS_KEY": secret_access_key,
                 },
             }
         }
+
+    async def _generate_user_credentials(self) -> dict[str, t.Any]:
+        """Generate user credentials for Weaviate, using a random password."""
+        values: dict[str, t.Any] = {}
+        values["clusterApi"] = {
+            "username": "admin",
+            "password": secrets.token_urlsafe(16),
+        }
+        return values
 
     async def gen_extra_values(
         self,
@@ -123,17 +125,16 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
         # else:
         #     auth_vals = {}
 
+        auth_vals = await self._generate_user_credentials()
         # Configure backups if enabled
-        if input_.backup_bucket:
-            values["backups"] = await self._get_backup_values(
-                input_.backup_bucket, app_secrets_name
-            )
+        if input_.persistence.enable_backups:
+            values["backups"] = await self._get_backup_values(app_name)
 
         logger.debug("Generated extra Weaviate values: %s", values)
         return merge_list_of_dicts(
             [
                 values,
-                # auth_vals,
+                auth_vals,
                 {"storage": {"size": f"{input_.persistence.size}Gi"}},
             ]
         )

@@ -85,22 +85,25 @@ class PostgresConfig(AbstractAppFieldType):
     )
     postgres_version: PostgresSupportedVersions = Field(
         default=PostgresSupportedVersions.v16,
-        description="Postgres version to use.",
+        description="Set version of the Postgres server to use.",
         title="Postgres version",
     )
     instance_replicas: int = Field(
         default=3,
-        description="Number of replicas for the Postgres instance.",
+        description="Set number of replicas for the Postgres instance.",
         title="Postgres instance replicas",
     )
     instance_size: int = Field(
         default=1,
-        description="Size of the Postgres instance disk.",
+        description="Set size of the Postgres instance disk (in GB).",
         title="Postgres instance disk size",
     )
     db_users: list[PostgresDBUser] = Field(
         default_factory=list,
-        description="List of database users.",
+        description=(
+            "Configure list of users and databases they have access to. "
+            "Multiple users could have access to the same database."
+        ),
         title="Database users",
     )
 
@@ -120,7 +123,7 @@ class PGBackupConfig(AbstractAppFieldType):
             "Enable backups for the Postgres cluster. "
             "We automatically create and configure the corresponding backup "
             "bucket for you. "
-            "Note: this bucket will not be automaticaly removed when you remove "
+            "Note: this bucket will not be automatically removed when you remove "
             "the app."
         ),
     )

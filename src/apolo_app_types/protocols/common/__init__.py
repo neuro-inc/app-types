@@ -26,7 +26,6 @@ from .storage import (
     ApoloFilesPath,
     ApoloMountMode,
     MountPath,
-    StorageGB,
     StorageMounts,
 )
 
@@ -43,7 +42,6 @@ __all__ = [
     "HuggingFaceCache",
     "Preset",
     "BasicAuth",
-    "StorageGB",
     "ApoloFilesMount",
     "ApoloFilesPath",
     "ApoloFilesFile",

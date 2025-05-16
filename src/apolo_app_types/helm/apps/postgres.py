@@ -11,6 +11,7 @@ from apolo_app_types.helm.apps.common import (
     preset_to_resources,
     preset_to_tolerations,
 )
+from apolo_app_types.helm.utils.buckets import get_or_create_bucket_credentials
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
 from apolo_app_types.protocols.postgres import PostgresDBUser, PostgresInputs
 
@@ -154,28 +155,18 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
         if not input_.backup.enable:
             return {}
 
-        name = f"pg-backup-{app_name}"
+        name = f"app-pg-backup-{app_name}"
 
-        try:
-            bucket = await self.client.buckets.get(bucket_id_or_name=name)
-            logger.info("Found existing bucket %s, using it as a backup target", name)
-        except apolo_sdk.ResourceNotFound:
-            bucket = await self.client.buckets.create(name=name)
-            logger.info("Created new bucket %s for backups", name)
-        try:
-            bucket_credentials = await self.client.buckets.persistent_credentials_get(
-                credential_id_or_name=name,
-            )
-            logger.info("Found existing bucket credentials %s", name)
-        except apolo_sdk.ResourceNotFound:
-            bucket_credentials = (
-                await self.client.buckets.persistent_credentials_create(
-                    bucket_ids=[bucket.id],
-                    name=name,
-                    read_only=False,
-                )
-            )
-            logger.info("Created new bucket credentials %s", name)
+        bucket_credentials = await get_or_create_bucket_credentials(
+            client=self.client,
+            bucket_name=name,
+            credentials_name=name,
+            supported_providers=[
+                apolo_sdk.Bucket.Provider.AWS,
+                apolo_sdk.Bucket.Provider.MINIO,
+                apolo_sdk.Bucket.Provider.GCP,
+            ],
+        )
 
         provider = bucket_credentials.credentials[0].provider
         credentials = bucket_credentials.credentials[0].credentials
