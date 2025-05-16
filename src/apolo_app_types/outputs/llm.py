@@ -12,7 +12,6 @@ from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
 )
-from apolo_app_types.protocols.llm import LLMApiKey, LLMModel
 
 
 logger = logging.getLogger()
@@ -70,11 +69,9 @@ async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> dict[str, 
         chat_external_api=chat_external_api,
         embeddings_internal_api=embeddings_internal_api,
         embeddings_external_api=embeddings_external_api,
-        llm=LLMModel(
-            hugging_face_model=hf_model,
-            tokenizer_hf_name=tokenizer_name,
-            server_extra_args=server_extra_args,
-        ),
-        llm_api_key=LLMApiKey(key=api_key),
+        hugging_face_model=hf_model,
+        tokenizer_hf_name=tokenizer_name,
+        server_extra_args=server_extra_args,
+        llm_api_key=api_key,
     )
     return vllm_outputs.model_dump()

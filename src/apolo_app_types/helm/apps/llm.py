@@ -18,7 +18,6 @@ from apolo_app_types.protocols.common import (
 )
 from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
 from apolo_app_types.protocols.common.storage import ApoloMountModes
-from apolo_app_types.protocols.llm import LLMModel
 
 
 class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
@@ -65,18 +64,18 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
 
         return parallel_server_args
 
-    def _configure_model(self, llm_model: LLMModel) -> dict[str, str]:
+    def _configure_model(self, input_: LLMInputs) -> dict[str, str]:
         return {
-            "modelHFName": llm_model.hugging_face_model.model_hf_name,
-            "tokenizerHFName": llm_model.tokenizer_hf_name,
+            "modelHFName": input_.hugging_face_model.model_hf_name,
+            "tokenizerHFName": input_.tokenizer_hf_name,
         }
 
     def _configure_env(
-        self, llm_model: LLMModel, app_secrets_name: str
+        self, input_: LLMInputs, app_secrets_name: str
     ) -> dict[str, t.Any]:
         return {
             "HUGGING_FACE_HUB_TOKEN": serialize_optional_secret(
-                llm_model.hugging_face_model.hf_token, secret_name=app_secrets_name
+                input_.hugging_face_model.hf_token, secret_name=app_secrets_name
             )
         }
 
@@ -167,14 +166,14 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
 
         gpu_env = self._configure_gpu_env(gpu_provider, gpu_count)
         parallel_args = self._configure_parallel_args(
-            input_.llm.server_extra_args, gpu_count
+            input_.server_extra_args, gpu_count
         )
         server_extra_args = [
-            *input_.llm.server_extra_args,
+            *input_.server_extra_args,
             *parallel_args,
         ]
-        model = self._configure_model(input_.llm)
-        env = self._configure_env(input_.llm, app_secrets_name)
+        model = self._configure_model(input_)
+        env = self._configure_env(input_, app_secrets_name)
         return merge_list_of_dicts(
             [
                 {

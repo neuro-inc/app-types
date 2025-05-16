@@ -14,7 +14,6 @@ from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 from apolo_app_types.protocols.huggingface_cache import (
     HuggingFaceCache,
 )
-from apolo_app_types.protocols.llm import LLMModel
 
 from tests.unit.constants import APP_SECRETS_NAME, CPU_POOL, DEFAULT_NAMESPACE
 
@@ -30,13 +29,11 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
             ingress_http=IngressHttp(
                 clusterName="test",
             ),
-            llm=LLMModel(
-                hugging_face_model=HuggingFaceModel(
-                    model_hf_name="test", hf_token=hf_token
-                ),
-                tokenizer_hf_name="test_tokenizer",
-                server_extra_args=["--flag1.1 --flag1.2", "--flag2", "--flag3"],
+            hugging_face_model=HuggingFaceModel(
+                model_hf_name="test", hf_token=hf_token
             ),
+            tokenizer_hf_name="test_tokenizer",
+            server_extra_args=["--flag1.1 --flag1.2", "--flag2", "--flag3"],
         ),
         apolo_client=apolo_client,
         app_type=AppType.LLMInference,
@@ -111,13 +108,11 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
             ingress_http=IngressHttp(
                 clusterName="test",
             ),
-            llm=LLMModel(
-                hugging_face_model=HuggingFaceModel(
-                    model_hf_name="test", hf_token=hf_token
-                ),
-                tokenizer_hf_name="test_tokenizer",
-                server_extra_args=["--flag1.1 --flag1.2", "--flag2", "--flag3"],
+            hugging_face_model=HuggingFaceModel(
+                model_hf_name="test", hf_token=hf_token
             ),
+            tokenizer_hf_name="test_tokenizer",
+            server_extra_args=["--flag1.1 --flag1.2", "--flag2", "--flag3"],
         ),
         apolo_client=apolo_client,
         app_type=AppType.LLMInference,
@@ -224,16 +219,14 @@ async def test_values_llm_generation_cpu_apolo_secret(
             ingress_http=IngressHttp(
                 clusterName="test",
             ),
-            llm=LLMModel(
-                hugging_face_model=HuggingFaceModel(
-                    model_hf_name="test",
-                    hf_token=ApoloSecret(
-                        key="hf_token",
-                    ),
+            hugging_face_model=HuggingFaceModel(
+                model_hf_name="test",
+                hf_token=ApoloSecret(
+                    key="hf_token",
                 ),
-                tokenizer_hf_name="test_tokenizer",
-                server_extra_args=["--flag1.1 --flag1.2", "--flag2", "--flag3"],
             ),
+            tokenizer_hf_name="test_tokenizer",
+            server_extra_args=["--flag1.1 --flag1.2", "--flag2", "--flag3"],
         ),
         apolo_client=apolo_client,
         app_type=AppType.LLMInference,
@@ -305,12 +298,8 @@ async def test_values_llm_generation_gpu_4x(setup_clients, mock_get_preset_gpu):
         input_=LLMInputs(
             preset=Preset(name="gpu-large"),  # triggers nvidia_gpu=4 in conftest
             ingress_http=IngressHttp(clusterName="test"),
-            llm=LLMModel(
-                hugging_face_model=HuggingFaceModel(
-                    model_hf_name="test", hf_token="xxx"
-                ),
-                server_extra_args=["--foo"],
-            ),
+            hugging_face_model=HuggingFaceModel(model_hf_name="test", hf_token="xxx"),
+            server_extra_args=["--foo"],
         ),
         apolo_client=apolo_client,
         app_type=AppType.LLMInference,
@@ -328,12 +317,8 @@ async def test_values_llm_generation_gpu_8x(setup_clients, mock_get_preset_gpu):
         input_=LLMInputs(
             preset=Preset(name="gpu-xlarge"),  # triggers nvidia_gpu=8 in conftest
             ingress_http=IngressHttp(clusterName="test"),
-            llm=LLMModel(
-                hugging_face_model=HuggingFaceModel(
-                    model_hf_name="test2", hf_token="yyy"
-                ),
-                server_extra_args=["--bar"],
-            ),
+            hugging_face_model=HuggingFaceModel(model_hf_name="test2", hf_token="yyy"),
+            server_extra_args=["--bar"],
         ),
         apolo_client=apolo_client,
         app_type=AppType.LLMInference,
@@ -351,12 +336,8 @@ async def test_values_llm_generation_gpu_8x_pps(setup_clients, mock_get_preset_g
         input_=LLMInputs(
             preset=Preset(name="gpu-xlarge"),  # triggers nvidia_gpu=8 in conftest
             ingress_http=IngressHttp(clusterName="test"),
-            llm=LLMModel(
-                hugging_face_model=HuggingFaceModel(
-                    model_hf_name="test2", hf_token="yyy"
-                ),
-                server_extra_args=["--bar", "--pipeline-parallel-size=8"],
-            ),
+            hugging_face_model=HuggingFaceModel(model_hf_name="test2", hf_token="yyy"),
+            server_extra_args=["--bar", "--pipeline-parallel-size=8"],
         ),
         apolo_client=apolo_client,
         app_type=AppType.LLMInference,
@@ -376,17 +357,15 @@ async def test_values_llm_generation_gpu_8x_pps_and_tps(
         input_=LLMInputs(
             preset=Preset(name="gpu-xlarge"),  # triggers nvidia_gpu=8 in conftest
             ingress_http=IngressHttp(clusterName="test"),
-            llm=LLMModel(
-                hugging_face_model=HuggingFaceModel(
-                    model_hf_name="test2",
-                    hf_token="yyy",
-                ),
-                server_extra_args=[
-                    "--bar",
-                    "--pipeline-parallel-size=8",
-                    "--tensor-parallel-size=8",
-                ],
+            hugging_face_model=HuggingFaceModel(
+                model_hf_name="test2",
+                hf_token="yyy",
             ),
+            server_extra_args=[
+                "--bar",
+                "--pipeline-parallel-size=8",
+                "--tensor-parallel-size=8",
+            ],
         ),
         apolo_client=apolo_client,
         app_type=AppType.LLMInference,
@@ -414,10 +393,8 @@ async def test_values_llm_generation__storage_integrated(
             ingress_http=IngressHttp(
                 clusterName="",
             ),
-            llm=LLMModel(
-                hugging_face_model=HuggingFaceModel(
-                    model_hf_name="test", hf_token=hf_token
-                ),
+            hugging_face_model=HuggingFaceModel(
+                model_hf_name="test", hf_token=hf_token
             ),
             cache_config=HuggingFaceCache(
                 files_path=ApoloFilesPath(

@@ -1,4 +1,4 @@
-from pydantic import ConfigDict, Field
+from pydantic import Field
 
 from apolo_app_types.protocols.common import (
     AbstractAppFieldType,
@@ -31,34 +31,6 @@ class LLMApi(AbstractAppFieldType):
     )
 
 
-class LLMModel(AbstractAppFieldType):
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="LLM",
-            description="Configure VLLM.",
-            meta_type=SchemaMetaType.INTEGRATION,
-        ).as_json_schema_extra(),
-    )
-    hugging_face_model: HuggingFaceModel  # noqa: N815
-    tokenizer_hf_name: str = Field(  # noqa: N815
-        "",
-        json_schema_extra=SchemaExtraMetadata(
-            description="Set the name of the tokenizer "
-            "associated with the Hugging Face model.",
-            title="Hugging Face Tokenizer Name",
-        ).as_json_schema_extra(),
-    )
-    server_extra_args: list[str] = Field(  # noqa: N815
-        default_factory=list,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Server Extra Arguments",
-            description="Configure extra arguments "
-            "to pass to the server (see VLLM doc, e.g. --max-model-len=131072).",
-        ).as_json_schema_extra(),
-    )
-
-
 class Worker(AbstractAppFieldType):
     replicas: int | None
     preset_name: str
@@ -83,7 +55,23 @@ class LLMInputs(AppInputs):
             " over the internet using HTTPS.",
         ).as_json_schema_extra(),
     )
-    llm: LLMModel
+    hugging_face_model: HuggingFaceModel  # noqa: N815
+    tokenizer_hf_name: str = Field(  # noqa: N815
+        "",
+        json_schema_extra=SchemaExtraMetadata(
+            description="Set the name of the tokenizer "
+            "associated with the Hugging Face model.",
+            title="Hugging Face Tokenizer Name",
+        ).as_json_schema_extra(),
+    )
+    server_extra_args: list[str] = Field(  # noqa: N815
+        default_factory=list,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Server Extra Arguments",
+            description="Configure extra arguments "
+            "to pass to the server (see VLLM doc, e.g. --max-model-len=131072).",
+        ).as_json_schema_extra(),
+    )
     cache_config: HuggingFaceCache | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
@@ -126,60 +114,59 @@ class VLLMOutputs(AppOutputsDeployer):
     embeddings_external_api: OpenAICompatibleEmbeddingsAPI | None
 
 
-class LLMApiKey(AbstractAppFieldType):
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="LLM Integration API key",
-            description="Configuration for LLM Api key.",
-            meta_type=SchemaMetaType.INTEGRATION,
-        ).as_json_schema_extra(),
-    )
-    key: str | None = None
-
-
 class VLLMOutputsV2(AppOutputs):
     chat_internal_api: OpenAICompatChatAPI | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="Chat Internal API",
-            description="Chat Internal API ",
+            title="Internal Chat API",
+            description="Internal Chat API compatible with "
+            "OpenAI standard for seamless integration.",
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     chat_external_api: OpenAICompatChatAPI | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="Chat External API",
-            description="Chat External API description",
+            title="External Chat API",
+            description="External Chat API compatible with OpenAI standard.",
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     embeddings_internal_api: OpenAICompatEmbeddingsAPI | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="Embeddings Internal API",
-            description="Embeddings Internal API description",
+            title="Internal Embeddings API",
+            description="Internal Embeddings API compatible with OpenAI "
+            "standard for seamless integration.",
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     embeddings_external_api: OpenAICompatEmbeddingsAPI | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="Embeddings External API",
-            description="Embeddings External API",
+            title="External Embeddings API",
+            description="External Embeddings API compatible with OpenAI standard.",
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
-    llm: LLMModel | None = Field(
-        default=None,
+    hugging_face_model: HuggingFaceModel  # noqa: N815
+    tokenizer_hf_name: str = Field(  # noqa: N815
+        "",
         json_schema_extra=SchemaExtraMetadata(
-            title="LLM Model Details",
-            description="LLM Model Details",
-            meta_type=SchemaMetaType.INTEGRATION,
+            description="Set the name of the tokenizer "
+            "associated with the Hugging Face model.",
+            title="Hugging Face Tokenizer Name",
         ).as_json_schema_extra(),
     )
-    llm_api_key: LLMApiKey | None = Field(
+    server_extra_args: list[str] = Field(  # noqa: N815
+        default_factory=list,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Server Extra Arguments",
+            description="Configure extra arguments "
+            "to pass to the server (see VLLM doc, e.g. --max-model-len=131072).",
+        ).as_json_schema_extra(),
+    )
+    llm_api_key: str | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
             title="LLM Api Key",
