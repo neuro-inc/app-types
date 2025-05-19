@@ -46,6 +46,24 @@ class MLFlowMetadataSQLite(AbstractAppFieldType):
 MLFlowMetaStorage = MLFlowMetadataSQLite | MLFlowMetadataPostgres
 
 
+class MLFlowArtifactStore(ApoloFilesPath):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Artifact Store",
+            description=(
+                "Use Apolo Files to store your MLFlow artifacts "
+                "(model binaries, dependency files, etc). "
+                "E.g. 'storage://cluster/myorg/proj/mlflow-artifacts'"
+                "or relative path E.g. 'storage:mlflow-artifacts'"
+            ),
+        ).as_json_schema_extra(),
+    )
+    path: str = Field(
+        default="storage:mlflow-artifacts",
+    )
+
+
 class MLFlowAppInputs(AppInputs):
     """
     The overall MLFlow app config, referencing:
@@ -57,18 +75,7 @@ class MLFlowAppInputs(AppInputs):
     preset: Preset
     ingress_http: IngressHttp
     metadata_storage: MLFlowMetaStorage
-    artifact_store: ApoloFilesPath = Field(
-        default=ApoloFilesPath(path="storage:mlflow-artifacts"),
-        json_schema_extra=SchemaExtraMetadata(
-            description=(
-                "Use Apolo Files to store your MLFlow artifacts "
-                "(model binaries, dependency files, etc). "
-                "E.g. 'storage://cluster/myorg/proj/mlflow-artifacts'"
-                "or relative path E.g. 'storage:mlflow-artifacts'"
-            ),
-            title="Artifact Store",
-        ).as_json_schema_extra(),
-    )
+    artifact_store: MLFlowArtifactStore
 
 
 class MLFlowAppOutputs(AppOutputs):
