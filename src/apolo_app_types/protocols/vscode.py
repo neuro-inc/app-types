@@ -54,6 +54,65 @@ class Networking(AbstractAppFieldType):
     )
 
 
+class VSCodeMainStoragePath(ApoloFilesPath):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Code Storage Path",
+            description="This is the path in Apolo Storage that will be"
+            " mounted in the container.",
+        ).as_json_schema_extra(),
+    )
+    path: str = Field(
+        default=_get_app_data_files_path_url(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Apolo Path",
+            description="This path always starts with `storage:`. "
+            "You can use a relative path like `storage:directory` "
+            "(which maps to the current project) or an absolute path "
+            "like `storage://cluster/org/proj/directory`.",
+        ).as_json_schema_extra(),
+    )
+
+
+class VSCodeMainMountPath(MountPath):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Code Mount Path",
+            description="This is the path in the container where the code storage "
+            "will be mounted.",
+        ).as_json_schema_extra(),
+    )
+    path: str = Field(
+        default="/home/coder/project",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Mount Path",
+            description="Linux-style path inside the container where the volume "
+            "will be mounted.",
+        ).as_json_schema_extra(),
+    )
+
+
+class VSCodeFilesMount(ApoloFilesMount):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Code Storage Mount",
+            description="Code storage mount for VSCode.",
+        ).as_json_schema_extra(),
+    )
+    storage_uri: VSCodeMainStoragePath
+    mount_path: VSCodeMainMountPath
+    mode: ApoloMountMode = Field(
+        default=ApoloMountMode(mode=ApoloMountModes.RW),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Mount Mode",
+            description="Mount mode for the code storage.",
+        ).as_json_schema_extra(),
+    )
+
+
 class VSCodeSpecificAppInputs(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
@@ -62,20 +121,7 @@ class VSCodeSpecificAppInputs(AbstractAppFieldType):
             description="VSCode App configuration.",
         ).as_json_schema_extra(),
     )
-    code_storage_mount: ApoloFilesMount = Field(
-        default=ApoloFilesMount(
-            storage_uri=ApoloFilesPath(path=_get_app_data_files_path_url()),
-            mount_path=MountPath(path="/home/coder/project"),
-            mode=ApoloMountMode(mode=ApoloMountModes.RW),
-        ),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Code Storage Mount",
-            description=(
-                "Configure Apolo Files mount within the application workloads. "
-                "If not set, Apolo will automatically assign a mount to the storage."
-            ),
-        ).as_json_schema_extra(),
-    )
+    code_storage_mount: VSCodeFilesMount
 
 
 class VSCodeAppInputs(AppInputs):
