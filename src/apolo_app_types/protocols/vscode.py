@@ -102,8 +102,8 @@ class VSCodeFilesMount(ApoloFilesMount):
             description="Code storage mount for VSCode.",
         ).as_json_schema_extra(),
     )
-    storage_uri: VSCodeMainStoragePath
-    mount_path: VSCodeMainMountPath
+    storage_uri: VSCodeMainStoragePath = Field(default=VSCodeMainStoragePath())
+    mount_path: VSCodeMainMountPath = Field(default=VSCodeMainMountPath())
     mode: ApoloMountMode = Field(
         default=ApoloMountMode(mode=ApoloMountModes.RW),
         json_schema_extra=SchemaExtraMetadata(
@@ -121,7 +121,7 @@ class VSCodeSpecificAppInputs(AbstractAppFieldType):
             description="VSCode App configuration.",
         ).as_json_schema_extra(),
     )
-    code_storage_mount: VSCodeFilesMount
+    code_storage_mount: VSCodeFilesMount = Field(default=VSCodeFilesMount())
 
 
 class VSCodeAppInputs(AppInputs):
