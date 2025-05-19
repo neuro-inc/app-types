@@ -3,12 +3,12 @@ import pytest
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import (
-    ApoloFilesPath,
     IngressHttp,
     Preset,
 )
 from apolo_app_types.protocols.mlflow import (
     MLFlowAppInputs,
+    MLFlowArtifactStore,
     MLFlowMetadataPostgres,
     MLFlowMetadataSQLite,
     PostgresURI,
@@ -29,7 +29,7 @@ async def test_values_mlflow_generation_default_sqlite(
         preset=Preset(name="cpu-small"),
         ingress_http=IngressHttp(clusterName="test"),
         metadata_storage=MLFlowMetadataSQLite(),
-        artifact_store=ApoloFilesPath(
+        artifact_store=MLFlowArtifactStore(
             path="storage://test-cluster/myorg/proj/mlflow-artifacts"
         ),
     )
@@ -89,7 +89,7 @@ async def test_values_mlflow_generation_sqlite_explicit_no_pvc_name(
         preset=Preset(name="cpu-small"),
         ingress_http=IngressHttp(clusterName="test"),
         metadata_storage=MLFlowMetadataSQLite(),
-        artifact_store=ApoloFilesPath(path="storage://foo/bar/baz"),
+        artifact_store=MLFlowArtifactStore(path="storage://foo/bar/baz"),
     )
 
     helm_args, helm_params = await app_type_to_vals(
@@ -128,7 +128,7 @@ async def test_values_mlflow_generation_sqlite_explicit_custom_pvc_name(
         preset=Preset(name="cpu-small"),
         ingress_http=IngressHttp(clusterName="test"),
         metadata_storage=MLFlowMetadataSQLite(pvc_name=custom_pvc_name),
-        artifact_store=ApoloFilesPath(path="storage://foo/bar/baz"),
+        artifact_store=MLFlowArtifactStore(path="storage://foo/bar/baz"),
     )
 
     helm_args, helm_params = await app_type_to_vals(
@@ -170,7 +170,7 @@ async def test_values_mlflow_generation_postgres_uri(
                 uri="postgresql://user:pass@custom-host:5432/mlflow"
             ),
         ),
-        artifact_store=ApoloFilesPath(
+        artifact_store=MLFlowArtifactStore(
             path="storage://test-cluster/myorg/proj/mlflow-artifacts"
         ),
     )
