@@ -19,6 +19,7 @@ class ProbeType(str, Enum):
     HTTP = "HTTP"
     GRPC = "gRPC"
     TCP = "TCP"
+    EXEC = "Exec"
 
 
 class HTTPHealthCheckConfig(AbstractAppFieldType):
@@ -91,7 +92,35 @@ class TCPHealthCheckConfig(AbstractAppFieldType):
     # No additional fields needed for TCP, just the connection attempt itself
 
 
-HealthCheckConfig = HTTPHealthCheckConfig | GRPCHealthCheckConfig | TCPHealthCheckConfig
+class ExecHealthCheckConfig(AbstractAppFieldType):
+    """
+    Exec-specific health check configuration.
+    """
+
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Exec Health Check",
+            description="Configuration for exec health checks.",
+            meta_type=SchemaMetaType.INLINE,
+        ).as_json_schema_extra(),
+    )
+    probe_type: Literal[ProbeType.EXEC] = Field(default=ProbeType.EXEC)
+    command: list[str] = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Command",
+            description="Command to execute for the health check",
+        ).as_json_schema_extra(),
+    )
+
+
+HealthCheckConfig = (
+    HTTPHealthCheckConfig
+    | GRPCHealthCheckConfig
+    | TCPHealthCheckConfig
+    | ExecHealthCheckConfig
+)
 
 
 class HealthCheck(AbstractAppFieldType):

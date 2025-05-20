@@ -31,6 +31,10 @@ def get_probe_values(config: HealthCheck) -> dict[str, t.Any]:
             "port": config.port,
             "service": config.health_check_config.service,
         }
+    elif config.health_check_config.probe_type == ProbeType.EXEC:
+        values["exec"] = {
+            "command": config.health_check_config.command,
+        }
     else:
         err = f"Unsupported probe type: {config.health_check_config.probe_type}"
         raise ValueError(err)
