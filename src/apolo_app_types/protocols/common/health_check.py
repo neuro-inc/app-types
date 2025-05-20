@@ -202,3 +202,10 @@ class HealthCheckProbesConfig(AbstractAppFieldType):
             description="Configuration for liveness probe",
         ).as_json_schema_extra(),
     )
+    readiness: HealthCheck | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Readiness Probe",
+            description="Configuration for liveness probe",
+        ).as_json_schema_extra(),
+    )

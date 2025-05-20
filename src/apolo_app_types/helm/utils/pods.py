@@ -52,4 +52,9 @@ def get_health_check_values(
         values["health_checks"]["livenessProbe"] = get_probe_values(
             health_checks.liveness
         )
+
+    if health_checks.readiness:
+        values["health_checks"]["readinessProbe"] = get_probe_values(
+            health_checks.readiness
+        )
     return values

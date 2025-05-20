@@ -22,6 +22,11 @@ from apolo_app_types.protocols.common import (
     MountPath,
     StorageMounts,
 )
+from apolo_app_types.protocols.common.health_check import (
+    HealthCheck,
+    HealthCheckProbesConfig,
+    HTTPHealthCheckConfig,
+)
 from apolo_app_types.protocols.common.k8s import Port
 from apolo_app_types.protocols.custom_deployment import NetworkingConfig
 
@@ -117,6 +122,30 @@ class FooocusChartValueProcessor(BaseChartValueProcessor[FooocusAppInputs]):
                         mode=ApoloMountMode(mode="rw"),
                     ),
                 ]
+            ),
+            health_checks=HealthCheckProbesConfig(
+                liveness=HealthCheck(
+                    enabled=True,
+                    port=7865,
+                    initial_delay_seconds=30,
+                    period_seconds=5,
+                    timeout=5,
+                    failure_threshold=20,
+                    health_check_config=HTTPHealthCheckConfig(
+                        path="/",
+                    ),
+                ),
+                readiness=HealthCheck(
+                    enabled=True,
+                    port=7865,
+                    initial_delay_seconds=30,
+                    period_seconds=5,
+                    timeout=5,
+                    failure_threshold=20,
+                    health_check_config=HTTPHealthCheckConfig(
+                        path="/",
+                    ),
+                ),
             ),
         )
 

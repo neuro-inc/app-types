@@ -21,6 +21,11 @@ from apolo_app_types.protocols.common import (
     MountPath,
     StorageMounts,
 )
+from apolo_app_types.protocols.common.health_check import (
+    HealthCheck,
+    HealthCheckProbesConfig,
+    HTTPHealthCheckConfig,
+)
 from apolo_app_types.protocols.common.ingress import IngressHttp
 from apolo_app_types.protocols.common.k8s import Port
 from apolo_app_types.protocols.custom_deployment import NetworkingConfig
@@ -28,6 +33,8 @@ from apolo_app_types.protocols.shell import ShellAppInputs
 
 
 class ShellChartValueProcessor(BaseChartValueProcessor[ShellAppInputs]):
+    _port: int = 7681
+
     def __init__(self, *args: t.Any, **kwargs: t.Any):
         super().__init__(*args, **kwargs)
         self.custom_dep_val_processor = CustomDeploymentChartValueProcessor(
@@ -76,7 +83,7 @@ class ShellChartValueProcessor(BaseChartValueProcessor[ShellAppInputs]):
                 service_enabled=True,
                 ingress_http=IngressHttp(auth=input_.networking.http_auth),
                 ports=[
-                    Port(name="http", port="7681"),
+                    Port(name="http", port=self._port),
                 ],
             ),
             storage_mounts=StorageMounts(
@@ -89,6 +96,30 @@ class ShellChartValueProcessor(BaseChartValueProcessor[ShellAppInputs]):
                         mode=ApoloMountMode(mode="r"),
                     ),
                 ]
+            ),
+            health_checks=HealthCheckProbesConfig(
+                liveness=HealthCheck(
+                    enabled=True,
+                    port=self._port,
+                    initial_delay_seconds=30,
+                    period_seconds=5,
+                    timeout=5,
+                    failure_threshold=20,
+                    health_check_config=HTTPHealthCheckConfig(
+                        path="/",
+                    ),
+                ),
+                readiness=HealthCheck(
+                    enabled=True,
+                    port=self._port,
+                    initial_delay_seconds=30,
+                    period_seconds=5,
+                    timeout=5,
+                    failure_threshold=20,
+                    health_check_config=HTTPHealthCheckConfig(
+                        path="/",
+                    ),
+                ),
             ),
         )
 
