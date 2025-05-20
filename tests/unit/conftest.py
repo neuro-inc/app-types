@@ -322,6 +322,6 @@ def mock_kubernetes_client():
             "mock_networking_v1_api": mock_networking_v1_api,
             "mock_v1_instance": mock_v1_instance,
             "mock_networking_instance": mock_networking_instance,
-            "mock_custom_objects_api": mock_custom_objects_api,
+            "mock_custom_objects": mock_custom_objects_instance,
             "fake_ingresses": fake_ingresses,
         }

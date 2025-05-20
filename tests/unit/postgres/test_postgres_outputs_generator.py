@@ -1,9 +1,6 @@
-import pytest
-
 from apolo_app_types.outputs.postgres import get_postgres_outputs
 
 
-@pytest.mark.asyncio
 async def test_postgres_outputs(setup_clients, mock_kubernetes_client):
     res = await get_postgres_outputs(helm_values={})
     assert res["postgres_users"]["users"] == [
@@ -40,3 +37,10 @@ async def test_postgres_outputs(setup_clients, mock_kubernetes_client):
             },
         },
     ]
+    mock = mock_kubernetes_client["mock_custom_objects"]
+    mock.list_namespaced_custom_object.assert_called_once_with(
+        group="postgres-operator.crunchydata.com",
+        version="v1beta1",
+        namespace="default-namespace",
+        plural="postgresclusters",
+    )
