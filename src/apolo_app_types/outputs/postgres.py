@@ -6,7 +6,7 @@ import typing as t
 from apolo_app_types import (
     CrunchyPostgresUserCredentials,
 )
-from apolo_app_types.clients.kube import get_secret
+from apolo_app_types.clients.kube import get_crd_objects, get_secret
 from apolo_app_types.protocols.postgres import (
     PostgresOutputs,
     PostgresURI,
@@ -17,6 +17,18 @@ from apolo_app_types.protocols.postgres import (
 logger = logging.getLogger()
 
 MAX_SLEEP_SEC = 10
+
+
+def get_postgres_cluster_users() -> dict[str, t.Any]:
+    pg_clusters = get_crd_objects(
+        api_group="postgres-operator.crunchydata.com",
+        api_version="v1beta1",
+        crd_plural_name="postgresclusters",
+    )
+    assert len(pg_clusters["items"]) == 1
+    pg_cluster = pg_clusters["items"][0]
+    users = pg_cluster["spec"].get("users", [])
+    return {user["name"]: user for user in users}
 
 
 def postgres_creds_from_kube_secret_data(
@@ -74,11 +86,20 @@ async def get_postgres_outputs(
     else:
         msg = "Failed to get postgres outputs"
         raise Exception(msg)
+
+    requested_users = get_postgres_cluster_users()
     users = []
 
     for item in secrets.items:
         user = postgres_creds_from_kube_secret_data(item.data)
         users.append(user)
+        # currently, postgres operator does not create all combinations of
+        # user <> database accesses, we need to expand this
+        requested_dbs = requested_users.get(user.user, {}).get("databases", [])
+        for db in requested_dbs:
+            if user.dbname == db:
+                continue
+            users.append(user.with_database(db))
 
     return PostgresOutputs(
         postgres_users=PostgresUsers(users=users),

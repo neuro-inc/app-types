@@ -104,3 +104,21 @@ async def get_secret(label: str) -> typing.Any:
         err_msg = f"Exception when calling CoreV1Api->read_namespaced_secret: {e}"
         logger.error(err_msg)
         raise e
+
+
+def get_crd_objects(
+    *,
+    api_group: str,
+    api_version: str,
+    crd_plural_name: str,
+) -> dict[str, typing.Any]:
+    config.load_incluster_config()
+
+    namespace = get_current_namespace()
+    api = client.CustomObjectsApi()
+    return api.list_namespaced_custom_object(
+        group=api_group,
+        version=api_version,
+        namespace=namespace,
+        plural=crd_plural_name,
+    )

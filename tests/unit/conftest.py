@@ -186,6 +186,7 @@ def mock_kubernetes_client():
         patch("kubernetes.config.load_incluster_config") as mock_load_incluster_config,
         patch("kubernetes.client.CoreV1Api") as mock_core_v1_api,
         patch("kubernetes.client.NetworkingV1Api") as mock_networking_v1_api,
+        patch("kubernetes.client.CustomObjectsApi") as mock_custom_objects_api,
         patch(
             "apolo_app_types.clients.kube.get_current_namespace"
         ) as mock_get_curr_namespace,
@@ -284,6 +285,36 @@ def mock_kubernetes_client():
         # Set .items to a list containing the mocked secret
         mock_v1_instance.list_namespaced_secret.return_value.items = [mock_secret]
 
+        def mock_list_namespaced_custom_object(
+            group, version, namespace, plural, **kwargs
+        ):
+            if (
+                group == "postgres-operator.crunchydata.com"
+                and version == "v1beta1"
+                and plural == "postgresclusters"
+            ):
+                return {
+                    "items": [
+                        {
+                            "spec": {
+                                "users": [
+                                    {
+                                        "name": "admin",
+                                        "databases": ["mydatabase", "otherdatabase"],
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            raise Exception("Unknown custom object")  # noqa: EM101
+
+        mock_custom_objects_instance = MagicMock()
+        mock_custom_objects_api.return_value = mock_custom_objects_instance
+        mock_custom_objects_instance.list_namespaced_custom_object.side_effect = (
+            mock_list_namespaced_custom_object
+        )
+
         yield {
             "mock_load_config": mock_load_config,
             "mock_load_incluster_config": mock_load_incluster_config,
@@ -291,5 +322,6 @@ def mock_kubernetes_client():
             "mock_networking_v1_api": mock_networking_v1_api,
             "mock_v1_instance": mock_v1_instance,
             "mock_networking_instance": mock_networking_instance,
+            "mock_custom_objects_api": mock_custom_objects_api,
             "fake_ingresses": fake_ingresses,
         }

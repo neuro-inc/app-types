@@ -5,7 +5,6 @@ from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
 
 
 class AutoscalingBase(AbstractAppFieldType):
-    type: str
     min_replicas: int = Field(
         default=1,
         json_schema_extra=SchemaExtraMetadata(

@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import enum
+import typing as t
 
 from pydantic import ConfigDict, Field
 
@@ -158,6 +161,30 @@ class CrunchyPostgresUserCredentials(AbstractAppFieldType):
     pgbouncer_uri: str | None = None
     uri: str | None = None
     postgres_uri: PostgresURI | None = None
+
+    def with_database(self, database: str) -> CrunchyPostgresUserCredentials:
+        updates: dict[str, t.Any] = {
+            "dbname": database,
+        }
+        if self.jdbc_uri:
+            updates["jdbc_uri"] = self.jdbc_uri.replace(
+                f"/{self.dbname}", f"/{database}"
+            )
+        if self.pgbouncer_jdbc_uri:
+            updates["pgbouncer_jdbc_uri"] = self.pgbouncer_jdbc_uri.replace(
+                f"/{self.dbname}", f"/{database}"
+            )
+        if self.pgbouncer_uri:
+            updates["pgbouncer_uri"] = self.pgbouncer_uri.replace(
+                f"/{self.dbname}", f"/{database}"
+            )
+        if self.uri:
+            updates["uri"] = self.uri.replace(f"/{self.dbname}", f"/{database}")
+        if self.postgres_uri:
+            uri = self.postgres_uri.uri or ""
+            uri = uri.replace(f"/{self.dbname}", f"/{database}")
+            updates["postgres_uri"] = PostgresURI(uri=uri)
+        return self.model_copy(update=updates)
 
 
 class CrunchyPostgresOutputs(AppOutputsDeployer):
