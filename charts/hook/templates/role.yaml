@@ -15,3 +15,6 @@ rules:
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["get", "list"]
+  - apiGroups: ["postgres-operator.crunchydata.com"]
+    resources: ["postgresclusters"]
+    verbs: ["get", "list", "watch"]
