@@ -10,11 +10,6 @@ from apolo_app_types.protocols.common.schema_extra import (
 )
 
 
-class HealthCheckType(str, Enum):
-    STARTUP = "Startup check"
-    LIVENESS = "Liveness check"
-
-
 class ProbeType(str, Enum):
     HTTP = "HTTP"
     GRPC = "gRPC"
@@ -132,20 +127,6 @@ class HealthCheck(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
-    # probe_type: ProbeType = Field(
-    #     ...,
-    #     json_schema_extra=SchemaExtraMetadata(
-    #         title="Probe Type",
-    #         description="Type of probe to use for health check",
-    #     ).as_json_schema_extra()
-    # )
-    # health_check_type: HealthCheckType = Field(
-    #     HealthCheckType.STARTUP,
-    #     json_schema_extra=SchemaExtraMetadata(
-    #         title="Health Check Type",
-    #         description="Type of health check",
-    #     ).as_json_schema_extra()
-    # )
     port: int = Field(
         default=8080,
         json_schema_extra=SchemaExtraMetadata(
