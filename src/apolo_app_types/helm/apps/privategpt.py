@@ -30,6 +30,8 @@ from apolo_app_types.protocols.private_gpt import PrivateGPTAppInputs
 
 
 class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]):
+    _port = 8080
+
     def __init__(self, *args: t.Any, **kwargs: t.Any):
         super().__init__(*args, **kwargs)
         self.custom_dep_val_processor = CustomDeploymentChartValueProcessor(
@@ -102,7 +104,7 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
                 service_enabled=True,
                 ingress_http=input_.ingress_http,
                 ports=[
-                    Port(name="http", port=8080),
+                    Port(name="http", port=self._port),
                 ],
             ),
             storage_mounts=StorageMounts(
@@ -126,24 +128,24 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
             health_checks=HealthCheckProbesConfig(
                 liveness=HealthCheck(
                     enabled=True,
-                    port=7865,
-                    initial_delay_seconds=30,
+                    initial_delay=30,
                     period_seconds=5,
                     timeout=5,
                     failure_threshold=20,
                     health_check_config=HTTPHealthCheckConfig(
                         path="/",
+                        port=self._port,
                     ),
                 ),
                 readiness=HealthCheck(
                     enabled=True,
-                    port=7865,
-                    initial_delay_seconds=30,
+                    initial_delay=30,
                     period_seconds=5,
                     timeout=5,
                     failure_threshold=20,
                     health_check_config=HTTPHealthCheckConfig(
                         path="/",
+                        port=self._port,
                     ),
                 ),
             ),

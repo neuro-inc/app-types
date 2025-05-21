@@ -106,24 +106,24 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
             health_checks=HealthCheckProbesConfig(
                 liveness=HealthCheck(
                     enabled=True,
-                    port=self._jupyter_port,
-                    initial_delay_seconds=30,
+                    initial_delay=30,
                     period_seconds=5,
                     timeout=5,
                     failure_threshold=20,
                     health_check_config=HTTPHealthCheckConfig(
                         path="/",
+                        port=self._jupyter_port,
                     ),
                 ),
                 readiness=HealthCheck(
                     enabled=True,
-                    port=self._jupyter_port,
-                    initial_delay_seconds=30,
+                    initial_delay=30,
                     period_seconds=5,
                     timeout=5,
                     failure_threshold=20,
                     health_check_config=HTTPHealthCheckConfig(
                         path="/",
+                        port=self._jupyter_port,
                     ),
                 ),
             ),

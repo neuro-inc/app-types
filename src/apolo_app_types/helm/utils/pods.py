@@ -15,11 +15,11 @@ def get_probe_values(config: HealthCheck) -> dict[str, t.Any]:
         "failureThreshold": config.failure_threshold,
     }
     if config.health_check_config.probe_type == ProbeType.TCP:
-        values["tcpSocket"] = {"port": config.port}
+        values["tcpSocket"] = {"port": config.health_check_config.port}
     elif config.health_check_config.probe_type == ProbeType.HTTP:
         values["httpGet"] = {
             "path": config.health_check_config.path,
-            "port": config.port,
+            "port": config.health_check_config.port,
         }
         if config.health_check_config.http_headers:
             values["httpGet"]["httpHeaders"] = [
@@ -28,7 +28,7 @@ def get_probe_values(config: HealthCheck) -> dict[str, t.Any]:
             ]
     elif config.health_check_config.probe_type == ProbeType.GRPC:
         values["grpc"] = {
-            "port": config.port,
+            "port": config.health_check_config.port,
             "service": config.health_check_config.service,
         }
     elif config.health_check_config.probe_type == ProbeType.EXEC:
@@ -41,7 +41,7 @@ def get_probe_values(config: HealthCheck) -> dict[str, t.Any]:
     return values
 
 
-def get_health_check_values(
+def get_custom_deployment_health_check_values(
     health_checks: HealthCheckProbesConfig | None,
 ) -> dict[str, t.Any]:
     if not health_checks:

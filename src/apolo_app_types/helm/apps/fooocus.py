@@ -32,14 +32,13 @@ from apolo_app_types.protocols.custom_deployment import NetworkingConfig
 
 
 class FooocusChartValueProcessor(BaseChartValueProcessor[FooocusAppInputs]):
+    _port = 7865
+
     def __init__(self, *args: t.Any, **kwargs: t.Any):
         super().__init__(*args, **kwargs)
         self.custom_dep_val_processor = CustomDeploymentChartValueProcessor(
             *args, **kwargs
         )
-
-    async def gen_extra_helm_args(self, *_: t.Any) -> list[str]:
-        return ["--timeout", "30m"]
 
     async def _configure_env(
         self, data_volume: URL, outputs_volume: URL
@@ -102,7 +101,7 @@ class FooocusChartValueProcessor(BaseChartValueProcessor[FooocusAppInputs]):
                 service_enabled=True,
                 ingress_http=input_.ingress_http,
                 ports=[
-                    Port(name="http", port=7865),
+                    Port(name="http", port=self._port),
                 ],
             ),
             storage_mounts=StorageMounts(
@@ -125,25 +124,23 @@ class FooocusChartValueProcessor(BaseChartValueProcessor[FooocusAppInputs]):
             ),
             health_checks=HealthCheckProbesConfig(
                 liveness=HealthCheck(
-                    enabled=True,
-                    port=7865,
-                    initial_delay_seconds=30,
+                    initial_delay=30,
                     period_seconds=5,
                     timeout=5,
                     failure_threshold=20,
                     health_check_config=HTTPHealthCheckConfig(
                         path="/",
+                        port=self._port,
                     ),
                 ),
                 readiness=HealthCheck(
-                    enabled=True,
-                    port=7865,
-                    initial_delay_seconds=30,
+                    initial_delay=30,
                     period_seconds=5,
                     timeout=5,
                     failure_threshold=20,
                     health_check_config=HTTPHealthCheckConfig(
                         path="/",
+                        port=self._port,
                     ),
                 ),
             ),

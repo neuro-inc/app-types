@@ -15,6 +15,7 @@ from apolo_app_types.protocols.common.health_check import (
     HealthCheck,
     HealthCheckProbesConfig,
     HTTPHealthCheckConfig,
+    TCPHealthCheckConfig,
 )
 from apolo_app_types.protocols.common.k8s import Port
 from apolo_app_types.protocols.common.storage import (
@@ -356,14 +357,25 @@ async def test_custom_deployment_values_generation_with_health_checks(
                 liveness=HealthCheck(
                     period=30,
                     initial_delay=10,
-                    port=8080,
-                    health_check_config=HTTPHealthCheckConfig(path="/health"),
+                    health_check_config=HTTPHealthCheckConfig(
+                        path="/health",
+                        port=8080,
+                    ),
                 ),
                 startup=HealthCheck(
                     period=10,
                     initial_delay=5,
-                    port=8080,
-                    health_check_config=GRPCHealthCheckConfig(service="service-name"),
+                    health_check_config=GRPCHealthCheckConfig(
+                        service="service-name",
+                        port=8080,
+                    ),
+                ),
+                readiness=HealthCheck(
+                    period=10,
+                    initial_delay=5,
+                    health_check_config=TCPHealthCheckConfig(
+                        port=8080,
+                    ),
                 ),
             ),
         ),

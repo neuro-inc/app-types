@@ -58,10 +58,8 @@ class Networking(AbstractAppFieldType):
     )
     http_auth: bool = Field(
         default=True,
-        json_schema_extra=SchemaExtraMetadata(
-            description="Enable platform provided HTTP authentication.",
-            title="HTTP Authentication",
-        ).as_json_schema_extra(),
+        description="Whether to use HTTP authentication.",
+        title="HTTP Authentication",
     )
 
 
@@ -75,10 +73,8 @@ class JupyterSpecificAppInputs(AbstractAppFieldType):
     )
     jupyter_type: JupyterTypes = Field(
         default=JupyterTypes.LAB,
-        json_schema_extra=SchemaExtraMetadata(
-            description="Set the type of Jupyter application (lab or notebook).",
-            title="Jupyter Type",
-        ).as_json_schema_extra(),
+        description="Set the type of Jupyter application (lab or notebook).",
+        title="Jupyter Type",
     )
     code_storage_mount: ApoloFilesMount = Field(
         default=ApoloFilesMount(

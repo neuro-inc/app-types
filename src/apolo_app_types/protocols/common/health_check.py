@@ -17,7 +17,27 @@ class ProbeType(str, Enum):
     EXEC = "Exec"
 
 
-class HTTPHealthCheckConfig(AbstractAppFieldType):
+class HealthCheckConfigBase(AbstractAppFieldType):
+    """Base class for health check configurations."""
+
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Health Check Config Base",
+            description="Base configuration for health checks.",
+            meta_type=SchemaMetaType.INLINE,
+        ).as_json_schema_extra(),
+    )
+    port: int = Field(
+        default=8080,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Port",
+            description="Port to make a connection for the Custom Deployment instance",
+        ).as_json_schema_extra(),
+    )
+
+
+class HTTPHealthCheckConfig(HealthCheckConfigBase):
     """
     HTTP-specific health check configuration.
     """
@@ -47,7 +67,7 @@ class HTTPHealthCheckConfig(AbstractAppFieldType):
     )
 
 
-class GRPCHealthCheckConfig(AbstractAppFieldType):
+class GRPCHealthCheckConfig(HealthCheckConfigBase):
     """
     gRPC-specific health check configuration.
     """
@@ -70,7 +90,7 @@ class GRPCHealthCheckConfig(AbstractAppFieldType):
     )
 
 
-class TCPHealthCheckConfig(AbstractAppFieldType):
+class TCPHealthCheckConfig(HealthCheckConfigBase):
     """
     TCP-specific health check configuration.
     """
@@ -87,7 +107,7 @@ class TCPHealthCheckConfig(AbstractAppFieldType):
     # No additional fields needed for TCP, just the connection attempt itself
 
 
-class ExecHealthCheckConfig(AbstractAppFieldType):
+class ExecHealthCheckConfig(HealthCheckConfigBase):
     """
     Exec-specific health check configuration.
     """
@@ -125,13 +145,6 @@ class HealthCheck(AbstractAppFieldType):
             title="Health Check",
             description="Configuration for health checks on the application.",
             meta_type=SchemaMetaType.INLINE,
-        ).as_json_schema_extra(),
-    )
-    port: int = Field(
-        default=8080,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Port",
-            description="Port to make a connection for the Custom Deployment instance",
         ).as_json_schema_extra(),
     )
     initial_delay: int = Field(
