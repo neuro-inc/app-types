@@ -137,10 +137,9 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
         values["api"]["initPassword"] = secrets.token_urlsafe(16)
 
         values.update(await self._get_dify_pg_values(input_))
-        if input_.api.use_object_store:
-            values.update(
-                await self._get_or_create_dify_blob_storage_values(input_, app_name)
-            )
+        values.update(
+            await self._get_or_create_dify_blob_storage_values(input_, app_name)
+        )
         values.update(await self._get_dify_redis_values(input_, namespace))
         ingress: dict[str, t.Any] = {"ingress": {}}
         if input_.ingress_http:

@@ -16,4 +16,10 @@ class Preset(AbstractAppFieldType):
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
-    name: str = Field(..., description="The name of the preset.", title="Preset name")
+    name: str = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Resource Preset",
+            description="The name of the preset.",
+        ).as_json_schema_extra(),
+    )

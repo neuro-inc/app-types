@@ -71,19 +71,6 @@ class DifyAppApi(BaseModel):
         ).as_json_schema_extra(),
     )
     preset: Preset
-    use_object_store: bool = Field(
-        default=False,
-        title="Use Object Store",
-        description=(
-            "Use platform Object Storage to store Dify data. "
-            "We automatically create and configure the corresponding bucket "
-            "for you. Currently, only AWS/Minio buckets are supported. "
-            "If you disable this option, we will provision a dedicated disk "
-            "to store data. "
-            "Note: this bucket will not be automatically removed when you remove "
-            "the app."
-        ),
-    )
 
 
 class DifyAppWorker(BaseModel):
