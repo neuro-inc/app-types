@@ -60,7 +60,11 @@ from apolo_app_types.protocols.llm import (
     VLLMOutputs,
     VLLMOutputsV2,
 )
-from apolo_app_types.protocols.mlflow import MLFlowAppInputs, MLFlowAppOutputs
+from apolo_app_types.protocols.mlflow import (
+    MLFlowAppInputs,
+    MLFlowAppOutputs,
+    MLFlowTrackingServerURL,
+)
 from apolo_app_types.protocols.postgres import (
     CrunchyPostgresOutputs,
     CrunchyPostgresUserCredentials,
@@ -123,6 +127,7 @@ __all__ = [
     "VLLMOutputs",
     "MLFlowAppInputs",
     "MLFlowAppOutputs",
+    "MLFlowTrackingServerURL",
     "PostgresInputs",
     "CrunchyPostgresOutputs",
     "ShellInputs",

@@ -71,7 +71,7 @@ class MLFlowAppInputs(AppInputs):
     )
 
 
-class MLFlowServerURL(RestAPI):
+class MLFlowTrackingServerURL(RestAPI):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
@@ -108,10 +108,28 @@ class MLFlowAppOutputs(AppOutputs):
             ),
         ).as_json_schema_extra(),
     )
-    mlflow_server_url: MLFlowServerURL | None = Field(
+    internal_server_url: MLFlowTrackingServerURL | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="MLFlow Server URL",
-            description="The URL to access the MLFlow server.",
+            title="Internal MLFlow Server URL",
+            description=(
+                "Internal URL to access the MLFlow tracking server "
+                "from inside the cluster. This route is not protected "
+                "by platform authorization and only workloads from "
+                "the same project can access it."
+            ),
+        ).as_json_schema_extra(),
+    )
+    external_server_url: MLFlowTrackingServerURL | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="External MLFlow Server URL",
+            description=(
+                "External URL for accessing the MLFlow tracking server "
+                "from outside the cluster. This route is secured by "
+                "platform authorization and is accessible from any "
+                "network with a valid platform authorization token "
+                "that has appropriate permissions."
+            ),
         ).as_json_schema_extra(),
     )
