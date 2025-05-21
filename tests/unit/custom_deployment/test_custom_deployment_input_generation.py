@@ -419,3 +419,11 @@ async def test_custom_deployment_values_generation_with_health_checks(
         "initialDelaySeconds": 5,
         "periodSeconds": 10,
     }
+    assert "readinessProbe" in helm_params["health_checks"]
+    assert helm_params["health_checks"]["readinessProbe"] == {
+        "tcpSocket": {"port": 8080},
+        "failureThreshold": 3,
+        "timeoutSeconds": 1,
+        "initialDelaySeconds": 5,
+        "periodSeconds": 10,
+    }
