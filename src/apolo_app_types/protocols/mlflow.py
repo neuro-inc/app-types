@@ -71,6 +71,16 @@ class MLFlowAppInputs(AppInputs):
     )
 
 
+class MLFlowServerURL(RestAPI):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="MLFlow Server URL",
+            description="The URL to access the MLFlow server.",
+        ).as_json_schema_extra(),
+    )
+
+
 class MLFlowAppOutputs(AppOutputs):
     internal_web_app_url: RestAPI | None = Field(
         default=None,
@@ -96,5 +106,12 @@ class MLFlowAppOutputs(AppOutputs):
                 "network with a valid platform authorization"
                 " token that has appropriate permissions."
             ),
+        ).as_json_schema_extra(),
+    )
+    mlflow_server_url: MLFlowServerURL | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="MLFlow Server URL",
+            description="The URL to access the MLFlow server.",
         ).as_json_schema_extra(),
     )
