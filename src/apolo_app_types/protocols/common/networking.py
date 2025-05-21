@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Generic, Literal, TypeVar
 
 from pydantic import ConfigDict, Field
 
@@ -60,3 +60,38 @@ class RestAPI(HttpApi):
 
 class GrpcAPI(HttpApi):
     api_type: Literal["grpc"] = "grpc"
+
+
+API_TYPE = TypeVar("API_TYPE", bound=HttpApi)
+
+
+class ServiceAPI(AbstractAppFieldType, Generic[API_TYPE]):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Service APIs",
+            description="Service APIs URLs.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+    internal_url: API_TYPE | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Internal URL",
+            description="Internal URL to access the service. "
+            "This route is not protected by platform authorization "
+            "and only workloads from the same project can access it.",
+        ).as_json_schema_extra(),
+    )
+    external_url: API_TYPE | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="External URL",
+            description="External URL for accessing the service "
+            "from outside the cluster. "
+            "This route is secured by platform "
+            "authorization and is accessible from any "
+            "network with a valid platform authorization"
+            " token that has appropriate permissions.",
+        ).as_json_schema_extra(),
+    )

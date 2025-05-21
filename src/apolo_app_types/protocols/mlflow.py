@@ -10,6 +10,7 @@ from apolo_app_types.protocols.common import (
     RestAPI,
     SchemaExtraMetadata,
 )
+from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI
 from apolo_app_types.protocols.postgres import PostgresURI
 
 
@@ -71,7 +72,7 @@ class MLFlowAppInputs(AppInputs):
     )
 
 
-class MLFlowTrackingServerURL(RestAPI):
+class MLFlowTrackingServerURL(ServiceAPI[RestAPI]):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
@@ -82,54 +83,18 @@ class MLFlowTrackingServerURL(RestAPI):
 
 
 class MLFlowAppOutputs(AppOutputs):
-    internal_web_app_url: RestAPI | None = Field(
-        default=None,
+    web_app_url: ServiceAPI[HttpApi] = Field(
+        default=ServiceAPI[HttpApi](),
         json_schema_extra=SchemaExtraMetadata(
-            title="Internal MLFlow URL",
-            description=(
-                "Internal URL to access the MLFlow web "
-                "app and API from inside the cluster. "
-                "This route is not protected by platform authorization "
-                "and only workloads from the same project can access it."
-            ),
+            title="MLFlow Web App URL",
+            description=("URL to access the MLFlow web application. "),
         ).as_json_schema_extra(),
     )
-    external_web_app_url: RestAPI | None = Field(
+
+    server_url: MLFlowTrackingServerURL | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="External MLFlow URL",
-            description=(
-                "External URL for accessing the MLFlow web "
-                "application and API from outside the cluster. "
-                "This route is secured by platform "
-                "authorization and is accessible from any "
-                "network with a valid platform authorization"
-                " token that has appropriate permissions."
-            ),
-        ).as_json_schema_extra(),
-    )
-    internal_server_url: MLFlowTrackingServerURL | None = Field(
-        default=None,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Internal MLFlow Server URL",
-            description=(
-                "Internal URL to access the MLFlow tracking server "
-                "from inside the cluster. This route is not protected "
-                "by platform authorization and only workloads from "
-                "the same project can access it."
-            ),
-        ).as_json_schema_extra(),
-    )
-    external_server_url: MLFlowTrackingServerURL | None = Field(
-        default=None,
-        json_schema_extra=SchemaExtraMetadata(
-            title="External MLFlow Server URL",
-            description=(
-                "External URL for accessing the MLFlow tracking server "
-                "from outside the cluster. This route is secured by "
-                "platform authorization and is accessible from any "
-                "network with a valid platform authorization token "
-                "that has appropriate permissions."
-            ),
+            title="MLFlow Tracking Server URL",
+            description=("URL to access the MLFlow tracking server. "),
         ).as_json_schema_extra(),
     )

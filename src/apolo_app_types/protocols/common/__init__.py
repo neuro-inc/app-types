@@ -13,7 +13,7 @@ from .containers import ContainerImage
 from .hugging_face import HuggingFaceCache, HuggingFaceModel
 from .ingress import IngressGrpc, IngressHttp
 from .k8s import Container, DeploymentName, Env
-from .networking import GraphQLAPI, GrpcAPI, RestAPI
+from .networking import GraphQLAPI, GrpcAPI, RestAPI, ServiceAPI
 from .openai_compat import OpenAICompatChatAPI, OpenAICompatEmbeddingsAPI
 from .postgres import Postgres
 from .preset import Preset
@@ -50,6 +50,7 @@ __all__ = [
     "GrpcAPI",
     "RestAPI",
     "GraphQLAPI",
+    "ServiceAPI",
     "ApoloSecret",
     "StrOrSecret",
     "OptionalStrOrSecret",
