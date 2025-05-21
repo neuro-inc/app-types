@@ -10,6 +10,13 @@ from apolo_app_types import (
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import IngressHttp, Preset
+from apolo_app_types.protocols.common.health_check import (
+    GRPCHealthCheckConfig,
+    HealthCheck,
+    HealthCheckProbesConfig,
+    HTTPHealthCheckConfig,
+    TCPHealthCheckConfig,
+)
 from apolo_app_types.protocols.common.k8s import Port
 from apolo_app_types.protocols.common.storage import (
     ApoloFilesMount,
@@ -317,3 +324,106 @@ async def test_custom_deployment_values_generation_network_not_supplied(
     assert helm_params["ingress"]["hosts"][0]["paths"] == [
         {"path": "/", "pathType": "Prefix", "portName": "http"},
     ]
+
+
+@pytest.mark.asyncio
+async def test_custom_deployment_values_generation_with_health_checks(
+    setup_clients,
+):
+    """
+    Ensure that when health checks are provided, they are properly
+    configured in the helm values
+    """
+    helm_args, helm_params = await app_type_to_vals(
+        input_=CustomDeploymentInputs(
+            preset=Preset(name="cpu-small"),
+            image=ContainerImage(
+                repository="myrepo/custom-deployment",
+                tag="v1.2.3",
+            ),
+            container=Container(
+                command=["python", "app.py"],
+                args=["--port", "8080"],
+                env=[Env(name="ENV_VAR", value="value")],
+            ),
+            networking=NetworkingConfig(
+                service_enabled=True,
+                ports=[
+                    Port(name="http", port=8080),
+                ],
+                ingress_http=IngressHttp(),
+            ),
+            health_checks=HealthCheckProbesConfig(
+                liveness=HealthCheck(
+                    period=30,
+                    initial_delay=10,
+                    health_check_config=HTTPHealthCheckConfig(
+                        path="/health",
+                        port=8080,
+                    ),
+                ),
+                startup=HealthCheck(
+                    period=10,
+                    initial_delay=5,
+                    health_check_config=GRPCHealthCheckConfig(
+                        service="service-name",
+                        port=8080,
+                    ),
+                ),
+                readiness=HealthCheck(
+                    period=10,
+                    initial_delay=5,
+                    health_check_config=TCPHealthCheckConfig(
+                        port=8080,
+                    ),
+                ),
+            ),
+        ),
+        apolo_client=setup_clients,
+        app_type=AppType.CustomDeployment,
+        app_name="custom-app",
+        namespace="default-namespace",
+        app_secrets_name=APP_SECRETS_NAME,
+    )
+
+    # Base assertions
+    assert helm_params["image"] == {
+        "repository": "myrepo/custom-deployment",
+        "tag": "v1.2.3",
+    }
+    assert helm_params["container"] == {
+        "command": ["python", "app.py"],
+        "args": ["--port", "8080"],
+        "env": [{"name": "ENV_VAR", "value": "value"}],
+    }
+    assert helm_params["service"] == {
+        "enabled": True,
+        "ports": [{"name": "http", "containerPort": 8080}],
+    }
+
+    # Health check assertions
+    assert "health_checks" in helm_params
+    assert "livenessProbe" in helm_params["health_checks"]
+    assert helm_params["health_checks"]["livenessProbe"] == {
+        "httpGet": {"path": "/health", "port": 8080},
+        "failureThreshold": 3,
+        "timeoutSeconds": 1,
+        "initialDelaySeconds": 10,
+        "periodSeconds": 30,
+    }
+    assert "startupProbe" in helm_params["health_checks"]
+    assert helm_params["health_checks"]["startupProbe"] == {
+        "grpc": {"port": 8080, "service": "service-name"},
+        "failureThreshold": 3,
+        "timeoutSeconds": 1,
+        "initialDelaySeconds": 5,
+        "periodSeconds": 10,
+    }
+    assert "readinessProbe" in helm_params["health_checks"]
+    assert helm_params["health_checks"]["readinessProbe"] == {
+        "tcpSocket": {"port": 8080},
+        "failureThreshold": 3,
+        "timeoutSeconds": 1,
+        "initialDelaySeconds": 5,
+        "periodSeconds": 10,
+    }

@@ -12,6 +12,9 @@ from apolo_app_types.protocols.common import (
     SchemaExtraMetadata,
     StorageMounts,
 )
+from apolo_app_types.protocols.common.health_check import (
+    HealthCheckProbesConfig,
+)
 from apolo_app_types.protocols.common.k8s import Port
 
 
@@ -88,6 +91,7 @@ class CustomDeploymentInputs(AppInputs):
         ).as_json_schema_extra(),
     )
     networking: NetworkingConfig = Field(default_factory=lambda: NetworkingConfig())
+    health_checks: HealthCheckProbesConfig | None = Field(default=None)
 
 
 class CustomDeploymentOutputs(AppOutputs):

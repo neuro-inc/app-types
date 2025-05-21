@@ -9,6 +9,11 @@ from apolo_app_types.helm.apps.custom_deployment import (
     CustomDeploymentChartValueProcessor,
 )
 from apolo_app_types.protocols.common import Container, Env, StorageMounts
+from apolo_app_types.protocols.common.health_check import (
+    HealthCheck,
+    HealthCheckProbesConfig,
+    HTTPHealthCheckConfig,
+)
 from apolo_app_types.protocols.common.ingress import IngressHttp
 from apolo_app_types.protocols.common.k8s import Port
 from apolo_app_types.protocols.custom_deployment import NetworkingConfig
@@ -69,6 +74,30 @@ class VSCodeChartValueProcessor(BaseChartValueProcessor[VSCodeAppInputs]):
                 ],
             ),
             storage_mounts=storage_mounts,
+            health_checks=HealthCheckProbesConfig(
+                liveness=HealthCheck(
+                    enabled=True,
+                    initial_delay=30,
+                    period_seconds=5,
+                    timeout=5,
+                    failure_threshold=20,
+                    health_check_config=HTTPHealthCheckConfig(
+                        path="/",
+                        port=self._port,
+                    ),
+                ),
+                readiness=HealthCheck(
+                    enabled=True,
+                    initial_delay=30,
+                    period_seconds=5,
+                    timeout=5,
+                    failure_threshold=20,
+                    health_check_config=HTTPHealthCheckConfig(
+                        path="/",
+                        port=self._port,
+                    ),
+                ),
+            ),
         )
 
         custom_app_vals = await self.custom_dep_val_processor.gen_extra_values(

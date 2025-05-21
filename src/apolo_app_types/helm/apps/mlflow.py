@@ -14,6 +14,11 @@ from apolo_app_types.protocols.common import (
     MountPath,
     StorageMounts,
 )
+from apolo_app_types.protocols.common.health_check import (
+    HealthCheck,
+    HealthCheckProbesConfig,
+    HTTPHealthCheckConfig,
+)
 from apolo_app_types.protocols.common.k8s import Port
 from apolo_app_types.protocols.custom_deployment import (
     CustomDeploymentInputs,
@@ -33,6 +38,8 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
     - Postgres with URI or app name
     - Artifact storage on Apolo Files
     """
+
+    _port = 5000
 
     def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
         super().__init__(*args, **kwargs)
@@ -104,7 +111,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
             "server",
             "--serve-artifacts",
             "--host=0.0.0.0",
-            "--port=5000",
+            f"--port={self._port}",
             f"--backend-store-uri={backend_uri}",
         ]
         if artifact_env_val:
@@ -125,10 +132,34 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
                 service_enabled=True,
                 ingress_http=input_.ingress_http,
                 ports=[
-                    Port(name="http", port=5000),
+                    Port(name="http", port=self._port),
                 ],
             ),
             storage_mounts=artifact_mounts,
+            health_checks=HealthCheckProbesConfig(
+                liveness=HealthCheck(
+                    enabled=True,
+                    initial_delay=30,
+                    period_seconds=5,
+                    timeout=5,
+                    failure_threshold=20,
+                    health_check_config=HTTPHealthCheckConfig(
+                        path="/",
+                        port=self._port,
+                    ),
+                ),
+                readiness=HealthCheck(
+                    enabled=True,
+                    initial_delay=30,
+                    period_seconds=5,
+                    timeout=5,
+                    failure_threshold=20,
+                    health_check_config=HTTPHealthCheckConfig(
+                        path="/",
+                        port=self._port,
+                    ),
+                ),
+            ),
         )
 
         custom_vals = await self.custom_dep_val_processor.gen_extra_values(

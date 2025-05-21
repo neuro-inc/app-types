@@ -18,6 +18,11 @@ from apolo_app_types.protocols.common import (
     MountPath,
     StorageMounts,
 )
+from apolo_app_types.protocols.common.health_check import (
+    HealthCheck,
+    HealthCheckProbesConfig,
+    HTTPHealthCheckConfig,
+)
 from apolo_app_types.protocols.common.k8s import Container, Env, Port
 from apolo_app_types.protocols.common.openai_compat import get_api_base_url
 from apolo_app_types.protocols.custom_deployment import NetworkingConfig
@@ -25,6 +30,8 @@ from apolo_app_types.protocols.private_gpt import PrivateGPTAppInputs
 
 
 class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]):
+    _port = 8080
+
     def __init__(self, *args: t.Any, **kwargs: t.Any):
         super().__init__(*args, **kwargs)
         self.custom_dep_val_processor = CustomDeploymentChartValueProcessor(
@@ -97,7 +104,7 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
                 service_enabled=True,
                 ingress_http=input_.ingress_http,
                 ports=[
-                    Port(name="http", port=8080),
+                    Port(name="http", port=self._port),
                 ],
             ),
             storage_mounts=StorageMounts(
@@ -117,6 +124,30 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
                         mode=ApoloMountMode(mode="rw"),
                     ),
                 ]
+            ),
+            health_checks=HealthCheckProbesConfig(
+                liveness=HealthCheck(
+                    enabled=True,
+                    initial_delay=30,
+                    period_seconds=5,
+                    timeout=5,
+                    failure_threshold=20,
+                    health_check_config=HTTPHealthCheckConfig(
+                        path="/",
+                        port=self._port,
+                    ),
+                ),
+                readiness=HealthCheck(
+                    enabled=True,
+                    initial_delay=30,
+                    period_seconds=5,
+                    timeout=5,
+                    failure_threshold=20,
+                    health_check_config=HTTPHealthCheckConfig(
+                        path="/",
+                        port=self._port,
+                    ),
+                ),
             ),
         )
 

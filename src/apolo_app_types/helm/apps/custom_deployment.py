@@ -11,6 +11,7 @@ from apolo_app_types.helm.utils.images import (
     get_apolo_registry_secrets_value,
     get_image_docker_url,
 )
+from apolo_app_types.helm.utils.pods import get_custom_deployment_health_check_values
 
 
 class CustomDeploymentChartValueProcessor(
@@ -57,6 +58,8 @@ class CustomDeploymentChartValueProcessor(
         """
         Generate extra Helm values for Custom Deployment.
         """
+        health_checks = get_custom_deployment_health_check_values(input_.health_checks)
+
         extra_values = await gen_extra_values(
             apolo_client=self.client,
             preset_type=input_.preset,
@@ -131,4 +134,8 @@ class CustomDeploymentChartValueProcessor(
 
         if dockerconfig:
             values["dockerconfigjson"] = dockerconfig.filecontents
+
+        health_checks = get_custom_deployment_health_check_values(input_.health_checks)
+        values |= health_checks
+
         return values
