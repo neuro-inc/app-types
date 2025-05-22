@@ -14,13 +14,20 @@ from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.networking import RestAPI
 from apolo_app_types.protocols.common.storage import (
     ApoloFilesMount,
-    ApoloFilesPath,
-    ApoloMountMode,
-    ApoloMountModes,
-    MountPath,
     StorageMounts,
 )
 from apolo_app_types.protocols.mlflow import MLFlowTrackingServerURL
+
+
+_JUPYTER_DEFAULTS = {
+    "storage": str(
+        get_app_data_files_relative_path_url(
+            app_type_name="jupyter", app_name="jupyter-app"
+        )
+        / "code"
+    ),
+    "mount": "/root/notebooks",
+}
 
 
 class JupyterTypes(str, Enum):
@@ -36,16 +43,6 @@ class JupyterInputs(AppInputsDeployer):
 
 class JupyterOutputs(AppOutputsDeployer):
     internal_web_app_url: str
-
-
-def _get_app_data_files_path_url() -> str:
-    # Passing app_type_name as string to avoid circular import
-    return str(
-        get_app_data_files_relative_path_url(
-            app_type_name="jupyter", app_name="jupyter-app"
-        )
-        / "code"
-    )
 
 
 class Networking(AbstractAppFieldType):
@@ -76,17 +73,14 @@ class JupyterSpecificAppInputs(AbstractAppFieldType):
         description="Set the type of Jupyter application (lab or notebook).",
         title="Jupyter Type",
     )
-    code_storage_mount: ApoloFilesMount = Field(
-        default=ApoloFilesMount(
-            storage_uri=ApoloFilesPath(path=_get_app_data_files_path_url()),
-            mount_path=MountPath(path="/root/notebooks"),
-            mode=ApoloMountMode(mode=ApoloMountModes.RW),
-        ),
+    override_code_storage_mount: ApoloFilesMount | None = Field(
+        default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="Code Storage Mount",
+            title="Override Default Storage Mount",
             description=(
-                "Configure Apolo Files mount within the application workloads. "
-                "If not set, Apolo will automatically assign a mount to the storage."
+                "Override Apolo Files mount within the application workloads. "
+                "If not set, Apolo will automatically mount "
+                f'"{_JUPYTER_DEFAULTS["storage"]}" to "{_JUPYTER_DEFAULTS["mount"]}"'
             ),
         ).as_json_schema_extra(),
     )

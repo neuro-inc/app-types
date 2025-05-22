@@ -8,7 +8,6 @@ from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.custom_deployment import (
     CustomDeploymentChartValueProcessor,
 )
-from apolo_app_types.helm.utils.storage import get_app_data_files_relative_path_url
 from apolo_app_types.protocols.common import Container, Env, StorageMounts
 from apolo_app_types.protocols.common.health_check import (
     HealthCheck,
@@ -25,7 +24,7 @@ from apolo_app_types.protocols.common.storage import (
     MountPath,
 )
 from apolo_app_types.protocols.custom_deployment import NetworkingConfig
-from apolo_app_types.protocols.vscode import VSCodeAppInputs
+from apolo_app_types.protocols.vscode import _VSCODE_DEFAULTS, VSCodeAppInputs
 
 
 class VSCodeChartValueProcessor(BaseChartValueProcessor[VSCodeAppInputs]):
@@ -39,15 +38,8 @@ class VSCodeChartValueProcessor(BaseChartValueProcessor[VSCodeAppInputs]):
 
     def _get_default_code_storage_mount(self) -> ApoloFilesMount:
         return ApoloFilesMount(
-            storage_uri=ApoloFilesPath(
-                path=str(
-                    get_app_data_files_relative_path_url(
-                        app_type_name="vscode", app_name="vscode-app"
-                    )
-                    / "code"
-                )
-            ),
-            mount_path=MountPath(path="/home/coder/project"),
+            storage_uri=ApoloFilesPath(path=_VSCODE_DEFAULTS["storage"]),
+            mount_path=MountPath(path=_VSCODE_DEFAULTS["mount"]),
             mode=ApoloMountMode(mode=ApoloMountModes.RW),
         )
 
