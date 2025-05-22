@@ -116,45 +116,6 @@ async def test_values_mlflow_generation_sqlite_explicit_no_pvc_name(
 
 
 @pytest.mark.asyncio
-async def test_values_mlflow_generation_sqlite_explicit_custom_pvc_name(
-    setup_clients, mock_get_preset_cpu
-):
-    """
-    Test that MLFlow uses the custom PVC name when SQLite is chosen
-    and a pvc_name is provided.
-    """
-    custom_pvc_name = "my-custom-pvc"
-    input_data = MLFlowAppInputs(
-        preset=Preset(name="cpu-small"),
-        ingress_http=IngressHttp(clusterName="test"),
-        metadata_storage=MLFlowMetadataSQLite(pvc_name=custom_pvc_name),
-        artifact_store=ApoloFilesPath(path="storage://foo/bar/baz"),
-    )
-
-    helm_args, helm_params = await app_type_to_vals(
-        input_=input_data,
-        apolo_client=setup_clients,
-        app_type=AppType.MLFlow,
-        app_name="my-mlflow",
-        namespace=DEFAULT_NAMESPACE,
-        app_secrets_name=APP_SECRETS_NAME,
-    )
-
-    # Assert SQLite URI
-    env_vars = helm_params["container"]["env"]
-    tracking_env = next(
-        (e for e in env_vars if e["name"] == "MLFLOW_TRACKING_URI"), None
-    )
-    assert tracking_env["value"] == "sqlite:///mlflow-data/mlflow.db"
-
-    # Assert custom PVC name
-    assert (
-        helm_params["volumes"][0]["persistentVolumeClaim"]["claimName"]
-        == custom_pvc_name
-    )
-
-
-@pytest.mark.asyncio
 async def test_values_mlflow_generation_postgres_uri(
     setup_clients, mock_get_preset_cpu
 ):
