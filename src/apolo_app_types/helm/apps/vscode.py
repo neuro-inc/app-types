@@ -8,6 +8,7 @@ from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.custom_deployment import (
     CustomDeploymentChartValueProcessor,
 )
+from apolo_app_types.helm.utils.storage import get_app_data_files_relative_path_url
 from apolo_app_types.protocols.common import Container, Env, StorageMounts
 from apolo_app_types.protocols.common.health_check import (
     HealthCheck,
@@ -16,6 +17,13 @@ from apolo_app_types.protocols.common.health_check import (
 )
 from apolo_app_types.protocols.common.ingress import IngressHttp
 from apolo_app_types.protocols.common.k8s import Port
+from apolo_app_types.protocols.common.storage import (
+    ApoloFilesMount,
+    ApoloFilesPath,
+    ApoloMountMode,
+    ApoloMountModes,
+    MountPath,
+)
 from apolo_app_types.protocols.custom_deployment import NetworkingConfig
 from apolo_app_types.protocols.vscode import VSCodeAppInputs
 
@@ -27,6 +35,20 @@ class VSCodeChartValueProcessor(BaseChartValueProcessor[VSCodeAppInputs]):
         super().__init__(*args, **kwargs)
         self.custom_dep_val_processor = CustomDeploymentChartValueProcessor(
             *args, **kwargs
+        )
+
+    def _get_default_code_storage_mount(self) -> ApoloFilesMount:
+        return ApoloFilesMount(
+            storage_uri=ApoloFilesPath(
+                path=str(
+                    get_app_data_files_relative_path_url(
+                        app_type_name="vscode", app_name="vscode-app"
+                    )
+                    / "code"
+                )
+            ),
+            mount_path=MountPath(path="/home/coder/project"),
+            mode=ApoloMountMode(mode=ApoloMountModes.RW),
         )
 
     async def gen_extra_values(
@@ -42,7 +64,10 @@ class VSCodeChartValueProcessor(BaseChartValueProcessor[VSCodeAppInputs]):
         Generate extra Helm values for Foocus configuration.
         """
 
-        code_storage_mount = input_.vscode_specific.code_storage_mount
+        code_storage_mount = (
+            input_.vscode_specific.override_code_storage_mount
+            or self._get_default_code_storage_mount()
+        )
         storage_mounts = input_.extra_storage_mounts or StorageMounts(mounts=[])
         storage_mounts.mounts.append(code_storage_mount)
 
