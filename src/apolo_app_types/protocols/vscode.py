@@ -1,6 +1,7 @@
 from pydantic import ConfigDict, Field
 
 from apolo_app_types import AppInputs, AppOutputs
+from apolo_app_types.helm.utils.storage import get_app_data_files_relative_path_url
 from apolo_app_types.protocols.common import AppInputsDeployer, AppOutputsDeployer
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.networking import RestAPI
@@ -11,6 +12,17 @@ from apolo_app_types.protocols.common.storage import (
     StorageMounts,
 )
 from apolo_app_types.protocols.mlflow import MLFlowTrackingServerURL
+
+
+_VSCODE_DEFAULTS = {
+    "storage": str(
+        get_app_data_files_relative_path_url(
+            app_type_name="vscode", app_name="vscode-app"
+        )
+        / "code"
+    ),
+    "mount": "/home/coder/project",
+}
 
 
 class VSCodeInputs(AppInputsDeployer):
@@ -53,7 +65,8 @@ class VSCodeSpecificAppInputs(AbstractAppFieldType):
             title="Override Default Storage Mounts",
             description=(
                 "Override Apolo Files mount within the application workloads. "
-                "If not set, Apolo will automatically assign a mount to the storage."
+                "If not set, Apolo will automatically mount "
+                f'"{_VSCODE_DEFAULTS["storage"]}" to "{_VSCODE_DEFAULTS["mount"]}"'
             ),
         ).as_json_schema_extra(),
     )
