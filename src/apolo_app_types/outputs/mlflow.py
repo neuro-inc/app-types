@@ -4,6 +4,7 @@ from apolo_app_types import MLFlowAppOutputs, MLFlowTrackingServerURL
 from apolo_app_types.clients.kube import get_service_host_port
 from apolo_app_types.outputs.common import get_internal_external_web_urls
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
+from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI
 
 
 async def get_mlflow_outputs(
@@ -35,8 +36,12 @@ async def get_mlflow_outputs(
         )
 
     return MLFlowAppOutputs(
-        internal_web_app_url=internal_web_app_url,
-        external_web_app_url=external_web_app_url,
-        internal_server_url=internal_server_url,
-        external_server_url=external_server_url,
+        web_app_url=ServiceAPI[HttpApi](
+            internal_url=internal_web_app_url,
+            external_url=external_web_app_url,
+        ),
+        server_url=MLFlowTrackingServerURL(
+            internal_url=internal_server_url,
+            external_url=external_server_url,
+        ),
     ).model_dump()

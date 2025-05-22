@@ -49,11 +49,11 @@ class VSCodeChartValueProcessor(BaseChartValueProcessor[VSCodeAppInputs]):
         env_vars = [
             Env(name="CODER_HTTP_ADDRESS", value=f"0.0.0.0:{self._port}"),
         ]
-        if input_.mlflow_integration and input_.mlflow_integration.internal_web_app_url:
+        if input_.mlflow_integration and input_.mlflow_integration.internal_url:
             env_vars.append(
                 Env(
                     name="MLFLOW_TRACKING_URI",
-                    value=input_.mlflow_integration.internal_web_app_url.complete_url,
+                    value=input_.mlflow_integration.internal_url.complete_url,
                 )
             )
 

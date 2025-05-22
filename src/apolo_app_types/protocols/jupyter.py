@@ -20,7 +20,7 @@ from apolo_app_types.protocols.common.storage import (
     MountPath,
     StorageMounts,
 )
-from apolo_app_types.protocols.mlflow import MLFlowAppOutputs
+from apolo_app_types.protocols.mlflow import MLFlowTrackingServerURL
 
 
 class JupyterTypes(str, Enum):
@@ -114,7 +114,7 @@ class JupyterAppInputs(AppInputs):
         ).as_json_schema_extra(),
     )
 
-    mlflow_integration: MLFlowAppOutputs | None = Field(
+    mlflow_integration: MLFlowTrackingServerURL | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
             title="MLFlow Integration",
