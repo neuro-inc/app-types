@@ -27,7 +27,6 @@ from apolo_app_types.protocols.custom_deployment import (
 from apolo_app_types.protocols.mlflow import (
     MLFlowAppInputs,
     MLFlowMetadataPostgres,
-    MLFlowMetadataSQLite,
 )
 
 
@@ -83,8 +82,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
                 raise ValueError(error_msg)
             backend_uri = input_.metadata_storage.postgres_uri.uri
             use_sqlite = False
-        elif isinstance(input_.metadata_storage, MLFlowMetadataSQLite):
-            pvc_name = input_.metadata_storage.pvc_name
+
         if use_sqlite:
             backend_uri = "sqlite:///mlflow-data/mlflow.db"
 
