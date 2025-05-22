@@ -89,7 +89,7 @@ class ServiceAPI(AbstractAppFieldType, Generic[API_TYPE]):
             title="External URL",
             description="External URL for accessing the service "
             "from outside the cluster. "
-            "This route is secured by platform "
+            "This route might be secured by platform "
             "authorization and is accessible from any "
             "network with a valid platform authorization"
             " token that has appropriate permissions.",
