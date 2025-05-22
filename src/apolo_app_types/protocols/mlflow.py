@@ -35,13 +35,6 @@ class MLFlowMetadataSQLite(AbstractAppFieldType):
             ),
         ).as_json_schema_extra(),
     )
-    pvc_name: str = Field(
-        default="mlflow-sqlite-storage",
-        json_schema_extra=SchemaExtraMetadata(
-            description="Specify the name of the PVC claim to store local DB.",
-            title="PVC Name",
-        ).as_json_schema_extra(),
-    )
 
 
 MLFlowMetaStorage = MLFlowMetadataSQLite | MLFlowMetadataPostgres
