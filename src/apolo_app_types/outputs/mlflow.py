@@ -4,7 +4,7 @@ from apolo_app_types import MLFlowAppOutputs, MLFlowTrackingServerURL
 from apolo_app_types.clients.kube import get_service_host_port
 from apolo_app_types.outputs.common import get_internal_external_web_urls
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
-from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI
+from apolo_app_types.protocols.common.networking import HttpApi, RestAPI, ServiceAPI
 
 
 async def get_mlflow_outputs(
@@ -19,7 +19,7 @@ async def get_mlflow_outputs(
     internal_host, internal_port = await get_service_host_port(match_labels=labels)
     internal_server_url = None
     if internal_host:
-        internal_server_url = MLFlowTrackingServerURL(
+        internal_server_url = RestAPI(
             host=internal_host,
             port=int(internal_port),
             protocol="http",
@@ -29,7 +29,7 @@ async def get_mlflow_outputs(
     external_server_url = None
     ingress_host_port = await get_ingress_host_port(match_labels=labels)
     if ingress_host_port:
-        external_server_url = MLFlowTrackingServerURL(
+        external_server_url = RestAPI(
             host=ingress_host_port[0],
             port=int(ingress_host_port[1]),
             protocol="https",
