@@ -60,7 +60,6 @@ class DifyAppApi(BaseModel):
         json_schema_extra=SchemaExtraMetadata(
             title="Dify API",
             description="Configure Dify Api.",
-            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     replicas: int = Field(
@@ -79,7 +78,6 @@ class DifyAppWorker(BaseModel):
         json_schema_extra=SchemaExtraMetadata(
             title="Dify Worker",
             description="Configure Dify Worker.",
-            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     replicas: int = Field(
@@ -98,7 +96,6 @@ class DifyAppProxy(BaseModel):
         json_schema_extra=SchemaExtraMetadata(
             title="Dify Proxy",
             description="Configure Dify Proxy.",
-            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     preset: Preset
@@ -110,7 +107,6 @@ class DifyAppWeb(BaseModel):
         json_schema_extra=SchemaExtraMetadata(
             title="Dify Web",
             description="Configure Dify Web.",
-            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     replicas: int = Field(
@@ -129,7 +125,6 @@ class DifyAppRedis(BaseModel):
         json_schema_extra=SchemaExtraMetadata(
             title="Dify Redis",
             description="Configure Dify Redis.",
-            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     master_preset: Preset = Field(
