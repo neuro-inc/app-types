@@ -1,7 +1,10 @@
 from pydantic import ConfigDict, Field
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
-from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
+from apolo_app_types.protocols.common.schema_extra import (
+    SchemaExtraMetadata,
+    SchemaMetaType,
+)
 from apolo_app_types.protocols.dockerhub import DockerConfigModel
 
 
@@ -32,5 +35,6 @@ class ContainerImage(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="ImagePullSecrets for DockerHub",
             description="ImagePullSecrets for DockerHub",
+            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
