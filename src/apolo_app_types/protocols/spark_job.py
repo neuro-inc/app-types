@@ -14,7 +14,10 @@ from apolo_app_types.protocols.common import (
 )
 
 
-_SPARK_DEFAULT_IMAGE = ("spark", "3.5.3")
+_SPARK_DEFAULTS = {
+    "image": "spark",
+    "tag": "3.5.3",
+}
 
 
 class SparkApplicationType(StrEnum):
@@ -284,15 +287,13 @@ class SparkJobInputs(AppInputs):
         ).as_json_schema_extra(),
     )
 
-    image: ContainerImage = Field(
-        default=ContainerImage(
-            repository=_SPARK_DEFAULT_IMAGE[0], tag=_SPARK_DEFAULT_IMAGE[1]
-        ),
+    image: ContainerImage | None = Field(
+        default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="Spark Container Image",
+            title="Override Spark Container Image",
             description="Modify this to select the container image used "
             "to run your Spark job. Defaults to "
-            "{_SPARK_DEFAULT_IMAGE[0]}:{_SPARK_DEFAULT_IMAGE[1]}.",
+            f"{_SPARK_DEFAULTS['image']}:{_SPARK_DEFAULTS['tag']}.",
             is_advanced_field=True,
         ).as_json_schema_extra(),
     )
