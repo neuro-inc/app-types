@@ -6,7 +6,10 @@ from apolo_app_types.protocols.common import AppInputsDeployer, AppOutputsDeploy
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.networking import RestAPI
 from apolo_app_types.protocols.common.preset import Preset
-from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
+from apolo_app_types.protocols.common.schema_extra import (
+    SchemaExtraMetadata,
+    SchemaMetaType,
+)
 from apolo_app_types.protocols.common.storage import (
     ApoloFilesMount,
     StorageMounts,
@@ -97,6 +100,7 @@ class VSCodeAppInputs(AppInputs):
                 "MLFlow integration settings for the application. "
                 "If not set, MLFlow integration will not be enabled."
             ),
+            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
 
