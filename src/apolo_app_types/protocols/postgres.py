@@ -26,8 +26,8 @@ class PostgresURI(AbstractAppFieldType):
             description="Full Postgres connection URI configuration.",
         ).as_json_schema_extra(),
     )
-    uri: str | None = Field(
-        default=None,
+    uri: str = Field(
+        ...,
         json_schema_extra=SchemaExtraMetadata(
             title="URI",
             description=(
