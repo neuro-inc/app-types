@@ -70,8 +70,10 @@ class JupyterSpecificAppInputs(AbstractAppFieldType):
     )
     jupyter_type: JupyterTypes = Field(
         default=JupyterTypes.LAB,
-        description="Set the type of Jupyter application (lab or notebook).",
-        title="Jupyter Type",
+        description=(
+            "Choose whether the Jupyter server should run in 'lab' or 'notebook' mode."
+        ),
+        title="Jupyter server type",
     )
     override_code_storage_mount: ApoloFilesMount | None = Field(
         default=None,
