@@ -2,7 +2,7 @@ import typing as t
 
 from yarl import URL
 
-from apolo_app_types import SparkJobInputs
+from apolo_app_types import ContainerImage, SparkJobInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
@@ -18,6 +18,7 @@ from apolo_app_types.protocols.common.storage import (
     ApoloMountModes,
     MountPath,
 )
+from apolo_app_types.protocols.spark_job import _SPARK_DEFAULTS
 
 
 class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
@@ -53,6 +54,11 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         main_application_file = f"local://{mount_path}/{main_app_file_path.name}"
         return extra_annotations, main_application_file
 
+    def _get_default_container_image(self) -> ContainerImage:
+        return ContainerImage(
+            repository=_SPARK_DEFAULTS["image"], tag=_SPARK_DEFAULTS["tag"]
+        )
+
     async def gen_extra_values(
         self,
         input_: SparkJobInputs,
@@ -83,6 +89,8 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             self._configure_application_storage(input_)
         )
 
+        image = input_.image or self._get_default_container_image()
+
         values: dict[str, t.Any] = {
             "namespace": namespace,
             "spark": {
@@ -90,8 +98,8 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
                 "type": input_.spark_application_config.type.value,
                 "arguments": input_.spark_application_config.arguments,
                 "image": {
-                    "repository": input_.image.repository,
-                    "tag": input_.image.tag or "latest",
+                    "repository": image.repository,
+                    "tag": image.tag or "latest",
                 },
                 "driver": {
                     "labels": {
