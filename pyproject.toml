@@ -41,7 +41,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-apolo-sdk = "^24.12.3"
+apolo-sdk = "^25.5.0"
 click = "^8.0.3"
 httpx = "^0.28.0"
 kubernetes = "^31.0.0"
