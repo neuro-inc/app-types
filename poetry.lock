@@ -232,14 +232,14 @@ trio = ["trio (>=0.26.1)"]
 
 [[package]]
 name = "apolo-sdk"
-version = "24.12.3"
+version = "25.5.0"
 description = "Apolo SDK"
 optional = false
 python-versions = ">=3.9.0"
 groups = ["main"]
 files = [
-    {file = "apolo_sdk-24.12.3-py3-none-any.whl", hash = "sha256:cd3a003f7d213a9930656e34ce80743dbe772f6b365f615c8dcced1c74fdfeaa"},
-    {file = "apolo_sdk-24.12.3.tar.gz", hash = "sha256:6af9612f956e24f2492396bea0e93006ffddeb4f14da6ef3de05f0522dfd381b"},
+    {file = "apolo_sdk-25.5.0-py3-none-any.whl", hash = "sha256:0f4a063bcc6fbbeb71bea66a966196a8870c59ed9ff2a26ed4e84c9e903e4cb6"},
+    {file = "apolo_sdk-25.5.0.tar.gz", hash = "sha256:9ca7bece92f3b3d89f35c038a04ff5151a876ca9b87131dca04141015c03fb55"},
 ]
 
 [package.dependencies]
@@ -251,7 +251,7 @@ certifi = "*"
 google-auth = ">=2.0.2"
 importlib_metadata = {version = ">=4.11.4", markers = "python_version < \"3.11\""}
 neuro-admin-client = ">=24.12.2"
-neuro-config-client = ">=24.11.0"
+neuro-config-client = ">=24.12.4"
 packaging = ">=20.4"
 python-dateutil = ">=2.7.0"
 python-jose = ">=3.3.0"
@@ -2309,4 +2309,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9.0,<4.0"
-content-hash = "d70d3d296497b7083a4aa52696fa31c4705ffa0988747687b912c8d6605f63ec"
+content-hash = "4aad4c2e54bd838a04048813396e5fc570332cd4efb77e1c7fe01c1f3005a445"
