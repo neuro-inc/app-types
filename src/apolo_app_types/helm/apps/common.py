@@ -42,7 +42,7 @@ def get_preset(client: apolo_sdk.Client, preset_name: str) -> apolo_sdk.Preset:
     preset = client.config.presets.get(preset_name)
     if not preset:
         msg = f"Preset {preset_name} not exist in cluster {client.config.cluster_name}"
-        raise Exception(msg)
+        raise ValueError(msg)
     return preset
 
 
