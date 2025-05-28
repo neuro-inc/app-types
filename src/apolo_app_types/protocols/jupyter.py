@@ -27,7 +27,7 @@ _JUPYTER_DEFAULTS = {
         )
         / "code"
     ),
-    "mount": "/root/notebooks",
+    "mount": "/home/jovyan",
 }
 
 

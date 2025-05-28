@@ -33,7 +33,7 @@ from apolo_app_types.protocols.jupyter import (
 
 
 class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
-    _default_code_mount_path: URL = URL("/root/notebooks")
+    _default_code_mount_path: URL = URL("/home/jovyan")
     _jupyter_port: int = 8888
 
     def __init__(self, *args: t.Any, **kwargs: t.Any):
@@ -70,12 +70,13 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
         storage_mounts.mounts.append(code_storage_mount)
 
         jupyter_args = (
-            f"--ServerApp.root_dir={code_storage_mount.mount_path.path} "
-            "--ServerApp.token= "
-            "--ServerApp.password= "
-            f"--ServerApp.port={self._jupyter_port}"
-            "--ServerApp.ip=0.0.0.0 "
-            f"--ServerApp.default_url={code_storage_mount.mount_path.path}/README.ipynb)"
+            "start-notebook.py",
+            f"--ServerApp.root_dir={code_storage_mount.mount_path.path}",
+            "--IdentityProvider.auth_enabled=false",
+            "--PasswordIdentityProvider.password_required=false",
+            f"--ServerApp.port={self._jupyter_port}",
+            "--ServerApp.ip=0.0.0.0",
+            f"--ServerApp.default_url={code_storage_mount.mount_path.path}/README.ipynb",
         )
 
         env_vars = []
@@ -95,17 +96,7 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
                 tag=tag,
             ),
             container=Container(
-                command=[
-                    "bash",
-                    "-c",
-                    (
-                        f"(mkdir -p {code_storage_mount.mount_path.path}) && "
-                        "(rsync -a --ignore-existing "
-                        f"{code_storage_mount.mount_path.path}/README.ipynb "
-                        f"{code_storage_mount.mount_path.path}) && "
-                        f"(start-notebook.py {jupyter_args} "
-                    ),
-                ],
+                args=jupyter_args,
                 env=env_vars,
             ),
             networking=NetworkingConfig(
