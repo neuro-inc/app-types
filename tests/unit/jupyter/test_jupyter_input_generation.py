@@ -8,7 +8,6 @@ from apolo_app_types.protocols.common import Preset
 from apolo_app_types.protocols.jupyter import (
     JupyterAppInputs,
     JupyterSpecificAppInputs,
-    JupyterTypes,
 )
 
 from tests.unit.constants import (
@@ -25,7 +24,6 @@ async def test_jupyter_values_generation(setup_clients):
         input_=JupyterAppInputs(
             preset=Preset(name="cpu-small"),
             jupyter_specific=JupyterSpecificAppInputs(
-                jupyter_type=JupyterTypes.LAB,
                 http_auth=False,
             ),
         ),
@@ -36,8 +34,8 @@ async def test_jupyter_values_generation(setup_clients):
         app_secrets_name=APP_SECRETS_NAME,
     )
     assert helm_params["image"] == {
-        "repository": "ghcr.io/neuro-inc/base",
-        "tag": "v25.3.0-runtime",
+        "repository": "quay.io/jupyter/base-notebook",
+        "tag": "python-3.12",
     }
 
     assert helm_params["service"] == {

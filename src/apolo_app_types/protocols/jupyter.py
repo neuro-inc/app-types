@@ -31,6 +31,11 @@ _JUPYTER_DEFAULTS = {
 }
 
 
+class JupyterImage(str, Enum):
+    BASE_NOTEBOOK = "quay.io/jupyter/base-notebook:python-3.12"
+    PYTORCH_NOTEBOOK = "quay.io/jupyter/pytorch-notebook:cuda12-python-3.12"
+
+
 class JupyterTypes(str, Enum):
     LAB = "lab"
     NOTEBOOK = "notebook"
@@ -69,12 +74,12 @@ class JupyterSpecificAppInputs(AbstractAppFieldType):
             description="Configure the Jupyter App.",
         ).as_json_schema_extra(),
     )
-    jupyter_type: JupyterTypes = Field(
-        default=JupyterTypes.LAB,
-        description=(
-            "Choose whether the Jupyter server should run in 'lab' or 'notebook' mode."
-        ),
-        title="Jupyter server type",
+    container_image: JupyterImage = Field(
+        default=JupyterImage.BASE_NOTEBOOK,
+        json_schema_extra=SchemaExtraMetadata(
+            description="Container image for the Jupyter application.",
+            title="Container Image",
+        ).as_json_schema_extra(),
     )
     override_code_storage_mount: ApoloFilesMount | None = Field(
         default=None,

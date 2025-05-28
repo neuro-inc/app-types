@@ -29,7 +29,6 @@ from apolo_app_types.protocols.custom_deployment import NetworkingConfig
 from apolo_app_types.protocols.jupyter import (
     _JUPYTER_DEFAULTS,
     JupyterAppInputs,
-    JupyterTypes,
 )
 
 
@@ -71,20 +70,13 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
         storage_mounts.mounts.append(code_storage_mount)
 
         jupyter_args = (
-            "--no-browser "
-            "--ip=0.0.0.0 "
-            f"--port {self._jupyter_port} "
-            "--allow-root "
-            "--NotebookApp.token= "
-            f"--notebook-dir={code_storage_mount.mount_path.path} "
-            # "--NotebookApp.shutdown_no_activity_timeout=7200 "
-            # "--MappingKernelManager.cull_idle_timeout=7200 "
-            # "--MappingKernelManager.cull_connected=True"
-            # see https://apolocloud.slack.com/archives/C07KJJBE2S2/p1741960663342579
+            f"--ServerApp.root_dir={code_storage_mount.mount_path.path} "
+            "--ServerApp.token= "
+            "--ServerApp.password= "
+            f"--ServerApp.port={self._jupyter_port}"
+            "--ServerApp.ip=0.0.0.0 "
+            f"--ServerApp.default_url={code_storage_mount.mount_path.path}/README.ipynb)"
         )
-        cmd = "lab"
-        if input_.jupyter_specific.jupyter_type == JupyterTypes.NOTEBOOK:
-            cmd = "notebook"
 
         env_vars = []
         if input_.mlflow_integration and input_.mlflow_integration.internal_url:
@@ -95,11 +87,12 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
                 )
             )
 
+        image, tag = input_.jupyter_specific.container_image.value.split(":")
         custom_deployment = CustomDeploymentInputs(
             preset=input_.preset,
             image=ContainerImage(
-                repository="ghcr.io/neuro-inc/base",
-                tag="v25.3.0-runtime",
+                repository=image,
+                tag=tag,
             ),
             container=Container(
                 command=[
@@ -108,10 +101,9 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
                     (
                         f"(mkdir -p {code_storage_mount.mount_path.path}) && "
                         "(rsync -a --ignore-existing "
-                        "/var/notebooks/README.ipynb "
+                        f"{code_storage_mount.mount_path.path}/README.ipynb "
                         f"{code_storage_mount.mount_path.path}) && "
-                        f"(jupyter {cmd} {jupyter_args} "
-                        f"--NotebookApp.default_url={code_storage_mount.mount_path.path}/README.ipynb)"
+                        f"(start-notebook.py {jupyter_args} "
                     ),
                 ],
                 env=env_vars,
