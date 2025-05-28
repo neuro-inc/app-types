@@ -46,7 +46,7 @@ async def post_outputs(api_url: str, api_token: str, outputs: dict[str, t.Any]) 
         logger.error(
             "HTTP error occurred: %s - Response body: %s",
             e,
-            e.response.text if e.response else "No response"
+            e.response.text if e.response else "No response",
         )
     except httpx.RequestError as e:
         logger.error("Request error occurred: %s", e)
