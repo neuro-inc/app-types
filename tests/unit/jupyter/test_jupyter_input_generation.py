@@ -55,7 +55,7 @@ async def test_jupyter_values_generation(setup_clients):
         == f"storage://{DEFAULT_CLUSTER_NAME}/{DEFAULT_ORG_NAME}/{DEFAULT_PROJECT_NAME}/"
         f".apps/jupyter/jupyter-app/code"
     )
-    assert parsed_storage[0]["mount_path"] == "/root/notebooks"
+    assert parsed_storage[0]["mount_path"] == "/home/jovyan"
     assert parsed_storage[0]["mount_mode"] == "rw"
 
     pod_labels = helm_params.get("podLabels", {})
