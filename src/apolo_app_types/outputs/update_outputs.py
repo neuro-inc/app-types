@@ -29,17 +29,29 @@ logger = logging.getLogger()
 
 
 async def post_outputs(api_url: str, api_token: str, outputs: dict[str, t.Any]) -> None:
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            api_url,
-            headers={"Authorization": f"Bearer {api_token}"},
-            json={"output": outputs},
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                api_url,
+                headers={"Authorization": f"Bearer {api_token}"},
+                json={"output": outputs},
+            )
+            logger.info(
+                "API response status code: %s, body: %s",
+                response.status_code,
+                response.text,
+            )
+            response.raise_for_status()
+    except httpx.HTTPStatusError as e:
+        logger.error(
+            "HTTP error occurred: %s - Response body: %s",
+            e,
+            e.response.text if e.response else "No response"
         )
-        logger.info(
-            "API response status code: %s, body: %s",
-            response.status_code,
-            response.text,
-        )
+    except httpx.RequestError as e:
+        logger.error("Request error occurred: %s", e)
+    except Exception as e:
+        logger.exception("Unexpected error occurred: %s", e)
 
 
 async def update_app_outputs(  # noqa: C901
