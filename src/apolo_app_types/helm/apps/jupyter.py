@@ -28,7 +28,10 @@ from apolo_app_types.protocols.common.storage import (
 from apolo_app_types.protocols.custom_deployment import NetworkingConfig
 from apolo_app_types.protocols.jupyter import (
     _JUPYTER_DEFAULTS,
+    CustomImage,
+    DefaultContainer,
     JupyterAppInputs,
+    JupyterImage,
 )
 
 
@@ -49,6 +52,93 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
             mode=ApoloMountMode(mode=ApoloMountModes.RW),
         )
 
+    def get_default_image_args(
+        self, image: JupyterImage, code_storage_mount: ApoloFilesMount
+    ) -> tuple[t.Sequence[str] | None, t.Sequence[str] | None]:
+        match image:
+            case JupyterImage.APOLO_BASE_IMAGE:
+                jupyter_args = (
+                    "--no-browser "
+                    "--ip=0.0.0.0 "
+                    f"--port {self._jupyter_port} "
+                    "--allow-root "
+                    "--NotebookApp.token= "
+                    f"--notebook-dir={code_storage_mount.mount_path.path} "
+                    f"--NotebookApp.default_url={code_storage_mount.mount_path.path}/README.ipynb)"
+                )
+                command = (
+                    "bash",
+                    "-c",
+                    (
+                        f"(mkdir -p {code_storage_mount.mount_path.path}) && "
+                        "(rsync -a --ignore-existing "
+                        "/var/notebooks/README.ipynb "
+                        f"{code_storage_mount.mount_path.path}) && "
+                        f"(jupyter lab {jupyter_args} "
+                    ),
+                )
+                return command, None
+            case JupyterImage.BASE_NOTEBOOK | JupyterImage.PYTORCH_NOTEBOOK:
+                return None, (
+                    "start-notebook.py",
+                    f"--ServerApp.root_dir={code_storage_mount.mount_path.path}",
+                    "--IdentityProvider.auth_enabled=false",
+                    "--PasswordIdentityProvider.password_required=false",
+                    f"--ServerApp.port={self._jupyter_port}",
+                    "--ServerApp.ip=0.0.0.0",
+                    f"--ServerApp.default_url={code_storage_mount.mount_path.path}",
+                )
+            case _:
+                err = f"Unsupported Jupyter image: {image}"
+                raise ValueError(err)
+
+    def get_container(
+        self, input_: JupyterAppInputs
+    ) -> tuple[ContainerImage, Container]:
+        code_storage_mount = self.get_code_storage_mount(input_)
+        env_vars = []
+
+        if input_.mlflow_integration and input_.mlflow_integration.internal_url:
+            env_vars.append(
+                Env(
+                    name="MLFLOW_TRACKING_URI",
+                    value=input_.mlflow_integration.internal_url.complete_url,
+                )
+            )
+
+        match container_settings := input_.jupyter_specific.container_settings:
+            case DefaultContainer():
+                image, tag = container_settings.container_image.value.split(":")
+                cmd, args = self.get_default_image_args(
+                    image=container_settings.container_image,
+                    code_storage_mount=code_storage_mount,
+                )
+                return ContainerImage(
+                    repository=image,
+                    tag=tag,
+                ), Container(
+                    cmd=cmd,
+                    args=args,
+                    env=env_vars,
+                )
+            case CustomImage():
+                container = container_settings.container_config
+                container.env.extend(env_vars)
+                return container_settings.container_image, container
+            case _:
+                err = "Unsupported container configuration type."
+                raise ValueError(err)
+
+    def get_code_storage_mount(self, input_: JupyterAppInputs) -> ApoloFilesMount:
+        """
+        Get the code storage mount for Jupyter.
+        If the user has overridden the default, use that; otherwise, return the default.
+        """
+        return (
+            input_.jupyter_specific.override_code_storage_mount
+            or self._get_default_code_storage_mount()
+        )
+
     async def gen_extra_values(
         self,
         input_: JupyterAppInputs,
@@ -62,43 +152,15 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
         Generate extra Helm values for Jupyter configuration.
         """
 
-        code_storage_mount = (
-            input_.jupyter_specific.override_code_storage_mount
-            or self._get_default_code_storage_mount()
-        )
+        code_storage_mount = self.get_code_storage_mount(input_)
         storage_mounts = input_.extra_storage_mounts or StorageMounts(mounts=[])
         storage_mounts.mounts.append(code_storage_mount)
 
-        jupyter_args = (
-            "start-notebook.py",
-            f"--ServerApp.root_dir={code_storage_mount.mount_path.path}",
-            "--IdentityProvider.auth_enabled=false",
-            "--PasswordIdentityProvider.password_required=false",
-            f"--ServerApp.port={self._jupyter_port}",
-            "--ServerApp.ip=0.0.0.0",
-            f"--ServerApp.default_url={code_storage_mount.mount_path.path}/README.ipynb",
-        )
-
-        env_vars = []
-        if input_.mlflow_integration and input_.mlflow_integration.internal_url:
-            env_vars.append(
-                Env(
-                    name="MLFLOW_TRACKING_URI",
-                    value=input_.mlflow_integration.internal_url.complete_url,
-                )
-            )
-
-        image, tag = input_.jupyter_specific.container_image.value.split(":")
+        image, container = self.get_container(input_)
         custom_deployment = CustomDeploymentInputs(
             preset=input_.preset,
-            image=ContainerImage(
-                repository=image,
-                tag=tag,
-            ),
-            container=Container(
-                args=jupyter_args,
-                env=env_vars,
-            ),
+            image=image,
+            container=container,
             networking=NetworkingConfig(
                 service_enabled=True,
                 ingress_http=IngressHttp(auth=input_.networking.http_auth),

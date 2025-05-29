@@ -1,8 +1,9 @@
 from enum import Enum
+from typing import Literal
 
 from pydantic import ConfigDict, Field
 
-from apolo_app_types import AppInputsDeployer, AppOutputs
+from apolo_app_types import AppInputsDeployer, AppOutputs, Container, ContainerImage
 from apolo_app_types.helm.utils.storage import get_app_data_files_relative_path_url
 from apolo_app_types.protocols.common import (
     AppInputs,
@@ -32,8 +33,46 @@ _JUPYTER_DEFAULTS = {
 
 
 class JupyterImage(str, Enum):
+    APOLO_BASE_IMAGE = "ghcr.io/neuro-inc/base:v25.3.0-runtime"
     BASE_NOTEBOOK = "quay.io/jupyter/base-notebook:python-3.12"
     PYTORCH_NOTEBOOK = "quay.io/jupyter/pytorch-notebook:cuda12-python-3.12"
+
+
+class ApoloBaseImage(ContainerImage):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Apolo Base Image",
+            description="Base image for Jupyter.",
+        ).as_json_schema_extra(),
+    )
+    # Using Literal to restrict the repository and tag to specific values
+    repository: Literal["ghcr.io/neuro-inc/base"]
+    tag: Literal["v25.3.0-runtime"]
+
+
+class CustomImage(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Custom Container Image",
+            description="Custom container image for the Jupyter application.",
+        ).as_json_schema_extra(),
+    )
+    container_image: ContainerImage = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Custom Container Image",
+            description="Custom container image for the Jupyter application.",
+        ).as_json_schema_extra(),
+    )
+    container_config: Container = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Container Configuration",
+            description="Configuration for the Jupyter container.",
+        ).as_json_schema_extra(),
+    )
 
 
 class JupyterTypes(str, Enum):
@@ -66,6 +105,17 @@ class Networking(AbstractAppFieldType):
     )
 
 
+class DefaultContainer(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Container Image",
+            description="Container image to use for Jupyter application.",
+        ).as_json_schema_extra(),
+    )
+    container_image: JupyterImage = Field(...)
+
+
 class JupyterSpecificAppInputs(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
@@ -74,11 +124,14 @@ class JupyterSpecificAppInputs(AbstractAppFieldType):
             description="Configure the Jupyter App.",
         ).as_json_schema_extra(),
     )
-    container_image: JupyterImage = Field(
-        default=JupyterImage.BASE_NOTEBOOK,
+    container_settings: DefaultContainer | CustomImage = Field(
+        default=DefaultContainer(
+            container_image=JupyterImage.APOLO_BASE_IMAGE,
+        ),
         json_schema_extra=SchemaExtraMetadata(
-            description="Container image for the Jupyter application.",
-            title="Container Image",
+            title="Container Settings",
+            description="Settings for the Jupyter container, including image "
+            "and configuration.",
         ).as_json_schema_extra(),
     )
     override_code_storage_mount: ApoloFilesMount | None = Field(
