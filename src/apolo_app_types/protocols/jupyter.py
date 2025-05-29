@@ -28,7 +28,7 @@ _JUPYTER_DEFAULTS = {
         )
         / "code"
     ),
-    "mount": "/home/jovyan",
+    "mount": "/root/notebooks",
 }
 
 
@@ -141,7 +141,7 @@ class JupyterSpecificAppInputs(AbstractAppFieldType):
             description=(
                 "Override Apolo Files mount within the application workloads. "
                 "If not set, Apolo will automatically mount "
-                f'"{_JUPYTER_DEFAULTS["storage"]}" to "{_JUPYTER_DEFAULTS["mount"]}"'
+                f'"{_JUPYTER_DEFAULTS["storage"]}" to "{_JUPYTER_DEFAULTS["mount"]}".'
             ),
         ).as_json_schema_extra(),
     )

@@ -8,6 +8,7 @@ from apolo_app_types.helm.apps.jupyter import JupyterChartValueProcessor
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import Preset
 from apolo_app_types.protocols.jupyter import (
+    _JUPYTER_DEFAULTS,
     CustomImage,
     DefaultContainer,
     JupyterAppInputs,
@@ -60,7 +61,7 @@ async def test_jupyter_values_generation(setup_clients):
         == f"storage://{DEFAULT_CLUSTER_NAME}/{DEFAULT_ORG_NAME}/{DEFAULT_PROJECT_NAME}/"
         f".apps/jupyter/jupyter-app/code"
     )
-    assert parsed_storage[0]["mount_path"] == "/home/jovyan"
+    assert parsed_storage[0]["mount_path"] == "/root/notebooks"
     assert parsed_storage[0]["mount_mode"] == "rw"
 
     pod_labels = helm_params.get("podLabels", {})
@@ -90,7 +91,7 @@ async def test_jupyter_community_images_values_generation(setup_clients):
         "repository": image,
         "tag": tag,
     }
-    mount_path = str(JupyterChartValueProcessor._default_code_mount_path)
+    mount_path = "/home/jovyan"
     jupyter_port = JupyterChartValueProcessor._jupyter_port
     assert helm_params["container"] == {
         "command": None,
@@ -123,7 +124,7 @@ async def test_jupyter_community_images_values_generation(setup_clients):
         == f"storage://{DEFAULT_CLUSTER_NAME}/{DEFAULT_ORG_NAME}/{DEFAULT_PROJECT_NAME}/"
         f".apps/jupyter/jupyter-app/code"
     )
-    assert parsed_storage[0]["mount_path"] == "/home/jovyan"
+    assert parsed_storage[0]["mount_path"] == mount_path
     assert parsed_storage[0]["mount_mode"] == "rw"
 
     pod_labels = helm_params.get("podLabels", {})
@@ -182,7 +183,7 @@ async def test_jupyter_custom_image_values_generation(setup_clients):
         == f"storage://{DEFAULT_CLUSTER_NAME}/{DEFAULT_ORG_NAME}/{DEFAULT_PROJECT_NAME}/"
         f".apps/jupyter/jupyter-app/code"
     )
-    assert parsed_storage[0]["mount_path"] == "/home/jovyan"
+    assert parsed_storage[0]["mount_path"] == _JUPYTER_DEFAULTS["mount"]
     assert parsed_storage[0]["mount_mode"] == "rw"
 
     pod_labels = helm_params.get("podLabels", {})

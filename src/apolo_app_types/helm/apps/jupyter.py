@@ -1,7 +1,5 @@
 import typing as t
 
-from yarl import URL
-
 from apolo_app_types import (
     ContainerImage,
     CustomDeploymentInputs,
@@ -36,7 +34,6 @@ from apolo_app_types.protocols.jupyter import (
 
 
 class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
-    _default_code_mount_path: URL = URL("/home/jovyan")
     _jupyter_port: int = 8888
 
     def __init__(self, *args: t.Any, **kwargs: t.Any):
@@ -45,10 +42,20 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
             *args, **kwargs
         )
 
-    def _get_default_code_storage_mount(self) -> ApoloFilesMount:
+    def _get_default_code_storage_mount(
+        self, input_: JupyterAppInputs
+    ) -> ApoloFilesMount:
+        container = input_.jupyter_specific.container_settings
+        mount_path = _JUPYTER_DEFAULTS["mount"]
+        if (
+            isinstance(container, DefaultContainer)
+            and container.container_image != JupyterImage.APOLO_BASE_IMAGE
+        ):
+            mount_path = "/home/jovyan"
+
         return ApoloFilesMount(
             storage_uri=ApoloFilesPath(path=_JUPYTER_DEFAULTS["storage"]),
-            mount_path=MountPath(path=_JUPYTER_DEFAULTS["mount"]),
+            mount_path=MountPath(path=mount_path),
             mode=ApoloMountMode(mode=ApoloMountModes.RW),
         )
 
@@ -136,7 +143,7 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
         """
         return (
             input_.jupyter_specific.override_code_storage_mount
-            or self._get_default_code_storage_mount()
+            or self._get_default_code_storage_mount(input_)
         )
 
     async def gen_extra_values(
