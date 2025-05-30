@@ -24,3 +24,10 @@ class SupersetOutputs(AppOutputs):
             description=("URL to access the Superset web application. "),
         ).as_json_schema_extra(),
     )
+    secret: str | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Superset Secret",
+            description=("Secret token for Superset."),
+        ).as_json_schema_extra(),
+    )
