@@ -106,6 +106,7 @@ async def get_http_ingress_values(
             "authResponseHeaders": [],
         }
         ingress_vals["forwardAuth"] = forward_auth_config
+        ingress_vals["stripHeaders"] = {"enabled": True}
         ingress_vals.setdefault("annotations", {})  # Ensure annotations key exists
         ingress_vals["annotations"][
             "traefik.ingress.kubernetes.io/router.middlewares"
