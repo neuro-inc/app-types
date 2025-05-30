@@ -10,7 +10,7 @@ from apolo_app_types.protocols.superset import SupersetInputs
 logger = logging.getLogger(__name__)
 
 
-def _generate_superset_secret_hex(length=16):
+def _generate_superset_secret_hex(length: int = 16) -> str:
     """
     Generates a short random API secret using hexadecimal characters.
 
