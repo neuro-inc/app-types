@@ -26,6 +26,7 @@ from apolo_app_types.helm.apps.postgres import PostgresValueProcessor
 from apolo_app_types.helm.apps.privategpt import PrivateGptChartValueProcessor
 from apolo_app_types.helm.apps.shell import ShellChartValueProcessor
 from apolo_app_types.helm.apps.spark_job import SparkJobValueProcessor
+from apolo_app_types.helm.apps.superset import SupersetChartValueProcessor
 from apolo_app_types.helm.apps.text_embeddings import TextEmbeddingsChartValueProcessor
 from apolo_app_types.helm.apps.vscode import VSCodeChartValueProcessor
 from apolo_app_types.helm.apps.weaviate import WeaviateChartValueProcessor
@@ -37,6 +38,7 @@ from apolo_app_types.protocols.jupyter import JupyterAppInputs
 from apolo_app_types.protocols.mlflow import MLFlowAppInputs
 from apolo_app_types.protocols.private_gpt import PrivateGPTAppInputs
 from apolo_app_types.protocols.spark_job import SparkJobInputs
+from apolo_app_types.protocols.superset import SupersetInputs
 from apolo_app_types.protocols.text_embeddings import TextEmbeddingsInferenceAppInputs
 from apolo_app_types.protocols.vscode import VSCodeAppInputs
 
@@ -66,6 +68,7 @@ async def app_type_to_vals(
         AppType.VSCode: VSCodeChartValueProcessor,
         AppType.Shell: ShellChartValueProcessor,
         AppType.Dify: DifyChartValueProcessor,
+        AppType.Superset: SupersetChartValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)
@@ -109,6 +112,7 @@ async def get_installation_vals(
         AppType.Dify: DifyAppInputs,
         AppType.VSCode: VSCodeAppInputs,
         AppType.Shell: ShellAppInputs,
+        AppType.Superset: SupersetInputs,
     }
 
     if app_type not in input_type_map:

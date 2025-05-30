@@ -19,6 +19,7 @@ from apolo_app_types.outputs.privategpt import get_privategpt_outputs
 from apolo_app_types.outputs.shell import get_shell_outputs
 from apolo_app_types.outputs.spark_job import get_spark_job_outputs
 from apolo_app_types.outputs.stable_diffusion import get_stable_diffusion_outputs
+from apolo_app_types.outputs.superset import get_superset_outputs
 from apolo_app_types.outputs.tei import get_tei_outputs
 from apolo_app_types.outputs.utils.discovery import load_app_postprocessor
 from apolo_app_types.outputs.vscode import get_vscode_outputs
@@ -98,6 +99,8 @@ async def update_app_outputs(  # noqa: C901
                 conv_outputs = await get_shell_outputs(helm_outputs)
             case AppType.Dify:
                 conv_outputs = await get_dify_outputs(helm_outputs)
+            case AppType.Superset:
+                conv_outputs = await get_superset_outputs(helm_outputs)
             case _:
                 # Try loading application postprocessor defined in the app repo
                 postprocessor = load_app_postprocessor(

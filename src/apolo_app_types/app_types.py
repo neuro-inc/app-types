@@ -34,6 +34,7 @@ class AppType(enum.StrEnum):
     CustomDeployment = "custom-deployment"
     ServiceDeployment = "service-deployment"
     SparkJob = "spark-job"
+    Superset = "superset"
 
     def __repr__(self) -> str:
         return str(self)
