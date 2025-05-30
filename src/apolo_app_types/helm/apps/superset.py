@@ -1,4 +1,5 @@
 import logging
+import secrets
 import typing as t
 
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
@@ -7,6 +8,26 @@ from apolo_app_types.protocols.superset import SupersetInputs
 
 
 logger = logging.getLogger(__name__)
+
+
+def _generate_superset_secret_hex(length: int = 16) -> str:
+    """
+    Generates a short random API secret using hexadecimal characters.
+
+    Args:
+        length (int): Number of hex characters (must be even for full bytes).
+
+    Returns:
+        str: The generated secret.
+    """
+    num_bytes = length // 2
+
+    secret = secrets.token_hex(num_bytes)
+
+    if length % 2 != 0:
+        secret = secret[:-1]
+
+    return secret
 
 
 class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
@@ -29,7 +50,12 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
             # ingress_grpc=input_.ingress_grpc,
             namespace=namespace,
         )
-
+        secret = _generate_superset_secret_hex()
         logger.debug("Generated extra Weaviate values: %s", values)
         # TODO: add worker and Celery as well
-        return {"supersetNode": values}
+        return {
+            "supersetNode": values,
+            "extraSecretEnv": {
+                "SUPERSET_SECRET_KEY": secret,
+            },
+        }

@@ -37,4 +37,5 @@ async def get_superset_outputs(
             internal_url=internal_web_app_url,
             external_url=external_web_app_url,
         ),
+        secret=helm_values.get("extraSecretEnv", {}).get("SUPERSET_SECRET_KEY", None),
     ).model_dump()
