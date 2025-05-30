@@ -4,6 +4,7 @@ import typing as t
 
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import gen_extra_values
+from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
 from apolo_app_types.protocols.superset import SupersetInputs
 
 
@@ -51,11 +52,17 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
             namespace=namespace,
         )
         secret = _generate_superset_secret_hex()
-        logger.debug("Generated extra Weaviate values: %s", values)
+        logger.debug("Generated extra Superset values: %s", values)
+        ingress_vals = values.pop("ingress", {})
         # TODO: add worker and Celery as well
-        return {
-            "supersetNode": values,
-            "extraSecretEnv": {
-                "SUPERSET_SECRET_KEY": secret,
-            },
-        }
+        return merge_list_of_dicts(
+            [
+                {
+                    "supersetNode": values,
+                    "extraSecretEnv": {
+                        "SUPERSET_SECRET_KEY": secret,
+                    },
+                },
+                {"ingress": ingress_vals} if ingress_vals else {},
+            ]
+        )
