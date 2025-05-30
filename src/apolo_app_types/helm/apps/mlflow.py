@@ -172,7 +172,6 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
                 {
                     "name": pvc_name,
                     "size": "5Gi",
-                    "storageClassName": "standard",
                     "accessModes": ["ReadWriteOnce"],
                 }
             ]
