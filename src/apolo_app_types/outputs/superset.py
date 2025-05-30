@@ -2,8 +2,9 @@ import typing as t
 
 from apolo_app_types.clients.kube import get_service_host_port
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
-from apolo_app_types.protocols.common import RestAPI
-from apolo_app_types.protocols.private_gpt import PrivateGPTAppOutputs
+from apolo_app_types.protocols.common import RestAPI, ServiceAPI
+from apolo_app_types.protocols.common.networking import HttpApi
+from apolo_app_types.protocols.superset import SupersetOutputs
 
 
 async def get_superset_outputs(
@@ -30,8 +31,10 @@ async def get_superset_outputs(
             base_path="/",
             protocol="https",
         )
-    outputs = PrivateGPTAppOutputs(
-        internal_web_app_url=internal_web_app_url,
-        external_web_app_url=external_web_app_url,
-    )
-    return outputs.model_dump()
+
+    return SupersetOutputs(
+        web_app_url=ServiceAPI[HttpApi](
+            internal_url=internal_web_app_url,
+            external_url=external_web_app_url,
+        ),
+    ).model_dump()
