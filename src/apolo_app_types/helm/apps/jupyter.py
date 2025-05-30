@@ -85,19 +85,19 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
                     ),
                 )
                 return command, None
-            case JupyterImage.BASE_NOTEBOOK | JupyterImage.PYTORCH_NOTEBOOK:
-                return None, (
-                    "start-notebook.py",
-                    f"--ServerApp.root_dir={code_storage_mount.mount_path.path}",
-                    "--IdentityProvider.auth_enabled=false",
-                    "--PasswordIdentityProvider.password_required=false",
-                    f"--ServerApp.port={self._jupyter_port}",
-                    "--ServerApp.ip=0.0.0.0",
-                    f"--ServerApp.default_url={code_storage_mount.mount_path.path}",
-                )
-            case _:
-                err = f"Unsupported Jupyter image: {image}"
-                raise ValueError(err)
+            # case JupyterImage.BASE_NOTEBOOK | JupyterImage.PYTORCH_NOTEBOOK:
+            #     return None, (
+            #         "start-notebook.py",
+            #         f"--ServerApp.root_dir={code_storage_mount.mount_path.path}",
+            #         "--IdentityProvider.auth_enabled=false",
+            #         "--PasswordIdentityProvider.password_required=false",
+            #         f"--ServerApp.port={self._jupyter_port}",
+            #         "--ServerApp.ip=0.0.0.0",
+            #         f"--ServerApp.default_url={code_storage_mount.mount_path.path}",
+            #     )
+            # case _:
+            #     err = f"Unsupported Jupyter image: {image}"
+            #     raise ValueError(err)
 
     def get_container(
         self, input_: JupyterAppInputs

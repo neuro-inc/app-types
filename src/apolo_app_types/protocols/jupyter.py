@@ -34,8 +34,8 @@ _JUPYTER_DEFAULTS = {
 
 class JupyterImage(str, Enum):
     APOLO_BASE_IMAGE = "ghcr.io/neuro-inc/base:v25.3.0-runtime"
-    BASE_NOTEBOOK = "quay.io/jupyter/base-notebook:python-3.12"
-    PYTORCH_NOTEBOOK = "quay.io/jupyter/pytorch-notebook:cuda12-python-3.12"
+    # BASE_NOTEBOOK = "quay.io/jupyter/base-notebook:python-3.12"
+    # PYTORCH_NOTEBOOK = "quay.io/jupyter/pytorch-notebook:cuda12-python-3.12"
 
 
 class ApoloBaseImage(ContainerImage):
