@@ -17,12 +17,12 @@ class StableDiffusionChartValueProcessor(
     BaseChartValueProcessor[StableDiffusionInputs]
 ):
     def _get_env_vars(
-        self, input_: StableDiffusionInputs, app_secrets_name: str
+        self, input_: StableDiffusionInputs, preset: Preset, app_secrets_name: str
     ) -> dict[str, t.Any]:
         default_cmd_args = "--docs --cors-origins=*"
-        if input_.preset.nvidia_gpu:
+        if preset.nvidia_gpu:
             commandline_args = "--use-cuda"
-        elif input_.preset.amd_gpu:
+        elif preset.amd_gpu:
             commandline_args = "--use-rocm"
         else:
             commandline_args = "--lowvram"
@@ -61,7 +61,7 @@ class StableDiffusionChartValueProcessor(
         preset = get_preset(self.client, preset_name)
 
         component_vals = get_component_values(preset, preset_name)
-        api_vars = self._get_env_vars(input_, app_secrets_name)
+        api_vars = self._get_env_vars(input_, preset, app_secrets_name)
         img_repository = self._get_image_repository(preset)
 
         model_vals = {
