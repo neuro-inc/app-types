@@ -4,8 +4,8 @@ from apolo_app_types.outputs.tei import get_tei_outputs
 
 
 @pytest.mark.asyncio
-async def test_tei_outputs(setup_clients, mock_kubernetes_client):
-    res = await get_tei_outputs(helm_values={})
+async def test_tei_outputs(setup_clients, mock_kubernetes_client, app_instance_id):
+    res = await get_tei_outputs(helm_values={}, app_instance_id=app_instance_id)
 
     assert res["internal_api"]["host"] == "app.default-namespace"
     assert res["internal_api"]["port"] == 80
@@ -17,13 +17,16 @@ async def test_tei_outputs(setup_clients, mock_kubernetes_client):
 
 
 @pytest.mark.asyncio
-async def test_tei_outputs_with_model(setup_clients, mock_kubernetes_client):
+async def test_tei_outputs_with_model(
+    setup_clients, mock_kubernetes_client, app_instance_id
+):
     res = await get_tei_outputs(
         helm_values={
             "model": {
                 "modelHFName": "random/name",
             },
-        }
+        },
+        app_instance_id=app_instance_id,
     )
 
     assert res["internal_api"]["host"] == "app.default-namespace"
