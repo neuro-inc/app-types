@@ -1,4 +1,5 @@
 import logging
+import os
 import typing as t
 
 import httpx
@@ -65,42 +66,60 @@ async def update_app_outputs(  # noqa: C901
     app_type = apolo_app_type or helm_outputs["PLATFORM_APPS_APP_TYPE"]
     platform_apps_url = apolo_apps_url or helm_outputs["PLATFORM_APPS_URL"]
     platform_apps_token = apolo_apps_token or helm_outputs["PLATFORM_APPS_TOKEN"]
+    app_instance_id = os.getenv("K8S_INSTANCE_ID", None)
+    if app_instance_id is None:
+        err = "K8S_INSTANCE_ID environment variable is not set."
+        raise ValueError(err)
     try:
         match app_type:
             case AppType.LLMInference:
-                conv_outputs = await get_llm_inference_outputs(helm_outputs)
+                conv_outputs = await get_llm_inference_outputs(
+                    helm_outputs, app_instance_id
+                )
             case AppType.StableDiffusion:
-                conv_outputs = await get_stable_diffusion_outputs(helm_outputs)
+                conv_outputs = await get_stable_diffusion_outputs(
+                    helm_outputs, app_instance_id
+                )
             case AppType.Weaviate:
-                conv_outputs = await get_weaviate_outputs(helm_outputs)
+                conv_outputs = await get_weaviate_outputs(helm_outputs, app_instance_id)
             case AppType.DockerHub:
-                conv_outputs = await get_dockerhub_outputs(helm_outputs)
+                conv_outputs = await get_dockerhub_outputs(
+                    helm_outputs, app_instance_id
+                )
             case AppType.PostgreSQL:
-                conv_outputs = await get_postgres_outputs(helm_outputs)
+                conv_outputs = await get_postgres_outputs(helm_outputs, app_instance_id)
             case AppType.HuggingFaceCache:
-                conv_outputs = await get_huggingface_cache_outputs(helm_outputs)
+                conv_outputs = await get_huggingface_cache_outputs(
+                    helm_outputs, app_instance_id
+                )
             case AppType.CustomDeployment:
-                conv_outputs = await get_custom_deployment_outputs(helm_outputs)
+                conv_outputs = await get_custom_deployment_outputs(
+                    helm_outputs, app_instance_id
+                )
             case AppType.SparkJob:
-                conv_outputs = await get_spark_job_outputs(helm_outputs)
+                conv_outputs = await get_spark_job_outputs(
+                    helm_outputs, app_instance_id
+                )
             case AppType.TextEmbeddingsInference:
-                conv_outputs = await get_tei_outputs(helm_outputs)
+                conv_outputs = await get_tei_outputs(helm_outputs, app_instance_id)
             case AppType.Fooocus:
-                conv_outputs = await get_fooocus_outputs(helm_outputs)
+                conv_outputs = await get_fooocus_outputs(helm_outputs, app_instance_id)
             case AppType.MLFlow:
-                conv_outputs = await get_mlflow_outputs(helm_outputs)
+                conv_outputs = await get_mlflow_outputs(helm_outputs, app_instance_id)
             case AppType.Jupyter:
-                conv_outputs = await get_jupyter_outputs(helm_outputs)
+                conv_outputs = await get_jupyter_outputs(helm_outputs, app_instance_id)
             case AppType.VSCode:
-                conv_outputs = await get_vscode_outputs(helm_outputs)
+                conv_outputs = await get_vscode_outputs(helm_outputs, app_instance_id)
             case AppType.PrivateGPT:
-                conv_outputs = await get_privategpt_outputs(helm_outputs)
+                conv_outputs = await get_privategpt_outputs(
+                    helm_outputs, app_instance_id
+                )
             case AppType.Shell:
-                conv_outputs = await get_shell_outputs(helm_outputs)
+                conv_outputs = await get_shell_outputs(helm_outputs, app_instance_id)
             case AppType.Dify:
-                conv_outputs = await get_dify_outputs(helm_outputs)
+                conv_outputs = await get_dify_outputs(helm_outputs, app_instance_id)
             case AppType.Superset:
-                conv_outputs = await get_superset_outputs(helm_outputs)
+                conv_outputs = await get_superset_outputs(helm_outputs, app_instance_id)
             case _:
                 # Try loading application postprocessor defined in the app repo
                 postprocessor = load_app_postprocessor(

@@ -5,7 +5,7 @@ from apolo_app_types.outputs.custom_deployment import get_custom_deployment_outp
 
 @pytest.mark.asyncio
 async def test_custom_deployment_outputs_generation_with_ingress(
-    setup_clients, mock_kubernetes_client, monkeypatch
+    setup_clients, mock_kubernetes_client, monkeypatch, app_instance_id: str
 ):
     async def mock_get_service_host_port(*args, **kwargs):
         return ("custom-deployment.default.svc.cluster.local", 80)
@@ -29,7 +29,9 @@ async def test_custom_deployment_outputs_generation_with_ingress(
             "tag": "v1.0.0",
         },
     }
-    res = await get_custom_deployment_outputs(helm_values=helm_values)
+    res = await get_custom_deployment_outputs(
+        helm_values=helm_values, app_instance_id=app_instance_id
+    )
     assert res["external_web_app_url"]["host"] == "custom-deployment.example.com"
     assert res["external_web_app_url"]["port"] == 443
 

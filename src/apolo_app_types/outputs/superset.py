@@ -9,8 +9,9 @@ from apolo_app_types.protocols.superset import SupersetOutputs
 
 async def get_superset_outputs(
     helm_values: dict[str, t.Any],
+    app_instance_id: str,
 ) -> dict[str, t.Any]:
-    labels = {"application": "superset"}
+    labels = {"application": "superset", "app.kubernetes.io/instance": app_instance_id}
     internal_host, internal_port = await get_service_host_port(match_labels=labels)
     internal_web_app_url = None
     if internal_host:

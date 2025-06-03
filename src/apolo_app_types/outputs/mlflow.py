@@ -9,8 +9,9 @@ from apolo_app_types.protocols.common.networking import HttpApi, RestAPI, Servic
 
 async def get_mlflow_outputs(
     helm_values: dict[str, t.Any],
+    app_instance_id: str,
 ) -> dict[str, t.Any]:
-    labels = {"application": "mlflow"}
+    labels = {"application": "mlflow", "app.kubernetes.io/instance": app_instance_id}
     internal_web_app_url, external_web_app_url = await get_internal_external_web_urls(
         labels
     )

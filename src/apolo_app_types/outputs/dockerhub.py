@@ -9,7 +9,9 @@ from apolo_app_types import DockerConfigModel, DockerHubOutputs
 logger = logging.getLogger()
 
 
-async def get_dockerhub_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any]:
+async def get_dockerhub_outputs(
+    helm_values: dict[str, t.Any], app_instance_id: str
+) -> dict[str, t.Any]:
     user = helm_values["job"]["args"]["registry_user"]
     secret = helm_values["job"]["args"]["registry_secret"]
     auth64 = base64.b64encode(f"{user}:{secret}".encode())

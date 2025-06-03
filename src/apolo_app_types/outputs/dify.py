@@ -8,8 +8,10 @@ from apolo_app_types.protocols.dify import DifyAppOutputs, DifySpecificOutputs
 
 async def get_dify_outputs(
     helm_values: dict[str, t.Any],
+    app_instance_id: str,
 ) -> dict[str, t.Any]:
-    api_labels = {"application": "dify", "component": "api"}
+    main_labels = {"application": "dify", "app.kubernetes.io/instance": app_instance_id}
+    api_labels = {**main_labels, "component": "api"}
     api_internal_host, api_internal_port = await get_service_host_port(
         match_labels=api_labels
     )
@@ -21,7 +23,7 @@ async def get_dify_outputs(
             base_path="/",
             protocol="http",
         )
-    web_labels = {"application": "dify", "component": "web"}
+    web_labels = {**main_labels, "component": "web"}
     web_internal_host, web_internal_port = await get_service_host_port(
         match_labels=web_labels
     )
@@ -33,8 +35,7 @@ async def get_dify_outputs(
             base_path="/",
             protocol="http",
         )
-    match_labels = {"application": "dify"}
-    host_port = await get_ingress_host_port(match_labels=match_labels)
+    host_port = await get_ingress_host_port(match_labels=main_labels)
     external_web_app_url = None
     if host_port:
         host, port = host_port

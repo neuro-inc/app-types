@@ -4,7 +4,9 @@ from apolo_app_types.outputs.weaviate import get_weaviate_outputs
 
 
 @pytest.mark.asyncio
-async def test_output_values_weaviate(setup_clients, mock_kubernetes_client):
+async def test_output_values_weaviate(
+    setup_clients, mock_kubernetes_client, app_instance_id
+):
     res = await get_weaviate_outputs(
         {
             "nameOverride": "weaviate",
@@ -13,7 +15,8 @@ async def test_output_values_weaviate(setup_clients, mock_kubernetes_client):
                 "password": "admin",
             },
             "ingress": {"enabled": True},
-        }
+        },
+        app_instance_id=app_instance_id,
     )
     assert res["auth"] == {
         "username": "admin",
@@ -32,12 +35,13 @@ async def test_output_values_weaviate(setup_clients, mock_kubernetes_client):
 
 @pytest.mark.asyncio
 async def test_output_values_weaviate_without_cluster_creds(
-    setup_clients, mock_kubernetes_client
+    setup_clients, mock_kubernetes_client, app_instance_id
 ):
     res = await get_weaviate_outputs(
         {
             "ingress": {"enabled": True},
-        }
+        },
+        app_instance_id=app_instance_id,
     )
     assert res["auth"] == {
         "username": "",

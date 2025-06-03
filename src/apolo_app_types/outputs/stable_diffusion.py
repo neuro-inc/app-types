@@ -13,13 +13,16 @@ logger = logging.getLogger()
 
 async def get_stable_diffusion_outputs(
     helm_values: dict[str, t.Any],
+    app_instance_id: str,
 ) -> dict[str, t.Any]:
+    match_labels = {
+        "application": "stable-diffusion",
+        "app.kubernetes.io/instance": app_instance_id,
+    }
     internal_host, internal_port = await get_service_host_port(
-        match_labels={"application": "stable-diffusion"}
+        match_labels=match_labels
     )
-    ingress_host_port = await get_ingress_host_port(
-        match_labels={"application": "stable-diffusion"}
-    )
+    ingress_host_port = await get_ingress_host_port(match_labels=match_labels)
     if ingress_host_port:
         external_host = ingress_host_port[0]
     else:

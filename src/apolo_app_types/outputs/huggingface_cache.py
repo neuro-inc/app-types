@@ -11,7 +11,9 @@ from apolo_app_types.protocols.huggingface_cache import (
 logger = logging.getLogger(__name__)
 
 
-async def get_app_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any]:
+async def get_app_outputs(
+    helm_values: dict[str, t.Any], app_instance_id: str
+) -> dict[str, t.Any]:
     storage_uri = helm_values["storage_uri"]
     return HuggingFaceCacheOutputs(
         cache_config=HuggingFaceCache(

@@ -17,9 +17,14 @@ from apolo_app_types.protocols.common.openai_compat import (
 logger = logging.getLogger()
 
 
-async def get_llm_inference_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any]:
+async def get_llm_inference_outputs(
+    helm_values: dict[str, t.Any], app_instance_id: str
+) -> dict[str, t.Any]:
     internal_host, internal_port = await get_service_host_port(
-        match_labels={"application": "llm-inference"}
+        match_labels={
+            "application": "llm-inference",
+            "app.kubernetes.io/instance": app_instance_id,
+        }
     )
     server_extra_args = helm_values.get("serverExtraArgs", [])
     cli_args = parse_cli_args(server_extra_args)

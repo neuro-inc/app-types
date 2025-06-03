@@ -8,8 +8,12 @@ from apolo_app_types.protocols.private_gpt import PrivateGPTAppOutputs
 
 async def get_privategpt_outputs(
     helm_values: dict[str, t.Any],
+    app_instance_id: str,
 ) -> dict[str, t.Any]:
-    labels = {"application": "privategpt"}
+    labels = {
+        "application": "privategpt",
+        "app.kubernetes.io/instance": app_instance_id,
+    }
     internal_host, internal_port = await get_service_host_port(match_labels=labels)
     internal_web_app_url = None
     if internal_host:

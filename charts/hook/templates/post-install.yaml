@@ -22,3 +22,8 @@ spec:
         - "update-outputs"
         - {{ include "filterNonEmptyAndConvertToJson" .Values | squote }}
         imagePullPolicy: {{ .Values.appTypesImage.pullPolicy }}
+        env:
+        - name: K8S_INSTANCE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['app.kubernetes.io/instance']

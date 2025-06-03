@@ -9,7 +9,9 @@ from tests.unit.constants import DEFAULT_NAMESPACE
 
 
 @pytest.mark.asyncio
-async def test_dockerhub_outputs(setup_clients, mock_kubernetes_client):
+async def test_dockerhub_outputs(
+    setup_clients, mock_kubernetes_client, app_instance_id
+):
     res = await get_dockerhub_outputs(
         helm_values={
             "job": {
@@ -25,7 +27,8 @@ async def test_dockerhub_outputs(setup_clients, mock_kubernetes_client):
                     "registry_secret": "test",
                 }
             }
-        }
+        },
+        app_instance_id=app_instance_id,
     )
     auth64 = base64.b64encode(b"test:test")
     dockerconfigjson = base64.b64encode(

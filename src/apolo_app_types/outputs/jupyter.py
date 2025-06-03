@@ -9,10 +9,9 @@ logger = logging.getLogger()
 
 
 async def get_jupyter_outputs(
-    helm_values: dict[str, t.Any], labels: dict[str, str] | None = None
+    helm_values: dict[str, t.Any], app_instance_id: str
 ) -> dict[str, t.Any]:
-    if not labels:
-        labels = {"application": "jupyter"}
+    labels = {"application": "jupyter", "app.kubernetes.io/instance": app_instance_id}
     internal_web_app_url, external_web_app_url = await get_internal_external_web_urls(
         labels
     )

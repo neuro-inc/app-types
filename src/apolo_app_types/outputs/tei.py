@@ -9,8 +9,12 @@ from apolo_app_types.protocols.text_embeddings import TextEmbeddingsInferenceApp
 
 async def get_tei_outputs(
     helm_values: dict[str, t.Any],
+    app_instance_id: str,
 ) -> dict[str, t.Any]:
-    labels = {"application": "text-embeddings-inference"}
+    labels = {
+        "application": "text-embeddings-inference",
+        "app.kubernetes.io/instance": app_instance_id,
+    }
     internal_host, internal_port = await get_service_host_port(match_labels=labels)
     internal_api = None
     model_prop = helm_values.get("model")

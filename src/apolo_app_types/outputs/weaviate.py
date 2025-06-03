@@ -14,9 +14,14 @@ logger = logging.getLogger()
 
 
 async def _get_service_endpoints(
-    release_name: str,
+    release_name: str, app_instance_id: str
 ) -> tuple[tuple[str, int], tuple[str, int]]:
-    services = await get_services(match_labels={"application": release_name})
+    services = await get_services(
+        match_labels={
+            "application": release_name,
+            "app.kubernetes.io/instance": app_instance_id,
+        }
+    )
     http_host, grpc_host = "", ""
     http_port, grpc_port = 0, 0
     for service in services:
@@ -36,13 +41,15 @@ async def _get_service_endpoints(
     return (http_host, http_port), (grpc_host, grpc_port)
 
 
-async def get_weaviate_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any]:
+async def get_weaviate_outputs(
+    helm_values: dict[str, t.Any], app_instance_id: str
+) -> dict[str, t.Any]:
     release_name = "weaviate"
     cluster_api = helm_values.get("clusterApi", {})
 
     try:
         (http_host, http_port), (grpc_host, grpc_port) = await _get_service_endpoints(
-            release_name
+            release_name, app_instance_id
         )
     except Exception as e:
         msg = f"Could not find Weaviate services: {e}"
@@ -60,7 +67,10 @@ async def get_weaviate_outputs(helm_values: dict[str, t.Any]) -> dict[str, t.Any
     graphql_external = None
     if ingress_config.get("enabled"):
         ingress_host_port = await get_ingress_host_port(
-            match_labels={"application": "weaviate"}
+            match_labels={
+                "application": "weaviate",
+                "app.kubernetes.io/instance": app_instance_id,
+            }
         )
 
         if ingress_host_port:

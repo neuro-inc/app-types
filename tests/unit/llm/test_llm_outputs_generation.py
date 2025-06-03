@@ -4,7 +4,7 @@ from apolo_app_types.outputs.llm import get_llm_inference_outputs
 
 
 @pytest.mark.asyncio
-async def test_llm(setup_clients, mock_kubernetes_client):
+async def test_llm(setup_clients, mock_kubernetes_client, app_instance_id):
     res = await get_llm_inference_outputs(
         helm_values={
             "model": {
@@ -13,7 +13,8 @@ async def test_llm(setup_clients, mock_kubernetes_client):
             },
             "serverExtraArgs": ["--api-key dummy-api-key"],
             "env": {"VLLM_API_KEY": "dummy"},
-        }
+        },
+        app_instance_id=app_instance_id,
     )
     assert res["hugging_face_model"] == {
         "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct",
@@ -31,7 +32,9 @@ async def test_llm(setup_clients, mock_kubernetes_client):
 
 
 @pytest.mark.asyncio
-async def test_llm_without_server_args(setup_clients, mock_kubernetes_client):
+async def test_llm_without_server_args(
+    setup_clients, mock_kubernetes_client, app_instance_id
+):
     res = await get_llm_inference_outputs(
         helm_values={
             "model": {
@@ -39,7 +42,8 @@ async def test_llm_without_server_args(setup_clients, mock_kubernetes_client):
                 "tokenizerHFName": "meta-llama/Llama-3.1-8B-Instruct",
             },
             "env": {"VLLM_API_KEY": "dummy-api-key"},
-        }
+        },
+        app_instance_id=app_instance_id,
     )
 
     assert res["hugging_face_model"] == {
@@ -58,7 +62,12 @@ async def test_llm_without_server_args(setup_clients, mock_kubernetes_client):
 
 
 @pytest.mark.asyncio
-async def test_llm_without_model(setup_clients, mock_kubernetes_client):
+async def test_llm_without_model(
+    setup_clients, mock_kubernetes_client, app_instance_id
+):
     with pytest.raises(KeyError) as exc_info:
-        await get_llm_inference_outputs(helm_values={"env": {"VLLM_API_KEY": "dummy"}})
+        await get_llm_inference_outputs(
+            helm_values={"env": {"VLLM_API_KEY": "dummy"}},
+            app_instance_id=app_instance_id,
+        )
     assert str(exc_info.value) == "'model'"

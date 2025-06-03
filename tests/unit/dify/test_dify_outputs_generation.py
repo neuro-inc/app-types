@@ -4,8 +4,8 @@ from apolo_app_types.outputs.dify import get_dify_outputs
 
 
 @pytest.mark.asyncio
-async def test_dify(setup_clients, mock_kubernetes_client):
-    res = await get_dify_outputs({})
+async def test_dify(setup_clients, mock_kubernetes_client, app_instance_id):
+    res = await get_dify_outputs(helm_values={}, app_instance_id=app_instance_id)
 
     assert res["internal_web_app_url"]["host"] == "app.default-namespace"
     assert res["internal_web_app_url"]["port"] == 80
@@ -15,11 +15,14 @@ async def test_dify(setup_clients, mock_kubernetes_client):
 
 
 @pytest.mark.asyncio
-async def test_dify_with_password(setup_clients, mock_kubernetes_client):
+async def test_dify_with_password(
+    setup_clients, mock_kubernetes_client, app_instance_id
+):
     res = await get_dify_outputs(
         {
             "api": {"initPassword": "some_password"},
-        }
+        },
+        app_instance_id=app_instance_id,
     )
 
     assert res["internal_web_app_url"]["host"] == "app.default-namespace"
