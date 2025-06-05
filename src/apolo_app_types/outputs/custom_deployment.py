@@ -2,7 +2,10 @@ import logging
 import typing as t
 
 from apolo_app_types import CustomDeploymentOutputs
-from apolo_app_types.outputs.common import get_internal_external_web_urls
+from apolo_app_types.outputs.common import (
+    INSTANCE_LABEL,
+    get_internal_external_web_urls,
+)
 
 
 logger = logging.getLogger()
@@ -16,7 +19,7 @@ async def get_custom_deployment_outputs(
     if not labels:
         labels = {
             "application": "custom-deployment",
-            "app.kubernetes.io/instance": app_instance_id,
+            INSTANCE_LABEL: app_instance_id,
         }
     internal_web_app_url, external_web_app_url = await get_internal_external_web_urls(
         labels

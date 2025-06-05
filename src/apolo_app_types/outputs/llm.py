@@ -6,6 +6,7 @@ from apolo_app_types import (
     VLLMOutputsV2,
 )
 from apolo_app_types.clients.kube import get_service_host_port
+from apolo_app_types.outputs.common import INSTANCE_LABEL
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
 from apolo_app_types.outputs.utils.parsing import parse_cli_args
 from apolo_app_types.protocols.common.openai_compat import (
@@ -23,7 +24,7 @@ async def get_llm_inference_outputs(
     internal_host, internal_port = await get_service_host_port(
         match_labels={
             "application": "llm-inference",
-            "app.kubernetes.io/instance": app_instance_id,
+            INSTANCE_LABEL: app_instance_id,
         }
     )
     server_extra_args = helm_values.get("serverExtraArgs", [])

@@ -1,6 +1,7 @@
 import typing as t
 
 from apolo_app_types.clients.kube import get_service_host_port
+from apolo_app_types.outputs.common import INSTANCE_LABEL
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
 from apolo_app_types.protocols.common import RestAPI
 from apolo_app_types.protocols.dify import DifyAppOutputs, DifySpecificOutputs
@@ -10,7 +11,7 @@ async def get_dify_outputs(
     helm_values: dict[str, t.Any],
     app_instance_id: str,
 ) -> dict[str, t.Any]:
-    main_labels = {"application": "dify", "app.kubernetes.io/instance": app_instance_id}
+    main_labels = {"application": "dify", INSTANCE_LABEL: app_instance_id}
     api_labels = {**main_labels, "component": "api"}
     api_internal_host, api_internal_port = await get_service_host_port(
         match_labels=api_labels

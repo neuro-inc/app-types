@@ -6,6 +6,7 @@ from apolo_app_types import (
     WeaviateOutputs,
 )
 from apolo_app_types.clients.kube import get_services
+from apolo_app_types.outputs.common import INSTANCE_LABEL
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
 from apolo_app_types.protocols.common.networking import GraphQLAPI, GrpcAPI, RestAPI
 
@@ -19,7 +20,7 @@ async def _get_service_endpoints(
     services = await get_services(
         match_labels={
             "application": release_name,
-            "app.kubernetes.io/instance": app_instance_id,
+            INSTANCE_LABEL: app_instance_id,
         }
     )
     http_host, grpc_host = "", ""
@@ -69,7 +70,7 @@ async def get_weaviate_outputs(
         ingress_host_port = await get_ingress_host_port(
             match_labels={
                 "application": "weaviate",
-                "app.kubernetes.io/instance": app_instance_id,
+                INSTANCE_LABEL: app_instance_id,
             }
         )
 

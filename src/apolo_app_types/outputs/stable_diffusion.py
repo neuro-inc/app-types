@@ -3,6 +3,7 @@ import typing as t
 
 from apolo_app_types import HuggingFaceModel
 from apolo_app_types.clients.kube import get_service_host_port
+from apolo_app_types.outputs.common import INSTANCE_LABEL
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
 from apolo_app_types.protocols.common.networking import RestAPI
 from apolo_app_types.protocols.stable_diffusion import StableDiffusionOutputs
@@ -17,7 +18,7 @@ async def get_stable_diffusion_outputs(
 ) -> dict[str, t.Any]:
     match_labels = {
         "application": "stable-diffusion",
-        "app.kubernetes.io/instance": app_instance_id,
+        INSTANCE_LABEL: app_instance_id,
     }
     internal_host, internal_port = await get_service_host_port(
         match_labels=match_labels

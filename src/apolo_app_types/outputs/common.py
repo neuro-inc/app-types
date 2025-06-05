@@ -3,6 +3,9 @@ from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
 from apolo_app_types.protocols.common import RestAPI
 
 
+INSTANCE_LABEL = "app.kubernetes.io/instance"
+
+
 async def get_internal_external_web_urls(
     labels: dict[str, str],
 ) -> tuple[RestAPI | None, RestAPI | None]:
