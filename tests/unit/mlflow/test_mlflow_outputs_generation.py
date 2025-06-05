@@ -5,7 +5,7 @@ from apolo_app_types.outputs.mlflow import get_mlflow_outputs
 
 @pytest.mark.asyncio
 async def test_mlflow_outputs_generation(
-    setup_clients, mock_kubernetes_client, monkeypatch
+    setup_clients, mock_kubernetes_client, monkeypatch, app_instance_id
 ):
     """
     Validate that get_mlflow_outputs returns the correct
@@ -40,7 +40,7 @@ async def test_mlflow_outputs_generation(
 
     helm_values = {"labels": {"application": "mlflow"}}
 
-    result = await get_mlflow_outputs(helm_values)
+    result = await get_mlflow_outputs(helm_values, app_instance_id=app_instance_id)
     assert result["web_app_url"]["internal_url"] is not None
     assert (
         result["web_app_url"]["internal_url"]["host"]

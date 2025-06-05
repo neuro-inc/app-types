@@ -71,6 +71,7 @@ def postgres_creds_from_kube_secret_data(
 
 async def get_postgres_outputs(
     helm_values: dict[str, t.Any],
+    app_instance_id: str,
 ) -> dict[str, t.Any]:
     for trial in range(1, MAX_SLEEP_SEC):
         logger.info("Trying to get postgres outputs")  # noqa: T201

@@ -213,7 +213,10 @@ def mock_kubernetes_client():
         }
 
         def get_services_by_label(namespace, label_selector):
-            if label_selector == "application=weaviate":
+            if (
+                label_selector
+                == "application=weaviate,app.kubernetes.io/instance=test-app-instance-id"  # noqa: E501
+            ):
                 return {
                     "items": [
                         {
@@ -229,7 +232,10 @@ def mock_kubernetes_client():
                         },
                     ]
                 }
-            if label_selector == "application=llm-inference":
+            if (
+                label_selector
+                == "application=llm-inference,app.kubernetes.io/instance=test-app-instance-id"  # noqa: E501
+            ):
                 return {
                     "items": [
                         {
@@ -325,3 +331,9 @@ def mock_kubernetes_client():
             "mock_custom_objects": mock_custom_objects_instance,
             "fake_ingresses": fake_ingresses,
         }
+
+
+@pytest.fixture
+def app_instance_id():
+    """Fixture to provide a mock app instance ID."""
+    return "test-app-instance-id"

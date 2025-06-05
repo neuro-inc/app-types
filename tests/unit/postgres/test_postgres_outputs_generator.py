@@ -1,8 +1,8 @@
 from apolo_app_types.outputs.postgres import get_postgres_outputs
 
 
-async def test_postgres_outputs(setup_clients, mock_kubernetes_client):
-    res = await get_postgres_outputs(helm_values={})
+async def test_postgres_outputs(setup_clients, mock_kubernetes_client, app_instance_id):
+    res = await get_postgres_outputs(helm_values={}, app_instance_id=app_instance_id)
     assert res["postgres_users"]["users"] == [
         {
             "dbname": "mydatabase",

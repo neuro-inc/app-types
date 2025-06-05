@@ -1,6 +1,7 @@
 import typing as t
 
 from apolo_app_types.clients.kube import get_service_host_port
+from apolo_app_types.outputs.common import INSTANCE_LABEL
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
 from apolo_app_types.protocols.common import RestAPI
 from apolo_app_types.protocols.private_gpt import PrivateGPTAppOutputs
@@ -8,8 +9,12 @@ from apolo_app_types.protocols.private_gpt import PrivateGPTAppOutputs
 
 async def get_privategpt_outputs(
     helm_values: dict[str, t.Any],
+    app_instance_id: str,
 ) -> dict[str, t.Any]:
-    labels = {"application": "privategpt"}
+    labels = {
+        "application": "privategpt",
+        INSTANCE_LABEL: app_instance_id,
+    }
     internal_host, internal_port = await get_service_host_port(match_labels=labels)
     internal_web_app_url = None
     if internal_host:
