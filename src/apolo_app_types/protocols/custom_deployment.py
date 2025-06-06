@@ -12,10 +12,12 @@ from apolo_app_types.protocols.common import (
     SchemaExtraMetadata,
     StorageMounts,
 )
+from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.health_check import (
     HealthCheckProbesConfig,
 )
 from apolo_app_types.protocols.common.k8s import Port
+from apolo_app_types.protocols.common.storage import MountPath
 
 
 class NetworkingConfig(BaseModel):
@@ -56,6 +58,53 @@ class NetworkingConfig(BaseModel):
     )
 
 
+class ConfigMapKeyValue(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Key-Value Pair",
+            description="Define a key-value pair."
+            " Each key will be a file in the mounted directory.",
+        ).as_json_schema_extra(),
+    )
+    key: str = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Key",
+            description="The key for the entry. "
+            "It will be used as a file name in the mounted directory.",
+        ).as_json_schema_extra(),
+    )
+    value: str = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Value",
+            description="The value associated with the key.",
+        ).as_json_schema_extra(),
+    )
+
+
+class ConfigMap(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Mount Configuration Data",
+            description="Store non-sensitive"
+            " configuration data in key-value format"
+            " that can be mounted into the"
+            " application as files.",
+        ).as_json_schema_extra(),
+    )
+    mount_path: MountPath = Field(
+        json_schema_extra=SchemaExtraMetadata(
+            title="Mount Path",
+            description="The path where the key-value pairs"
+            " will be mounted in the container.",
+        ).as_json_schema_extra(),
+    )
+    data: list[ConfigMapKeyValue]
+
+
 class CustomDeploymentInputs(AppInputs):
     model_config = ConfigDict(
         protected_namespaces=(),
@@ -82,6 +131,7 @@ class CustomDeploymentInputs(AppInputs):
             is_advanced_field=True,
         ).as_json_schema_extra(),
     )
+    config_map: ConfigMap | None = Field(default=None)
     storage_mounts: StorageMounts | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
