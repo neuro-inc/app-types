@@ -62,22 +62,24 @@ class ConfigMapKeyValue(BaseModel):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="ConfigMap Key-Value Pair",
-            description="Define a key-value pair for the ConfigMap.",
+            title="Key-Value Pair",
+            description="Define a key-value pair."
+            " Each key will be a file in the mounted directory.",
         ).as_json_schema_extra(),
     )
     key: str = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
             title="Key",
-            description="The key for the ConfigMap entry.",
+            description="The key for the entry. "
+            "It will be used as a file name in the mounted directory.",
         ).as_json_schema_extra(),
     )
     value: str = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
             title="Value",
-            description="The value associated with the ConfigMap key.",
+            description="The value associated with the key.",
         ).as_json_schema_extra(),
     )
 
@@ -86,24 +88,18 @@ class ConfigMap(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="ConfigMap",
-            description="Use ConfigMap to store non-sensitive"
-            " configuration data that can be mounted into the"
-            " application as environment variables or files.",
-        ).as_json_schema_extra(),
-    )
-
-    name: str = Field(
-        json_schema_extra=SchemaExtraMetadata(
-            description="The name of the ConfigMap to use.",
-            title="ConfigMap Name",
+            title="Mount Configuration Data",
+            description="Store non-sensitive"
+            " configuration data in key-value format"
+            " that can be mounted into the"
+            " application as files.",
         ).as_json_schema_extra(),
     )
     mount_path: MountPath = Field(
         json_schema_extra=SchemaExtraMetadata(
             title="Mount Path",
-            description="The path where the ConfigMap will be"
-            " mounted in the container.",
+            description="The path where the key-value pairs"
+            " will be mounted in the container.",
         ).as_json_schema_extra(),
     )
     data: list[ConfigMapKeyValue]

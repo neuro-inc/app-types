@@ -138,20 +138,21 @@ class CustomDeploymentChartValueProcessor(
         health_checks = get_custom_deployment_health_check_values(input_.health_checks)
         values |= health_checks
 
+        configmap_name = "app-configmap"
         if input_.config_map:
             values["configMap"] = {
                 "enabled": True,
-                "name": input_.config_map.name,
+                "name": configmap_name,
                 "data": {item.key: item.value for item in input_.config_map.data},
             }
             volume = {
-                "name": input_.config_map.name,
+                "name": configmap_name,
                 "configMap": {
-                    "name": input_.config_map.name,
+                    "name": configmap_name,
                 },
             }
             volume_mount = {
-                "name": input_.config_map.name,
+                "name": configmap_name,
                 "mountPath": input_.config_map.mount_path.path,
             }
             values.setdefault("volumes", []).append(volume)

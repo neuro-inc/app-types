@@ -459,7 +459,6 @@ async def test_custom_deployment_values_configmap_checks(
                 ingress_http=IngressHttp(),
             ),
             config_map=ConfigMap(
-                name="configmap-name",
                 mount_path=MountPath(path="/config"),
                 data=[
                     ConfigMapKeyValue(key="config_key", value="config_value"),
@@ -492,16 +491,16 @@ async def test_custom_deployment_values_configmap_checks(
     assert "configMap" in helm_params
     assert helm_params["configMap"] == {
         "enabled": True,
-        "name": "configmap-name",
+        "name": "app-configmap",
         "data": {"config_key": "config_value", "config_key_2": "config_value_2"},
     }
     assert {
-        "name": "configmap-name",
+        "name": "app-configmap",
         "configMap": {
-            "name": "configmap-name",
+            "name": "app-configmap",
         },
     } in helm_params["volumes"]
     assert {
-        "name": "configmap-name",
+        "name": "app-configmap",
         "mountPath": "/config",
     } in helm_params["volumeMounts"]
