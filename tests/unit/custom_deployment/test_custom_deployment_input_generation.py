@@ -511,3 +511,58 @@ async def test_custom_deployment_values_configmap_checks(
         "name": "app-configmap",
         "mountPath": "/config",
     } in helm_params["volumeMounts"]
+
+
+@pytest.mark.asyncio
+async def test_custom_deployment_values_app_id(
+    setup_clients,
+):
+    """
+    Ensure that when health checks are provided, they are properly
+    configured in the helm values
+    """
+    helm_args, helm_params = await app_type_to_vals(
+        input_=CustomDeploymentInputs(
+            preset=Preset(name="cpu-small"),
+            image=ContainerImage(
+                repository="myrepo/custom-deployment",
+                tag="v1.2.3",
+            ),
+            container=Container(
+                command=["python", "app.py"],
+                args=["--port", "8080"],
+                env=[Env(name="ENV_VAR", value="value")],
+            ),
+            networking=NetworkingConfig(
+                service_enabled=True,
+                ports=[
+                    Port(name="http", port=8080),
+                ],
+                ingress_http=IngressHttp(),
+            ),
+        ),
+        apolo_client=setup_clients,
+        app_type=AppType.CustomDeployment,
+        app_name="custom-app",
+        namespace="default-namespace",
+        app_secrets_name=APP_SECRETS_NAME,
+        app_id="custom-app-id",
+    )
+
+    # Base assertions
+    assert helm_params["image"] == {
+        "repository": "myrepo/custom-deployment",
+        "tag": "v1.2.3",
+        "pullPolicy": "IfNotPresent",
+    }
+    assert helm_params["container"] == {
+        "command": ["python", "app.py"],
+        "args": ["--port", "8080"],
+        "env": [{"name": "ENV_VAR", "value": "value"}],
+    }
+    assert helm_params["service"] == {
+        "enabled": True,
+        "ports": [{"name": "http", "containerPort": 8080}],
+    }
+
+    assert helm_params["apolo_app_id"] == "custom-app-id"
