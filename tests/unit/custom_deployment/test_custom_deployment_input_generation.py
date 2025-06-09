@@ -25,6 +25,8 @@ from apolo_app_types.protocols.common.storage import (
     MountPath,
 )
 from apolo_app_types.protocols.custom_deployment import (
+    ConfigMap,
+    ConfigMapKeyValue,
     CustomDeploymentInputs,
     NetworkingConfig,
     StorageMounts,
@@ -427,3 +429,78 @@ async def test_custom_deployment_values_generation_with_health_checks(
         "initialDelaySeconds": 5,
         "periodSeconds": 10,
     }
+
+
+@pytest.mark.asyncio
+async def test_custom_deployment_values_configmap_checks(
+    setup_clients,
+):
+    """
+    Ensure that when health checks are provided, they are properly
+    configured in the helm values
+    """
+    helm_args, helm_params = await app_type_to_vals(
+        input_=CustomDeploymentInputs(
+            preset=Preset(name="cpu-small"),
+            image=ContainerImage(
+                repository="myrepo/custom-deployment",
+                tag="v1.2.3",
+            ),
+            container=Container(
+                command=["python", "app.py"],
+                args=["--port", "8080"],
+                env=[Env(name="ENV_VAR", value="value")],
+            ),
+            networking=NetworkingConfig(
+                service_enabled=True,
+                ports=[
+                    Port(name="http", port=8080),
+                ],
+                ingress_http=IngressHttp(),
+            ),
+            config_map=ConfigMap(
+                mount_path=MountPath(path="/config"),
+                data=[
+                    ConfigMapKeyValue(key="config_key", value="config_value"),
+                    ConfigMapKeyValue(key="config_key_2", value="config_value_2"),
+                ],
+            ),
+        ),
+        apolo_client=setup_clients,
+        app_type=AppType.CustomDeployment,
+        app_name="custom-app",
+        namespace="default-namespace",
+        app_secrets_name=APP_SECRETS_NAME,
+    )
+
+    # Base assertions
+    assert helm_params["image"] == {
+        "repository": "myrepo/custom-deployment",
+        "tag": "v1.2.3",
+    }
+    assert helm_params["container"] == {
+        "command": ["python", "app.py"],
+        "args": ["--port", "8080"],
+        "env": [{"name": "ENV_VAR", "value": "value"}],
+    }
+    assert helm_params["service"] == {
+        "enabled": True,
+        "ports": [{"name": "http", "containerPort": 8080}],
+    }
+
+    assert "configMap" in helm_params
+    assert helm_params["configMap"] == {
+        "enabled": True,
+        "name": "app-configmap",
+        "data": {"config_key": "config_value", "config_key_2": "config_value_2"},
+    }
+    assert {
+        "name": "app-configmap",
+        "configMap": {
+            "name": "app-configmap",
+        },
+    } in helm_params["volumes"]
+    assert {
+        "name": "app-configmap",
+        "mountPath": "/config",
+    } in helm_params["volumeMounts"]
