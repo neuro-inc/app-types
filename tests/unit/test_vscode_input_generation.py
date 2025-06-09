@@ -41,6 +41,7 @@ async def test_vscode_values_generation(setup_clients):
     assert helm_params["image"] == {
         "repository": "ghcr.io/neuro-inc/vscode-server",
         "tag": "development",
+        "pullPolicy": "IfNotPresent",
     }
 
     assert helm_params["service"] == {
@@ -91,6 +92,7 @@ async def test_vscode_override_storage_values_generation(setup_clients):
     assert helm_params["image"] == {
         "repository": "ghcr.io/neuro-inc/vscode-server",
         "tag": "development",
+        "pullPolicy": "IfNotPresent",
     }
 
     assert helm_params["service"] == {

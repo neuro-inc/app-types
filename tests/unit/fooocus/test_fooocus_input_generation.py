@@ -39,6 +39,7 @@ async def test_fooocus_values_generation(setup_clients):
     assert helm_params["image"] == {
         "repository": "ghcr.io/neuro-inc/fooocus",
         "tag": "latest",
+        "pullPolicy": "IfNotPresent",
     }
 
     assert helm_params["service"] == {

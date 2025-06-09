@@ -63,6 +63,7 @@ async def test_custom_deployment_values_generation(setup_clients):
     assert helm_params["image"] == {
         "repository": "myrepo/custom-deployment",
         "tag": "v1.2.3",
+        "pullPolicy": "IfNotPresent",
     }
     assert helm_params["container"] == {
         "command": ["python", "app.py"],
@@ -133,6 +134,7 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
     assert helm_params["image"] == {
         "repository": "myrepo/custom-deployment",
         "tag": "v1.2.3",
+        "pullPolicy": "IfNotPresent",
     }
     assert helm_params["container"] == {
         "command": ["python", "app.py"],
@@ -204,6 +206,7 @@ async def test_custom_deployment_values_generation_with_multiport_exposure(
     assert helm_params["image"] == {
         "repository": "multiport",
         "tag": "latest",
+        "pullPolicy": "IfNotPresent",
     }
     assert helm_params["container"] == {
         "command": ["python", "app.py"],
@@ -262,6 +265,7 @@ async def test_custom_deployment_values_generation_path_port_not_supplied(
     assert helm_params["image"] == {
         "repository": "any",
         "tag": "latest",
+        "pullPolicy": "IfNotPresent",
     }
     assert helm_params["container"] == {
         "command": ["python", "app.py"],
@@ -311,6 +315,7 @@ async def test_custom_deployment_values_generation_network_not_supplied(
     assert helm_params["image"] == {
         "repository": "any",
         "tag": "latest",
+        "pullPolicy": "IfNotPresent",
     }
     assert helm_params["container"] == {
         "command": ["python", "app.py"],
@@ -392,6 +397,7 @@ async def test_custom_deployment_values_generation_with_health_checks(
     assert helm_params["image"] == {
         "repository": "myrepo/custom-deployment",
         "tag": "v1.2.3",
+        "pullPolicy": "IfNotPresent",
     }
     assert helm_params["container"] == {
         "command": ["python", "app.py"],
@@ -477,6 +483,7 @@ async def test_custom_deployment_values_configmap_checks(
     assert helm_params["image"] == {
         "repository": "myrepo/custom-deployment",
         "tag": "v1.2.3",
+        "pullPolicy": "IfNotPresent",
     }
     assert helm_params["container"] == {
         "command": ["python", "app.py"],

@@ -39,6 +39,7 @@ async def test_jupyter_values_generation(setup_clients):
     assert helm_params["image"] == {
         "repository": "ghcr.io/neuro-inc/base",
         "tag": "v25.3.0-runtime",
+        "pullPolicy": "IfNotPresent",
     }
 
     assert helm_params["service"] == {
@@ -156,6 +157,7 @@ async def test_jupyter_custom_image_values_generation(setup_clients):
     assert helm_params["image"] == {
         "repository": "image-name",
         "tag": "latest",
+        "pullPolicy": "IfNotPresent",
     }
     assert helm_params["container"] == {
         "command": ["start-notebook.sh"],

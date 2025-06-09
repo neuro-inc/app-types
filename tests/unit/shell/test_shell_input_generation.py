@@ -31,6 +31,7 @@ async def test_shell_values_generation(setup_clients):
     assert helm_params["image"] == {
         "repository": "ghcr.io/neuro-inc/web-shell",
         "tag": "pipelines",
+        "pullPolicy": "IfNotPresent",
     }
 
     assert helm_params["service"] == {
