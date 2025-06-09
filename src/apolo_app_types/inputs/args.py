@@ -50,6 +50,7 @@ async def app_type_to_vals(
     app_name: str,
     namespace: str,
     app_secrets_name: str,
+    app_id: str | None = None,
 ) -> tuple[list[str], dict[str, t.Any]]:
     # Mapping AppType to their respective processor classes
     processor_map: dict[AppType, type[BaseChartValueProcessor[t.Any]]] = {
@@ -84,6 +85,7 @@ async def app_type_to_vals(
         app_name=app_name,
         namespace=namespace,
         app_secrets_name=app_secrets_name,
+        app_id=app_id,
     )
     return extra_helm_args, extra_vals
 
@@ -95,6 +97,7 @@ async def get_installation_vals(
     app_type: AppType,
     namespace: str = "default",
     app_secrets_name: str = "apps-secrets",
+    app_id: str | None = None,
 ) -> dict[str, t.Any]:
     input_type_map: dict[AppType, type[AppInputs]] = {
         AppType.LLMInference: LLMInputs,
@@ -127,6 +130,7 @@ async def get_installation_vals(
         app_name,
         namespace=namespace,
         app_secrets_name=app_secrets_name,
+        app_id=app_id,
     )
 
     return extra_vals

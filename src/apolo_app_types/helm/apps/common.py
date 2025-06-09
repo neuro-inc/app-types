@@ -261,6 +261,7 @@ async def gen_extra_values(
     namespace: str | None = None,
     port_configurations: list[Port] | None = None,
     component_name: str | None = None,
+    app_id: str | None = None,
 ) -> dict[str, t.Any]:
     preset_name = preset_type.name
     if not preset_name:
@@ -300,6 +301,10 @@ async def gen_extra_values(
         if "annotations" not in ingress_vals["ingress"] and grpc_ingress_conf:
             ingress_vals["ingress"]["annotations"] = {}
 
+    app_specific = {}
+    if app_id:
+        app_specific["apolo_app_id"] = app_id
+
     return {
         "preset_name": preset_name,
         "resources": resources_vals,
@@ -310,4 +315,8 @@ async def gen_extra_values(
             "platform.apolo.us/preset": preset_name,
         },
         **ingress_vals,
+        **app_specific,
     }
+
+
+# async def gen_
