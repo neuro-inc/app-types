@@ -124,7 +124,7 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
                     repository=image,
                     tag=tag,
                 ), Container(
-                    cmd=cmd,
+                    command=cmd,
                     args=args,
                     env=env_vars,
                 )
