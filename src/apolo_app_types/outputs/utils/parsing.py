@@ -1,20 +1,23 @@
-import typing as t
-
-
-def parse_cli_args(args: list[str]) -> dict[str, t.Any]:
+def parse_cli_args(args: list[str]) -> dict[str, str]:
     # Args could be in the form of '--key=value' or '--key value'
     result = {}
-    for arg in args:
+    i = 0
+    while i < len(args):
+        arg = args[i]
         if not arg.startswith(("-", "--")):
             print("Don't know how to handle argument:", arg)  # noqa: T201
+            i += 1
             continue
         # you can pass any arguments to add_argument
-        kv = arg.lstrip("-")
-        if "=" in kv:
-            key, value = kv.split("=", 1)
-        elif " " in kv:
-            key, value = kv.split(" ", 1)
+        key = arg.lstrip("-")
+        if "=" in key:
+            key, value = key.split("=", 1)
+            result[key] = value
+            i += 1
+        elif i + 1 < len(args) and not args[i + 1].startswith("-"):
+            result[key] = args[i + 1]
+            i += 2
         else:
-            key, value = kv, True
-        result[key] = value
+            result[key] = "true"
+            i += 1
     return result
