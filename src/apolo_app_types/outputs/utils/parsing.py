@@ -10,9 +10,11 @@ def parse_cli_args(args: list[str]) -> dict[str, t.Any]:
             continue
         # you can pass any arguments to add_argument
         kv = arg.lstrip("-")
-        if " " in kv:
+        if "=" in kv:
+            key, value = kv.split("=", 1)
+        elif " " in kv:
             key, value = kv.split(" ", 1)
         else:
-            key, value = kv.split("=", 1)
+            key, value = kv, True
         result[key] = value
     return result
