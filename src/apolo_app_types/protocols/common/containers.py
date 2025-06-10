@@ -1,3 +1,5 @@
+from enum import StrEnum
+
 from pydantic import ConfigDict, Field
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
@@ -6,6 +8,12 @@ from apolo_app_types.protocols.common.schema_extra import (
     SchemaMetaType,
 )
 from apolo_app_types.protocols.dockerhub import DockerConfigModel
+
+
+class ContainerImagePullPolicy(StrEnum):
+    ALWAYS = "Always"
+    NEVER = "Never"
+    IF_NOT_PRESENT = "IfNotPresent"
 
 
 class ContainerImage(AbstractAppFieldType):
@@ -36,5 +44,12 @@ class ContainerImage(AbstractAppFieldType):
             title="ImagePullSecrets for DockerHub",
             description="ImagePullSecrets for DockerHub",
             meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+    pull_policy: ContainerImagePullPolicy = Field(
+        default=ContainerImagePullPolicy.IF_NOT_PRESENT,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Container Image Pull Policy",
+            description="Specify the pull policy for the container image.",
         ).as_json_schema_extra(),
     )
