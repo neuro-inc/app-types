@@ -1,3 +1,5 @@
+from enum import StrEnum
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from apolo_app_types.protocols.common import (
@@ -76,10 +78,10 @@ class MLFlowTrackingServerURL(ServiceAPI[RestAPI]):
     )
 
 
-class ModelVersionStatus(BaseModel):
-    """Status information for model versions"""
-
-    # Add fields based on your ModelVersionStatus structure
+class ModelVersionStatus(StrEnum):
+    PENDING_REGISTRATION = "PENDING_REGISTRATION"
+    FAILED_REGISTRATION = "FAILED_REGISTRATION"
+    READY = "READY"
 
 
 class ModelVersionTag(BaseModel):
