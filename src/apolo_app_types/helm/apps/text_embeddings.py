@@ -68,6 +68,7 @@ class TextEmbeddingsChartValueProcessor(
         return merge_list_of_dicts(
             [
                 {
+                    "serverExtraArgs": input_.server_extra_args,
                     "model": model,
                     "image": image,
                     "env": env,
