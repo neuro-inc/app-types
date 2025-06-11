@@ -14,12 +14,14 @@ from apolo_app_types.protocols.common import (
     MountPath,
     StorageMounts,
 )
+from apolo_app_types.protocols.common.containers import ContainerImagePullPolicy
 from apolo_app_types.protocols.common.health_check import (
     HealthCheck,
     HealthCheckProbesConfig,
     HTTPHealthCheckConfig,
 )
 from apolo_app_types.protocols.common.k8s import Port
+from apolo_app_types.protocols.common.preset import Preset
 from apolo_app_types.protocols.custom_deployment import (
     CustomDeploymentInputs,
     NetworkingConfig,
@@ -46,6 +48,39 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
             *args, **kwargs
         )
 
+    async def gen_outputs_endpoint_values(
+        self, app_name: str, namespace: str, app_secrets_name: str
+    ) -> dict[str, t.Any]:
+        values = {
+            "enabled": True,
+            **await self.custom_dep_val_processor.gen_extra_values(
+                input_=CustomDeploymentInputs(
+                    preset=Preset(name="cpu-small"),
+                    image=ContainerImage(
+                        repository="ghcr.io/neuro-inc/mlflow-outputs",
+                        tag="latest",
+                        pull_policy=ContainerImagePullPolicy.ALWAYS,
+                    ),
+                    container=Container(
+                        env=[
+                            Env(name="MLFLOW_PORT", value=str(self._port)),
+                        ]
+                    ),
+                    networking=NetworkingConfig(
+                        service_enabled=True,
+                        ingress_http=None,  # No HTTP ingress for outputs
+                        ports=[Port(name="http", port="8000")],
+                    ),
+                ),
+                app_name=app_name,
+                namespace=namespace,
+                app_secrets_name=app_secrets_name,
+            ),
+            "includeMainDeploymentInfo": True,
+        }
+        values["service"]["labels"] = {"output-server": "true"}
+        return values
+
     async def gen_extra_helm_args(self, *_: t.Any) -> list[str]:
         return ["--timeout", "30m"]
 
@@ -55,6 +90,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         app_name: str,
         namespace: str,
         app_secrets_name: str,
+        app_id: str | None = None,
         *args: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -165,6 +201,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
             app_name=app_name,
             namespace=namespace,
             app_secrets_name=app_secrets_name,
+            app_id=app_id,
         )
 
         if use_sqlite:
@@ -193,5 +230,11 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         merged_vals = {**base_vals, **custom_vals}
         merged_vals.setdefault("labels", {})
         merged_vals["labels"]["application"] = "mlflow"
+
+        merged_vals["extraDeployment"] = await self.gen_outputs_endpoint_values(
+            app_name=app_name,
+            namespace=namespace,
+            app_secrets_name=app_secrets_name,
+        )
 
         return merged_vals
