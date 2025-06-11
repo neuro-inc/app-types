@@ -52,6 +52,7 @@ class CustomDeploymentChartValueProcessor(
         app_name: str,
         namespace: str,
         app_secrets_name: str,
+        app_id: str | None = None,
         *_: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -67,6 +68,7 @@ class CustomDeploymentChartValueProcessor(
             ingress_http=input_.networking.ingress_http,
             ingress_grpc=None,
             port_configurations=input_.networking.ports,
+            app_id=app_id,
         )
         image_docker_url = await get_image_docker_url(
             client=self.client,
@@ -78,6 +80,7 @@ class CustomDeploymentChartValueProcessor(
             "image": {
                 "repository": image,
                 "tag": tag,
+                "pullPolicy": input_.image.pull_policy.value,
             },
             **extra_values,
         }

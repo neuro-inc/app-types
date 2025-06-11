@@ -62,6 +62,7 @@ async def test_privategpt_values_generation(setup_clients):
     assert helm_params["image"] == {
         "repository": "ghcr.io/neuro-inc/private-gpt",
         "tag": "latest",
+        "pullPolicy": "IfNotPresent",
     }
     assert helm_params["ingress"]["enabled"] is True
 
@@ -139,6 +140,7 @@ async def test_privategpt_values_generation_custom_temperature(setup_clients):
     assert helm_params["image"] == {
         "repository": "ghcr.io/neuro-inc/private-gpt",
         "tag": "latest",
+        "pullPolicy": "IfNotPresent",
     }
     assert helm_params["ingress"]["enabled"] is True
     assert helm_params["service"] == {
