@@ -48,4 +48,5 @@ async def get_mlflow_outputs(
             internal_url=internal_server_url,
             external_url=external_server_url,
         ),
+        registered_models=None,
     ).model_dump()

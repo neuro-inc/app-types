@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 class SchemaMetaType(enum.StrEnum):
     INLINE = "inline"
     INTEGRATION = "integration"
+    DYNAMIC = "dynamic"
 
 
 class SchemaExtraMetadata(BaseModel):
