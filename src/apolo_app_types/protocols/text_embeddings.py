@@ -25,7 +25,7 @@ class TextEmbeddingsInferenceAppInputs(AppInputs):
         title="Enable HTTP Ingress",
     )
     model: HuggingFaceModel
-    server_extra_args: list[str] = Field(  # noqa: N815
+    server_extra_args: list[str] = Field(
         default_factory=list,
         json_schema_extra=SchemaExtraMetadata(
             title="Server Extra Arguments",
@@ -43,7 +43,7 @@ class TextEmbeddingsInferenceInputs(AppInputsDeployer):
     )
     model: HuggingFaceModel
     image: Image
-    server_extra_args: list[str] = Field(  # noqa: N815
+    server_extra_args: list[str] = Field(
         default_factory=list,
         json_schema_extra=SchemaExtraMetadata(
             title="Server Extra Arguments",
