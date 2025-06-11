@@ -92,8 +92,6 @@ from apolo_app_types.protocols.stable_diffusion import (
 from apolo_app_types.protocols.text_embeddings import (
     TextEmbeddingsInferenceAppInputs,
     TextEmbeddingsInferenceAppOutputs,
-    TextEmbeddingsInferenceInputs,
-    TextEmbeddingsInferenceOutputs,
 )
 from apolo_app_types.protocols.vscode import (
     VSCodeAppInputs,
@@ -134,8 +132,8 @@ __all__ = [
     "ShellOutputs",
     "SDOutputs",
     "StableDiffusionInputs",
-    "TextEmbeddingsInferenceInputs",
-    "TextEmbeddingsInferenceOutputs",
+    "TextEmbeddingsInferenceAppInputs",
+    "TextEmbeddingsInferenceAppOutputs",
     "WeaviateInputs",
     "WeaviateOutputs",
     "OpenAICompatibleEmbeddingsAPI",
@@ -181,8 +179,6 @@ __all__ = [
     "Bucket",
     "JupyterAppInputs",
     "JupyterAppOutputs",
-    "TextEmbeddingsInferenceAppInputs",
-    "TextEmbeddingsInferenceAppOutputs",
     "OpenAICompatChatAPI",
     "OpenAICompatEmbeddingsAPI",
     "ShellAppInputs",
