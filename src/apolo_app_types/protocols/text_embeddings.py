@@ -30,6 +30,15 @@ class TextEmbeddingsInferenceAppInputs(AppInputs):
             "to pass to the server (see TEI doc, e.g. --max-client-batch-size=1024).",
         ).as_json_schema_extra(),
     )
+    extra_env_vars: dict[str, str] = Field(  # noqa: N815
+        default_factory=dict,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Extra Environment Variables",
+            description="Additional environment variables to set for the "
+            "container. These will override any existing environment variables "
+            "with the same name.",
+        ).as_json_schema_extra(),
+    )
 
 
 class TextEmbeddingsInferenceAppOutputs(AppOutputs):

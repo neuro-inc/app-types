@@ -73,11 +73,18 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
     def _configure_env(
         self, input_: LLMInputs, app_secrets_name: str
     ) -> dict[str, t.Any]:
-        return {
+        # Start with base environment variables
+        env_vars = {
             "HUGGING_FACE_HUB_TOKEN": serialize_optional_secret(
                 input_.hugging_face_model.hf_token, secret_name=app_secrets_name
             )
         }
+
+        # Add extra environment variables with priority over base ones
+        # User-provided extra_env_vars override any existing env vars with the same name
+        env_vars.update(input_.extra_env_vars)
+
+        return env_vars
 
     def _configure_extra_annotations(self, input_: LLMInputs) -> dict[str, str]:
         extra_annotations: dict[str, str] = {}

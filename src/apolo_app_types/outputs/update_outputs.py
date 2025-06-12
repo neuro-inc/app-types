@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import typing as t
 
 import httpx
@@ -50,10 +51,13 @@ async def post_outputs(api_url: str, api_token: str, outputs: dict[str, t.Any]) 
             e,
             e.response.text if e.response else "No response",
         )
+        sys.exit(1)
     except httpx.RequestError as e:
         logger.error("Request error occurred: %s", e)
+        sys.exit(1)
     except Exception as e:
         logger.exception("Unexpected error occurred: %s", e)
+        sys.exit(1)
 
 
 async def update_app_outputs(  # noqa: C901
