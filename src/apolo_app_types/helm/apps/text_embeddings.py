@@ -37,11 +37,18 @@ class TextEmbeddingsChartValueProcessor(
     def _configure_env(
         self, tei: TextEmbeddingsInferenceAppInputs, app_secrets_name: str
     ) -> dict[str, t.Any]:
-        return {
+        # Start with base environment variables
+        env_vars = {
             "HUGGING_FACE_HUB_TOKEN": serialize_optional_secret(
                 tei.model.hf_token, secret_name=app_secrets_name
             )
         }
+
+        # Add extra environment variables with priority over base ones
+        # User-provided extra_env_vars override any existing env vars with the same name
+        env_vars.update(tei.extra_env_vars)
+
+        return env_vars
 
     async def gen_extra_values(
         self,
@@ -68,10 +75,10 @@ class TextEmbeddingsChartValueProcessor(
         return merge_list_of_dicts(
             [
                 {
-                    "serverExtraArgs": input_.server_extra_args,
                     "model": model,
                     "image": image,
                     "env": env,
+                    "serverExtraArgs": input_.server_extra_args,
                 },
                 values,
             ]
