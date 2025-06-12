@@ -36,7 +36,7 @@ class TextEmbeddingsInferenceAppInputs(AppInputs):
             title="Extra Environment Variables",
             description="Additional environment variables to set for the "
             "container. These will override any existing environment variables "
-            "with the same name.",
+            "with the same name. (see vLLM doc, e.g. VLLM_USE_V1=0)",
         ).as_json_schema_extra(),
     )
 
