@@ -22,6 +22,10 @@ async def test_tei_values_generation(setup_clients):
             model=HuggingFaceModel(
                 model_hf_name="random/name", hf_token="random-token"
             ),
+            server_extra_args=[
+                "--max-concurrent-requests=512",
+                "--max-client-batch-size=16",
+            ],
         ),
         apolo_client=setup_clients,
         app_type=AppType.TextEmbeddingsInference,
@@ -39,3 +43,7 @@ async def test_tei_values_generation(setup_clients):
     assert helm_params["env"] == {
         "HUGGING_FACE_HUB_TOKEN": "random-token",
     }
+    assert helm_params["serverExtraArgs"] == [
+        "--max-concurrent-requests=512",
+        "--max-client-batch-size=16",
+    ]
