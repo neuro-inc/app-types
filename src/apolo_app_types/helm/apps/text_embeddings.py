@@ -44,9 +44,12 @@ class TextEmbeddingsChartValueProcessor(
             )
         }
 
-        # Add extra environment variables with priority over base ones
+        # Parse and add extra environment variables with priority over base ones
         # User-provided extra_env_vars override any existing env vars with the same name
-        env_vars.update(tei.extra_env_vars)
+        for env_var in tei.extra_env_vars:
+            if "=" in env_var:
+                key, value = env_var.split("=", 1)
+                env_vars[key] = value
 
         return env_vars
 

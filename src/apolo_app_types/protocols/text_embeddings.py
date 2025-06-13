@@ -30,13 +30,14 @@ class TextEmbeddingsInferenceAppInputs(AppInputs):
             "to pass to the server (see TEI doc, e.g. --max-client-batch-size=1024).",
         ).as_json_schema_extra(),
     )
-    extra_env_vars: dict[str, str] = Field(  # noqa: N815
-        default_factory=dict,
+    extra_env_vars: list[str] = Field(  # noqa: N815
+        default_factory=list,
         json_schema_extra=SchemaExtraMetadata(
             title="Extra Environment Variables",
-            description="Additional environment variables to set for the "
-            "container. These will override any existing environment variables "
-            "with the same name. (see vLLM doc, e.g. VLLM_USE_V1=0)",
+            description="Additional environment variables to set for the container "
+            "in KEY=VALUE format (e.g. TEI_LOG_LEVEL=debug). "
+            "These will override any existing environment variables with "
+            "the same name.",
         ).as_json_schema_extra(),
     )
 

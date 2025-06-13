@@ -72,13 +72,14 @@ class LLMInputs(AppInputs):
             "to pass to the server (see VLLM doc, e.g. --max-model-len=131072).",
         ).as_json_schema_extra(),
     )
-    extra_env_vars: dict[str, str] = Field(  # noqa: N815
-        default_factory=dict,
+    extra_env_vars: list[str] = Field(  # noqa: N815
+        default_factory=list,
         json_schema_extra=SchemaExtraMetadata(
             title="Extra Environment Variables",
-            description="Additional environment variables to set for "
-            "the container. These will override any existing environment "
-            "variables with the same name.",
+            description="Additional environment variables to set for the container "
+            "in KEY=VALUE format (e.g. VLLM_USE_V1=0). "
+            "These will override any existing environment variables "
+            "with the same name.",
         ).as_json_schema_extra(),
     )
     cache_config: HuggingFaceCache | None = Field(
