@@ -46,7 +46,12 @@ class TextEmbeddingsChartValueProcessor(
 
         # Add extra environment variables with priority over base ones
         # User-provided extra_env_vars override any existing env vars with the same name
-        env_vars.update(tei.extra_env_vars)
+        for env_var in tei.extra_env_vars:
+            value = env_var.deserialize_value(app_secrets_name)
+            if isinstance(value, str | dict):
+                env_vars[env_var.name] = value
+            else:
+                env_vars[env_var.name] = str(value)
 
         return env_vars
 
