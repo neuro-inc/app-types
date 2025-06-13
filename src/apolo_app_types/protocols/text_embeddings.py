@@ -8,6 +8,7 @@ from apolo_app_types.protocols.common import (
     Preset,
     SchemaExtraMetadata,
 )
+from apolo_app_types.protocols.common.k8s import Env
 from apolo_app_types.protocols.common.openai_compat import OpenAICompatEmbeddingsAPI
 
 
@@ -30,14 +31,15 @@ class TextEmbeddingsInferenceAppInputs(AppInputs):
             "to pass to the server (see TEI doc, e.g. --max-client-batch-size=1024).",
         ).as_json_schema_extra(),
     )
-    extra_env_vars: list[str] = Field(  # noqa: N815
+    extra_env_vars: list[Env] = Field(  # noqa: N815
         default_factory=list,
         json_schema_extra=SchemaExtraMetadata(
             title="Extra Environment Variables",
-            description="Additional environment variables to set for the container "
-            "in KEY=VALUE format (e.g. TEI_LOG_LEVEL=debug). "
-            "These will override any existing environment variables with "
-            "the same name.",
+            description=(
+                "Additional environment variables to inject into the container. "
+                "These will override any existing environment variables "
+                "with the same name."
+            ),
         ).as_json_schema_extra(),
     )
 

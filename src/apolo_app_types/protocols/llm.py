@@ -12,6 +12,7 @@ from apolo_app_types.protocols.common import (
     SchemaExtraMetadata,
     SchemaMetaType,
 )
+from apolo_app_types.protocols.common.k8s import Env
 from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
@@ -72,14 +73,15 @@ class LLMInputs(AppInputs):
             "to pass to the server (see VLLM doc, e.g. --max-model-len=131072).",
         ).as_json_schema_extra(),
     )
-    extra_env_vars: list[str] = Field(  # noqa: N815
+    extra_env_vars: list[Env] = Field(  # noqa: N815
         default_factory=list,
         json_schema_extra=SchemaExtraMetadata(
             title="Extra Environment Variables",
-            description="Additional environment variables to set for the container "
-            "in KEY=VALUE format (e.g. VLLM_USE_V1=0). "
-            "These will override any existing environment variables "
-            "with the same name.",
+            description=(
+                "Additional environment variables to inject into the container. "
+                "These will override any existing environment variables "
+                "with the same name."
+            ),
         ).as_json_schema_extra(),
     )
     cache_config: HuggingFaceCache | None = Field(
