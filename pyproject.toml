@@ -47,7 +47,7 @@ httpx = "^0.28.0"
 kubernetes = "^31.0.0"
 pydantic = "^2.11.7"
 pyyaml = "^6.0.2"
-types-PyYAML = "^6.0.12.20241230"
+types-PyYAML = "^6.0.12.20250516"
 yarl = "^1.18.3"
 
 [tool.poetry-dynamic-versioning]
