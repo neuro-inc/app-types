@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 import sys
@@ -30,33 +31,52 @@ from apolo_app_types.outputs.weaviate import get_weaviate_outputs
 
 logger = logging.getLogger()
 
+MAX_RETRIES = 5
+RETRY_DELAY = 5  # seconds
+
 
 async def post_outputs(api_url: str, api_token: str, outputs: dict[str, t.Any]) -> None:
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                api_url,
-                headers={"Authorization": f"Bearer {api_token}"},
-                json={"output": outputs},
-            )
-            logger.info(
-                "API response status code: %s, body: %s",
-                response.status_code,
-                response.text,
-            )
-            response.raise_for_status()
-    except httpx.HTTPStatusError as e:
-        logger.error(
-            "HTTP error occurred: %s - Response body: %s",
-            e,
-            e.response.text if e.response else "No response",
-        )
-        sys.exit(1)
-    except httpx.RequestError as e:
-        logger.error("Request error occurred: %s", e)
-        sys.exit(1)
-    except Exception as e:
-        logger.exception("Unexpected error occurred: %s", e)
+    async with httpx.AsyncClient() as client:
+        for attempt in range(1, MAX_RETRIES + 1):
+            try:
+                response = await client.post(
+                    api_url,
+                    headers={"Authorization": f"Bearer {api_token}"},
+                    json={"output": outputs},
+                )
+                logger.info(
+                    "API response status code: %s, body: %s",
+                    response.status_code,
+                    response.text,
+                )
+                if 200 <= response.status_code < 300:
+                    return
+                logger.warning(
+                    "Non-2xx response (attempt %d/%d): %s",
+                    attempt,
+                    MAX_RETRIES,
+                    response.status_code,
+                )
+            except httpx.RequestError as e:
+                logger.warning(
+                    "Request error on attempt %d/%d: %s",
+                    attempt,
+                    MAX_RETRIES,
+                    e,
+                )
+            except Exception as e:
+                logger.exception(
+                    "Unexpected error on attempt %d/%d: %s",
+                    attempt,
+                    MAX_RETRIES,
+                    e,
+                )
+
+            if attempt < MAX_RETRIES:
+                await asyncio.sleep(RETRY_DELAY)
+
+        # Final failure after all retries
+        logger.error("Failed to post outputs after %d attempts", MAX_RETRIES)
         sys.exit(1)
 
 
