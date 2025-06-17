@@ -58,7 +58,7 @@ vcs = "git"
 optional = true
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^4.0.1"
+pre-commit = "^4.2.0"
 pytest = "^8.3.4"
 pytest-asyncio = "^1.0.0"
 pytest-cov = "^6.2.1"
