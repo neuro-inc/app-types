@@ -18,6 +18,7 @@ from apolo_app_types.helm.apps import (
     StableDiffusionChartValueProcessor,
 )
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
+from apolo_app_types.helm.apps.buckets import BucketsChartValueProcessor
 from apolo_app_types.helm.apps.dify import DifyChartValueProcessor
 from apolo_app_types.helm.apps.dockerhub import DockerHubModelChartValueProcessor
 from apolo_app_types.helm.apps.fooocus import FooocusChartValueProcessor
@@ -71,6 +72,7 @@ async def app_type_to_vals(
         AppType.Shell: ShellChartValueProcessor,
         AppType.Dify: DifyChartValueProcessor,
         AppType.Superset: SupersetChartValueProcessor,
+        AppType.Buckets: BucketsChartValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)
