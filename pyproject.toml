@@ -58,11 +58,12 @@ vcs = "git"
 optional = true
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^4.0.1"
-pytest = "^8.3.4"
-pytest-asyncio = "^0.25.3"
-pytest-cov = "^6.0.0"
-mypy = "^1.15.0"
+pre-commit = "^4.2.0"
+pytest = "^8.4.0"
+pytest-asyncio = "^1.0.0"
+pytest-cov = "^6.2.1"
+mypy = "^1.16.1"
+dirty-equals = "^0.9.0"
 
 [tool.ruff]
 target-version = "py311"

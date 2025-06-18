@@ -1,4 +1,5 @@
 import typing as t
+from importlib.metadata import version
 
 import apolo_sdk
 
@@ -85,6 +86,16 @@ async def app_type_to_vals(
         namespace=namespace,
         app_secrets_name=app_secrets_name,
     )
+
+    # Adding post-install hook image version
+    try:
+        app_types_image_version = "v" + version("apolo-app-types")
+    except Exception:
+        app_types_image_version = "development"
+    extra_vals["appTypesImage"] = {
+        "tag": app_types_image_version,
+    }
+
     return extra_helm_args, extra_vals
 
 

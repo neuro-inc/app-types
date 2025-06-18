@@ -1,5 +1,7 @@
 from unittest.mock import ANY
 
+from dirty_equals import IsStr
+
 from apolo_app_types import HuggingFaceModel, LLMInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import (
@@ -206,6 +208,7 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
             "platform.apolo.us/component": "app",
             "platform.apolo.us/preset": "gpu-small",
         },
+        "appTypesImage": {"tag": IsStr(regex=r"^v\d+\.\d+\.\d+.*$")},
     }
 
 
@@ -501,5 +504,8 @@ async def test_values_llm_generation__storage_integrated(
         "podLabels": {
             "platform.apolo.us/component": "app",
             "platform.apolo.us/preset": "gpu-small",
+        },
+        "appTypesImage": {
+            "tag": IsStr(regex=r"^v\d+\.\d+\.\d+.*$"),
         },
     }
