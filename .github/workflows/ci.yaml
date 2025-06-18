@@ -55,13 +55,20 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
-      - name: Release development image
+      - name: Build development image
         run: |
           make build-hook-image
-      - name: Release development image
+      - name: Push development image
         run: |
           export IMAGE_TAG=development
           make push-hook-image
+      - name: Push release image
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          export IMAGE_TAG=$TAG_NAME
+          make push-hook-image
+
   release-hook-image-pr:
     name: Release hook image from PR
     runs-on: ubuntu-latest

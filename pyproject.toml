@@ -63,6 +63,7 @@ pytest = "^8.4.0"
 pytest-asyncio = "^1.0.0"
 pytest-cov = "^6.2.1"
 mypy = "^1.16.1"
+dirty-equals = "^0.9.0"
 
 [tool.ruff]
 target-version = "py311"
