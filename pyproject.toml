@@ -48,7 +48,7 @@ kubernetes = "^33.1.0"
 pydantic = "^2.11.7"
 pyyaml = "^6.0.2"
 types-PyYAML = "^6.0.12.20250516"
-yarl = "^1.18.3"
+yarl = "^1.20.1"
 
 [tool.poetry-dynamic-versioning]
 enable = true
