@@ -37,6 +37,7 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
         input_: SupersetInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         app_secrets_name: str,
         *_: t.Any,
         **kwargs: t.Any,
@@ -50,6 +51,7 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
             ingress_http=input_.ingress_http,
             # ingress_grpc=input_.ingress_grpc,
             namespace=namespace,
+            app_id=app_id,
         )
         secret = _generate_superset_secret_hex()
         logger.debug("Generated extra Superset values: %s", values)

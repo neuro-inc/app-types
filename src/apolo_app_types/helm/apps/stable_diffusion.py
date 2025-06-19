@@ -49,13 +49,14 @@ class StableDiffusionChartValueProcessor(
         input_: StableDiffusionInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         app_secrets_name: str,
         *_: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
         preset_name = input_.preset.name
         generic_vals = await gen_extra_values(
-            self.client, input_.preset, input_.ingress_http, None, namespace
+            self.client, input_.preset, app_id, input_.ingress_http, None, namespace
         )
 
         preset = get_preset(self.client, preset_name)

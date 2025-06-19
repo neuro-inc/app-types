@@ -140,6 +140,7 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
         input_: LLMInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         app_secrets_name: str,
         *_: t.Any,
         **kwargs: t.Any,
@@ -153,6 +154,7 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
         values = await gen_extra_values(
             self.client,
             input_.preset,
+            app_id,
             input_.ingress_http,
             None,
             namespace,

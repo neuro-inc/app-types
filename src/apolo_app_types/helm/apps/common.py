@@ -256,12 +256,12 @@ def append_apolo_storage_integration_annotations(
 async def gen_extra_values(
     apolo_client: apolo_sdk.Client,
     preset_type: PresetType,
+    app_id: str,
     ingress_http: IngressHttp | None = None,
     ingress_grpc: IngressGrpc | None = None,
     namespace: str | None = None,
     port_configurations: list[Port] | None = None,
     component_name: str | None = None,
-    app_id: str | None = None,
 ) -> dict[str, t.Any]:
     preset_name = preset_type.name
     if not preset_name:
@@ -282,11 +282,11 @@ async def gen_extra_values(
             raise ValueError(exception_msg)
         if ingress_http:
             http_ingress_conf = await get_http_ingress_values(
-                apolo_client, ingress_http, namespace, port_configurations
+                apolo_client, ingress_http, namespace, app_id, port_configurations
             )
         if ingress_grpc:
             grpc_ingress_conf = await get_grpc_ingress_values(
-                apolo_client, ingress_grpc, namespace, port_configurations
+                apolo_client, ingress_grpc, namespace, app_id, port_configurations
             )
 
         ingress_vals["ingress"] = {

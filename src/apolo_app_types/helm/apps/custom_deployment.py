@@ -51,8 +51,8 @@ class CustomDeploymentChartValueProcessor(
         input_: CustomDeploymentInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         app_secrets_name: str,
-        app_id: str | None = None,
         *_: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:

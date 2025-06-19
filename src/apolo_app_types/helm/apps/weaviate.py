@@ -102,6 +102,7 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
         input_: WeaviateInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         app_secrets_name: str,
         *_: t.Any,
         **kwargs: t.Any,
@@ -115,6 +116,7 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
             ingress_http=input_.ingress_http,
             # ingress_grpc=input_.ingress_grpc,
             namespace=namespace,
+            app_id=app_id,
         )
 
         # TODO: temporarily removed cluster_api from WeaviateInputs and

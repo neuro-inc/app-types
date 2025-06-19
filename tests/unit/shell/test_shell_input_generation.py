@@ -8,6 +8,7 @@ from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import Preset
 
 from tests.unit.constants import (
+    APP_ID,
     APP_SECRETS_NAME,
     DEFAULT_CLUSTER_NAME,
     DEFAULT_NAMESPACE,
@@ -27,6 +28,7 @@ async def test_shell_values_generation(setup_clients):
         app_name="shell-app",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
     assert helm_params["image"] == {
         "repository": "ghcr.io/neuro-inc/web-shell",

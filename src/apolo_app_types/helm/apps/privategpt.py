@@ -78,6 +78,7 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
         input_: PrivateGPTAppInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         app_secrets_name: str,
         *_: t.Any,
         **kwargs: t.Any,
@@ -155,6 +156,7 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
             input_=custom_deployment,
             app_name=app_name,
             namespace=namespace,
+            app_id=app_id,
             app_secrets_name=app_secrets_name,
         )
         return {**custom_app_vals, "labels": {"application": "privategpt"}}

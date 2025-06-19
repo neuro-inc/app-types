@@ -49,7 +49,11 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         )
 
     async def gen_outputs_endpoint_values(
-        self, app_name: str, namespace: str, app_secrets_name: str
+        self,
+        app_name: str,
+        namespace: str,
+        app_secrets_name: str,
+        app_id: str,
     ) -> dict[str, t.Any]:
         values = {
             "enabled": True,
@@ -75,6 +79,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
                 app_name=app_name,
                 namespace=namespace,
                 app_secrets_name=app_secrets_name,
+                app_id=app_id,
             ),
             "includeMainDeploymentInfo": True,
         }
@@ -89,8 +94,8 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         input_: MLFlowAppInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         app_secrets_name: str,
-        app_id: str | None = None,
         *args: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -105,6 +110,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
             ingress_http=input_.ingress_http,
             ingress_grpc=None,
             namespace=namespace,
+            app_id=app_id,
         )
 
         envs: list[Env] = []
@@ -235,6 +241,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
             app_name=app_name,
             namespace=namespace,
             app_secrets_name=app_secrets_name,
+            app_id=app_id,
         )
 
         return merged_vals

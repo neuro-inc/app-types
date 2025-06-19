@@ -198,6 +198,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
         input_: PostgresInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         app_secrets_name: str,
         *_: t.Any,
         **kwargs: t.Any,

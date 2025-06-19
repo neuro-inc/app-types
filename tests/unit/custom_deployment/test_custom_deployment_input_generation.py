@@ -32,7 +32,7 @@ from apolo_app_types.protocols.custom_deployment import (
     StorageMounts,
 )
 
-from tests.unit.constants import APP_SECRETS_NAME
+from tests.unit.constants import APP_ID, APP_SECRETS_NAME
 
 
 @pytest.mark.asyncio
@@ -59,6 +59,7 @@ async def test_custom_deployment_values_generation(setup_clients):
         app_name="custom-app",
         namespace="default-namespace",
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
     assert helm_params["image"] == {
         "repository": "myrepo/custom-deployment",
@@ -128,6 +129,7 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
         app_name="custom-app",
         namespace="default-namespace",
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
 
     # The base checks from the existing test
@@ -199,6 +201,7 @@ async def test_custom_deployment_values_generation_with_multiport_exposure(
         app_type=AppType.CustomDeployment,
         app_name="custom-app",
         namespace="default-namespace",
+        app_id=APP_ID,
         app_secrets_name=APP_SECRETS_NAME,
     )
 
@@ -259,6 +262,7 @@ async def test_custom_deployment_values_generation_path_port_not_supplied(
         app_name="custom-app",
         namespace="default-namespace",
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
 
     # The base checks from the existing test
@@ -309,6 +313,7 @@ async def test_custom_deployment_values_generation_network_not_supplied(
         app_name="custom-app",
         namespace="default-namespace",
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
 
     # The base checks from the existing test
@@ -391,6 +396,7 @@ async def test_custom_deployment_values_generation_with_health_checks(
         app_name="custom-app",
         namespace="default-namespace",
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
 
     # Base assertions
@@ -477,6 +483,7 @@ async def test_custom_deployment_values_configmap_checks(
         app_name="custom-app",
         namespace="default-namespace",
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
 
     # Base assertions
@@ -546,7 +553,7 @@ async def test_custom_deployment_values_app_id(
         app_name="custom-app",
         namespace="default-namespace",
         app_secrets_name=APP_SECRETS_NAME,
-        app_id="custom-app-id",
+        app_id=APP_ID,
     )
 
     # Base assertions
@@ -565,4 +572,4 @@ async def test_custom_deployment_values_app_id(
         "ports": [{"name": "http", "containerPort": 8080}],
     }
 
-    assert helm_params["apolo_app_id"] == "custom-app-id"
+    assert helm_params["apolo_app_id"] == APP_ID

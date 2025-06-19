@@ -60,6 +60,7 @@ class TextEmbeddingsChartValueProcessor(
         input_: TextEmbeddingsInferenceAppInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         app_secrets_name: str,
         *args: t.Any,
         **kwargs: t.Any,
@@ -70,6 +71,7 @@ class TextEmbeddingsChartValueProcessor(
         values = await gen_extra_values(
             self.client,
             input_.preset,
+            app_id,
             input_.ingress_http,
             None,
             namespace,

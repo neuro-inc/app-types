@@ -48,6 +48,7 @@ class VSCodeChartValueProcessor(BaseChartValueProcessor[VSCodeAppInputs]):
         input_: VSCodeAppInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         app_secrets_name: str,
         *args: t.Any,
         **kwargs: t.Any,
@@ -122,5 +123,6 @@ class VSCodeChartValueProcessor(BaseChartValueProcessor[VSCodeAppInputs]):
             app_name=app_name,
             namespace=namespace,
             app_secrets_name=app_secrets_name,
+            app_id=app_id,
         )
         return {**custom_app_vals, "labels": {"application": "vscode"}}

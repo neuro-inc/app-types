@@ -41,7 +41,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         )
         mount_path = "/opt/spark/app"
         main_app_file_mount = ApoloFilesMount(
-            storage_uri=ApoloFilesPath(path=str(main_app_file_path.parent)),  # type: ignore
+            storage_uri=ApoloFilesPath(path=str(main_app_file_path.parent)),
             mount_path=MountPath(path=mount_path),
             mode=ApoloMountMode(mode="r"),
         )
@@ -51,7 +51,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             self.client,
         )
 
-        main_application_file = f"local://{mount_path}/{main_app_file_path.name}"  # type: ignore
+        main_application_file = f"local://{mount_path}/{main_app_file_path.name}"
         return extra_annotations, main_application_file
 
     def _get_default_container_image(self) -> ContainerImage:
@@ -64,6 +64,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         input_: SparkJobInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         *_: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -76,11 +77,13 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             apolo_client=self.client,
             preset_type=input_.driver_config.preset,
             namespace=namespace,
+            app_id=app_id,
         )
         executor_extra_values = await gen_extra_values(
             apolo_client=self.client,
             preset_type=input_.executor_config.preset,
             namespace=namespace,
+            app_id=app_id,
         )
         extra_labels = gen_apolo_storage_integration_labels(
             client=self.client, inject_storage=True
