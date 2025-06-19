@@ -7,6 +7,7 @@ from apolo_app_types.protocols.huggingface_cache import (
     HuggingFaceCacheInputs,
 )
 from apolo_app_types.protocols.jupyter import JupyterAppInputs
+from apolo_app_types.protocols.lightrag import LightRAGInputs
 from apolo_app_types.protocols.llm import LLMInputs
 from apolo_app_types.protocols.mlflow import MLFlowAppInputs
 from apolo_app_types.protocols.spark_job import SparkJobInputs
@@ -22,6 +23,7 @@ class AppType(enum.StrEnum):
     Dify = "dify"
     StableDiffusion = "stable-diffusion"
     Weaviate = "weaviate"
+    LightRAG = "lightrag"
     Fooocus = "fooocus"
     Jupyter = "jupyter"
     VSCode = "vscode"
@@ -58,25 +60,23 @@ class AppType(enum.StrEnum):
 
     @classmethod
     def from_app_inputs(cls, inputs: AppInputs) -> "AppType":
-        match inputs:
-            case LLMInputs():
-                return AppType.LLMInference
-            case WeaviateInputs():
-                return AppType.Weaviate
-            case StableDiffusionInputs():
-                return AppType.StableDiffusion
-            case DockerHubInputs():
-                return AppType.DockerHub
-            case HuggingFaceCacheInputs():
-                return AppType.HuggingFaceCache
-            case SparkJobInputs():
-                return AppType.SparkJob
-            case MLFlowAppInputs():
-                return AppType.MLFlow
-            case VSCodeAppInputs():
-                return AppType.VSCode
-            case JupyterAppInputs():
-                return AppType.Jupyter
+        # Mapping from input types to app types to reduce complexity
+        input_type_mapping = {
+            LLMInputs: AppType.LLMInference,
+            WeaviateInputs: AppType.Weaviate,
+            LightRAGInputs: AppType.LightRAG,
+            StableDiffusionInputs: AppType.StableDiffusion,
+            DockerHubInputs: AppType.DockerHub,
+            HuggingFaceCacheInputs: AppType.HuggingFaceCache,
+            SparkJobInputs: AppType.SparkJob,
+            MLFlowAppInputs: AppType.MLFlow,
+            VSCodeAppInputs: AppType.VSCode,
+            JupyterAppInputs: AppType.Jupyter,
+        }
 
-        error_message = f"Unsupported input type: {type(inputs).__name__}"
+        input_type = type(inputs)
+        if input_type in input_type_mapping:
+            return input_type_mapping[input_type]
+
+        error_message = f"Unsupported input type: {input_type.__name__}"
         raise ValueError(error_message)
