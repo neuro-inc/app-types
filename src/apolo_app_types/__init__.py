@@ -51,6 +51,14 @@ from apolo_app_types.protocols.jupyter import (
     JupyterOutputs,
     JupyterTypes,
 )
+from apolo_app_types.protocols.lightrag import (
+    LightRAGEmbeddingConfig,
+    LightRAGInputs,
+    LightRAGLLMConfig,
+    LightRAGOutputs,
+    LightRAGPersistence,
+    LightRAGWebUIConfig,
+)
 from apolo_app_types.protocols.llm import (
     LLMInputs,
     OpenAICompatibleAPI,
@@ -136,6 +144,12 @@ __all__ = [
     "TextEmbeddingsInferenceAppOutputs",
     "WeaviateInputs",
     "WeaviateOutputs",
+    "LightRAGInputs",
+    "LightRAGOutputs",
+    "LightRAGPersistence",
+    "LightRAGLLMConfig",
+    "LightRAGEmbeddingConfig",
+    "LightRAGWebUIConfig",
     "OpenAICompatibleEmbeddingsAPI",
     "OpenAICompatibleAPI",
     "OpenAICompatibleChatAPI",
