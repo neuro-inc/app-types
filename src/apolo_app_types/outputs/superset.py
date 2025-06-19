@@ -5,7 +5,7 @@ from apolo_app_types.outputs.common import INSTANCE_LABEL
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
 from apolo_app_types.protocols.common import RestAPI, ServiceAPI
 from apolo_app_types.protocols.common.networking import HttpApi
-from apolo_app_types.protocols.superset import SupersetOutputs
+from apolo_app_types.protocols.superset import SupersetOutputs, SupersetUserConfig
 
 
 async def get_superset_outputs(
@@ -33,11 +33,18 @@ async def get_superset_outputs(
             base_path="/",
             protocol="https",
         )
-
+    admin_config = helm_values.get("init", {}).get("adminUser", {})
     return SupersetOutputs(
         web_app_url=ServiceAPI[HttpApi](
             internal_url=internal_web_app_url,
             external_url=external_web_app_url,
         ),
         secret=helm_values.get("extraSecretEnv", {}).get("SUPERSET_SECRET_KEY", None),
+        admin_user=SupersetUserConfig(
+            username=admin_config.get("username"),
+            firstname=admin_config.get("firstname"),
+            lastname=admin_config.get("lastname"),
+            password=admin_config.get("password"),
+            email=admin_config.get("email"),
+        ),
     ).model_dump()

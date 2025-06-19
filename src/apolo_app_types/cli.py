@@ -81,6 +81,7 @@ def update_outputs(
 @click.argument("inputs_json", type=str)
 @click.argument("helm_values_path", type=Path)
 @click.argument("helm_args_path", type=Path)
+@click.argument("apps_secret_name", type=str)
 @click.option("--inputs-type", type=str, envvar="APOLO_APP_INPUTS_TYPE")
 @click.option("--preprocessor-type", type=str, envvar="APOLO_APP_PREPROCESSOR_TYPE")
 @click.option("--apolo-api-url", type=str, envvar="APOLO_API_URL", required=True)
@@ -95,6 +96,7 @@ def run_preprocessor(
     inputs_json: str,
     helm_values_path: Path,
     helm_args_path: Path,
+    apps_secret_name: str,
     inputs_type: str | None,
     preprocessor_type: str | None,
     apolo_api_url: str,
@@ -136,7 +138,7 @@ def run_preprocessor(
                     input_=loaded_inputs,
                     app_name=app_name,
                     namespace=namespace,
-                    app_secrets_name="apps-secrets",
+                    app_secrets_name=apps_secret_name,
                     app_id=app_id,
                 )
                 with helm_values_path.open("w") as f:  # noqa: ASYNC230
