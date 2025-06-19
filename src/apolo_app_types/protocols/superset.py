@@ -41,7 +41,7 @@ class SupersetUserConfig(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Configuration for the admin user.",
             description="Set the admin user fields to be ",
-        ),
+        ).as_json_schema_extra(),
     )
     username: str = Field(
         default="admin",
@@ -71,7 +71,7 @@ class SupersetUserConfig(AbstractAppFieldType):
         default="admin",
         json_schema_extra=SchemaExtraMetadata(
             title="Admin Password", description="Set Admin password."
-        ),
+        ).as_json_schema_extra()
     )
 
 

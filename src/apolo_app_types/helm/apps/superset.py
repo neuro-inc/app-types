@@ -35,7 +35,7 @@ def _generate_superset_secret_hex(length: int = 16) -> str:
 
 
 class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
-    async def _get_init_params(self, input_: SupersetInputs) -> dict:
+    async def _get_init_params(self, input_: SupersetInputs) -> dict[str, t.Any]:
         return {
             "init": {
                 "adminUser": {
@@ -48,7 +48,7 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
             }
         }
 
-    async def _get_postgres_values(self, input_: SupersetInputs):
+    async def _get_postgres_values(self, input_: SupersetInputs) -> dict[str, t.Any]:
         if not input_.postgres_user:
             return {}
         return {
