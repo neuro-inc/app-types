@@ -43,7 +43,7 @@ async def _generate_ingress_config(
 ) -> dict[str, t.Any]:
     ingress_hostname = await _get_ingress_name_template(apolo_client)
     hostname = ingress_hostname.format(
-        **{APP_NAME_PLACEHOLDER: namespace + namespace_suffix}
+        **{APP_NAME_PLACEHOLDER: namespace + "-" + namespace_suffix}
     )
 
     if hostname.endswith("."):

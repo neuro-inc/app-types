@@ -71,7 +71,7 @@ class SupersetUserConfig(AbstractAppFieldType):
         default="admin",
         json_schema_extra=SchemaExtraMetadata(
             title="Admin Password", description="Set Admin password."
-        ).as_json_schema_extra()
+        ).as_json_schema_extra(),
     )
 
 
