@@ -15,6 +15,9 @@ from apolo_app_types.protocols.text_embeddings import TextEmbeddingsInferenceApp
 
 logger = logging.getLogger(__name__)
 
+# TEI Docker image repository
+TEI_IMAGE_REPOSITORY = "ghcr.io/huggingface/text-embeddings-inference"
+
 
 def _detect_gpu_architecture(preset: apolo_sdk.Preset) -> str:
     """
@@ -26,6 +29,13 @@ def _detect_gpu_architecture(preset: apolo_sdk.Preset) -> str:
     """
     # If no NVIDIA GPU, use CPU image
     if not preset.nvidia_gpu or preset.nvidia_gpu == 0:
+        # Check for AMD GPU - not supported by TEI, fall back to CPU
+        if preset.amd_gpu and preset.amd_gpu > 0:
+            logger.warning(
+                "AMD GPU detected (%s) is not supported by HuggingFace Text "
+                "Embeddings Inference. Falling back to CPU image.",
+                preset.amd_gpu_model or "Unknown AMD GPU",
+            )
         return "cpu"
 
     # If no GPU model specified, default to ampere-80 (safest choice)
@@ -39,7 +49,10 @@ def _detect_gpu_architecture(preset: apolo_sdk.Preset) -> str:
 
     # Map GPU models to architectures based on HuggingFace TEI documentation
     # Volta (V100) - NOT SUPPORTED by HuggingFace TEI
-    if any(model in gpu_model for model in ["v100", "volta"]):
+    if any(
+        model in gpu_model
+        for model in ["v100", "volta", "tesla-v100", "tesla-v100-pcie"]
+    ):
         logger.warning(
             "GPU model %s (Volta architecture) is not supported by "
             "HuggingFace Text Embeddings Inference. Falling back to CPU image.",
@@ -50,30 +63,71 @@ def _detect_gpu_architecture(preset: apolo_sdk.Preset) -> str:
     # Turing (T4, RTX 2000 series) - Experimental support
     if any(
         model in gpu_model
-        for model in ["t4", "rtx 20", "rtx20", "2080", "2070", "2060"]
+        for model in [
+            "t4",
+            "rtx 20",
+            "rtx20",
+            "2080",
+            "2070",
+            "2060",
+            "turing",
+            "tesla t4",
+        ]
     ):
         return "turing"
 
     # Ampere 80 (A100, A30)
-    if any(model in gpu_model for model in ["a100", "a30"]):
+    if any(
+        model in gpu_model
+        for model in ["a100", "a30", "nvidia-a100", "nvidia-a100-sxm4"]
+    ):
         return "ampere-80"
 
     # Ampere 86 (A10, A40, RTX 3000 series)
     if any(
         model in gpu_model
-        for model in ["a10", "a40", "rtx 30", "rtx30", "3090", "3080", "3070", "3060"]
+        for model in [
+            "a10",
+            "a40",
+            "rtx 30",
+            "rtx30",
+            "3090",
+            "3080",
+            "3070",
+            "3060",
+            "geforce rtx 30",
+        ]
     ):
         return "ampere-86"
 
     # Ada Lovelace (RTX 4000 series)
     if any(
         model in gpu_model
-        for model in ["rtx 40", "rtx40", "4090", "4080", "4070", "4060", "ada"]
+        for model in [
+            "rtx 40",
+            "rtx40",
+            "4090",
+            "4080",
+            "4070",
+            "4060",
+            "ada",
+            "lovelace",
+            "geforce rtx 40",
+        ]
     ):
         return "ada-lovelace"
 
     # Hopper (H100)
-    if any(model in gpu_model for model in ["h100", "hopper"]):
+    if any(
+        model in gpu_model
+        for model in [
+            "h100",
+            "hopper",
+            "nvidia-h100",
+            "nvidia-dgx-h100",
+            "nvidia-h100-pcie",
+        ]
+    ):
         return "hopper"
 
     # Unknown GPU model - default to ampere-80 as safest fallback
@@ -97,32 +151,32 @@ def _get_tei_image_for_architecture(architecture: str) -> dict[str, str]:
     """
     image_map = {
         "cpu": {
-            "repository": "ghcr.io/huggingface/text-embeddings-inference",
+            "repository": TEI_IMAGE_REPOSITORY,
             "tag": "cpu-1.7",
         },
         "turing": {
-            "repository": "ghcr.io/huggingface/text-embeddings-inference",
+            "repository": TEI_IMAGE_REPOSITORY,
             "tag": "turing-1.7",
         },
         "ampere-80": {
-            "repository": "ghcr.io/huggingface/text-embeddings-inference",
+            "repository": TEI_IMAGE_REPOSITORY,
             "tag": "1.7",  # Default/main image for A100/A30
         },
         "ampere-86": {
-            "repository": "ghcr.io/huggingface/text-embeddings-inference",
+            "repository": TEI_IMAGE_REPOSITORY,
             "tag": "86-1.7",
         },
         "ada-lovelace": {
-            "repository": "ghcr.io/huggingface/text-embeddings-inference",
+            "repository": TEI_IMAGE_REPOSITORY,
             "tag": "89-1.7",
         },
         "hopper": {
-            "repository": "ghcr.io/huggingface/text-embeddings-inference",
+            "repository": TEI_IMAGE_REPOSITORY,
             "tag": "hopper-1.7",
         },
     }
 
-    return image_map.get(architecture, image_map["ampere-80"])
+    return image_map.get(architecture, image_map["cpu"])
 
 
 class TextEmbeddingsChartValueProcessor(

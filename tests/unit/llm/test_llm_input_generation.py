@@ -28,9 +28,7 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
             preset=Preset(
                 name="cpu-large",
             ),
-            ingress_http=IngressHttp(
-                clusterName="test",
-            ),
+            ingress_http=IngressHttp(),
             hugging_face_model=HuggingFaceModel(
                 model_hf_name="test", hf_token=hf_token
             ),
@@ -108,9 +106,7 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
             preset=Preset(
                 name="gpu-small",
             ),
-            ingress_http=IngressHttp(
-                clusterName="test",
-            ),
+            ingress_http=IngressHttp(),
             hugging_face_model=HuggingFaceModel(
                 model_hf_name="test", hf_token=hf_token
             ),
@@ -221,9 +217,7 @@ async def test_values_llm_generation_cpu_apolo_secret(
             preset=Preset(
                 name="cpu-large",
             ),
-            ingress_http=IngressHttp(
-                clusterName="test",
-            ),
+            ingress_http=IngressHttp(),
             hugging_face_model=HuggingFaceModel(
                 model_hf_name="test",
                 hf_token=ApoloSecret(
