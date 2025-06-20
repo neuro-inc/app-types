@@ -38,12 +38,12 @@ def _detect_gpu_architecture(preset: apolo_sdk.Preset) -> str:
             )
         return "cpu"
 
-    # If no GPU model specified, default to ampere-80 (safest choice)
+    # If no GPU model specified, default to cpu (safest choice)
     if not preset.nvidia_gpu_model:
         logger.warning(
-            "No GPU model specified in preset, defaulting to ampere-80 architecture"
+            "No GPU model specified in preset, defaulting to cpu architecture"
         )
-        return "ampere-80"
+        return "cpu"
 
     gpu_model = preset.nvidia_gpu_model.lower()
 

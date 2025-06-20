@@ -91,8 +91,8 @@ class TestGPUArchitectureDetection:
         )
         assert _detect_gpu_architecture(preset) == "cpu"
 
-    def test_gpu_preset_no_model_defaults_ampere_80(self):
-        """Test GPU preset without model info defaults to ampere-80."""
+    def test_gpu_preset_no_model_defaults_cpu(self):
+        """Test GPU preset without model info defaults to cpu."""
         preset = ApoloPreset(
             credits_per_hour=Decimal("1.0"),
             cpu=2.0,
@@ -100,7 +100,7 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model=None,
         )
-        assert _detect_gpu_architecture(preset) == "ampere-80"
+        assert _detect_gpu_architecture(preset) == "cpu"
 
     def test_volta_gpu_unsupported_falls_back_cpu(self):
         """Test V100 (Volta) falls back to CPU image."""
