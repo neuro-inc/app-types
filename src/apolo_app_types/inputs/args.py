@@ -87,6 +87,7 @@ async def app_type_to_vals(
         namespace=namespace,
         app_secrets_name=app_secrets_name,
         app_id=app_id,
+        app_type=AppType.SparkJob,
     )
 
     # Adding post-install hook image version

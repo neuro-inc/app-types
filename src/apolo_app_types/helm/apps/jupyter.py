@@ -4,6 +4,7 @@ from apolo_app_types import (
     ContainerImage,
     CustomDeploymentInputs,
 )
+from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.custom_deployment import (
     CustomDeploymentChartValueProcessor,
@@ -209,5 +210,6 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
             namespace=namespace,
             app_id=app_id,
             app_secrets_name=app_secrets_name,
+            app_type=AppType.Jupyter,
         )
         return {**custom_app_vals, "labels": {"application": "jupyter"}}

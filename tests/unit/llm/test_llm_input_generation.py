@@ -60,7 +60,8 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
         },
         "hosts": [
             {
-                "host": f"default-{APP_ID[:8]}.apps.some.org.neu.ro",
+                "host": f"default-{AppType.LLMInference.value}-"
+                f"{APP_ID[:8]}.apps.some.org.neu.ro",
                 "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
             }
         ],
@@ -183,7 +184,8 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
             "className": "traefik",
             "hosts": [
                 {
-                    "host": f"default-{APP_ID[:8]}.apps.some.org.neu.ro",
+                    "host": f"default-{AppType.LLMInference.value}-"
+                    f"{APP_ID[:8]}.apps.some.org.neu.ro",
                     "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
                 }
             ],
@@ -259,7 +261,8 @@ async def test_values_llm_generation_cpu_apolo_secret(
         },
         "hosts": [
             {
-                "host": f"default-{APP_ID[:8]}.apps.some.org.neu.ro",
+                "host": f"default-{AppType.LLMInference.value}-"
+                f"{APP_ID[:8]}.apps.some.org.neu.ro",
                 "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
             }
         ],
@@ -486,7 +489,8 @@ async def test_values_llm_generation__storage_integrated(
             "className": "traefik",
             "hosts": [
                 {
-                    "host": f"default-{APP_ID[:8]}.apps.some.org.neu.ro",
+                    "host": f"default-{AppType.LLMInference.value}-"
+                    f"{APP_ID[:8]}.apps.some.org.neu.ro",
                     "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
                 }
             ],

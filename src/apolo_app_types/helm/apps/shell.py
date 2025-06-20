@@ -130,6 +130,7 @@ class ShellChartValueProcessor(BaseChartValueProcessor[ShellAppInputs]):
             namespace=namespace,
             app_id=app_id,
             app_secrets_name=app_secrets_name,
+            app_type=AppType.Shell,
         )
 
         return {**custom_app_vals, "labels": {"application": "shell"}}

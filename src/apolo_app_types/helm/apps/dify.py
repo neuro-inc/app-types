@@ -3,6 +3,7 @@ import typing as t
 
 import apolo_sdk
 
+from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import gen_extra_values
 from apolo_app_types.helm.apps.ingress import get_http_ingress_values
@@ -104,6 +105,7 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
                     app_id=app_id,
                     namespace=namespace,
                     component_name="redis_master",
+                    app_type=AppType.Dify,
                 ),
             }
         }
@@ -134,6 +136,7 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
                 namespace=namespace,
                 component_name=component_name,
                 app_id=app_id,
+                app_type=AppType.Dify,
             )
 
         values["api"]["secretKey"] = secrets.token_urlsafe(32)
@@ -147,7 +150,11 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
         ingress: dict[str, t.Any] = {"ingress": {}}
         if input_.ingress_http:
             http_ingress_conf = await get_http_ingress_values(
-                self.client, input_.ingress_http, namespace, app_id
+                self.client,
+                input_.ingress_http,
+                namespace,
+                app_id,
+                app_type=AppType.Dify,
             )
             ingress["ingress"] = http_ingress_conf
 

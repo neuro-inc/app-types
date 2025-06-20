@@ -1,5 +1,6 @@
 import typing as t
 
+from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import gen_extra_values
 from apolo_app_types.helm.apps.custom_deployment import (
@@ -80,6 +81,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
                 namespace=namespace,
                 app_secrets_name=app_secrets_name,
                 app_id=app_id,
+                app_type=AppType.MLFlow,
             ),
             "includeMainDeploymentInfo": True,
         }
@@ -111,6 +113,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
             ingress_grpc=None,
             namespace=namespace,
             app_id=app_id,
+            app_type=AppType.MLFlow,
         )
 
         envs: list[Env] = []
@@ -208,6 +211,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
             namespace=namespace,
             app_secrets_name=app_secrets_name,
             app_id=app_id,
+            app_type=AppType.MLFlow,
         )
 
         if use_sqlite:

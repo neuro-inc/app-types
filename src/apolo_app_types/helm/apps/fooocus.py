@@ -153,5 +153,6 @@ class FooocusChartValueProcessor(BaseChartValueProcessor[FooocusAppInputs]):
             namespace=namespace,
             app_id=app_id,
             app_secrets_name=app_secrets_name,
+            app_type=AppType.Fooocus,
         )
         return {**custom_app_vals, "labels": {"application": "fooocus"}}

@@ -4,6 +4,7 @@ from apolo_app_types import (
     ContainerImage,
     CustomDeploymentInputs,
 )
+from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.custom_deployment import (
     CustomDeploymentChartValueProcessor,
@@ -49,6 +50,7 @@ class VSCodeChartValueProcessor(BaseChartValueProcessor[VSCodeAppInputs]):
         app_name: str,
         namespace: str,
         app_id: str,
+        app_type: AppType,
         app_secrets_name: str,
         *args: t.Any,
         **kwargs: t.Any,
@@ -124,5 +126,6 @@ class VSCodeChartValueProcessor(BaseChartValueProcessor[VSCodeAppInputs]):
             namespace=namespace,
             app_secrets_name=app_secrets_name,
             app_id=app_id,
+            app_type=app_type,
         )
         return {**custom_app_vals, "labels": {"application": "vscode"}}

@@ -10,6 +10,7 @@ import apolo_sdk
 import yaml
 from apolo_sdk import Preset
 
+from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.ingress import (
     get_grpc_ingress_values,
     get_http_ingress_values,
@@ -257,6 +258,7 @@ async def gen_extra_values(
     apolo_client: apolo_sdk.Client,
     preset_type: PresetType,
     app_id: str,
+    app_type: AppType,
     ingress_http: IngressHttp | None = None,
     ingress_grpc: IngressGrpc | None = None,
     namespace: str | None = None,
@@ -282,11 +284,21 @@ async def gen_extra_values(
             raise ValueError(exception_msg)
         if ingress_http:
             http_ingress_conf = await get_http_ingress_values(
-                apolo_client, ingress_http, namespace, app_id, port_configurations
+                apolo_client,
+                ingress_http,
+                namespace,
+                app_id,
+                app_type,
+                port_configurations,
             )
         if ingress_grpc:
             grpc_ingress_conf = await get_grpc_ingress_values(
-                apolo_client, ingress_grpc, namespace, app_id, port_configurations
+                apolo_client,
+                ingress_grpc,
+                namespace,
+                app_id,
+                app_type,
+                port_configurations,
             )
 
         ingress_vals["ingress"] = {
