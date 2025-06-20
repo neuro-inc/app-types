@@ -34,7 +34,7 @@ async def get_apolo_registry_secrets_value(
     Get the registry secrets value from the Apolo client.
     """
     token = await get_apolo_registry_token(client, sa_name=sa_name)
-    host = client.config.registry_url.host or "" # type: ignore
+    host = client.config.registry_url.host or ""  # type: ignore
     b64_token = base64.b64encode(f"token:{token}".encode()).decode("utf-8")
     contents = {"auths": {host: {"auth": b64_token}}}
     json_contents = json.dumps(contents)
