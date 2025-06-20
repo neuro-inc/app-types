@@ -3,6 +3,7 @@ import typing as t
 
 import apolo_sdk
 
+from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import gen_extra_values
 from apolo_app_types.helm.apps.ingress import get_http_ingress_values
@@ -92,7 +93,7 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
         }
 
     async def _get_dify_redis_values(
-        self, input_: DifyAppInputs, namespace: str
+        self, input_: DifyAppInputs, namespace: str, app_id: str
     ) -> dict[str, t.Any]:
         return {
             "redis": {
@@ -101,8 +102,10 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
                 "master": await gen_extra_values(
                     self.client,
                     input_.redis.master_preset,
+                    app_id=app_id,
                     namespace=namespace,
                     component_name="redis_master",
+                    app_type=AppType.Dify,
                 ),
             }
         }
@@ -112,6 +115,7 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
         input_: DifyAppInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         app_secrets_name: str,
         *args: t.Any,
         **kwargs: t.Any,
@@ -131,6 +135,8 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
                 component.preset,  # type: ignore[attr-defined]
                 namespace=namespace,
                 component_name=component_name,
+                app_id=app_id,
+                app_type=AppType.Dify,
             )
 
         values["api"]["secretKey"] = secrets.token_urlsafe(32)
@@ -140,11 +146,15 @@ class DifyChartValueProcessor(BaseChartValueProcessor[DifyAppInputs]):
         values.update(
             await self._get_or_create_dify_blob_storage_values(input_, app_name)
         )
-        values.update(await self._get_dify_redis_values(input_, namespace))
+        values.update(await self._get_dify_redis_values(input_, namespace, app_id))
         ingress: dict[str, t.Any] = {"ingress": {}}
         if input_.ingress_http:
             http_ingress_conf = await get_http_ingress_values(
-                self.client, input_.ingress_http, namespace
+                self.client,
+                input_.ingress_http,
+                namespace,
+                app_id,
+                app_type=AppType.Dify,
             )
             ingress["ingress"] = http_ingress_conf
 

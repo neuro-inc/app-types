@@ -10,7 +10,7 @@ from apolo_app_types.helm.apps.common import _get_match_expressions
 from apolo_app_types.protocols.common import IngressGrpc, IngressHttp, Preset
 from apolo_app_types.protocols.weaviate import WeaviatePersistence
 
-from tests.unit.constants import APP_SECRETS_NAME, DEFAULT_NAMESPACE
+from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
 
 @pytest.mark.asyncio
@@ -37,6 +37,7 @@ async def test_values_weaviate_generation_basic(setup_clients, mock_get_preset_c
         app_name="weaviate",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
 
     assert helm_params["resources"]["requests"]["cpu"] == "1000.0m"
@@ -97,6 +98,7 @@ async def test_values_weaviate_generation_with_ingress(
         app_name="weaviate",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
 
     assert helm_params["ingress"]["enabled"] is True
@@ -150,6 +152,7 @@ async def test_values_weaviate_generation_with_auth(setup_clients, mock_get_pres
         app_name="weaviate",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
 
     # assert helm_params["clusterApi"]["username"] == "testuser"
@@ -231,6 +234,7 @@ async def test_values_weaviate_generation_with_backup(
         app_name="weaviate",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
 
     assert helm_params["backups"]["s3"]["enabled"] is True

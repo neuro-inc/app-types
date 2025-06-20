@@ -16,7 +16,7 @@ from apolo_app_types.protocols.dify import (
     DifyAppWorker,
 )
 
-from tests.unit.constants import APP_SECRETS_NAME, DEFAULT_NAMESPACE
+from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
 
 @pytest.mark.asyncio
@@ -79,6 +79,7 @@ async def test_dify_values_generation(setup_clients):
             app_name="dify-app",
             namespace=DEFAULT_NAMESPACE,
             app_secrets_name=APP_SECRETS_NAME,
+            app_id=APP_ID,
         )
         assert helm_params["api"]["podLabels"] == {
             "platform.apolo.us/component": "api",

@@ -3,6 +3,7 @@ import typing as t
 from apolo_sdk import Preset
 
 from apolo_app_types import LLMInputs
+from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
     append_apolo_storage_integration_annotations,
@@ -140,6 +141,7 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
         input_: LLMInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         app_secrets_name: str,
         *_: t.Any,
         **kwargs: t.Any,
@@ -153,6 +155,8 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
         values = await gen_extra_values(
             self.client,
             input_.preset,
+            app_id,
+            AppType.LLMInference,
             input_.ingress_http,
             None,
             namespace,

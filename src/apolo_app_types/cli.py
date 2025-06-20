@@ -137,6 +137,7 @@ def run_preprocessor(
                     app_name=app_name,
                     namespace=namespace,
                     app_secrets_name="apps-secrets",
+                    app_id=app_id,
                 )
                 with helm_values_path.open("w") as f:  # noqa: ASYNC230
                     json.dump(extra_vals, f)
