@@ -10,7 +10,10 @@ from apolo_app_types.helm.apps.custom_deployment import (
 )
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
 from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
-from apolo_app_types.protocols.text_embeddings import TextEmbeddingsInferenceAppInputs
+from apolo_app_types.protocols.text_embeddings import (
+    TextEmbeddingsInferenceAppInputs,
+    TextEmbeddingsInferenceArchitecture,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -19,16 +22,17 @@ logger = logging.getLogger(__name__)
 TEI_IMAGE_REPOSITORY = "ghcr.io/huggingface/text-embeddings-inference"
 
 
-def _detect_gpu_architecture(preset: apolo_sdk.Preset) -> str:
+def _detect_gpu_architecture(
+    preset: apolo_sdk.Preset,
+) -> TextEmbeddingsInferenceArchitecture:
     """
     Detect GPU architecture from preset to select appropriate TEI Docker image.
 
     Returns:
-        str: Architecture identifier (cpu, turing, ampere-80, ampere-86,
-             ada-lovelace, hopper)
+        TextEmbeddingsInferenceArchitecture: Architecture identifier
     """
     # If no NVIDIA GPU, use CPU image
-    if not preset.nvidia_gpu or preset.nvidia_gpu == 0:
+    if not preset.nvidia_gpu:
         # Check for AMD GPU - not supported by TEI, fall back to CPU
         if preset.amd_gpu and preset.amd_gpu > 0:
             logger.warning(
@@ -36,14 +40,14 @@ def _detect_gpu_architecture(preset: apolo_sdk.Preset) -> str:
                 "Embeddings Inference. Falling back to CPU image.",
                 preset.amd_gpu_model or "Unknown AMD GPU",
             )
-        return "cpu"
+        return TextEmbeddingsInferenceArchitecture.CPU
 
     # If no GPU model specified, default to cpu (safest choice)
     if not preset.nvidia_gpu_model:
         logger.warning(
             "No GPU model specified in preset, defaulting to cpu architecture"
         )
-        return "cpu"
+        return TextEmbeddingsInferenceArchitecture.CPU
 
     gpu_model = preset.nvidia_gpu_model.lower()
 
@@ -58,7 +62,7 @@ def _detect_gpu_architecture(preset: apolo_sdk.Preset) -> str:
             "HuggingFace Text Embeddings Inference. Falling back to CPU image.",
             preset.nvidia_gpu_model,
         )
-        return "cpu"
+        return TextEmbeddingsInferenceArchitecture.CPU
 
     # Turing (T4, RTX 2000 series) - Experimental support
     if any(
@@ -74,14 +78,14 @@ def _detect_gpu_architecture(preset: apolo_sdk.Preset) -> str:
             "tesla t4",
         ]
     ):
-        return "turing"
+        return TextEmbeddingsInferenceArchitecture.TURING
 
     # Ampere 80 (A100, A30)
     if any(
         model in gpu_model
         for model in ["a100", "a30", "nvidia-a100", "nvidia-a100-sxm4"]
     ):
-        return "ampere-80"
+        return TextEmbeddingsInferenceArchitecture.AMPERE_80
 
     # Ampere 86 (A10, A40, RTX 3000 series)
     if any(
@@ -98,7 +102,7 @@ def _detect_gpu_architecture(preset: apolo_sdk.Preset) -> str:
             "geforce rtx 30",
         ]
     ):
-        return "ampere-86"
+        return TextEmbeddingsInferenceArchitecture.AMPERE_86
 
     # Ada Lovelace (RTX 4000 series)
     if any(
@@ -115,7 +119,7 @@ def _detect_gpu_architecture(preset: apolo_sdk.Preset) -> str:
             "geforce rtx 40",
         ]
     ):
-        return "ada-lovelace"
+        return TextEmbeddingsInferenceArchitecture.ADA_LOVELACE
 
     # Hopper (H100)
     if any(
@@ -128,55 +132,59 @@ def _detect_gpu_architecture(preset: apolo_sdk.Preset) -> str:
             "nvidia-h100-pcie",
         ]
     ):
-        return "hopper"
+        return TextEmbeddingsInferenceArchitecture.HOPPER
 
     # Unknown GPU model - default to ampere-80 as safest fallback
     logger.warning(
         "Unknown GPU model %s, defaulting to ampere-80 architecture",
         preset.nvidia_gpu_model,
     )
-    return "ampere-80"
+    return TextEmbeddingsInferenceArchitecture.AMPERE_80
 
 
-def _get_tei_image_for_architecture(architecture: str) -> dict[str, str]:
+def _get_tei_image_for_architecture(
+    architecture: TextEmbeddingsInferenceArchitecture,
+) -> dict[str, str]:
     """
     Get the appropriate HuggingFace Text Embeddings Inference Docker image
     for GPU architecture.
 
     Args:
-        architecture: GPU architecture identifier
+        architecture: GPU architecture identifier (enum)
 
     Returns:
         dict: Image repository and tag configuration
     """
     image_map = {
-        "cpu": {
+        TextEmbeddingsInferenceArchitecture.CPU: {
             "repository": TEI_IMAGE_REPOSITORY,
             "tag": "cpu-1.7",
         },
-        "turing": {
+        TextEmbeddingsInferenceArchitecture.TURING: {
             "repository": TEI_IMAGE_REPOSITORY,
             "tag": "turing-1.7",
         },
-        "ampere-80": {
+        TextEmbeddingsInferenceArchitecture.AMPERE_80: {
             "repository": TEI_IMAGE_REPOSITORY,
             "tag": "1.7",  # Default/main image for A100/A30
         },
-        "ampere-86": {
+        TextEmbeddingsInferenceArchitecture.AMPERE_86: {
             "repository": TEI_IMAGE_REPOSITORY,
             "tag": "86-1.7",
         },
-        "ada-lovelace": {
+        TextEmbeddingsInferenceArchitecture.ADA_LOVELACE: {
             "repository": TEI_IMAGE_REPOSITORY,
             "tag": "89-1.7",
         },
-        "hopper": {
+        TextEmbeddingsInferenceArchitecture.HOPPER: {
             "repository": TEI_IMAGE_REPOSITORY,
             "tag": "hopper-1.7",
         },
     }
 
-    return image_map.get(architecture, image_map["cpu"])
+    return image_map.get(
+        architecture, image_map[TextEmbeddingsInferenceArchitecture.CPU]
+    )
 
 
 class TextEmbeddingsChartValueProcessor(
