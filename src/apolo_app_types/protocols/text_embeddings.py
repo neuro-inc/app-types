@@ -1,3 +1,5 @@
+from enum import StrEnum
+
 from pydantic import Field
 
 from apolo_app_types import AppInputs, AppOutputs
@@ -10,6 +12,15 @@ from apolo_app_types.protocols.common import (
 )
 from apolo_app_types.protocols.common.k8s import Env
 from apolo_app_types.protocols.common.openai_compat import OpenAICompatEmbeddingsAPI
+
+
+class TextEmbeddingsInferenceArchitecture(StrEnum):
+    CPU = "cpu"
+    TURING = "turing"
+    AMPERE_80 = "ampere-80"
+    AMPERE_86 = "ampere-86"
+    ADA_LOVELACE = "ada-lovelace"
+    HOPPER = "hopper"
 
 
 class Image(AbstractAppFieldType):
