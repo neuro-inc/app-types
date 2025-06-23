@@ -1,6 +1,7 @@
 import enum
 
 from apolo_app_types import StableDiffusionInputs
+from apolo_app_types.protocols.buckets import BucketsAppInputs
 from apolo_app_types.protocols.common import AppInputs
 from apolo_app_types.protocols.dockerhub import DockerHubInputs
 from apolo_app_types.protocols.huggingface_cache import (
@@ -35,6 +36,7 @@ class AppType(enum.StrEnum):
     ServiceDeployment = "service-deployment"
     SparkJob = "spark-job"
     Superset = "superset"
+    Buckets = "buckets"
 
     def __repr__(self) -> str:
         return str(self)
@@ -57,7 +59,7 @@ class AppType(enum.StrEnum):
         }
 
     @classmethod
-    def from_app_inputs(cls, inputs: AppInputs) -> "AppType":
+    def from_app_inputs(cls, inputs: AppInputs) -> "AppType":  # noqa: C901
         match inputs:
             case LLMInputs():
                 return AppType.LLMInference
@@ -77,6 +79,8 @@ class AppType(enum.StrEnum):
                 return AppType.VSCode
             case JupyterAppInputs():
                 return AppType.Jupyter
+            case BucketsAppInputs():
+                return AppType.Buckets
 
         error_message = f"Unsupported input type: {type(inputs).__name__}"
         raise ValueError(error_message)
