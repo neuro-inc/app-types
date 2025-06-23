@@ -46,6 +46,7 @@ class ShellChartValueProcessor(BaseChartValueProcessor[ShellAppInputs]):
         input_: ShellAppInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         app_secrets_name: str,
         *args: t.Any,
         **kwargs: t.Any,
@@ -127,7 +128,9 @@ class ShellChartValueProcessor(BaseChartValueProcessor[ShellAppInputs]):
             input_=custom_deployment,
             app_name=app_name,
             namespace=namespace,
+            app_id=app_id,
             app_secrets_name=app_secrets_name,
+            app_type=AppType.Shell,
         )
 
         return {**custom_app_vals, "labels": {"application": "shell"}}

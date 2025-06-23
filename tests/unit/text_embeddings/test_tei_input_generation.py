@@ -7,6 +7,7 @@ from apolo_app_types.protocols.common import IngressHttp, Preset
 from apolo_app_types.protocols.text_embeddings import TextEmbeddingsInferenceAppInputs
 
 from tests.unit.constants import (
+    APP_ID,
     APP_SECRETS_NAME,
 )
 
@@ -32,6 +33,7 @@ async def test_tei_values_generation(setup_clients):
         app_name="tei-app",
         namespace="default-namespace",
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
     assert helm_params["image"] == {
         "repository": "ghcr.io/huggingface/text-embeddings-inference",

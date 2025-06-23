@@ -4,7 +4,7 @@ from apolo_app_types import DockerHubInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.protocols.dockerhub import DockerHubModel
 
-from tests.unit.constants import APP_SECRETS_NAME, DEFAULT_NAMESPACE
+from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
 
 @pytest.mark.asyncio
@@ -21,6 +21,7 @@ async def test_values_dockerhub_generation_(setup_clients, mock_get_preset_cpu):
         app_name="dockerhub",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
 
     assert helm_params["job"]["args"]["org"] == apolo_client.config.org_name

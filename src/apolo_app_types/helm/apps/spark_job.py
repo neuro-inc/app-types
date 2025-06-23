@@ -64,6 +64,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         input_: SparkJobInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         *_: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -76,11 +77,15 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             apolo_client=self.client,
             preset_type=input_.driver_config.preset,
             namespace=namespace,
+            app_id=app_id,
+            app_type=AppType.SparkJob,
         )
         executor_extra_values = await gen_extra_values(
             apolo_client=self.client,
             preset_type=input_.executor_config.preset,
             namespace=namespace,
+            app_id=app_id,
+            app_type=AppType.SparkJob,
         )
         extra_labels = gen_apolo_storage_integration_labels(
             client=self.client, inject_storage=True

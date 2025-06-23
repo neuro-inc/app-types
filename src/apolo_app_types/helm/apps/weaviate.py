@@ -5,6 +5,7 @@ import typing as t
 import apolo_sdk
 
 from apolo_app_types import BasicAuth, WeaviateInputs
+from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import gen_extra_values
 from apolo_app_types.helm.utils.buckets import get_or_create_bucket_credentials
@@ -102,6 +103,7 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
         input_: WeaviateInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         app_secrets_name: str,
         *_: t.Any,
         **kwargs: t.Any,
@@ -115,6 +117,8 @@ class WeaviateChartValueProcessor(BaseChartValueProcessor[WeaviateInputs]):
             ingress_http=input_.ingress_http,
             # ingress_grpc=input_.ingress_grpc,
             namespace=namespace,
+            app_id=app_id,
+            app_type=AppType.Weaviate,
         )
 
         # TODO: temporarily removed cluster_api from WeaviateInputs and

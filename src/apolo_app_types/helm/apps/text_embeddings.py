@@ -1,5 +1,6 @@
 import typing as t
 
+from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import gen_extra_values
 from apolo_app_types.helm.apps.custom_deployment import (
@@ -60,6 +61,7 @@ class TextEmbeddingsChartValueProcessor(
         input_: TextEmbeddingsInferenceAppInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         app_secrets_name: str,
         *args: t.Any,
         **kwargs: t.Any,
@@ -70,6 +72,8 @@ class TextEmbeddingsChartValueProcessor(
         values = await gen_extra_values(
             self.client,
             input_.preset,
+            app_id,
+            AppType.TextEmbeddingsInference,
             input_.ingress_http,
             None,
             namespace,
