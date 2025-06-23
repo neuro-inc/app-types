@@ -52,11 +52,14 @@ from apolo_app_types.protocols.jupyter import (
     JupyterTypes,
 )
 from apolo_app_types.protocols.lightrag import (
+    LightRAGAppInputs,
+    LightRAGAppOutputs,
     LightRAGEmbeddingConfig,
     LightRAGInputs,
     LightRAGLLMConfig,
     LightRAGOutputs,
     LightRAGPersistence,
+    LightRAGStorageConfig,
     LightRAGWebUIConfig,
 )
 from apolo_app_types.protocols.llm import (
@@ -197,4 +200,7 @@ __all__ = [
     "OpenAICompatEmbeddingsAPI",
     "ShellAppInputs",
     "ShellAppOutputs",
+    "LightRAGAppInputs",
+    "LightRAGAppOutputs",
+    "LightRAGStorageConfig",
 ]

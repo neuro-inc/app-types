@@ -1,6 +1,6 @@
 import typing as t
 
-from apolo_app_types import LightRAGOutputs
+from apolo_app_types import LightRAGAppOutputs
 from apolo_app_types.clients.kube import get_service_host_port
 from apolo_app_types.outputs.common import (
     INSTANCE_LABEL,
@@ -15,7 +15,9 @@ async def get_lightrag_outputs(
     app_instance_id: str,
 ) -> dict[str, t.Any]:
     """Generate LightRAG outputs following the MLflow pattern."""
-    labels = {"application": "lightrag-minimal", INSTANCE_LABEL: app_instance_id}
+    # Use the full chart's label selector (app.kubernetes.io/name: lightrag)
+    # and instance label for the deployed app
+    labels = {"app.kubernetes.io/name": "lightrag", INSTANCE_LABEL: app_instance_id}
 
     # Get internal and external web app URLs using the common utility
     internal_web_app_url, external_web_app_url = await get_internal_external_web_urls(
@@ -42,7 +44,7 @@ async def get_lightrag_outputs(
             protocol="https",
         )
 
-    return LightRAGOutputs(
+    return LightRAGAppOutputs(
         web_app_url=ServiceAPI[HttpApi](
             internal_url=internal_web_app_url,
             external_url=external_web_app_url,

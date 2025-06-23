@@ -1,227 +1,299 @@
 from typing import Literal
 
-from pydantic import ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from apolo_app_types import AppInputs
-from apolo_app_types.protocols.common import (
-    AbstractAppFieldType,
+from apolo_app_types import (
+    AppInputs,
     AppOutputs,
+    CrunchyPostgresUserCredentials,
+)
+from apolo_app_types.protocols.common import (
+    AppInputsDeployer,
+    AppOutputsDeployer,
     IngressHttp,
     Preset,
     SchemaExtraMetadata,
 )
-from apolo_app_types.protocols.common.ingress import (
-    INGRESS_HTTP_SCHEMA_EXTRA,
+from apolo_app_types.protocols.common.networking import (
+    HttpApi,
+    ServiceAPI,
 )
-from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI
 
 
-LIGHTRAG_MIN_GB_STORAGE = 10
-
-
-class LightRAGPersistence(AbstractAppFieldType):
+class LightRAGPersistence(BaseModel):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="LightRAG persistence",
-            description=(
-                "Configure LightRAG to store data in persistent storage with "
-                "PostgreSQL."
-            ),
+            **{
+                "x-title": "LightRAG Persistence",
+                "x-description": "Configure persistent storage for "
+                "LightRAG data and inputs.",
+            }
         ).as_json_schema_extra(),
     )
 
     rag_storage_size: int = Field(
-        default=LIGHTRAG_MIN_GB_STORAGE,
+        default=10,
         json_schema_extra=SchemaExtraMetadata(
-            title="RAG Storage Size (GB)",
-            description=("Specify the size of the RAG storage volume in gigabytes."),
+            **{
+                "x-title": "RAG Storage Size (GB)",
+                "x-description": "Size of the persistent volume for RAG data storage.",
+            }
         ).as_json_schema_extra(),
     )
 
     inputs_storage_size: int = Field(
         default=5,
         json_schema_extra=SchemaExtraMetadata(
-            title="Inputs Storage Size (GB)",
-            description=("Specify the size of the inputs storage volume in gigabytes."),
+            **{
+                "x-title": "Inputs Storage Size (GB)",
+                "x-description": "Size of the persistent volume for input files.",
+            }
         ).as_json_schema_extra(),
     )
 
-    postgres_storage_size: int = Field(
-        default=LIGHTRAG_MIN_GB_STORAGE,
-        json_schema_extra=SchemaExtraMetadata(
-            title="PostgreSQL Storage Size (GB)",
-            description=(
-                "Specify the size of the PostgreSQL storage volume in gigabytes."
-            ),
-        ).as_json_schema_extra(),
-    )
-
-    enable_backups: bool = Field(
-        default=True,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Enable backups",
-            description=(
-                "Enable periodic backups of LightRAG storage to object store. "
-                "We automatically create bucket and the corresponding "
-                "credentials for you. Note: this bucket will not be "
-                "automatically removed when you remove the application."
-            ),
-        ).as_json_schema_extra(),
-    )
-
-    @field_validator(
-        "rag_storage_size",
-        "inputs_storage_size",
-        "postgres_storage_size",
-        mode="before",
-    )
-    def validate_storage_size(cls, value: int) -> int:  # noqa: N805
+    @field_validator("rag_storage_size", "inputs_storage_size", mode="before")
+    @classmethod
+    def validate_storage_size(cls, value: int) -> int:
         if value and isinstance(value, int):
             if value < 1:
-                err_msg = "Storage size must be greater than 1GB."
-                raise ValueError(err_msg)
+                error_message = "Storage size must be greater than 1GB."
+                raise ValueError(error_message)
         else:
-            err_msg = "Storage size must be specified as int."
-            raise ValueError(err_msg)
+            error_message = "Storage size must be specified as int."
+            raise ValueError(error_message)
         return value
 
 
-class LightRAGLLMConfig(AbstractAppFieldType):
+class LightRAGLLMConfig(BaseModel):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="LLM Configuration",
-            description="Configure the Language Model for LightRAG processing.",
+            **{
+                "x-title": "LLM Configuration",
+                "x-description": "Configure the Language Model for text generation.",
+            }
         ).as_json_schema_extra(),
     )
 
     binding: Literal["openai", "anthropic", "ollama"] = Field(
         default="openai",
         json_schema_extra=SchemaExtraMetadata(
-            title="LLM Provider",
-            description="Choose the LLM provider for text generation.",
+            **{
+                "x-title": "LLM Provider",
+                "x-description": "Choose the LLM provider for text generation.",
+            }
         ).as_json_schema_extra(),
     )
 
     model: str = Field(
         default="gpt-4o-mini",
         json_schema_extra=SchemaExtraMetadata(
-            title="LLM Model",
-            description="Specify the model name to use for text generation.",
+            **{
+                "x-title": "LLM Model",
+                "x-description": "Model name for text generation.",
+            }
         ).as_json_schema_extra(),
     )
 
     api_key: str = Field(
         default="",
         json_schema_extra=SchemaExtraMetadata(
-            title="API Key",
-            description="API key for the LLM provider. This will be stored securely.",
+            **{
+                "x-title": "API Key",
+                "x-description": "API key for the LLM provider (stored securely).",
+            }
         ).as_json_schema_extra(),
     )
 
     host: str = Field(
         default="",
         json_schema_extra=SchemaExtraMetadata(
-            title="Host URL (Optional)",
-            description="Custom host URL for self-hosted LLM services (e.g., Ollama).",
+            **{
+                "x-title": "Host URL (Optional)",
+                "x-description": "Custom host URL for self-hosted services.",
+            }
         ).as_json_schema_extra(),
     )
 
 
-class LightRAGEmbeddingConfig(AbstractAppFieldType):
+class LightRAGEmbeddingConfig(BaseModel):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Embedding Configuration",
-            description="Configure the embedding model for LightRAG vector processing.",
+            **{
+                "x-title": "Embedding Configuration",
+                "x-description": "Configure the embedding model for vector generation.",
+            }
         ).as_json_schema_extra(),
     )
 
     binding: Literal["openai", "huggingface", "ollama"] = Field(
         default="openai",
         json_schema_extra=SchemaExtraMetadata(
-            title="Embedding Provider",
-            description="Choose the embedding provider for vector generation.",
+            **{
+                "x-title": "Embedding Provider",
+                "x-description": "Choose the embedding provider.",
+            }
         ).as_json_schema_extra(),
     )
 
     model: str = Field(
         default="text-embedding-ada-002",
         json_schema_extra=SchemaExtraMetadata(
-            title="Embedding Model",
-            description="Specify the embedding model name.",
+            **{
+                "x-title": "Embedding Model",
+                "x-description": "Model name for embedding generation.",
+            }
         ).as_json_schema_extra(),
     )
 
     dimensions: int = Field(
         default=1536,
         json_schema_extra=SchemaExtraMetadata(
-            title="Embedding Dimensions",
-            description="Number of dimensions for the embedding vectors.",
+            **{
+                "x-title": "Embedding Dimensions",
+                "x-description": "Number of dimensions for embedding vectors.",
+            }
         ).as_json_schema_extra(),
     )
 
     api_key: str = Field(
         default="",
         json_schema_extra=SchemaExtraMetadata(
-            title="API Key",
-            description=(
-                "API key for the embedding provider. This will be stored securely."
-            ),
+            **{
+                "x-title": "API Key",
+                "x-description": "API key for embedding provider (stored securely).",
+            }
         ).as_json_schema_extra(),
     )
 
 
-class LightRAGWebUIConfig(AbstractAppFieldType):
+class LightRAGWebUIConfig(BaseModel):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Web UI Configuration",
-            description="Configure the LightRAG web interface.",
+            **{
+                "x-title": "Web UI Configuration",
+                "x-description": "Configure the LightRAG web interface.",
+            }
         ).as_json_schema_extra(),
     )
 
     title: str = Field(
         default="Apolo Copilot - LightRAG",
         json_schema_extra=SchemaExtraMetadata(
-            title="UI Title",
-            description="Title displayed in the web interface.",
+            **{
+                "x-title": "UI Title",
+                "x-description": "Title displayed in the web interface.",
+            }
         ).as_json_schema_extra(),
     )
 
     description: str = Field(
         default="Simple and Fast Graph Based RAG System",
         json_schema_extra=SchemaExtraMetadata(
-            title="UI Description",
-            description="Description displayed in the web interface.",
+            **{
+                "x-title": "UI Description",
+                "x-description": "Description displayed in the web interface.",
+            }
         ).as_json_schema_extra(),
     )
 
 
-class LightRAGInputs(AppInputs):
-    preset: Preset
-    persistence: LightRAGPersistence
-    llm_config: LightRAGLLMConfig
-    embedding_config: LightRAGEmbeddingConfig
+class LightRAGStorageConfig(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            **{
+                "x-title": "Storage Configuration",
+                "x-description": "Configure LightRAG storage backends.",
+            }
+        ).as_json_schema_extra(),
+    )
+
+    kv_storage: Literal["PGKVStorage", "RedisKVStorage"] = Field(
+        default="PGKVStorage",
+        json_schema_extra=SchemaExtraMetadata(
+            **{
+                "x-title": "Key-Value Storage",
+                "x-description": "Backend for key-value storage.",
+            }
+        ).as_json_schema_extra(),
+    )
+
+    vector_storage: Literal["PGVectorStorage", "QdrantVectorDBStorage"] = Field(
+        default="PGVectorStorage",
+        json_schema_extra=SchemaExtraMetadata(
+            **{
+                "x-title": "Vector Storage",
+                "x-description": "Backend for vector storage.",
+            }
+        ).as_json_schema_extra(),
+    )
+
+    graph_storage: Literal["Neo4JStorage", "PGGraphStorage"] = Field(
+        default="Neo4JStorage",
+        json_schema_extra=SchemaExtraMetadata(
+            **{
+                "x-title": "Graph Storage",
+                "x-description": "Backend for graph storage.",
+            }
+        ).as_json_schema_extra(),
+    )
+
+    doc_status_storage: Literal["PGDocStatusStorage", "RedisDocStatusStorage"] = Field(
+        default="PGDocStatusStorage",
+        json_schema_extra=SchemaExtraMetadata(
+            **{
+                "x-title": "Document Status Storage",
+                "x-description": "Backend for document processing status.",
+            }
+        ).as_json_schema_extra(),
+    )
+
+
+# Input classes following PrivateGPT pattern
+class LightRAGInputs(AppInputsDeployer):
+    preset_name: str
+    pgvector_app_name: str
+    pgvector_user: str | None = None
+    llm_config: LightRAGLLMConfig = Field(default_factory=LightRAGLLMConfig)
+    embedding_config: LightRAGEmbeddingConfig = Field(
+        default_factory=LightRAGEmbeddingConfig
+    )
     webui_config: LightRAGWebUIConfig = Field(default_factory=LightRAGWebUIConfig)
-    ingress_http: IngressHttp | None = Field(
-        default=None, json_schema_extra=INGRESS_HTTP_SCHEMA_EXTRA.as_json_schema_extra()
-    )
+    storage_config: LightRAGStorageConfig = Field(default_factory=LightRAGStorageConfig)
+    persistence: LightRAGPersistence = Field(default_factory=LightRAGPersistence)
 
 
-class LightRAGOutputs(AppOutputs):
-    web_app_url: ServiceAPI[HttpApi] = Field(
-        default=ServiceAPI[HttpApi](),
-        json_schema_extra=SchemaExtraMetadata(
-            title="LightRAG Web App URL",
-            description="URL to access the LightRAG web application.",
-        ).as_json_schema_extra(),
+class LightRAGAppInputs(AppInputs):
+    preset: Preset
+    ingress_http: IngressHttp
+    pgvector_user: CrunchyPostgresUserCredentials
+    llm_config: LightRAGLLMConfig = Field(default_factory=LightRAGLLMConfig)
+    embedding_config: LightRAGEmbeddingConfig = Field(
+        default_factory=LightRAGEmbeddingConfig
     )
-    server_url: ServiceAPI[HttpApi] = Field(
-        default=ServiceAPI[HttpApi](),
-        json_schema_extra=SchemaExtraMetadata(
-            title="LightRAG Server URL",
-            description="URL to access the LightRAG API server.",
-        ).as_json_schema_extra(),
-    )
+    webui_config: LightRAGWebUIConfig = Field(default_factory=LightRAGWebUIConfig)
+    storage_config: LightRAGStorageConfig = Field(default_factory=LightRAGStorageConfig)
+    persistence: LightRAGPersistence = Field(default_factory=LightRAGPersistence)
+
+
+class LightRAGOutputs(AppOutputsDeployer):
+    internal_web_app_url: str
+    internal_server_url: str
+    external_web_app_url: str
+    external_server_url: str
+    external_authorization_required: bool
+
+
+class LightRAGAppOutputs(AppOutputs):
+    """
+    LightRAG outputs:
+      - web_app_url: URL to access the web interface
+      - server_url: URL to access the API server
+    """
+
+    web_app_url: ServiceAPI[HttpApi] | None = None
+    server_url: ServiceAPI[HttpApi] | None = None

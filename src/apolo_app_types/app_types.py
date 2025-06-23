@@ -7,7 +7,7 @@ from apolo_app_types.protocols.huggingface_cache import (
     HuggingFaceCacheInputs,
 )
 from apolo_app_types.protocols.jupyter import JupyterAppInputs
-from apolo_app_types.protocols.lightrag import LightRAGInputs
+from apolo_app_types.protocols.lightrag import LightRAGAppInputs
 from apolo_app_types.protocols.llm import LLMInputs
 from apolo_app_types.protocols.mlflow import MLFlowAppInputs
 from apolo_app_types.protocols.spark_job import SparkJobInputs
@@ -64,7 +64,7 @@ class AppType(enum.StrEnum):
         input_type_mapping = {
             LLMInputs: AppType.LLMInference,
             WeaviateInputs: AppType.Weaviate,
-            LightRAGInputs: AppType.LightRAG,
+            LightRAGAppInputs: AppType.LightRAG,
             StableDiffusionInputs: AppType.StableDiffusion,
             DockerHubInputs: AppType.DockerHub,
             HuggingFaceCacheInputs: AppType.HuggingFaceCache,
