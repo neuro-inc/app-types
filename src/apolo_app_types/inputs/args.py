@@ -50,8 +50,8 @@ async def app_type_to_vals(
     app_type: AppType,
     app_name: str,
     namespace: str,
+    app_id: str,
     app_secrets_name: str,
-    app_id: str | None = None,
 ) -> tuple[list[str], dict[str, t.Any]]:
     # Mapping AppType to their respective processor classes
     processor_map: dict[AppType, type[BaseChartValueProcessor[t.Any]]] = {
@@ -87,6 +87,7 @@ async def app_type_to_vals(
         namespace=namespace,
         app_secrets_name=app_secrets_name,
         app_id=app_id,
+        app_type=app_type,
     )
 
     # Adding post-install hook image version
@@ -106,9 +107,9 @@ async def get_installation_vals(
     input_dict: dict[str, t.Any],
     app_name: str,
     app_type: AppType,
+    app_id: str,
     namespace: str = "default",
     app_secrets_name: str = "apps-secrets",
-    app_id: str | None = None,
 ) -> dict[str, t.Any]:
     input_type_map: dict[AppType, type[AppInputs]] = {
         AppType.LLMInference: LLMInputs,

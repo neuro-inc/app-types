@@ -1,6 +1,7 @@
 import typing as t
 
 from apolo_app_types import CustomDeploymentInputs, DockerConfigModel
+from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
     append_apolo_storage_integration_annotations,
@@ -51,16 +52,15 @@ class CustomDeploymentChartValueProcessor(
         input_: CustomDeploymentInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
         app_secrets_name: str,
-        app_id: str | None = None,
         *_: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
         """
         Generate extra Helm values for Custom Deployment.
         """
-        health_checks = get_custom_deployment_health_check_values(input_.health_checks)
-
+        app_type = kwargs.get("app_type", AppType.CustomDeployment)
         extra_values = await gen_extra_values(
             apolo_client=self.client,
             preset_type=input_.preset,
@@ -69,6 +69,7 @@ class CustomDeploymentChartValueProcessor(
             ingress_grpc=None,
             port_configurations=input_.networking.ports,
             app_id=app_id,
+            app_type=app_type,
         )
         image_docker_url = await get_image_docker_url(
             client=self.client,

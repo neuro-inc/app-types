@@ -14,7 +14,7 @@ from apolo_app_types.protocols.mlflow import (
     PostgresURI,
 )
 
-from tests.unit.constants import APP_SECRETS_NAME, DEFAULT_NAMESPACE
+from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
 
 @pytest.mark.asyncio
@@ -41,6 +41,7 @@ async def test_values_mlflow_generation_default_sqlite(
         app_name="my-mlflow",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
 
     # Confirm environment var MLFLOW_TRACKING_URI = sqlite://...
@@ -99,6 +100,7 @@ async def test_values_mlflow_generation_sqlite_explicit_no_pvc_name(
         app_name="my-mlflow",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
 
     # Assert SQLite URI
@@ -143,6 +145,7 @@ async def test_values_mlflow_generation_postgres_uri(
         app_name="my-mlflow",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
 
     # Check environment var for PG URI

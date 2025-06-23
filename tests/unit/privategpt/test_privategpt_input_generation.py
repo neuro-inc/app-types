@@ -14,6 +14,7 @@ from apolo_app_types.protocols.private_gpt import (
 )
 
 from tests.unit.constants import (
+    APP_ID,
     APP_SECRETS_NAME,
 )
 
@@ -58,6 +59,7 @@ async def test_privategpt_values_generation(setup_clients):
         app_name="privategpt-app",
         namespace="default-namespace",
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
     assert helm_params["image"] == {
         "repository": "ghcr.io/neuro-inc/private-gpt",
@@ -136,6 +138,7 @@ async def test_privategpt_values_generation_custom_temperature(setup_clients):
         app_name="privategpt-app",
         namespace="default-namespace",
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
     assert helm_params["image"] == {
         "repository": "ghcr.io/neuro-inc/private-gpt",
