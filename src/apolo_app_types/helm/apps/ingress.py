@@ -38,19 +38,14 @@ async def _get_ingress_name_template(client: apolo_sdk.Client) -> str:
 
 async def _generate_ingress_config(
     apolo_client: apolo_sdk.Client,
-    namespace: str,
     app_id: str,
     app_type: AppType,
     port_configurations: list[Port] | None = None,
     namespace_suffix: str = "",
 ) -> dict[str, t.Any]:
     ingress_hostname = await _get_ingress_name_template(apolo_client)
-    app_id_suffix = app_id[:8]
     hostname = ingress_hostname.format(
-        **{
-            APP_NAME_PLACEHOLDER: f"{app_type.value}-{app_id_suffix}"
-            f".{namespace}{namespace_suffix}"
-        }
+        **{APP_NAME_PLACEHOLDER: f"{app_type.value}--{app_id}{namespace_suffix}"}
     )
 
     if hostname.endswith("."):
@@ -97,7 +92,7 @@ async def get_http_ingress_values(
     port_configurations: list[Port] | None = None,
 ) -> dict[str, t.Any]:
     http_ingress_config = await _generate_ingress_config(
-        apolo_client, namespace, app_id, app_type, port_configurations
+        apolo_client, app_id, app_type, port_configurations
     )
     ingress_vals: dict[str, t.Any] = {
         "enabled": True,
@@ -137,7 +132,6 @@ async def get_grpc_ingress_values(
 ) -> dict[str, t.Any]:
     grpc_ingress_config = await _generate_ingress_config(
         apolo_client,
-        namespace,
         app_id,
         app_type,
         port_configurations,
