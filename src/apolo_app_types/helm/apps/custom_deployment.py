@@ -60,7 +60,6 @@ class CustomDeploymentChartValueProcessor(
         """
         Generate extra Helm values for Custom Deployment.
         """
-        health_checks = get_custom_deployment_health_check_values(input_.health_checks)
         app_type = kwargs.get("app_type", AppType.CustomDeployment)
         extra_values = await gen_extra_values(
             apolo_client=self.client,
