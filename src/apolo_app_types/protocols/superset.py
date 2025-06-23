@@ -75,12 +75,23 @@ class SupersetUserConfig(AbstractAppFieldType):
     )
 
 
+class SupersetPostgresConfig(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Superset Postgres.",
+            description="Set the configuration for the superset database.",
+        ).as_json_schema_extra(),
+    )
+    preset: Preset
+
+
 class SupersetInputs(AppInputs):
     ingress_http: IngressHttp
 
     worker_config: WorkerConfig
     web_config: WebConfig
-    postgres_user: CrunchyPostgresUserCredentials | None = Field(
+    postgres_user: CrunchyPostgresUserCredentials | SupersetPostgresConfig = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
             title="Postgres Configuration",

@@ -48,19 +48,6 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
             }
         }
 
-    async def _get_postgres_values(self, input_: SupersetInputs) -> dict[str, t.Any]:
-        if not input_.postgres_user:
-            return {}
-        return {
-            "connections": {
-                "db_host": input_.postgres_user.pgbouncer_host,
-                "db_port": input_.postgres_user.pgbouncer_port,
-                "db_user": input_.postgres_user.user,
-                "db_pass": input_.postgres_user.password,
-                "db_name": input_.postgres_user.dbname,
-            }
-        }
-
     async def gen_extra_values(
         self,
         input_: SupersetInputs,
