@@ -48,8 +48,8 @@ async def _generate_ingress_config(
     app_id_suffix = app_id[:8]
     hostname = ingress_hostname.format(
         **{
-            APP_NAME_PLACEHOLDER: f"{namespace}-{app_type.value}"
-            f"-{app_id_suffix}{namespace_suffix}"
+            APP_NAME_PLACEHOLDER: f"{app_type.value}-{app_id_suffix}"
+            f".{namespace}{namespace_suffix}"
         }
     )
 
