@@ -16,6 +16,7 @@ from apolo_app_types.protocols.common import IngressHttp, Preset
 from apolo_app_types.protocols.text_embeddings import TextEmbeddingsInferenceAppInputs
 
 from tests.unit.constants import (
+    APP_ID,
     APP_SECRETS_NAME,
 )
 
@@ -423,18 +424,34 @@ async def test_tei_dynamic_image_selection_a100(setup_clients):
                     model_hf_name="sentence-transformers/all-MiniLM-L6-v2",
                     hf_token="test-token",
                 ),
+                server_extra_args=[
+                    "--max-concurrent-requests=512",
+                    "--max-client-batch-size=16",
+                ],
             ),
             apolo_client=setup_clients,
             app_type=AppType.TextEmbeddingsInference,
-            app_name="tei-a100",
+            app_name="tei-app",
             namespace="default-namespace",
             app_secrets_name=APP_SECRETS_NAME,
+            app_id=APP_ID,
         )
         # A100 should use the default Ampere 80 image
         assert helm_params["image"] == {
             "repository": TEI_IMAGE_REPOSITORY,
             "tag": "1.7",
         }
+
+    assert helm_params["model"] == {
+        "modelHFName": "random/name",
+    }
+    assert helm_params["env"] == {
+        "HUGGING_FACE_HUB_TOKEN": "random-token",
+    }
+    assert helm_params["serverExtraArgs"] == [
+        "--max-concurrent-requests=512",
+        "--max-client-batch-size=16",
+    ]
 
 
 @pytest.mark.asyncio

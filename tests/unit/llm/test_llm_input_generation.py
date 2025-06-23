@@ -17,7 +17,7 @@ from apolo_app_types.protocols.huggingface_cache import (
     HuggingFaceCache,
 )
 
-from tests.unit.constants import APP_SECRETS_NAME, CPU_POOL, DEFAULT_NAMESPACE
+from tests.unit.constants import APP_ID, APP_SECRETS_NAME, CPU_POOL, DEFAULT_NAMESPACE
 
 
 async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
@@ -40,6 +40,7 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
         app_name="llm",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
     assert helm_params["serverExtraArgs"] == [
         "--flag1.1 --flag1.2",
@@ -57,7 +58,8 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
         },
         "hosts": [
             {
-                "host": "default.apps.some.org.neu.ro",
+                "host": f"{AppType.LLMInference.value}-"
+                f"{APP_ID[:8]}.default.apps.some.org.neu.ro",
                 "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
             }
         ],
@@ -118,6 +120,7 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
         app_name="llm",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
     assert helm_args == [
         "--timeout",
@@ -177,7 +180,8 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
             "className": "traefik",
             "hosts": [
                 {
-                    "host": "default.apps.some.org.neu.ro",
+                    "host": f"{AppType.LLMInference.value}-"
+                    f"{APP_ID[:8]}.default.apps.some.org.neu.ro",
                     "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
                 }
             ],
@@ -205,6 +209,7 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
             "platform.apolo.us/preset": "gpu-small",
         },
         "appTypesImage": {"tag": IsStr(regex=r"^v\d+\.\d+\.\d+.*$")},
+        "apolo_app_id": APP_ID,
     }
 
 
@@ -232,6 +237,7 @@ async def test_values_llm_generation_cpu_apolo_secret(
         app_name="llm",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
     assert helm_params["serverExtraArgs"] == [
         "--flag1.1 --flag1.2",
@@ -249,7 +255,8 @@ async def test_values_llm_generation_cpu_apolo_secret(
         },
         "hosts": [
             {
-                "host": "default.apps.some.org.neu.ro",
+                "host": f"{AppType.LLMInference.value}-"
+                f"{APP_ID[:8]}.default.apps.some.org.neu.ro",
                 "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
             }
         ],
@@ -306,6 +313,7 @@ async def test_values_llm_generation_gpu_4x(setup_clients, mock_get_preset_gpu):
         app_name="llm",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
     # Make sure --tensor-parallel-size=4
     assert helm_params["serverExtraArgs"] == ["--foo", "--tensor-parallel-size=4"]
@@ -325,6 +333,7 @@ async def test_values_llm_generation_gpu_8x(setup_clients, mock_get_preset_gpu):
         app_name="llm",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
     # Make sure --tensor-parallel-size=8
     assert helm_params["serverExtraArgs"] == ["--bar", "--tensor-parallel-size=8"]
@@ -344,6 +353,7 @@ async def test_values_llm_generation_gpu_8x_pps(setup_clients, mock_get_preset_g
         app_name="llm",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
     assert helm_params["serverExtraArgs"] == ["--bar", "--pipeline-parallel-size=8"]
 
@@ -372,6 +382,7 @@ async def test_values_llm_generation_gpu_8x_pps_and_tps(
         app_name="llm",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
     assert helm_params["serverExtraArgs"] == [
         "--bar",
@@ -407,6 +418,7 @@ async def test_values_llm_generation__storage_integrated(
         app_name="llm",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
     assert helm_args == [
         "--timeout",
@@ -471,7 +483,8 @@ async def test_values_llm_generation__storage_integrated(
             "className": "traefik",
             "hosts": [
                 {
-                    "host": "default.apps.some.org.neu.ro",
+                    "host": f"{AppType.LLMInference.value}-"
+                    f"{APP_ID[:8]}.default.apps.some.org.neu.ro",
                     "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
                 }
             ],
@@ -502,4 +515,5 @@ async def test_values_llm_generation__storage_integrated(
         "appTypesImage": {
             "tag": IsStr(regex=r"^v\d+\.\d+\.\d+.*$"),
         },
+        "apolo_app_id": APP_ID,
     }
