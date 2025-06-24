@@ -11,7 +11,7 @@ from apolo_app_types.protocols.superset import (
     WorkerConfig,
 )
 
-from tests.unit.constants import APP_SECRETS_NAME, DEFAULT_NAMESPACE
+from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
 
 @pytest.mark.asyncio
@@ -31,6 +31,7 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
         app_name="superset",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
 
     assert helm_params["supersetNode"] == {
@@ -51,6 +52,7 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
                 }
             }
         },
+        "apolo_app_id": "b1aeaf654526474ba22480d00e5b0109",
         "podLabels": {
             "platform.apolo.us/component": "app",
             "platform.apolo.us/preset": "cpu-large",
@@ -81,6 +83,7 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
         ],
     }
     assert helm_params["supersetWorker"] == {
+        "apolo_app_id": "b1aeaf654526474ba22480d00e5b0109",
         "affinity": {
             "nodeAffinity": {
                 "requiredDuringSchedulingIgnoredDuringExecution": {
@@ -166,6 +169,7 @@ async def test_superset_values_generation_with_own_postgres(
         app_name="superset",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
     assert helm_params["postgres"]["enabled"] == "false"
     assert helm_params["supersetNode"]["connections"] == {
@@ -203,6 +207,7 @@ async def test_superset_values_generation_with_custom_admin_user(
         app_name="superset",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
     )
     assert helm_params["init"]["adminUser"] == {
         "email": "admin@mail.ua",

@@ -75,6 +75,8 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
             preset_type=input_.worker_config.preset,
             component_name="worker",
             namespace=namespace,
+            app_id=app_id,
+            app_type=AppType.Superset,
         )
         init_params = await self._get_init_params(input_)
 
@@ -84,7 +86,10 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
         additional_values = {}
         if isinstance(input_.postgres_config, SupersetPostgresConfig):
             postgres_values = await gen_extra_values(
-                self.client, input_.postgres_config.preset
+                self.client,
+                input_.postgres_config.preset,
+                app_id=app_id,
+                app_type=AppType.Superset,
             )
             additional_values.update(postgres_values)
         else:
