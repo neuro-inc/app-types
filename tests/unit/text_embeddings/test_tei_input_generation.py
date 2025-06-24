@@ -85,14 +85,14 @@ class TestGPUArchitectureDetection:
         preset = ApoloPreset(
             credits_per_hour=Decimal("1.0"), cpu=1.0, memory=1024, nvidia_gpu=None
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.CPU
+        assert _detect_gpu_architecture(preset, "cpu-small") == TEIArch.CPU
 
     def test_cpu_preset_zero_gpu(self):
         """Test preset with nvidia_gpu=0 returns cpu architecture."""
         preset = ApoloPreset(
             credits_per_hour=Decimal("1.0"), cpu=1.0, memory=1024, nvidia_gpu=0
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.CPU
+        assert _detect_gpu_architecture(preset, "cpu-small") == TEIArch.CPU
 
     def test_gpu_preset_no_model_defaults_cpu(self):
         """Test GPU preset without model info defaults to cpu."""
@@ -103,7 +103,7 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model=None,
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.CPU
+        assert _detect_gpu_architecture(preset, "gpu-unspecified") == TEIArch.CPU
 
     def test_volta_gpu_unsupported_falls_back_cpu(self):
         """Test V100 (Volta) falls back to CPU image."""
@@ -114,7 +114,7 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="Tesla V100",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.CPU
+        assert _detect_gpu_architecture(preset, "gpu-v100-x1") == TEIArch.CPU
 
     def test_turing_t4_detection(self):
         """Test T4 GPU detected as Turing architecture."""
@@ -125,7 +125,7 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="Tesla T4",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.TURING
+        assert _detect_gpu_architecture(preset, "gpu-t4-x1") == TEIArch.TURING
 
     def test_turing_rtx_2080_detection(self):
         """Test RTX 2080 detected as Turing architecture."""
@@ -136,7 +136,7 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="GeForce RTX 2080 Ti",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.TURING
+        assert _detect_gpu_architecture(preset, "gpu-rtx-2080-x1") == TEIArch.TURING
 
     def test_ampere_80_a100_detection(self):
         """Test A100 GPU detected as Ampere 80 architecture."""
@@ -147,7 +147,7 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="NVIDIA A100",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.AMPERE_80
+        assert _detect_gpu_architecture(preset, "gpu-a100-x1") == TEIArch.AMPERE_80
 
     def test_ampere_80_a30_detection(self):
         """Test A30 GPU detected as Ampere 80 architecture."""
@@ -158,7 +158,7 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="NVIDIA A30",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.AMPERE_80
+        assert _detect_gpu_architecture(preset, "gpu-a30-x1") == TEIArch.AMPERE_80
 
     def test_ampere_86_a10_detection(self):
         """Test A10 GPU detected as Ampere 86 architecture."""
@@ -169,7 +169,7 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="NVIDIA A10",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.AMPERE_86
+        assert _detect_gpu_architecture(preset, "gpu-a10g-x1") == TEIArch.AMPERE_86
 
     def test_ampere_86_a40_detection(self):
         """Test A40 GPU detected as Ampere 86 architecture."""
@@ -180,7 +180,7 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="NVIDIA A40",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.AMPERE_86
+        assert _detect_gpu_architecture(preset, "gpu-a40-x1") == TEIArch.AMPERE_86
 
     def test_ampere_86_rtx_3080_detection(self):
         """Test RTX 3080 detected as Ampere 86 architecture."""
@@ -191,7 +191,7 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="GeForce RTX 3080",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.AMPERE_86
+        assert _detect_gpu_architecture(preset, "gpu-rtx-3080-x1") == TEIArch.AMPERE_86
 
     def test_ada_lovelace_rtx_4090_detection(self):
         """Test RTX 4090 detected as Ada Lovelace architecture."""
@@ -202,7 +202,9 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="GeForce RTX 4090",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.ADA_LOVELACE
+        assert (
+            _detect_gpu_architecture(preset, "gpu-rtx-4090-x1") == TEIArch.ADA_LOVELACE
+        )
 
     def test_ada_lovelace_rtx_4070_detection(self):
         """Test RTX 4070 detected as Ada Lovelace architecture."""
@@ -213,7 +215,9 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="GeForce RTX 4070",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.ADA_LOVELACE
+        assert (
+            _detect_gpu_architecture(preset, "gpu-rtx-4070-x1") == TEIArch.ADA_LOVELACE
+        )
 
     def test_hopper_h100_detection(self):
         """Test H100 GPU detected as Hopper architecture."""
@@ -224,10 +228,10 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="NVIDIA H100",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.HOPPER
+        assert _detect_gpu_architecture(preset, "gpu-h100-x1") == TEIArch.HOPPER
 
-    def test_unknown_gpu_defaults_ampere_80(self):
-        """Test unknown GPU model defaults to ampere-80 architecture."""
+    def test_unknown_gpu_defaults_cpu(self):
+        """Test unknown GPU model defaults to CPU architecture."""
         preset = ApoloPreset(
             credits_per_hour=Decimal("1.0"),
             cpu=8.0,
@@ -235,7 +239,7 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="Unknown GPU Model",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.AMPERE_80
+        assert _detect_gpu_architecture(preset, "gpu-unknown-x1") == TEIArch.CPU
 
     def test_case_insensitive_matching(self):
         """Test GPU model matching is case insensitive."""
@@ -246,7 +250,10 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="GEFORCE RTX 4090",  # Uppercase
         )
-        assert _detect_gpu_architecture(preset_rtx40) == TEIArch.ADA_LOVELACE
+        assert (
+            _detect_gpu_architecture(preset_rtx40, "GPU-RTX-4090-X1")
+            == TEIArch.ADA_LOVELACE
+        )
 
     def test_amd_gpu_falls_back_to_cpu(self):
         """Test AMD GPU falls back to CPU image."""
@@ -258,7 +265,7 @@ class TestGPUArchitectureDetection:
             amd_gpu=1,
             amd_gpu_model="AMD Radeon RX 6800",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.CPU
+        assert _detect_gpu_architecture(preset, "amd-gpu-preset") == TEIArch.CPU
 
     def test_amd_gpu_no_model_falls_back_to_cpu(self):
         """Test AMD GPU without model falls back to CPU image."""
@@ -270,7 +277,7 @@ class TestGPUArchitectureDetection:
             amd_gpu=1,
             amd_gpu_model=None,
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.CPU
+        assert _detect_gpu_architecture(preset, "amd-gpu-preset") == TEIArch.CPU
 
     def test_tesla_v100_pcie_unsupported(self):
         """Test Tesla V100 PCIe falls back to CPU image."""
@@ -281,7 +288,7 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="Tesla V100-PCIE",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.CPU
+        assert _detect_gpu_architecture(preset, "gpu-v100-pcie-x1") == TEIArch.CPU
 
     def test_nvidia_a100_sxm4_detection(self):
         """Test NVIDIA A100-SXM4 detected as Ampere 80 architecture."""
@@ -292,7 +299,7 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="NVIDIA-A100-SXM4",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.AMPERE_80
+        assert _detect_gpu_architecture(preset, "gpu-a100-sxm4-x1") == TEIArch.AMPERE_80
 
     def test_nvidia_dgx_h100_detection(self):
         """Test NVIDIA DGX H100 detected as Hopper architecture."""
@@ -303,7 +310,7 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="NVIDIA-DGX-H100",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.HOPPER
+        assert _detect_gpu_architecture(preset, "gpu-dgx-h100-x1") == TEIArch.HOPPER
 
     def test_nvidia_h100_pcie_detection(self):
         """Test NVIDIA H100-PCIE detected as Hopper architecture."""
@@ -314,7 +321,7 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="NVIDIA-H100-PCIE",
         )
-        assert _detect_gpu_architecture(preset) == TEIArch.HOPPER
+        assert _detect_gpu_architecture(preset, "gpu-h100-pcie-x1") == TEIArch.HOPPER
 
     def test_geforce_rtx_series_detection(self):
         """Test GeForce RTX series detection for different architectures."""
@@ -326,7 +333,7 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="GeForce RTX 2080",
         )
-        assert _detect_gpu_architecture(preset_rtx20) == TEIArch.TURING
+        assert _detect_gpu_architecture(preset_rtx20, "gpu-rtx-2080") == TEIArch.TURING
 
         # RTX 3080 (Ampere 86)
         preset_rtx30 = ApoloPreset(
@@ -336,7 +343,9 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="GeForce RTX 3080",
         )
-        assert _detect_gpu_architecture(preset_rtx30) == TEIArch.AMPERE_86
+        assert (
+            _detect_gpu_architecture(preset_rtx30, "gpu-rtx-3080") == TEIArch.AMPERE_86
+        )
 
         # RTX 4090 (Ada Lovelace)
         preset_rtx40 = ApoloPreset(
@@ -346,7 +355,10 @@ class TestGPUArchitectureDetection:
             nvidia_gpu=1,
             nvidia_gpu_model="GeForce RTX 4090",
         )
-        assert _detect_gpu_architecture(preset_rtx40) == TEIArch.ADA_LOVELACE
+        assert (
+            _detect_gpu_architecture(preset_rtx40, "gpu-rtx-4090")
+            == TEIArch.ADA_LOVELACE
+        )
 
 
 class TestTEIImageSelection:

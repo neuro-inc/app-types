@@ -23,6 +23,15 @@ class TextEmbeddingsInferenceArchitecture(StrEnum):
     HOPPER = "hopper"
 
 
+class TextEmbeddingsInferenceImageTag(StrEnum):
+    CPU = "cpu-1.7"
+    TURING = "turing-1.7"
+    AMPERE_80 = "1.7"  # Default/main image for A100/A30
+    AMPERE_86 = "86-1.7"
+    ADA_LOVELACE = "89-1.7"
+    HOPPER = "hopper-1.7"
+
+
 class Image(AbstractAppFieldType):
     tag: str
 
