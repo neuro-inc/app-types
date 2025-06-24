@@ -161,27 +161,27 @@ def _get_tei_image_for_architecture(
     image_map = {
         TextEmbeddingsInferenceArchitecture.CPU: {
             "repository": TEI_IMAGE_REPOSITORY,
-            "tag": TextEmbeddingsInferenceImageTag.CPU,
+            "tag": TextEmbeddingsInferenceImageTag.CPU.value,
         },
         TextEmbeddingsInferenceArchitecture.TURING: {
             "repository": TEI_IMAGE_REPOSITORY,
-            "tag": TextEmbeddingsInferenceImageTag.TURING,
+            "tag": TextEmbeddingsInferenceImageTag.TURING.value,
         },
         TextEmbeddingsInferenceArchitecture.AMPERE_80: {
             "repository": TEI_IMAGE_REPOSITORY,
-            "tag": TextEmbeddingsInferenceImageTag.AMPERE_80,
+            "tag": TextEmbeddingsInferenceImageTag.AMPERE_80.value,
         },
         TextEmbeddingsInferenceArchitecture.AMPERE_86: {
             "repository": TEI_IMAGE_REPOSITORY,
-            "tag": TextEmbeddingsInferenceImageTag.AMPERE_86,
+            "tag": TextEmbeddingsInferenceImageTag.AMPERE_86.value,
         },
         TextEmbeddingsInferenceArchitecture.ADA_LOVELACE: {
             "repository": TEI_IMAGE_REPOSITORY,
-            "tag": TextEmbeddingsInferenceImageTag.ADA_LOVELACE,
+            "tag": TextEmbeddingsInferenceImageTag.ADA_LOVELACE.value,
         },
         TextEmbeddingsInferenceArchitecture.HOPPER: {
             "repository": TEI_IMAGE_REPOSITORY,
-            "tag": TextEmbeddingsInferenceImageTag.HOPPER,
+            "tag": TextEmbeddingsInferenceImageTag.HOPPER.value,
         },
     }
 
