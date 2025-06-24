@@ -91,7 +91,9 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
                 app_id=app_id,
                 app_type=AppType.Superset,
             )
-            additional_values.update(postgres_values)
+            additional_values.update({
+                "postgres": postgres_values
+            })
         else:
             node_values.update(
                 {
