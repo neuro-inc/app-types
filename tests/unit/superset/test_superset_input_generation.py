@@ -99,15 +99,37 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
                     ]
                 }
             }
-        }, 'apolo_app_id': APP_ID,
-        'podLabels': {'platform.apolo.us/component': 'app', 'platform.apolo.us/preset': 'cpu-large'},
-        'preset_name': 'cpu-large',
-        'resources': {'limits': {'cpu': '1000.0m', 'memory': '0M'}, 'requests': {'cpu': '1000.0m', 'memory': '0M'}},
-        'tolerations': [{'effect': 'NoSchedule', 'key': 'platform.neuromation.io/job', 'operator': 'Exists'},
-                        {'effect': 'NoExecute', 'key': 'node.kubernetes.io/not-ready', 'operator': 'Exists',
-                         'tolerationSeconds': 300},
-                        {'effect': 'NoExecute', 'key': 'node.kubernetes.io/unreachable', 'operator': 'Exists',
-                         'tolerationSeconds': 300}]}
+        },
+        "apolo_app_id": APP_ID,
+        "podLabels": {
+            "platform.apolo.us/component": "app",
+            "platform.apolo.us/preset": "cpu-large",
+        },
+        "preset_name": "cpu-large",
+        "resources": {
+            "limits": {"cpu": "1000.0m", "memory": "0M"},
+            "requests": {"cpu": "1000.0m", "memory": "0M"},
+        },
+        "tolerations": [
+            {
+                "effect": "NoSchedule",
+                "key": "platform.neuromation.io/job",
+                "operator": "Exists",
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300,
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300,
+            },
+        ],
+    }
     assert helm_params["supersetWorker"] == {
         "apolo_app_id": APP_ID,
         "affinity": {
@@ -170,7 +192,7 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
 
 @pytest.mark.asyncio
 async def test_superset_values_generation_with_postgres_integration(
-        setup_clients, mock_get_preset_cpu
+    setup_clients, mock_get_preset_cpu
 ):
     from apolo_app_types.inputs.args import app_type_to_vals
 
@@ -209,7 +231,7 @@ async def test_superset_values_generation_with_postgres_integration(
 
 @pytest.mark.asyncio
 async def test_superset_values_generation_with_custom_admin_user(
-        setup_clients, mock_get_preset_cpu
+    setup_clients, mock_get_preset_cpu
 ):
     from apolo_app_types.inputs.args import app_type_to_vals
 
