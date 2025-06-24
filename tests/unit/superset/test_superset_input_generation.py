@@ -52,7 +52,7 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
                 }
             }
         },
-        "apolo_app_id": "b1aeaf654526474ba22480d00e5b0109",
+        "apolo_app_id": APP_ID,
         "podLabels": {
             "platform.apolo.us/component": "app",
             "platform.apolo.us/preset": "cpu-large",
@@ -83,7 +83,7 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
         ],
     }
     assert helm_params["supersetWorker"] == {
-        "apolo_app_id": "b1aeaf654526474ba22480d00e5b0109",
+        "apolo_app_id": APP_ID,
         "affinity": {
             "nodeAffinity": {
                 "requiredDuringSchedulingIgnoredDuringExecution": {
