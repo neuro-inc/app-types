@@ -8,6 +8,7 @@ from apolo_app_types.helm.apps.common import gen_extra_values
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
 from apolo_app_types.protocols.superset import (
     SupersetInputs,
+    SupersetPostgresConfig,
 )
 
 
@@ -61,7 +62,7 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
         """Generate extra values for Weaviate configuration."""
 
         # Get base values
-        values = await gen_extra_values(
+        node_values = await gen_extra_values(
             apolo_client=self.client,
             preset_type=input_.web_config.preset,
             ingress_http=input_.ingress_http,
@@ -76,17 +77,34 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
             namespace=namespace,
         )
         init_params = await self._get_init_params(input_)
-        postgres_values = await self._get_postgres_values(input_)
+
         secret = _generate_superset_secret_hex()
-        logger.debug("Generated extra Superset values: %s", values)
-        ingress_vals = values.pop("ingress", {})
-        # TODO: add worker and Celery as well
+        logger.debug("Generated extra Superset values: %s", node_values)
+        ingress_vals = node_values.pop("ingress", {})
+        additional_values = {}
+        if isinstance(input_.postgres_config, SupersetPostgresConfig):
+            postgres_values = await gen_extra_values(
+                self.client, input_.postgres_config.preset
+            )
+            additional_values.update(postgres_values)
+        else:
+            node_values.update(
+                {
+                    "connections": {
+                        "db_host": input_.postgres_config.pgbouncer_host,
+                        "db_port": input_.postgres_config.pgbouncer_port,
+                        "db_user": input_.postgres_config.user,
+                        "db_pass": input_.postgres_config.password,
+                        "db_name": input_.postgres_config.dbname,
+                    }
+                }
+            )
+            additional_values.update({"postgres": {"enabled": "false"}})
         return merge_list_of_dicts(
             [
                 {
                     "supersetNode": {
-                        **values,
-                        **postgres_values,
+                        **node_values,
                     },
                     "supersetWorker": worker_values,
                     "extraSecretEnv": {
@@ -95,6 +113,6 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
                 },
                 {"ingress": ingress_vals} if ingress_vals else {},
                 init_params,
-                {"postgres": {"enabled": "false"}} if postgres_values else {},
+                additional_values,
             ]
         )

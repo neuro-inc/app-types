@@ -5,6 +5,7 @@ from apolo_app_types.app_types import AppType
 from apolo_app_types.protocols.common import IngressHttp, Preset
 from apolo_app_types.protocols.superset import (
     SupersetInputs,
+    SupersetPostgresConfig,
     SupersetUserConfig,
     WebConfig,
     WorkerConfig,
@@ -23,6 +24,7 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
             worker_config=WorkerConfig(preset=Preset(name="cpu-large")),
             web_config=WebConfig(preset=Preset(name="cpu-large")),
             ingress_http=IngressHttp(),
+            postgres_config=SupersetPostgresConfig(preset=Preset(name="cpu-large")),
         ),
         apolo_client=apolo_client,
         app_type=AppType.Superset,
@@ -149,7 +151,7 @@ async def test_superset_values_generation_with_own_postgres(
             worker_config=WorkerConfig(preset=Preset(name="cpu-large")),
             web_config=WebConfig(preset=Preset(name="cpu-large")),
             ingress_http=IngressHttp(),
-            postgres_user=CrunchyPostgresUserCredentials(
+            postgres_config=CrunchyPostgresUserCredentials(
                 user="pgvector_user",
                 password="pgvector_password",
                 host="pgvector_host",
@@ -194,6 +196,7 @@ async def test_superset_values_generation_with_custom_admin_user(
                 password="MyCrazyPass",
                 email="admin@mail.ua",
             ),
+            postgres_config=SupersetPostgresConfig(preset=Preset(name="cpu-large")),
         ),
         apolo_client=apolo_client,
         app_type=AppType.Superset,

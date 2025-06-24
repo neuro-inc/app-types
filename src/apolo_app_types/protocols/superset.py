@@ -91,8 +91,8 @@ class SupersetInputs(AppInputs):
 
     worker_config: WorkerConfig
     web_config: WebConfig
-    postgres_user: CrunchyPostgresUserCredentials | SupersetPostgresConfig = Field(
-        default=None,
+    postgres_config: CrunchyPostgresUserCredentials | SupersetPostgresConfig = Field(
+        ...,
         json_schema_extra=SchemaExtraMetadata(
             title="Postgres Configuration",
             description=(
