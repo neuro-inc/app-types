@@ -4,6 +4,7 @@ import typing as t
 from apolo_app_types import LightRAGAppInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
+from apolo_app_types.helm.apps.common import get_preset, preset_to_resources
 from apolo_app_types.helm.apps.ingress import get_http_ingress_values
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
 from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
@@ -49,7 +50,7 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
             "POSTGRES_PORT": input_.pgvector_user.pgbouncer_port,
             "POSTGRES_USER": input_.pgvector_user.user,
             "POSTGRES_PASSWORD": input_.pgvector_user.password,
-            "POSTGRES_DATABASE": input_.pgvector_user.dbname or "postgres",
+            "POSTGRES_DATABASE": input_.pgvector_user.dbname,
             "POSTGRES_WORKSPACE": "default",
         }
 
@@ -73,22 +74,6 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
             }
         }
 
-    async def _get_resource_values(self, input_: LightRAGAppInputs) -> dict[str, t.Any]:
-        """Configure resource limits and requests based on preset."""
-        # Basic resource configuration - can be enhanced based on preset details
-        return {
-            "resources": {
-                "limits": {
-                    "cpu": "2000m",
-                    "memory": "4Gi",
-                },
-                "requests": {
-                    "cpu": "500m",
-                    "memory": "1Gi",
-                },
-            }
-        }
-
     async def gen_extra_values(
         self,
         input_: LightRAGAppInputs,
@@ -104,7 +89,8 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
         # Get component-specific values
         env_values = await self._get_environment_values(input_, app_secrets_name)
         persistence_values = await self._get_persistence_values(input_)
-        resource_values = await self._get_resource_values(input_)
+        preset = get_preset(self.client, input_.preset.name)
+        resource_values = {"resources": preset_to_resources(preset)}
 
         ingress_values: dict[str, t.Any] = {"ingress": {"enabled": False}}
         if input_.ingress_http:
