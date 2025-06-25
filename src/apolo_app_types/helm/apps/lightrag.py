@@ -6,6 +6,7 @@ from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.ingress import get_http_ingress_values
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
+from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
 
 
 logger = logging.getLogger(__name__)
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
     async def _get_environment_values(
-        self, input_: LightRAGAppInputs
+        self, input_: LightRAGAppInputs, app_secrets_name: str
     ) -> dict[str, t.Any]:
         """Configure environment variables for LightRAG."""
 
@@ -21,24 +22,28 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
         env_config = {
             "HOST": "0.0.0.0",
             "PORT": 9621,
-            # Web UI configuration
-            "WEBUI_TITLE": input_.webui_config.title,
-            "WEBUI_DESCRIPTION": input_.webui_config.description,
+            # Web UI configuration - using default LightRAG values
+            "WEBUI_TITLE": "LightRAG - Graph RAG Engine",
+            "WEBUI_DESCRIPTION": "Simple and Fast Graph Based RAG System",
             # LLM configuration
             "LLM_BINDING": input_.llm_config.binding,
             "LLM_MODEL": input_.llm_config.model,
             "LLM_BINDING_HOST": input_.llm_config.host or "",
-            "LLM_BINDING_API_KEY": input_.llm_config.api_key or "",
+            "LLM_BINDING_API_KEY": serialize_optional_secret(
+                input_.llm_config.api_key, app_secrets_name
+            ),
             # Embedding configuration
             "EMBEDDING_BINDING": input_.embedding_config.binding,
             "EMBEDDING_MODEL": input_.embedding_config.model,
             "EMBEDDING_DIM": input_.embedding_config.dimensions,
-            "EMBEDDING_BINDING_API_KEY": input_.embedding_config.api_key or "",
-            # Storage configuration using PostgreSQL backends
-            "LIGHTRAG_KV_STORAGE": input_.storage_config.kv_storage,
-            "LIGHTRAG_VECTOR_STORAGE": input_.storage_config.vector_storage,
-            "LIGHTRAG_GRAPH_STORAGE": input_.storage_config.graph_storage,
-            "LIGHTRAG_DOC_STATUS_STORAGE": input_.storage_config.doc_status_storage,
+            "EMBEDDING_BINDING_API_KEY": serialize_optional_secret(
+                input_.embedding_config.api_key, app_secrets_name
+            ),
+            # Storage configuration - hardcoded to match minimal setup
+            "LIGHTRAG_KV_STORAGE": "PGKVStorage",
+            "LIGHTRAG_VECTOR_STORAGE": "PGVectorStorage",
+            "LIGHTRAG_DOC_STATUS_STORAGE": "PGDocStatusStorage",
+            "LIGHTRAG_GRAPH_STORAGE": "NetworkXStorage",
             # PostgreSQL connection using Crunchy Postgres app outputs
             "POSTGRES_HOST": input_.pgvector_user.pgbouncer_host,
             "POSTGRES_PORT": input_.pgvector_user.pgbouncer_port,
@@ -48,15 +53,7 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
             "POSTGRES_WORKSPACE": "default",
         }
 
-        # Add optional Neo4J configuration if using Neo4J graph storage
-        if input_.storage_config.graph_storage == "Neo4JStorage":
-            env_config.update(
-                {
-                    "NEO4J_URI": "neo4j://neo4j-cluster-neo4j:7687",
-                    "NEO4J_USERNAME": "neo4j",
-                    "NEO4J_PASSWORD": "",  # Will be configured via secret if needed
-                }
-            )
+        # NetworkXStorage uses local file storage, no additional configuration needed
 
         return {"env": env_config}
 
@@ -105,7 +102,7 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
         """Generate extra values for LightRAG Helm chart deployment."""
 
         # Get component-specific values
-        env_values = await self._get_environment_values(input_)
+        env_values = await self._get_environment_values(input_, app_secrets_name)
         persistence_values = await self._get_persistence_values(input_)
         resource_values = await self._get_resource_values(input_)
 
