@@ -58,10 +58,24 @@ class LightRAGPersistence(BaseModel):
 
 
 class LLMProviders(enum.StrEnum):
-    OPENAI = "openai"
+    """LLM providers supported by LightRAG."""
+
+    OPENAI = "openai"  # Also supports OpenRouter via OpenAI-compatible API
     ANTHROPIC = "anthropic"
     OLLAMA = "ollama"
-    VLLM = "vllm"
+    AZURE_OPENAI = "azure_openai"
+    HUGGINGFACE = "hf"
+    GEMINI = "gemini"  # Google Gemini via google-genai SDK
+
+
+class EmbeddingProviders(enum.StrEnum):
+    """Embedding providers supported by LightRAG."""
+
+    OPENAI = "openai"  # Also supports OpenRouter embeddings
+    OLLAMA = "ollama"
+    AZURE_OPENAI = "azure_openai"
+    HUGGINGFACE = "hf"
+    JINA = "jina"
 
 
 class LightRAGLLMConfig(BaseModel):
@@ -115,8 +129,8 @@ class LightRAGEmbeddingConfig(BaseModel):
         ).as_json_schema_extra(),
     )
 
-    binding: LLMProviders = Field(
-        default=LLMProviders.OPENAI,
+    binding: EmbeddingProviders = Field(
+        default=EmbeddingProviders.OPENAI,
         json_schema_extra=SchemaExtraMetadata(
             title="Embedding Provider",
             description="Choose the embedding provider.",
