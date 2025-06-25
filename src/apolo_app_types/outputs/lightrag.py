@@ -14,7 +14,7 @@ async def get_lightrag_outputs(
     helm_values: dict[str, t.Any],
     app_instance_id: str,
 ) -> dict[str, t.Any]:
-    """Generate LightRAG outputs following the MLflow pattern."""
+    """Generate LightRAG outputs"""
     # Use the full chart's label selector (app.kubernetes.io/name: lightrag)
     # and instance label for the deployed app
     labels = {"app.kubernetes.io/name": "lightrag", INSTANCE_LABEL: app_instance_id}
