@@ -5,6 +5,7 @@ import apolo_sdk
 
 from apolo_app_types import (
     FooocusAppInputs,
+    LightRAGAppInputs,
     LLMInputs,
     PostgresInputs,
     ShellAppInputs,
@@ -22,6 +23,7 @@ from apolo_app_types.helm.apps.dify import DifyChartValueProcessor
 from apolo_app_types.helm.apps.dockerhub import DockerHubModelChartValueProcessor
 from apolo_app_types.helm.apps.fooocus import FooocusChartValueProcessor
 from apolo_app_types.helm.apps.jupyter import JupyterChartValueProcessor
+from apolo_app_types.helm.apps.lightrag import LightRAGChartValueProcessor
 from apolo_app_types.helm.apps.mlflow import MLFlowChartValueProcessor
 from apolo_app_types.helm.apps.postgres import PostgresValueProcessor
 from apolo_app_types.helm.apps.privategpt import PrivateGptChartValueProcessor
@@ -63,6 +65,7 @@ async def app_type_to_vals(
         AppType.CustomDeployment: CustomDeploymentChartValueProcessor,
         AppType.SparkJob: SparkJobValueProcessor,
         AppType.Fooocus: FooocusChartValueProcessor,
+        AppType.LightRAG: LightRAGChartValueProcessor,
         AppType.MLFlow: MLFlowChartValueProcessor,
         AppType.Jupyter: JupyterChartValueProcessor,
         AppType.TextEmbeddingsInference: TextEmbeddingsChartValueProcessor,
@@ -120,6 +123,7 @@ async def get_installation_vals(
         AppType.CustomDeployment: CustomDeploymentInputs,
         AppType.SparkJob: SparkJobInputs,
         AppType.Fooocus: FooocusAppInputs,
+        AppType.LightRAG: LightRAGAppInputs,
         AppType.MLFlow: MLFlowAppInputs,
         AppType.Jupyter: JupyterAppInputs,
         AppType.TextEmbeddingsInference: TextEmbeddingsInferenceAppInputs,
