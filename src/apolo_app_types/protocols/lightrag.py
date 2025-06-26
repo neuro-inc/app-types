@@ -1,4 +1,4 @@
-import enum
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -7,13 +7,19 @@ from apolo_app_types import (
     AppOutputs,
 )
 from apolo_app_types.protocols.common import (
+    AbstractAppFieldType,
     IngressHttp,
     Preset,
     SchemaExtraMetadata,
+    SchemaMetaType,
 )
 from apolo_app_types.protocols.common.networking import (
     HttpApi,
     ServiceAPI,
+)
+from apolo_app_types.protocols.common.openai_compat import (
+    OpenAICompatChatAPI,
+    OpenAICompatEmbeddingsAPI,
 )
 from apolo_app_types.protocols.common.secrets_ import OptionalStrOrSecret
 from apolo_app_types.protocols.postgres import CrunchyPostgresUserCredentials
@@ -57,118 +63,150 @@ class LightRAGPersistence(BaseModel):
         return value
 
 
-class LLMProviders(enum.StrEnum):
-    """LLM providers supported by LightRAG."""
+# LLM Provider Types
+class OpenAILLMProvider(AbstractAppFieldType):
+    """OpenAI LLM provider configuration. Also supports OpenRouter."""
 
-    OPENAI = "openai"  # Also supports OpenRouter via OpenAI-compatible API
-    ANTHROPIC = "anthropic"
-    OLLAMA = "ollama"
-    AZURE_OPENAI = "azure_openai"
-    HUGGINGFACE = "hf"
-    GEMINI = "gemini"  # Google Gemini via google-genai SDK
-
-
-class EmbeddingProviders(enum.StrEnum):
-    """Embedding providers supported by LightRAG."""
-
-    OPENAI = "openai"  # Also supports OpenRouter embeddings
-    OLLAMA = "ollama"
-    AZURE_OPENAI = "azure_openai"
-    HUGGINGFACE = "hf"
-    JINA = "jina"
-
-
-class LightRAGLLMConfig(BaseModel):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="LLM Configuration",
-            description="Configure the Language Model for text generation.",
+            title="OpenAI LLM Provider",
+            description="OpenAI API configuration. Also supports OpenRouter.",
+            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
-
-    binding: LLMProviders = Field(
-        default=LLMProviders.OPENAI,
-        json_schema_extra=SchemaExtraMetadata(
-            title="LLM Provider",
-            description="Choose the LLM provider for text generation.",
-        ).as_json_schema_extra(),
-    )
-
-    model: str = Field(
-        default="gpt-4o-mini",
-        json_schema_extra=SchemaExtraMetadata(
-            title="LLM Model",
-            description="Model name for text generation.",
-        ).as_json_schema_extra(),
-    )
-
-    api_key: OptionalStrOrSecret = Field(
-        default=None,
-        json_schema_extra=SchemaExtraMetadata(
-            title="API Key",
-            description="API key for the LLM provider (stored securely).",
-        ).as_json_schema_extra(),
-    )
-
-    host: str = Field(
-        default="",
-        json_schema_extra=SchemaExtraMetadata(
-            title="Host URL (Optional)",
-            description="Custom host URL for self-hosted services.",
-        ).as_json_schema_extra(),
+    provider: Literal["openai"] = "openai"
+    model: str = Field(default="gpt-4o-mini", description="Model name")
+    api_key: OptionalStrOrSecret = Field(default=None, description="API key")
+    base_url: str | None = Field(
+        default=None, description="Custom API base URL (for OpenRouter, etc.)"
     )
 
 
-class LightRAGEmbeddingConfig(BaseModel):
+class AnthropicLLMProvider(AbstractAppFieldType):
+    """Anthropic Claude LLM provider configuration."""
+
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Embedding Configuration",
-            description="Configure the embedding model for vector generation.",
+            title="Anthropic LLM Provider",
+            description="Anthropic Claude API configuration.",
+            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
-
-    binding: EmbeddingProviders = Field(
-        default=EmbeddingProviders.OPENAI,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Embedding Provider",
-            description="Choose the embedding provider.",
-        ).as_json_schema_extra(),
-    )
-
+    provider: Literal["anthropic"] = "anthropic"
     model: str = Field(
-        default="text-embedding-ada-002",
-        json_schema_extra=SchemaExtraMetadata(
-            title="Embedding Model",
-            description="Model name for embedding generation.",
-        ).as_json_schema_extra(),
+        default="claude-3-sonnet-20240229", description="Claude model name"
     )
+    api_key: OptionalStrOrSecret = Field(default=None, description="Anthropic API key")
 
-    dimensions: int = Field(
-        default=1536,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Embedding Dimensions",
-            description="Number of dimensions for embedding vectors.",
-        ).as_json_schema_extra(),
-    )
 
-    api_key: OptionalStrOrSecret = Field(  # noqa: N815
-        default=None,
+class OllamaLLMProvider(AbstractAppFieldType):
+    """Ollama local LLM provider configuration."""
+
+    model_config = ConfigDict(
+        protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="API Key",
-            description="API key for embedding provider (stored securely).",
+            title="Ollama LLM Provider",
+            description="Ollama local model configuration.",
+            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
+    provider: Literal["ollama"] = "ollama"
+    model: str = Field(default="llama3.1:8b", description="Ollama model name")
+    host: str = Field(default="http://localhost:11434", description="Ollama server URL")
+
+
+class GeminiLLMProvider(AbstractAppFieldType):
+    """Google Gemini LLM provider configuration."""
+
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Google Gemini LLM Provider",
+            description="Google Gemini API configuration.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+    provider: Literal["gemini"] = "gemini"
+    model: str = Field(default="gemini-1.5-flash", description="Gemini model name")
+    api_key: OptionalStrOrSecret = Field(default=None, description="Google AI API key")
+
+
+# Union type for all LLM providers
+LLMProvider = (
+    OpenAILLMProvider
+    | AnthropicLLMProvider
+    | OllamaLLMProvider
+    | GeminiLLMProvider
+    | OpenAICompatChatAPI  # For other OpenAI-compatible providers
+)
+
+
+# Embedding Provider Types
+class OpenAIEmbeddingProvider(AbstractAppFieldType):
+    """OpenAI embedding provider configuration."""
+
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="OpenAI Embedding Provider",
+            description="OpenAI embeddings API configuration.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+    provider: Literal["openai"] = "openai"
+    model: str = Field(
+        default="text-embedding-ada-002", description="Embedding model name"
+    )
+    api_key: OptionalStrOrSecret = Field(default=None, description="OpenAI API key")
+    base_url: str | None = Field(default=None, description="Custom API base URL")
+
+
+class OllamaEmbeddingProvider(AbstractAppFieldType):
+    """Ollama embedding provider configuration."""
+
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Ollama Embedding Provider",
+            description="Ollama local embedding model configuration.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+    provider: Literal["ollama"] = "ollama"
+    model: str = Field(
+        default="nomic-embed-text", description="Ollama embedding model name"
+    )
+    host: str = Field(default="http://localhost:11434", description="Ollama server URL")
+
+
+# Union type for all embedding providers
+EmbeddingProvider = (
+    OpenAIEmbeddingProvider
+    | OllamaEmbeddingProvider
+    | OpenAICompatEmbeddingsAPI  # For other OpenAI-compatible providers
+)
+
+
+# For backward compatibility, create a simplified config
+LightRAGLLMConfig = LLMProvider
+
+
+# For backward compatibility, create a simplified config
+LightRAGEmbeddingConfig = EmbeddingProvider
 
 
 class LightRAGAppInputs(AppInputs):
     preset: Preset
     ingress_http: IngressHttp
     pgvector_user: CrunchyPostgresUserCredentials
-    llm_config: LightRAGLLMConfig = Field(default_factory=LightRAGLLMConfig)
+    llm_config: LightRAGLLMConfig = Field(
+        default=OpenAILLMProvider(), description="LLM provider configuration"
+    )
     embedding_config: LightRAGEmbeddingConfig = Field(
-        default_factory=LightRAGEmbeddingConfig
+        default=OpenAIEmbeddingProvider(),
+        description="Embedding provider configuration",
     )
     persistence: LightRAGPersistence = Field(default_factory=LightRAGPersistence)
 

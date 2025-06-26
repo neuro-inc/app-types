@@ -14,31 +14,70 @@ logger = logging.getLogger(__name__)
 
 
 class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
+    def _extract_llm_config(self, llm_config: t.Any) -> dict[str, t.Any]:
+        """Extract LLM configuration from provider-specific config."""
+        binding = getattr(llm_config, "provider", "openai")
+        model = getattr(llm_config, "model", "gpt-4o-mini")
+        api_key = getattr(llm_config, "api_key", None)
+
+        # Handle different host field names
+        host = ""
+        if hasattr(llm_config, "base_url") and llm_config.base_url:
+            host = llm_config.base_url
+        elif hasattr(llm_config, "host") and llm_config.host:
+            host = llm_config.host
+        elif hasattr(llm_config, "endpoint") and llm_config.endpoint:
+            host = llm_config.endpoint
+
+        return {"binding": binding, "model": model, "host": host, "api_key": api_key}
+
+    def _extract_embedding_config(self, embedding_config: t.Any) -> dict[str, t.Any]:
+        """Extract embedding configuration from provider-specific config."""
+        binding = getattr(embedding_config, "provider", "openai")
+        model = getattr(embedding_config, "model", "text-embedding-ada-002")
+        api_key = getattr(embedding_config, "api_key", None)
+
+        # Handle dimensions - some providers might not have this
+        dimensions = 1536  # default
+        if hasattr(embedding_config, "dimensions"):
+            dimensions = embedding_config.dimensions
+
+        return {
+            "binding": binding,
+            "model": model,
+            "api_key": api_key,
+            "dimensions": dimensions,
+        }
+
     async def _get_environment_values(
         self, input_: LightRAGAppInputs, app_secrets_name: str
     ) -> dict[str, t.Any]:
         """Configure environment variables for LightRAG."""
+
+        # Extract configurations from provider-specific types
+        llm_config = self._extract_llm_config(input_.llm_config)
+        embedding_config = self._extract_embedding_config(input_.embedding_config)
 
         # Build environment configuration matching the full chart structure
         env_config = {
             "HOST": "0.0.0.0",
             "PORT": 9621,
             # Web UI configuration - using default LightRAG values
-            "WEBUI_TITLE": "LightRAG - Graph RAG Engine",
+            "WEBUI_TITLE": "Graph RAG Engine",
             "WEBUI_DESCRIPTION": "Simple and Fast Graph Based RAG System",
             # LLM configuration
-            "LLM_BINDING": input_.llm_config.binding,
-            "LLM_MODEL": input_.llm_config.model,
-            "LLM_BINDING_HOST": input_.llm_config.host or "",
+            "LLM_BINDING": llm_config["binding"],
+            "LLM_MODEL": llm_config["model"],
+            "LLM_BINDING_HOST": llm_config["host"],
             "LLM_BINDING_API_KEY": serialize_optional_secret(
-                input_.llm_config.api_key, app_secrets_name
+                llm_config["api_key"], app_secrets_name
             ),
             # Embedding configuration
-            "EMBEDDING_BINDING": input_.embedding_config.binding,
-            "EMBEDDING_MODEL": input_.embedding_config.model,
-            "EMBEDDING_DIM": input_.embedding_config.dimensions,
+            "EMBEDDING_BINDING": embedding_config["binding"],
+            "EMBEDDING_MODEL": embedding_config["model"],
+            "EMBEDDING_DIM": embedding_config["dimensions"],
             "EMBEDDING_BINDING_API_KEY": serialize_optional_secret(
-                input_.embedding_config.api_key, app_secrets_name
+                embedding_config["api_key"], app_secrets_name
             ),
             # Storage configuration - hardcoded to match minimal setup
             "LIGHTRAG_KV_STORAGE": "PGKVStorage",
