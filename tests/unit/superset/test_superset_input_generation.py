@@ -219,7 +219,7 @@ async def test_superset_values_generation_with_postgres_integration(
         app_secrets_name=APP_SECRETS_NAME,
         app_id=APP_ID,
     )
-    assert helm_params["postgres"]["enabled"] == "false"
+    assert helm_params["postgres"]["enabled"] == False
     assert helm_params["supersetNode"]["connections"] == {
         "db_host": "pgbouncer_host",
         "db_name": "db_name",
