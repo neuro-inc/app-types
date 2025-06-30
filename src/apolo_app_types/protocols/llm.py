@@ -57,7 +57,14 @@ class LLMInputs(AppInputs):
             " over the internet using HTTPS.",
         ).as_json_schema_extra(),
     )
-    hugging_face_model: HuggingFaceModel  # noqa: N815
+    hugging_face_model: HuggingFaceModel = Field(
+        ...,
+        json_schema_extra=HF_SCHEMA_EXTRA.model_copy(
+            update={
+                "meta_type": SchemaMetaType.INLINE,
+            }
+        ).as_json_schema_extra(),
+    )  # noqa: N815
     tokenizer_hf_name: str = Field(  # noqa: N815
         "",
         json_schema_extra=SchemaExtraMetadata(
@@ -162,14 +169,7 @@ class VLLMOutputsV2(AppOutputs):
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
-    hugging_face_model: HuggingFaceModel = Field(
-        ...,
-        json_schema_extra=HF_SCHEMA_EXTRA.model_copy(
-            update={
-                "meta_type": SchemaMetaType.INLINE,
-            }
-        ).as_json_schema_extra(),
-    )
+    hugging_face_model: HuggingFaceModel
     tokenizer_hf_name: str = Field(  # noqa: N815
         "",
         json_schema_extra=SchemaExtraMetadata(
