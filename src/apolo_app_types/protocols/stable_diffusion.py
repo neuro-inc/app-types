@@ -39,7 +39,14 @@ class StableDiffusionParams(AbstractAppFieldType):
             "deploy for handling concurrent image generation requests.",
         ).as_json_schema_extra(),
     )
-    hugging_face_model: HuggingFaceModel
+    hugging_face_model: HuggingFaceModel = Field(
+        ...,
+        json_schema_extra=HF_SCHEMA_EXTRA.model_copy(
+            update={
+                "meta_type": SchemaMetaType.INLINE,
+            }
+        ).as_json_schema_extra(),
+    )
 
 
 class StableDiffusionInputs(AppInputs):

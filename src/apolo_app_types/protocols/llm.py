@@ -12,6 +12,7 @@ from apolo_app_types.protocols.common import (
     SchemaExtraMetadata,
     SchemaMetaType,
 )
+from apolo_app_types.protocols.common.hugging_face import HF_SCHEMA_EXTRA
 from apolo_app_types.protocols.common.k8s import Env
 from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
@@ -161,7 +162,14 @@ class VLLMOutputsV2(AppOutputs):
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
-    hugging_face_model: HuggingFaceModel  # noqa: N815
+    hugging_face_model: HuggingFaceModel = Field(
+        ...,
+        json_schema_extra=HF_SCHEMA_EXTRA.model_copy(
+            update={
+                "meta_type": SchemaMetaType.INLINE,
+            }
+        ).as_json_schema_extra(),
+    )
     tokenizer_hf_name: str = Field(  # noqa: N815
         "",
         json_schema_extra=SchemaExtraMetadata(
