@@ -9,7 +9,9 @@ from apolo_app_types.protocols.common import (
     IngressHttp,
     Preset,
     SchemaExtraMetadata,
+    SchemaMetaType,
 )
+from apolo_app_types.protocols.common.hugging_face import HF_SCHEMA_EXTRA
 from apolo_app_types.protocols.common.k8s import Env
 from apolo_app_types.protocols.common.openai_compat import OpenAICompatEmbeddingsAPI
 
@@ -42,7 +44,14 @@ class TextEmbeddingsInferenceAppInputs(AppInputs):
         default=None,
         title="Enable HTTP Ingress",
     )
-    model: HuggingFaceModel
+    model: HuggingFaceModel = Field(
+        ...,
+        json_schema_extra=HF_SCHEMA_EXTRA.model_copy(
+            update={
+                "meta_type": SchemaMetaType.INLINE,
+            }
+        ).as_json_schema_extra(),
+    )
     server_extra_args: list[str] = Field(
         default_factory=list,
         json_schema_extra=SchemaExtraMetadata(
