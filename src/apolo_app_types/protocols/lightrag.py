@@ -200,13 +200,11 @@ class LightRAGAppInputs(AppInputs):
     ingress_http: IngressHttp
     pgvector_user: CrunchyPostgresUserCredentials
     llm_config: LightRAGLLMConfig = Field(
-        default=OpenAICompatChatAPI(host="api.openai.com", port=443, protocol="https"),
+        default=OpenAICompatChatAPI(host="", port=443, protocol="https"),
         description="LLM provider configuration",
     )
     embedding_config: LightRAGEmbeddingConfig = Field(
-        default=OpenAICompatEmbeddingsAPI(
-            host="api.openai.com", port=443, protocol="https"
-        ),
+        default=OpenAICompatEmbeddingsAPI(host="", port=443, protocol="https"),
         description="Embedding provider configuration",
     )
     persistence: LightRAGPersistence = Field(default_factory=LightRAGPersistence)
