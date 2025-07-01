@@ -82,7 +82,7 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
             },
         ],
     }
-    assert helm_params["postgres"] == {
+    assert helm_params["postgresql"] == {
         "affinity": {
             "nodeAffinity": {
                 "requiredDuringSchedulingIgnoredDuringExecution": {
@@ -219,7 +219,7 @@ async def test_superset_values_generation_with_postgres_integration(
         app_secrets_name=APP_SECRETS_NAME,
         app_id=APP_ID,
     )
-    assert not helm_params["postgres"]["enabled"]
+    assert not helm_params["postgresql"]["enabled"]
     assert helm_params["supersetNode"]["connections"] == {
         "db_host": "pgbouncer_host",
         "db_name": "db_name",
