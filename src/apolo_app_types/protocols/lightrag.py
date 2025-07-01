@@ -135,11 +135,11 @@ class GeminiLLMProvider(AbstractAppFieldType):
 
 # Union type for all LLM providers
 LLMProvider = (
-    OpenAILLMProvider
+    OpenAICompatChatAPI
+    | OpenAILLMProvider
     | AnthropicLLMProvider
     | OllamaLLMProvider
     | GeminiLLMProvider
-    | OpenAICompatChatAPI  # For other OpenAI-compatible providers
 )
 
 
@@ -183,9 +183,7 @@ class OllamaEmbeddingProvider(AbstractAppFieldType):
 
 # Union type for all embedding providers
 EmbeddingProvider = (
-    OpenAIEmbeddingProvider
-    | OllamaEmbeddingProvider
-    | OpenAICompatEmbeddingsAPI  # For other OpenAI-compatible providers
+    OpenAICompatEmbeddingsAPI | OllamaEmbeddingProvider | OpenAIEmbeddingProvider
 )
 
 
