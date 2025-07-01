@@ -91,7 +91,7 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
                 app_id=app_id,
                 app_type=AppType.Superset,
             )
-            additional_values.update({"postgres": postgres_values})
+            additional_values.update({"postgresql": postgres_values})
         else:
             node_values.update(
                 {
@@ -104,7 +104,7 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
                     }
                 }
             )
-            additional_values.update({"postgres": {"enabled": False}})
+            additional_values.update({"postgresql": {"enabled": False}})
         return merge_list_of_dicts(
             [
                 {
