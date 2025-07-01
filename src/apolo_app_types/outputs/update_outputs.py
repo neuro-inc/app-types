@@ -15,6 +15,7 @@ from apolo_app_types.outputs.huggingface_cache import (
     get_app_outputs as get_huggingface_cache_outputs,
 )
 from apolo_app_types.outputs.jupyter import get_jupyter_outputs
+from apolo_app_types.outputs.lightrag import get_lightrag_outputs
 from apolo_app_types.outputs.llm import get_llm_inference_outputs
 from apolo_app_types.outputs.mlflow import get_mlflow_outputs
 from apolo_app_types.outputs.postgres import get_postgres_outputs
@@ -144,6 +145,8 @@ async def update_app_outputs(  # noqa: C901
                 conv_outputs = await get_dify_outputs(helm_outputs, app_instance_id)
             case AppType.Superset:
                 conv_outputs = await get_superset_outputs(helm_outputs, app_instance_id)
+            case AppType.LightRAG:
+                conv_outputs = await get_lightrag_outputs(helm_outputs, app_instance_id)
             case _:
                 # Try loading application postprocessor defined in the app repo
                 postprocessor = load_app_postprocessor(

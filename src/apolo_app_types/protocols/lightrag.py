@@ -72,7 +72,7 @@ class OpenAILLMProvider(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="OpenAI LLM Provider",
             description="OpenAI API configuration. Also supports OpenRouter.",
-            meta_type=SchemaMetaType.INTEGRATION,
+            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     provider: Literal["openai"] = "openai"
@@ -91,7 +91,7 @@ class AnthropicLLMProvider(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Anthropic LLM Provider",
             description="Anthropic Claude API configuration.",
-            meta_type=SchemaMetaType.INTEGRATION,
+            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     provider: Literal["anthropic"] = "anthropic"
@@ -109,7 +109,7 @@ class OllamaLLMProvider(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Ollama LLM Provider",
             description="Ollama local model configuration.",
-            meta_type=SchemaMetaType.INTEGRATION,
+            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     provider: Literal["ollama"] = "ollama"
@@ -125,7 +125,7 @@ class GeminiLLMProvider(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Google Gemini LLM Provider",
             description="Google Gemini API configuration.",
-            meta_type=SchemaMetaType.INTEGRATION,
+            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     provider: Literal["gemini"] = "gemini"
@@ -135,11 +135,11 @@ class GeminiLLMProvider(AbstractAppFieldType):
 
 # Union type for all LLM providers
 LLMProvider = (
-    OpenAILLMProvider
+    OpenAICompatChatAPI
+    | OpenAILLMProvider
     | AnthropicLLMProvider
     | OllamaLLMProvider
     | GeminiLLMProvider
-    | OpenAICompatChatAPI  # For other OpenAI-compatible providers
 )
 
 
@@ -152,7 +152,7 @@ class OpenAIEmbeddingProvider(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="OpenAI Embedding Provider",
             description="OpenAI embeddings API configuration.",
-            meta_type=SchemaMetaType.INTEGRATION,
+            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     provider: Literal["openai"] = "openai"
@@ -171,21 +171,19 @@ class OllamaEmbeddingProvider(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Ollama Embedding Provider",
             description="Ollama local embedding model configuration.",
-            meta_type=SchemaMetaType.INTEGRATION,
+            meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
     provider: Literal["ollama"] = "ollama"
     model: str = Field(
         default="nomic-embed-text", description="Ollama embedding model name"
     )
-    host: str = Field(default="http://localhost:11434", description="Ollama server URL")
+    host: str = Field(description="Ollama server URL")
 
 
 # Union type for all embedding providers
 EmbeddingProvider = (
-    OpenAIEmbeddingProvider
-    | OllamaEmbeddingProvider
-    | OpenAICompatEmbeddingsAPI  # For other OpenAI-compatible providers
+    OpenAICompatEmbeddingsAPI | OllamaEmbeddingProvider | OpenAIEmbeddingProvider
 )
 
 
@@ -202,10 +200,11 @@ class LightRAGAppInputs(AppInputs):
     ingress_http: IngressHttp
     pgvector_user: CrunchyPostgresUserCredentials
     llm_config: LightRAGLLMConfig = Field(
-        default=OpenAILLMProvider(), description="LLM provider configuration"
+        default=OpenAICompatChatAPI(host="", port=443, protocol="https"),
+        description="LLM provider configuration",
     )
     embedding_config: LightRAGEmbeddingConfig = Field(
-        default=OpenAIEmbeddingProvider(),
+        default=OpenAICompatEmbeddingsAPI(host="", port=443, protocol="https"),
         description="Embedding provider configuration",
     )
     persistence: LightRAGPersistence = Field(default_factory=LightRAGPersistence)
