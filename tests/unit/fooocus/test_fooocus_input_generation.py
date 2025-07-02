@@ -28,7 +28,7 @@ async def test_fooocus_values_generation(setup_clients):
                 clusterName="default",
             ),
             fooocus_specific=FooocusSpecificAppInputs(
-                http_auth=True, huggingface_token_secret="RAW_STRING"
+                huggingface_token_secret="RAW_STRING"
             ),
         ),
         apolo_client=setup_clients,
