@@ -124,7 +124,6 @@ async def get_http_ingress_values(
 
     # Handle auth based on its presence in the input object
     if ingress_http.auth:
-        ingress_vals["auth"] = True
         ingress_vals.setdefault("annotations", {})  # Ensure annotations key exists
         is_prod = is_production_cluster(apolo_client)
         middleware_string = _get_middleware_string(app_type, is_production=is_prod)
@@ -161,7 +160,6 @@ async def get_grpc_ingress_values(
     }
 
     if ingress_grpc.auth:
-        grpc_vals["auth"] = True
         grpc_vals.setdefault("annotations", {})
         is_prod = is_production_cluster(apolo_client)
         middleware_string = _get_middleware_string(app_type, is_production=is_prod)
