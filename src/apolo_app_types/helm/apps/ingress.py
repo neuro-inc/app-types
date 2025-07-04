@@ -101,10 +101,9 @@ async def get_http_ingress_values(
 
     # Handle auth based on its presence in the input object
     if ingress_http.auth:
-        forward_auth_name = "forwardauth"
         forward_auth_config = {
             "enabled": True,
-            "name": forward_auth_name,
+            "name": "forwardauth",
             "address": str(_get_forward_auth_address(apolo_client)),
             "trustForwardHeader": True,
             "authResponseHeaders": [],
@@ -148,17 +147,16 @@ async def get_grpc_ingress_values(
     }
 
     if ingress_grpc.auth:
-        forward_auth_name = "forwardauth"
         grpc_vals["auth"] = {
             "enabled": True,
-            "name": forward_auth_name,
+            "name": "forwardauth",
             "address": str(_get_forward_auth_address(apolo_client)),
             "trustForwardHeader": True,
             "authResponseHeaders": [],
         }
         grpc_vals.setdefault("annotations", {})
         grpc_vals["annotations"]["traefik.ingress.kubernetes.io/router.middlewares"] = (
-            f"{namespace}-{forward_auth_name}@kubernetescrd,{namespace}-strip-headers@kubernetescrd"
+            "platform-control-plane-ingress-auth@kubernetescrd,platform-control-plane-strip-headers@kubernetescrd"
         )
 
     return grpc_vals
