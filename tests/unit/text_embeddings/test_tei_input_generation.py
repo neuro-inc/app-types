@@ -76,6 +76,14 @@ async def test_tei_values_generation(setup_clients):
             "--max-client-batch-size=16",
         ]
 
+        # Verify Text Embeddings gets ONLY auth middleware (no strip headers)
+        assert (
+            helm_params["ingress"]["annotations"][
+                "traefik.ingress.kubernetes.io/router.middlewares"
+            ]
+            == "platform-control-plane-ingress-auth@kubernetescrd"
+        )
+
 
 class TestGPUArchitectureDetection:
     """Test GPU architecture detection for dynamic TEI image selection."""
