@@ -68,6 +68,14 @@ async def test_values_sd_generation(setup_clients, mock_get_preset_cpu):
     assert helm_params["api"]["resources"]["requests"].get("nvidia.com/gpu") is None
     assert helm_params["api"]["resources"]["limits"].get("nvidia.com/gpu") is None
 
+    # Verify Stable Diffusion gets ONLY auth middleware (no strip headers)
+    assert (
+        helm_params["ingress"]["annotations"][
+            "traefik.ingress.kubernetes.io/router.middlewares"
+        ]
+        == "platform-control-plane-ingress-auth@kubernetescrd"
+    )
+
 
 @pytest.mark.asyncio
 async def test_values_sd_generation_with_gpu(setup_clients, mock_get_preset_gpu):

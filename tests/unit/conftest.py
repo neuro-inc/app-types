@@ -35,6 +35,7 @@ async def setup_clients():
             mock_apolo_client.config.registry_url = PropertyMock(
                 return_value="registry.cluster.org.neu.ro"
             )
+            mock_apolo_client.config.api_url = "https://api.dev.apolo.us"
             mock_apolo_client.config.cluster_name = DEFAULT_CLUSTER_NAME
             mock_apolo_client.config.org_name = DEFAULT_ORG_NAME
             mock_apolo_client.config.project_name = DEFAULT_PROJECT_NAME
@@ -91,7 +92,7 @@ async def setup_clients():
                         provider=Bucket.Provider.GCP,
                         credentials={
                             "bucket_name": "test-bucket",
-                            "key_data": base64.b64encode(b"bucket-access-key"),
+                            "key_data": base64.b64encode(b"bucket-access-key").decode(),
                         },
                     )
                 ],

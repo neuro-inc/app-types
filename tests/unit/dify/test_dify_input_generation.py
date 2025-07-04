@@ -119,3 +119,11 @@ async def test_dify_values_generation(setup_clients):
         assert helm_params["redis"]["architecture"] == "standalone"
         assert helm_params["api"]["secretKey"]
         assert helm_params["api"]["initPassword"]
+
+        # Verify Dify gets ONLY auth middleware (no strip headers)
+        assert (
+            helm_params["ingress"]["annotations"][
+                "traefik.ingress.kubernetes.io/router.middlewares"
+            ]
+            == "platform-control-plane-ingress-auth@kubernetescrd"
+        )

@@ -189,6 +189,14 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
     }
     assert helm_params["extraSecretEnv"]["SUPERSET_SECRET_KEY"]
 
+    # Verify Superset gets ONLY auth middleware (no strip headers)
+    assert (
+        helm_params["ingress"]["annotations"][
+            "traefik.ingress.kubernetes.io/router.middlewares"
+        ]
+        == "platform-control-plane-ingress-auth@kubernetescrd"
+    )
+
 
 @pytest.mark.asyncio
 async def test_superset_values_generation_with_postgres_integration(

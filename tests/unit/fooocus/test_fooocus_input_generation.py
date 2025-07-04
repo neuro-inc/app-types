@@ -74,3 +74,11 @@ async def test_fooocus_values_generation(setup_clients):
 
     pod_labels = helm_params.get("podLabels", {})
     assert pod_labels.get("platform.apolo.us/inject-storage") == "true"
+
+    # Verify Fooocus gets ONLY auth middleware (no strip headers)
+    assert (
+        helm_params["ingress"]["annotations"][
+            "traefik.ingress.kubernetes.io/router.middlewares"
+        ]
+        == "platform-control-plane-ingress-auth@kubernetescrd"
+    )

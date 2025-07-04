@@ -79,6 +79,14 @@ async def test_custom_deployment_values_generation(setup_clients):
     assert helm_params["ingress"]["className"] == "traefik"
     assert helm_params["preset_name"] == "cpu-small"
 
+    # Verify Custom Deployment gets ONLY auth middleware (no strip headers)
+    assert (
+        helm_params["ingress"]["annotations"][
+            "traefik.ingress.kubernetes.io/router.middlewares"
+        ]
+        == "platform-control-plane-ingress-auth@kubernetescrd"
+    )
+
 
 @pytest.mark.asyncio
 async def test_custom_deployment_values_generation_with_storage_mounts(setup_clients):

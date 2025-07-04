@@ -1,5 +1,3 @@
-from unittest.mock import ANY
-
 from dirty_equals import IsStr
 
 from apolo_app_types import HuggingFaceModel, LLMInputs
@@ -64,17 +62,9 @@ async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):
         ],
         "annotations": {
             "traefik.ingress.kubernetes.io/router.middlewares": (
-                f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd,{DEFAULT_NAMESPACE}-strip-headers@kubernetescrd"
+                "platform-control-plane-ingress-auth@kubernetescrd"
             )
         },
-        "forwardAuth": {
-            "enabled": True,
-            "name": "forwardauth",
-            "address": ANY,
-            "trustForwardHeader": True,
-            "authResponseHeaders": [],
-        },
-        "stripHeaders": {"enabled": True},
     }
     assert helm_params["tolerations"] == [
         {
@@ -186,17 +176,9 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
             ],
             "annotations": {
                 "traefik.ingress.kubernetes.io/router.middlewares": (
-                    f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd,{DEFAULT_NAMESPACE}-strip-headers@kubernetescrd"
+                    "platform-control-plane-ingress-auth@kubernetescrd"
                 )
             },
-            "forwardAuth": {
-                "enabled": True,
-                "name": "forwardauth",
-                "address": ANY,
-                "trustForwardHeader": True,
-                "authResponseHeaders": [],
-            },
-            "stripHeaders": {"enabled": True},
         },
         "podAnnotations": {},
         "podExtraLabels": {},
@@ -260,17 +242,9 @@ async def test_values_llm_generation_cpu_apolo_secret(
         ],
         "annotations": {
             "traefik.ingress.kubernetes.io/router.middlewares": (
-                f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd,{DEFAULT_NAMESPACE}-strip-headers@kubernetescrd"
+                "platform-control-plane-ingress-auth@kubernetescrd"
             )
         },
-        "forwardAuth": {
-            "enabled": True,
-            "name": "forwardauth",
-            "address": ANY,
-            "trustForwardHeader": True,
-            "authResponseHeaders": [],
-        },
-        "stripHeaders": {"enabled": True},
     }
     assert helm_params["tolerations"] == [
         {
@@ -475,7 +449,7 @@ async def test_values_llm_generation__storage_integrated(
             "grpc": {"enabled": False},
             "annotations": {
                 "traefik.ingress.kubernetes.io/router.middlewares": (
-                    f"{DEFAULT_NAMESPACE}-forwardauth@kubernetescrd,{DEFAULT_NAMESPACE}-strip-headers@kubernetescrd"
+                    "platform-control-plane-ingress-auth@kubernetescrd"
                 )
             },
             "className": "traefik",
@@ -486,14 +460,6 @@ async def test_values_llm_generation__storage_integrated(
                     "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
                 }
             ],
-            "forwardAuth": {
-                "enabled": True,
-                "name": "forwardauth",
-                "address": ANY,
-                "trustForwardHeader": True,
-                "authResponseHeaders": [],
-            },
-            "stripHeaders": {"enabled": True},
         },
         "podAnnotations": {
             APOLO_STORAGE_LABEL: '[{"storage_uri": "storage://some-cluster/some-org/some-proj/some-folder", "mount_path": "/root/.cache/huggingface", "mount_mode": "rw"}]'  # noqa: E501
