@@ -77,6 +77,14 @@ async def test_values_mlflow_generation_default_sqlite(
     # Confirm "application=mlflow" label
     assert helm_params["labels"]["application"] == "mlflow"
 
+    # Verify MLflow gets ONLY auth middleware (no strip headers)
+    assert (
+        helm_params["ingress"]["annotations"][
+            "traefik.ingress.kubernetes.io/router.middlewares"
+        ]
+        == "platform-control-plane-ingress-auth@kubernetescrd"
+    )
+
 
 @pytest.mark.asyncio
 async def test_values_mlflow_generation_sqlite_explicit_no_pvc_name(

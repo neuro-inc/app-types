@@ -95,6 +95,14 @@ async def test_privategpt_values_generation(setup_clients):
         {"name": "HUGGINGFACE_TOKEN", "value": ""},
     ]
 
+    # Verify PrivateGPT gets ONLY auth middleware (no strip headers)
+    assert (
+        helm_params["ingress"]["annotations"][
+            "traefik.ingress.kubernetes.io/router.middlewares"
+        ]
+        == "platform-control-plane-ingress-auth@kubernetescrd"
+    )
+
 
 @pytest.mark.asyncio
 async def test_privategpt_values_generation_custom_temperature(setup_clients):
