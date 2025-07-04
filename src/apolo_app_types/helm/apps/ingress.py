@@ -2,7 +2,6 @@ import re
 import typing as t
 
 import apolo_sdk
-from yarl import URL
 
 from apolo_app_types.app_types import AppType
 from apolo_app_types.protocols.common import IngressGrpc, IngressHttp
@@ -15,9 +14,33 @@ APP_NAME_PLACEHOLDER = "app_name"
 APP_NAME_F_STRING_EXPRESSION = f"{{{APP_NAME_PLACEHOLDER}}}"
 F_STRING_EXPRESSION_RE = re.compile(r"\{.+?\}")
 
+# Middleware names
+PROD_AUTH_MIDDLEWARE = "platform-ingress-auth@kubernetescrd"
+DEV_AUTH_MIDDLEWARE = "platform-control-plane-ingress-auth@kubernetescrd"
+PROD_STRIP_HEADERS_MIDDLEWARE = "platform-ingress-strip-headers@kubernetescrd"
+DEV_STRIP_HEADERS_MIDDLEWARE = "platform-control-plane-strip-headers@kubernetescrd"
 
-def _get_forward_auth_address(client: apolo_sdk.Client) -> URL:
-    return client.config.api_url.with_path("/oauth/authorize")
+# App types that require strip headers middleware
+STRIP_HEADERS_APP_TYPES = {AppType.Weaviate}
+
+
+def _get_middleware_string(app_type: AppType, *, is_production: bool) -> str:
+    """Generate middleware string based on app type and cluster environment."""
+    auth_middleware = PROD_AUTH_MIDDLEWARE if is_production else DEV_AUTH_MIDDLEWARE
+
+    if app_type in STRIP_HEADERS_APP_TYPES:
+        strip_headers_middleware = (
+            PROD_STRIP_HEADERS_MIDDLEWARE
+            if is_production
+            else DEV_STRIP_HEADERS_MIDDLEWARE
+        )
+        return f"{auth_middleware},{strip_headers_middleware}"
+
+    return auth_middleware
+
+
+def is_production_cluster(client: apolo_sdk.Client) -> bool:
+    return client.config.api_url != "https://api.dev.apolo.us"
 
 
 async def _get_ingress_name_template(client: apolo_sdk.Client) -> str:
@@ -101,22 +124,13 @@ async def get_http_ingress_values(
 
     # Handle auth based on its presence in the input object
     if ingress_http.auth:
-        forward_auth_config = {
-            "enabled": True,
-            "name": "forwardauth",
-            "address": str(_get_forward_auth_address(apolo_client)),
-            "trustForwardHeader": True,
-            "authResponseHeaders": [],
-        }
-        ingress_vals["forwardAuth"] = forward_auth_config
-        ingress_vals["stripHeaders"] = {"enabled": True}
+        ingress_vals["auth"] = True
         ingress_vals.setdefault("annotations", {})  # Ensure annotations key exists
+        is_prod = is_production_cluster(apolo_client)
+        middleware_string = _get_middleware_string(app_type, is_production=is_prod)
         ingress_vals["annotations"][
             "traefik.ingress.kubernetes.io/router.middlewares"
-        ] = (
-            "platform-control-plane-ingress-auth@kubernetescrd,"
-            "platform-control-plane-strip-headers@kubernetescrd"
-        )
+        ] = middleware_string
 
     return ingress_vals
 
@@ -147,16 +161,12 @@ async def get_grpc_ingress_values(
     }
 
     if ingress_grpc.auth:
-        grpc_vals["auth"] = {
-            "enabled": True,
-            "name": "forwardauth",
-            "address": str(_get_forward_auth_address(apolo_client)),
-            "trustForwardHeader": True,
-            "authResponseHeaders": [],
-        }
+        grpc_vals["auth"] = True
         grpc_vals.setdefault("annotations", {})
+        is_prod = is_production_cluster(apolo_client)
+        middleware_string = _get_middleware_string(app_type, is_production=is_prod)
         grpc_vals["annotations"]["traefik.ingress.kubernetes.io/router.middlewares"] = (
-            "platform-control-plane-ingress-auth@kubernetescrd,platform-control-plane-strip-headers@kubernetescrd"
+            middleware_string
         )
 
     return grpc_vals
