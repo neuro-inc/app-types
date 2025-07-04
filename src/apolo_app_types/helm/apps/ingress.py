@@ -23,6 +23,10 @@ DEV_STRIP_HEADERS_MIDDLEWARE = "platform-control-plane-strip-headers@kubernetesc
 # App types that require strip headers middleware
 STRIP_HEADERS_APP_TYPES = {AppType.Weaviate}
 
+DEV_API_URL_DOMAIN = "api.dev.apolo.us"
+
+MIDDLEWARE_ANNOTATION_KEY = "traefik.ingress.kubernetes.io/router.middlewares"
+
 
 def _get_middlewares_annotation_value(app_type: AppType, *, is_production: bool) -> str:
     """Generate middleware string based on app type and cluster environment."""
@@ -40,7 +44,7 @@ def _get_middlewares_annotation_value(app_type: AppType, *, is_production: bool)
 
 
 def is_production_cluster(client: apolo_sdk.Client) -> bool:
-    return "api.dev.apolo.us" not in str(client.config.api_url)
+    return DEV_API_URL_DOMAIN not in str(client.config.api_url)
 
 
 async def _get_ingress_name_template(client: apolo_sdk.Client) -> str:
@@ -129,9 +133,7 @@ async def get_http_ingress_values(
         middleware_string = _get_middlewares_annotation_value(
             app_type, is_production=is_prod
         )
-        ingress_vals["annotations"][
-            "traefik.ingress.kubernetes.io/router.middlewares"
-        ] = middleware_string
+        ingress_vals["annotations"][MIDDLEWARE_ANNOTATION_KEY] = middleware_string
 
     return ingress_vals
 
@@ -167,8 +169,6 @@ async def get_grpc_ingress_values(
         middleware_string = _get_middlewares_annotation_value(
             app_type, is_production=is_prod
         )
-        grpc_vals["annotations"]["traefik.ingress.kubernetes.io/router.middlewares"] = (
-            middleware_string
-        )
+        grpc_vals["annotations"][MIDDLEWARE_ANNOTATION_KEY] = middleware_string
 
     return grpc_vals
