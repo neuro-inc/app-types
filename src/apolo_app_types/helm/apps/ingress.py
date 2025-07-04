@@ -40,7 +40,7 @@ def _get_middlewares_annotation_value(app_type: AppType, *, is_production: bool)
 
 
 def is_production_cluster(client: apolo_sdk.Client) -> bool:
-    return client.config.api_url != "https://api.dev.apolo.us"
+    return "api.dev.apolo.us" not in str(client.config.api_url)
 
 
 async def _get_ingress_name_template(client: apolo_sdk.Client) -> str:
