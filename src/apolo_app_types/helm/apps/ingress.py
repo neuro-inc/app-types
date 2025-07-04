@@ -115,8 +115,8 @@ async def get_http_ingress_values(
         ingress_vals["annotations"][
             "traefik.ingress.kubernetes.io/router.middlewares"
         ] = (
-            f"{namespace}-{forward_auth_name}@kubernetescrd,"
-            f"{namespace}-strip-headers@kubernetescrd"
+            "platform-control-plane-ingress-auth@kubernetescrd,"
+            "platform-control-plane-strip-headers@kubernetescrd"
         )
 
     return ingress_vals
