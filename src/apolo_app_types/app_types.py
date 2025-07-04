@@ -10,6 +10,7 @@ from apolo_app_types.protocols.jupyter import JupyterAppInputs
 from apolo_app_types.protocols.lightrag import LightRAGAppInputs
 from apolo_app_types.protocols.llm import LLMInputs
 from apolo_app_types.protocols.mlflow import MLFlowAppInputs
+from apolo_app_types.protocols.openwebui import OpenWebUIAppInputs
 from apolo_app_types.protocols.spark_job import SparkJobInputs
 from apolo_app_types.protocols.vscode import VSCodeAppInputs
 from apolo_app_types.protocols.weaviate import WeaviateInputs
@@ -37,6 +38,7 @@ class AppType(enum.StrEnum):
     ServiceDeployment = "service-deployment"
     SparkJob = "spark-job"
     Superset = "superset"
+    OpenWebUI = "openwebui"
 
     def __repr__(self) -> str:
         return str(self)
@@ -72,6 +74,7 @@ class AppType(enum.StrEnum):
             MLFlowAppInputs: AppType.MLFlow,
             VSCodeAppInputs: AppType.VSCode,
             JupyterAppInputs: AppType.Jupyter,
+            OpenWebUIAppInputs: AppType.OpenWebUI,
         }
 
         input_type = type(inputs)
