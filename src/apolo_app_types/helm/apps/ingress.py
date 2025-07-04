@@ -17,14 +17,14 @@ F_STRING_EXPRESSION_RE = re.compile(r"\{.+?\}")
 # Middleware names
 PROD_AUTH_MIDDLEWARE = "platform-ingress-auth@kubernetescrd"
 DEV_AUTH_MIDDLEWARE = "platform-control-plane-ingress-auth@kubernetescrd"
-PROD_STRIP_HEADERS_MIDDLEWARE = "platform-ingress-strip-headers@kubernetescrd"
+PROD_STRIP_HEADERS_MIDDLEWARE = "platform-strip-headers@kubernetescrd"
 DEV_STRIP_HEADERS_MIDDLEWARE = "platform-control-plane-strip-headers@kubernetescrd"
 
 # App types that require strip headers middleware
 STRIP_HEADERS_APP_TYPES = {AppType.Weaviate}
 
 
-def _get_middleware_string(app_type: AppType, *, is_production: bool) -> str:
+def _get_middlewares_annotation_value(app_type: AppType, *, is_production: bool) -> str:
     """Generate middleware string based on app type and cluster environment."""
     auth_middleware = PROD_AUTH_MIDDLEWARE if is_production else DEV_AUTH_MIDDLEWARE
 
@@ -126,7 +126,9 @@ async def get_http_ingress_values(
     if ingress_http.auth:
         ingress_vals.setdefault("annotations", {})  # Ensure annotations key exists
         is_prod = is_production_cluster(apolo_client)
-        middleware_string = _get_middleware_string(app_type, is_production=is_prod)
+        middleware_string = _get_middlewares_annotation_value(
+            app_type, is_production=is_prod
+        )
         ingress_vals["annotations"][
             "traefik.ingress.kubernetes.io/router.middlewares"
         ] = middleware_string
@@ -162,7 +164,9 @@ async def get_grpc_ingress_values(
     if ingress_grpc.auth:
         grpc_vals.setdefault("annotations", {})
         is_prod = is_production_cluster(apolo_client)
-        middleware_string = _get_middleware_string(app_type, is_production=is_prod)
+        middleware_string = _get_middlewares_annotation_value(
+            app_type, is_production=is_prod
+        )
         grpc_vals["annotations"]["traefik.ingress.kubernetes.io/router.middlewares"] = (
             middleware_string
         )

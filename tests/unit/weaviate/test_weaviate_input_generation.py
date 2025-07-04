@@ -14,6 +14,39 @@ from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
 
 @pytest.mark.asyncio
+async def test_weaviate_middleware_annotations(setup_clients, mock_get_preset_cpu):
+    """Test that Weaviate apps get both auth AND strip headers middleware."""
+    from apolo_app_types.inputs.args import app_type_to_vals
+
+    apolo_client = setup_clients
+    helm_args, helm_params = await app_type_to_vals(
+        input_=WeaviateInputs(
+            preset=Preset(name="cpu-large"),
+            persistence=WeaviatePersistence(size=64, enable_backups=False),
+            ingress_http=IngressHttp(auth=True),
+        ),
+        apolo_client=apolo_client,
+        app_type=AppType.Weaviate,
+        app_name="weaviate",
+        namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
+    )
+
+    # Verify Weaviate gets both auth AND strip headers middleware
+    expected_middleware = (
+        "platform-control-plane-ingress-auth@kubernetescrd,"
+        "platform-control-plane-strip-headers@kubernetescrd"
+    )
+    assert (
+        helm_params["ingress"]["annotations"][
+            "traefik.ingress.kubernetes.io/router.middlewares"
+        ]
+        == expected_middleware
+    )
+
+
+@pytest.mark.asyncio
 async def test_values_weaviate_generation_basic(setup_clients, mock_get_preset_cpu):
     from apolo_app_types.inputs.args import app_type_to_vals
 
