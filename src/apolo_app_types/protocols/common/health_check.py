@@ -107,7 +107,7 @@ class TCPHealthCheckConfig(HealthCheckConfigBase):
     # No additional fields needed for TCP, just the connection attempt itself
 
 
-class ExecHealthCheckConfig(HealthCheckConfigBase):
+class ExecHealthCheckConfig(AbstractAppFieldType):
     """
     Exec-specific health check configuration.
     """
