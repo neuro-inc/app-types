@@ -82,7 +82,7 @@ async def test_values_mlflow_generation_default_sqlite(
         helm_params["ingress"]["annotations"][
             "traefik.ingress.kubernetes.io/router.middlewares"
         ]
-        == "platform-control-plane-ingress-auth@kubernetescrd"
+        == "platform-platform-control-plane-ingress-auth@kubernetescrd"
     )
 
 

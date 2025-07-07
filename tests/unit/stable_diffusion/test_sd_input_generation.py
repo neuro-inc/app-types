@@ -73,7 +73,7 @@ async def test_values_sd_generation(setup_clients, mock_get_preset_cpu):
         helm_params["ingress"]["annotations"][
             "traefik.ingress.kubernetes.io/router.middlewares"
         ]
-        == "platform-control-plane-ingress-auth@kubernetescrd"
+        == "platform-platform-control-plane-ingress-auth@kubernetescrd"
     )
 
 

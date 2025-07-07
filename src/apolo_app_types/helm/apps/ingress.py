@@ -15,10 +15,12 @@ APP_NAME_F_STRING_EXPRESSION = f"{{{APP_NAME_PLACEHOLDER}}}"
 F_STRING_EXPRESSION_RE = re.compile(r"\{.+?\}")
 
 # Middleware names
-PROD_AUTH_MIDDLEWARE = "platform-ingress-auth@kubernetescrd"
-DEV_AUTH_MIDDLEWARE = "platform-control-plane-ingress-auth@kubernetescrd"
-PROD_STRIP_HEADERS_MIDDLEWARE = "platform-strip-headers@kubernetescrd"
-DEV_STRIP_HEADERS_MIDDLEWARE = "platform-control-plane-strip-headers@kubernetescrd"
+PROD_AUTH_MIDDLEWARE = "platform-platform-ingress-auth@kubernetescrd"
+DEV_AUTH_MIDDLEWARE = "platform-platform-control-plane-ingress-auth@kubernetescrd"
+PROD_STRIP_HEADERS_MIDDLEWARE = "platform-platform-strip-headers@kubernetescrd"
+DEV_STRIP_HEADERS_MIDDLEWARE = (
+    "platform-platform-control-plane-strip-headers@kubernetescrd"
+)
 
 # App types that require strip headers middleware
 STRIP_HEADERS_APP_TYPES = {AppType.Weaviate}
