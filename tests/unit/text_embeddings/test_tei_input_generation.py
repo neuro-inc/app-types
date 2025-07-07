@@ -81,7 +81,7 @@ async def test_tei_values_generation(setup_clients):
             helm_params["ingress"]["annotations"][
                 "traefik.ingress.kubernetes.io/router.middlewares"
             ]
-            == "platform-control-plane-ingress-auth@kubernetescrd"
+            == "platform-platform-control-plane-ingress-auth@kubernetescrd"
         )
 
 
