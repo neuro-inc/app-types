@@ -26,8 +26,8 @@ class OpenWebUISpecific(BaseModel):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="PrivateGPT Specific",
-            description="Configure PrivateGPT additional parameters.",
+            title="OpenWebUI Specific",
+            description="Configure OpenWebUI additional parameters.",
         ).as_json_schema_extra(),
     )
     env: list[Env] = Field(
@@ -53,7 +53,7 @@ class OpenWebUIAppInputs(AppInputs):
 
 class OpenWebUIAppOutputs(AppOutputs):
     """
-    PrivateGPT outputs:
+    OpenWebUI outputs:
       - internal_web_app_url
       - external_web_app_url
     """
