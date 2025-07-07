@@ -77,6 +77,10 @@ async def test_openwebui_values_generation(setup_clients):
             "name": "RAG_OPENAI_API_BASE_URL",
             "value": "https://text-embeddings-inference-host:3000/v1",
         },
+        {"name": "DATABASE_URL", "value": ""},  # no url on app install, only outputs
+        {
+            "name": "VECTOR_DB",
+            "value": "pgvector",
+        },  # no url on app install, only outputs
         {"name": "PGVECTOR_DB_URL", "value": ""},  # no url on app install, only outputs
-        {"name": "DATABASE_SCHEMA", "value": "openwebui"},
     ]
