@@ -80,6 +80,10 @@ from apolo_app_types.protocols.mlflow import (
     MLFlowAppOutputs,
     MLFlowTrackingServerURL,
 )
+from apolo_app_types.protocols.openwebui import (
+    OpenWebUIAppInputs,
+    OpenWebUIAppOutputs,
+)
 from apolo_app_types.protocols.postgres import (
     CrunchyPostgresOutputs,
     CrunchyPostgresUserCredentials,
@@ -211,4 +215,6 @@ __all__ = [
     "ShellAppOutputs",
     "LightRAGAppInputs",
     "LightRAGAppOutputs",
+    "OpenWebUIAppInputs",
+    "OpenWebUIAppOutputs",
 ]

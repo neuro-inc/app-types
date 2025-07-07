@@ -3,7 +3,6 @@ from pydantic import BaseModel, ConfigDict, Field
 from apolo_app_types import (
     AppInputs,
     AppOutputs,
-    CrunchyPostgresUserCredentials,
 )
 from apolo_app_types.protocols.common import (
     IngressHttp,
@@ -17,6 +16,9 @@ from apolo_app_types.protocols.common.networking import (
 from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
+)
+from apolo_app_types.protocols.postgres import (
+    CrunchyPostgresUserCredentials,
 )
 
 
