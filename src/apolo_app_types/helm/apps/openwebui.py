@@ -54,8 +54,9 @@ class OpenWebUIChartValueProcessor(BaseChartValueProcessor[OpenWebUIAppInputs]):
             "RAG_OPENAI_API_BASE_URL": str(
                 URL(input_.embeddings_api.complete_url) / "v1"
             ),
+            "DATABASE_URL": input_.pgvector_user.uri,
+            "VECTOR_DB": "pgvector",
             "PGVECTOR_DB_URL": input_.pgvector_user.uri,
-            "DATABASE_SCHEMA": "openwebui",
         }
         custom_env = {e.name: e.value for e in input_.openwebui_specific.env}
         return {**env, **custom_env}
