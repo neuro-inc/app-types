@@ -4,8 +4,9 @@ import typing as t
 from apolo_app_types import LightRAGAppInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
-from apolo_app_types.helm.apps.common import get_preset, preset_to_resources
-from apolo_app_types.helm.apps.ingress import get_http_ingress_values
+from apolo_app_types.helm.apps.common import (
+    gen_extra_values,
+)
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
 from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
 
@@ -128,18 +129,16 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
         # Get component-specific values
         env_values = await self._get_environment_values(input_, app_secrets_name)
         persistence_values = await self._get_persistence_values(input_)
-        preset = get_preset(self.client, input_.preset.name)
-        resource_values = {"resources": preset_to_resources(preset)}
-
-        ingress_values: dict[str, t.Any] = {"ingress": {"enabled": False}}
-        if input_.ingress_http:
-            ingress_values["ingress"] = await get_http_ingress_values(
-                self.client,
-                input_.ingress_http,
-                namespace,
-                app_id,
-                app_type=AppType.LightRAG,
-            )
+        # Use gen_extra_values for standard platform values (like LLM app)
+        platform_values = await gen_extra_values(
+            self.client,
+            input_.preset,
+            app_id,
+            AppType.LightRAG,
+            input_.ingress_http,
+            None,  # ingress_grpc
+            namespace,
+        )
 
         # Basic chart configuration
         base_values = {
@@ -165,7 +164,6 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
                 base_values,
                 env_values,
                 persistence_values,
-                ingress_values,
-                resource_values,
+                platform_values,
             ]
         )
