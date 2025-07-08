@@ -73,6 +73,9 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
             "LLM_BINDING_API_KEY": serialize_optional_secret(
                 llm_config["api_key"], app_secrets_name
             ),
+            "OPENAI_API_KEY": serialize_optional_secret(
+                llm_config["api_key"], app_secrets_name
+            ),
             # Embedding configuration
             "EMBEDDING_BINDING": embedding_config["binding"],
             "EMBEDDING_MODEL": embedding_config["model"],
@@ -131,13 +134,13 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
         persistence_values = await self._get_persistence_values(input_)
         # Use gen_extra_values for standard platform values (like LLM app)
         platform_values = await gen_extra_values(
-            self.client,
-            input_.preset,
-            app_id,
-            AppType.LightRAG,
-            input_.ingress_http,
-            None,  # ingress_grpc
-            namespace,
+            apolo_client=self.client,
+            preset_type=input_.preset,
+            ingress_http=input_.ingress_http,
+            ingress_grpc=None,
+            namespace=namespace,
+            app_id=app_id,
+            app_type=AppType.LightRAG,
         )
 
         # Basic chart configuration
