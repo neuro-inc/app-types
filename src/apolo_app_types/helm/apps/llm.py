@@ -30,7 +30,7 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
 
     def _configure_autoscaling(self, input_: LLMInputs) -> dict[str, t.Any]:
         """
-        Configure autoscaling based on the preset.
+        Configure autoscaling.
         """
         if not input_.http_autoscaling:
             return {}
