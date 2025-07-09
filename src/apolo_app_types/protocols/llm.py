@@ -12,6 +12,7 @@ from apolo_app_types.protocols.common import (
     SchemaExtraMetadata,
     SchemaMetaType,
 )
+from apolo_app_types.protocols.common.autoscaling import AutoscalingKedaHTTP
 from apolo_app_types.protocols.common.hugging_face import HF_SCHEMA_EXTRA
 from apolo_app_types.protocols.common.k8s import Env
 from apolo_app_types.protocols.common.openai_compat import (
@@ -96,6 +97,15 @@ class LLMInputs(AppInputs):
         default=None,
         json_schema_extra=SchemaExtraMetadata(
             title="Cache Config", description="Configure Hugging Face cache."
+        ).as_json_schema_extra(),
+    )
+    http_autoscaling: AutoscalingKedaHTTP | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="HTTP Autoscaling",
+            description="Configure autoscaling based on HTTP request rate.",
+            meta_type=SchemaMetaType.INTEGRATION,
+            is_advanced_field=True,
         ).as_json_schema_extra(),
     )
 

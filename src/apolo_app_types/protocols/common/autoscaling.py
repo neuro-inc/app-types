@@ -1,7 +1,10 @@
 from pydantic import ConfigDict, Field
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
-from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
+from apolo_app_types.protocols.common.schema_extra import (
+    SchemaExtraMetadata,
+    SchemaMetaType,
+)
 
 
 class AutoscalingBase(AbstractAppFieldType):
@@ -41,5 +44,62 @@ class AutoscalingHPA(AutoscalingBase):
         json_schema_extra=SchemaExtraMetadata(
             title="Target Memory Utilization Percentage",
             description="Choose target memory utilization percentage for autoscaling.",
+        ).as_json_schema_extra(),
+    )
+
+
+class RequestRateConfig(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Request Rate Configuration",
+            description="Configuration for request rate based autoscaling.",
+        ).as_json_schema_extra(),
+    )
+    granularity: int = Field(
+        default=1,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Granularity",
+            description="Time in seconds to calculate request rate.",
+        ).as_json_schema_extra(),
+    )
+    target_value: int = Field(
+        default=100,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Target Value",
+            description="Target request rate per second for autoscaling.",
+        ).as_json_schema_extra(),
+    )
+    window_size: int = Field(
+        default=60,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Window Size",
+            description="Time in seconds to consider for request rate calculation.",
+        ).as_json_schema_extra(),
+    )
+
+
+class AutoscalingKedaHTTP(AutoscalingBase):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Autoscaling HPA",
+            description="Autoscaling configuration for Horizontal Pod Autoscaler.",
+            is_advanced_field=True,
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+    scaledown_period: int = Field(
+        300,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Scaledown Period",
+            description="Time in seconds to wait before scaling down.",
+        ).as_json_schema_extra(),
+    )
+    request_rate: RequestRateConfig = Field(
+        default=RequestRateConfig(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Request Rate Configuration",
+            description="Configuration for request rate based autoscaling.",
         ).as_json_schema_extra(),
     )

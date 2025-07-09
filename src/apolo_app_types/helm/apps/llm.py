@@ -28,6 +28,29 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
     async def gen_extra_helm_args(self, *_: t.Any) -> list[str]:
         return ["--timeout", "30m"]
 
+    def _configure_autoscaling(self, input_: LLMInputs) -> dict[str, t.Any]:
+        """
+        Configure autoscaling based on the preset.
+        """
+        if not input_.http_autoscaling:
+            return {}
+        return {
+            "autoscaling": {
+                "enabled": True,
+                "replicas": {
+                    "min": input_.http_autoscaling.min_replicas,
+                    "max": input_.http_autoscaling.max_replicas,
+                },
+                "scaledownPeriod": input_.http_autoscaling.scaledown_period,
+                "requestRate": {
+                    "granularity": f"{input_.http_autoscaling.request_rate.granularity}"
+                    f"s",
+                    "targetValue": input_.http_autoscaling.request_rate.target_value,
+                    "window": f"{input_.http_autoscaling.request_rate.window_size}s",
+                },
+            }
+        }
+
     def _configure_gpu_env(
         self,
         gpu_provider: str,
@@ -190,6 +213,7 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
         ]
         model = self._configure_model(input_)
         env = self._configure_env(input_, app_secrets_name)
+        autoscaling = self._configure_autoscaling(input_)
         return merge_list_of_dicts(
             [
                 {
@@ -200,5 +224,6 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
                 },
                 gpu_env,
                 values,
+                autoscaling,
             ]
         )
