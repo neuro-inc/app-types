@@ -104,7 +104,6 @@ class LLMInputs(AppInputs):
         json_schema_extra=SchemaExtraMetadata(
             title="HTTP Autoscaling",
             description="Configure autoscaling based on HTTP request rate.",
-            meta_type=SchemaMetaType.INTEGRATION,
             is_advanced_field=True,
         ).as_json_schema_extra(),
     )

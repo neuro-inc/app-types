@@ -86,7 +86,6 @@ class AutoscalingKedaHTTP(AutoscalingBase):
             title="Autoscaling HPA",
             description="Autoscaling configuration for Horizontal Pod Autoscaler.",
             is_advanced_field=True,
-            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     scaledown_period: int = Field(
