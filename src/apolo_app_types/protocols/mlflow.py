@@ -1,4 +1,5 @@
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -21,8 +22,15 @@ class MLFlowMetadataPostgres(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Postgres",
-            description="Use PostgreSQL server as metadata storage for MLFlow.",
+            title="Postgres",  # pyright: ignore
+            description="Use PostgreSQL server as metadata storage for MLFlow.",  # pyright: ignore
+        ).as_json_schema_extra(),
+    )
+    storage_type: Literal["postgres"] = Field(
+        default="postgres",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Storage Type",
+            description="Storage type for MLFlow metadata.",
         ).as_json_schema_extra(),
     )
     postgres_uri: PostgresURI
@@ -32,10 +40,17 @@ class MLFlowMetadataSQLite(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="SQLite",
-            description=(
+            title="SQLite",  # pyright: ignore
+            description=(  # pyright: ignore
                 "Use SQLite on a dedicated block device as metadata store for MLFlow."
             ),
+        ).as_json_schema_extra(),
+    )
+    storage_type: Literal["sqlite"] = Field(
+        default="sqlite",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Storage Type",
+            description="Storage type for MLFlow metadata.",
         ).as_json_schema_extra(),
     )
 
