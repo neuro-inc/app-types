@@ -8,8 +8,13 @@ from apolo_app_types.helm.apps.common import (
     APOLO_STORAGE_LABEL,
     _get_match_expressions,
 )
+from apolo_app_types.helm.apps.llm import KEDA_HTTP_PROXY_SERVICE
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import ApoloFilesPath, IngressHttp, Preset
+from apolo_app_types.protocols.common.autoscaling import (
+    AutoscalingKedaHTTP,
+    RequestRateConfig,
+)
 from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 from apolo_app_types.protocols.huggingface_cache import (
     HuggingFaceCache,
@@ -480,4 +485,49 @@ async def test_values_llm_generation__storage_integrated(
             "tag": IsStr(regex=r"^v\d+\.\d+\.\d+.*$"),
         },
         "apolo_app_id": APP_ID,
+    }
+
+
+async def test_values_llm_generation__autoscaling(setup_clients, mock_get_preset_gpu):
+    hf_token = "test3"
+    apolo_client = setup_clients
+    helm_args, helm_params = await app_type_to_vals(
+        input_=LLMInputs(
+            preset=Preset(
+                name="gpu-small",
+            ),
+            ingress_http=IngressHttp(
+                clusterName="",
+            ),
+            hugging_face_model=HuggingFaceModel(
+                model_hf_name="test", hf_token=hf_token
+            ),
+            cache_config=HuggingFaceCache(
+                files_path=ApoloFilesPath(
+                    path="storage://some-cluster/some-org/some-proj/some-folder"
+                ),
+            ),
+            http_autoscaling=AutoscalingKedaHTTP(
+                scaledown_period=400,
+                min_replicas=1,
+                max_replicas=2,
+                request_rate=RequestRateConfig(
+                    granularity=1, target_value=2, window_size=1
+                ),
+            ),
+        ),
+        apolo_client=apolo_client,
+        app_type=AppType.LLMInference,
+        app_name="llm",
+        namespace=DEFAULT_NAMESPACE,
+        app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
+    )
+
+    assert helm_params["autoscaling"] == {
+        "enabled": True,
+        "replicas": {"max": 2, "min": 1},
+        "requestRate": {"granularity": "1s", "targetValue": 2, "window": "1s"},
+        "scaledownPeriod": 400,
+        "externalKedaHttpProxyService": KEDA_HTTP_PROXY_SERVICE,
     }
