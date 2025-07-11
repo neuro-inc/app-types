@@ -8,6 +8,7 @@ from apolo_app_types.helm.apps.common import (
     APOLO_STORAGE_LABEL,
     _get_match_expressions,
 )
+from apolo_app_types.helm.apps.llm import KEDA_HTTP_PROXY_SERVICE
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import ApoloFilesPath, IngressHttp, Preset
 from apolo_app_types.protocols.common.autoscaling import (
@@ -528,4 +529,5 @@ async def test_values_llm_generation__autoscaling(setup_clients, mock_get_preset
         "replicas": {"max": 2, "min": 1},
         "requestRate": {"granularity": "1s", "targetValue": 2, "window": "1s"},
         "scaledownPeriod": 400,
+        "externalKedaHttpProxyService": KEDA_HTTP_PROXY_SERVICE,
     }

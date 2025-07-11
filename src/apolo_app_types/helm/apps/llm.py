@@ -21,6 +21,11 @@ from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
 from apolo_app_types.protocols.common.storage import ApoloMountModes
 
 
+KEDA_HTTP_PROXY_SERVICE = (
+    "keda-add-ons-http-interceptor-proxy.platform.svc.cluster.local"
+)
+
+
 class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
     def __init__(self, *args: t.Any, **kwargs: t.Any):
         super().__init__(*args, **kwargs)
@@ -48,6 +53,7 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
                     "targetValue": input_.http_autoscaling.request_rate.target_value,
                     "window": f"{input_.http_autoscaling.request_rate.window_size}s",
                 },
+                "externalKedaHttpProxyService": KEDA_HTTP_PROXY_SERVICE,
             }
         }
 
