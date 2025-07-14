@@ -232,14 +232,14 @@ trio = ["trio (>=0.26.1)"]
 
 [[package]]
 name = "apolo-sdk"
-version = "25.7.0"
+version = "25.7.2"
 description = "Apolo SDK"
 optional = false
 python-versions = ">=3.9.0"
 groups = ["main"]
 files = [
-    {file = "apolo_sdk-25.7.0-py3-none-any.whl", hash = "sha256:75610d20e7a0c369681021db124b82921ac511f65cdc28770eb957dff3d7f67a"},
-    {file = "apolo_sdk-25.7.0.tar.gz", hash = "sha256:0a02a950e5a0a8c58de30721b1416bbcc700008d43f5b29d90fc2937b7abd3e6"},
+    {file = "apolo_sdk-25.7.2-py3-none-any.whl", hash = "sha256:c33f5fab191fc69d5a06a0abc8b6e079260d3a7df58982cbd6f120b1bd2e8bd4"},
+    {file = "apolo_sdk-25.7.2.tar.gz", hash = "sha256:b3b405711a45d30a723d6b84a66fb952782dc97f9c84cda7acc3fde05c5a74cc"},
 ]
 
 [package.dependencies]
@@ -2392,4 +2392,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9.0,<4.0"
-content-hash = "f98a3d27b26c3a7e33647369f27a4bb26879c28fd0b22c0d0ba4d53ac78944f0"
+content-hash = "a73b0310c6b1ac33c9346ca58d58c166b237dd54a305b448bfe15b90dffd0820"
