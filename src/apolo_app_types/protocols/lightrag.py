@@ -75,6 +75,8 @@ class OpenAILLMProvider(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    port: int = Field(default=443, description="Port to use for the OpenAI API")
+    protocol: Literal["https"] = "https"
     provider: Literal["openai"] = "openai"
     model: str = Field(default="gpt-4o-mini", description="Model name")
     api_key: OptionalStrOrSecret = Field(default=None, description="API key")
@@ -94,6 +96,8 @@ class AnthropicLLMProvider(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    port: int = Field(default=443, description="Port to use for the Anthropic API")
+    protocol: Literal["https"] = "https"
     provider: Literal["anthropic"] = "anthropic"
     model: str = Field(
         default="claude-3-sonnet-20240229", description="Claude model name"
@@ -128,6 +132,8 @@ class GeminiLLMProvider(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    port: int = Field(default=443, description="Port to use for the Google Gemini API")
+    protocol: Literal["https"] = "https"
     provider: Literal["gemini"] = "gemini"
     model: str = Field(default="gemini-1.5-flash", description="Gemini model name")
     api_key: OptionalStrOrSecret = Field(default=None, description="Google AI API key")
@@ -155,6 +161,8 @@ class OpenAIEmbeddingProvider(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    port: int = Field(default=443, description="Port to use for the OpenAI API")
+    protocol: Literal["https"] = "https"
     provider: Literal["openai"] = "openai"
     model: str = Field(
         default="text-embedding-ada-002", description="Embedding model name"
