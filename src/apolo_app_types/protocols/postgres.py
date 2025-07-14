@@ -3,7 +3,7 @@ from __future__ import annotations
 import enum
 import typing as t
 
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, model_validator
 
 from apolo_app_types import AppInputs
 from apolo_app_types.protocols.common import (
@@ -14,6 +14,9 @@ from apolo_app_types.protocols.common import (
     SchemaExtraMetadata,
     SchemaMetaType,
 )
+
+
+POSTGRES_ADMIN_DEFAULT_USER_NAME = "postgres"
 
 
 class PostgresURI(AbstractAppFieldType):
@@ -88,27 +91,53 @@ class PostgresConfig(AbstractAppFieldType):
     )
     postgres_version: PostgresSupportedVersions = Field(
         default=PostgresSupportedVersions.v16,
-        description="Set version of the Postgres server to use.",
-        title="Postgres version",
+        json_schema_extra=SchemaExtraMetadata(
+            description="Set version of the Postgres server to use.",
+            title="Postgres version",
+        ),
     )
     instance_replicas: int = Field(
         default=3,
-        description="Set number of replicas for the Postgres instance.",
-        title="Postgres instance replicas",
+        json_schema_extra=SchemaExtraMetadata(
+            description="Set number of replicas for the Postgres instance.",
+            title="Postgres instance replicas",
+        ).as_json_schema_extra(),
     )
     instance_size: int = Field(
         default=1,
-        description="Set size of the Postgres instance disk (in GB).",
-        title="Postgres instance disk size",
+        json_schema_extra=SchemaExtraMetadata(
+            description="Set size of the Postgres instance disk (in GB).",
+            title="Postgres instance disk size",
+        ).as_json_schema_extra(),
     )
     db_users: list[PostgresDBUser] = Field(
-        default_factory=list,
-        description=(
-            "Configure list of users and databases they have access to. "
-            "Multiple users could have access to the same database."
-        ),
-        title="Database users",
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            description=(
+                "Configure list of users and databases they have access to. "
+                "Multiple users could have access to the same database."
+                "Postgres user 'postgres' is always created and has access "
+                "to all databases."
+            ),
+            title="Database users",
+        ).as_json_schema_extra(),
+        min_length=1,
     )
+
+    @model_validator(mode="after")
+    def check_db_users_not_empty(self) -> PostgresConfig:
+        if not self.db_users:
+            err_msg = "Database Users list must not be empty."
+            raise ValueError(err_msg)
+
+        for user in self.db_users:
+            if user.name.lower() == POSTGRES_ADMIN_DEFAULT_USER_NAME:
+                err_msg = (
+                    f"User '{POSTGRES_ADMIN_DEFAULT_USER_NAME}'"
+                    f" is not allowed in db_users."
+                )
+                raise ValueError(err_msg)
+        return self
 
 
 class PGBackupConfig(AbstractAppFieldType):
@@ -140,7 +169,28 @@ class PostgresInputs(AppInputs):
     backup: PGBackupConfig
 
 
-class CrunchyPostgresUserCredentials(AbstractAppFieldType):
+class BasePostgresUserCredentials(AbstractAppFieldType):
+    """Base class for Postgres user credentials."""
+
+    user: str = Field(
+        ...,
+        description="Username for the Postgres user.",
+        title="Postgres User",
+    )
+    password: str = Field(
+        ...,
+        description="Password for the Postgres user.",
+        title="Postgres Password",
+    )
+    user: str
+    password: str
+    host: str
+    port: int
+    pgbouncer_host: str
+    pgbouncer_port: int
+
+
+class CrunchyPostgresUserCredentials(BasePostgresUserCredentials):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
@@ -149,12 +199,6 @@ class CrunchyPostgresUserCredentials(AbstractAppFieldType):
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
-    user: str
-    password: str
-    host: str
-    port: int
-    pgbouncer_host: str
-    pgbouncer_port: int
     dbname: str | None = None
     jdbc_uri: str | None = None
     pgbouncer_jdbc_uri: str | None = None
@@ -186,13 +230,48 @@ class CrunchyPostgresUserCredentials(AbstractAppFieldType):
             updates["postgres_uri"] = PostgresURI(uri=uri)
         return self.model_copy(update=updates)
 
+    user_type: t.Literal["user"] = "user"
+
+
+class PostgresAdminUser(BasePostgresUserCredentials):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Postgres Admin User",
+            description="Configuration for the Postgres admin user.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+    user_type: t.Literal["admin"] = "admin"
+
 
 class CrunchyPostgresOutputs(AppOutputsDeployer):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Crunchy Postgres Outputs",
+            description="Outputs for Crunchy Postgres app.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
     users: list[CrunchyPostgresUserCredentials]
 
 
 class PostgresUsers(AbstractAppFieldType):
-    users: list[CrunchyPostgresUserCredentials]
+    postgres_admin_user: PostgresAdminUser | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Postgres Admin User",
+            description="Admin user for the Postgres instance.",
+        ).as_json_schema_extra(),
+    )
+    users: list[CrunchyPostgresUserCredentials] = Field(
+        default_factory=list,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Postgres Users",
+            description="List of Postgres users with their credentials.",
+        ).as_json_schema_extra(),
+    )
 
 
 class PostgresOutputs(AppOutputs):
