@@ -133,8 +133,8 @@ class PostgresConfig(AbstractAppFieldType):
         for user in self.db_users:
             if user.name.lower() == POSTGRES_ADMIN_DEFAULT_USER_NAME:
                 err_msg = (
-                    f"User '{POSTGRES_ADMIN_DEFAULT_USER_NAME}'"
-                    f" is not allowed in db_users."
+                    f"User name '{POSTGRES_ADMIN_DEFAULT_USER_NAME}'"
+                    f" is reserved and this user will be created automatically."
                 )
                 raise ValueError(err_msg)
         return self
