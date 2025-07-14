@@ -7,7 +7,6 @@ from apolo_app_types import (
     AppOutputs,
 )
 from apolo_app_types.protocols.common import (
-    AbstractAppFieldType,
     IngressHttp,
     Preset,
     SchemaExtraMetadata,
@@ -15,6 +14,7 @@ from apolo_app_types.protocols.common import (
 )
 from apolo_app_types.protocols.common.networking import (
     HttpApi,
+    RestAPI,
     ServiceAPI,
 )
 from apolo_app_types.protocols.common.openai_compat import (
@@ -64,7 +64,7 @@ class LightRAGPersistence(BaseModel):
 
 
 # LLM Provider Types
-class OpenAILLMProvider(AbstractAppFieldType):
+class OpenAILLMProvider(RestAPI):
     """OpenAI LLM provider configuration. Also supports OpenRouter."""
 
     model_config = ConfigDict(
@@ -75,7 +75,7 @@ class OpenAILLMProvider(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
-    port: int = Field(default=443, description="Port to use for the OpenAI API")
+    port: int = 443
     protocol: Literal["https"] = "https"
     provider: Literal["openai"] = "openai"
     model: str = Field(default="gpt-4o-mini", description="Model name")
@@ -85,7 +85,7 @@ class OpenAILLMProvider(AbstractAppFieldType):
     )
 
 
-class AnthropicLLMProvider(AbstractAppFieldType):
+class AnthropicLLMProvider(RestAPI):
     """Anthropic Claude LLM provider configuration."""
 
     model_config = ConfigDict(
@@ -96,7 +96,7 @@ class AnthropicLLMProvider(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
-    port: int = Field(default=443, description="Port to use for the Anthropic API")
+    port: int = 443
     protocol: Literal["https"] = "https"
     provider: Literal["anthropic"] = "anthropic"
     model: str = Field(
@@ -105,7 +105,7 @@ class AnthropicLLMProvider(AbstractAppFieldType):
     api_key: OptionalStrOrSecret = Field(default=None, description="Anthropic API key")
 
 
-class OllamaLLMProvider(AbstractAppFieldType):
+class OllamaLLMProvider(RestAPI):
     """Ollama local LLM provider configuration."""
 
     model_config = ConfigDict(
@@ -116,12 +116,16 @@ class OllamaLLMProvider(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    port: int = Field(default=11434, description="Ollama server port")
+    protocol: Literal["http", "https"] = Field(
+        default="http", description="Ollama server protocol"
+    )
     provider: Literal["ollama"] = "ollama"
     model: str = Field(default="llama3.1:8b", description="Ollama model name")
     host: str = Field(default="http://localhost:11434", description="Ollama server URL")
 
 
-class GeminiLLMProvider(AbstractAppFieldType):
+class GeminiLLMProvider(RestAPI):
     """Google Gemini LLM provider configuration."""
 
     model_config = ConfigDict(
@@ -132,7 +136,7 @@ class GeminiLLMProvider(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
-    port: int = Field(default=443, description="Port to use for the Google Gemini API")
+    port: int = 443
     protocol: Literal["https"] = "https"
     provider: Literal["gemini"] = "gemini"
     model: str = Field(default="gemini-1.5-flash", description="Gemini model name")
@@ -150,7 +154,7 @@ LLMProvider = (
 
 
 # Embedding Provider Types
-class OpenAIEmbeddingProvider(AbstractAppFieldType):
+class OpenAIEmbeddingProvider(RestAPI):
     """OpenAI embedding provider configuration."""
 
     model_config = ConfigDict(
@@ -161,7 +165,7 @@ class OpenAIEmbeddingProvider(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
-    port: int = Field(default=443, description="Port to use for the OpenAI API")
+    port: int = 443
     protocol: Literal["https"] = "https"
     provider: Literal["openai"] = "openai"
     model: str = Field(
@@ -171,7 +175,7 @@ class OpenAIEmbeddingProvider(AbstractAppFieldType):
     base_url: str | None = Field(default=None, description="Custom API base URL")
 
 
-class OllamaEmbeddingProvider(AbstractAppFieldType):
+class OllamaEmbeddingProvider(RestAPI):
     """Ollama embedding provider configuration."""
 
     model_config = ConfigDict(
