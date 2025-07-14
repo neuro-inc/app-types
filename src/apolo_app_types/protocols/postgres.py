@@ -94,7 +94,7 @@ class PostgresConfig(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             description="Set version of the Postgres server to use.",
             title="Postgres version",
-        ),
+        ).as_json_schema_extra(),
     )
     instance_replicas: int = Field(
         default=3,
@@ -174,20 +174,46 @@ class BasePostgresUserCredentials(AbstractAppFieldType):
 
     user: str = Field(
         ...,
-        description="Username for the Postgres user.",
-        title="Postgres User",
+        json_schema_extra=SchemaExtraMetadata(
+            description="Username for the Postgres user.",
+            title="Postgres User",
+        ).as_json_schema_extra(),
     )
     password: str = Field(
         ...,
-        description="Password for the Postgres user.",
-        title="Postgres Password",
+        json_schema_extra=SchemaExtraMetadata(
+            description="Password for the Postgres user.",
+            title="Postgres Password",
+        ).as_json_schema_extra(),
     )
-    user: str
-    password: str
-    host: str
-    port: int
-    pgbouncer_host: str
-    pgbouncer_port: int
+    host: str = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            description="Host of the Postgres instance.",
+            title="Postgres Host",
+        ).as_json_schema_extra(),
+    )
+    port: int = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            description="Port of the Postgres instance.",
+            title="Postgres Port",
+        ).as_json_schema_extra(),
+    )
+    pgbouncer_host: str = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            description="Host of the PGBouncer instance.",
+            title="PGBouncer Host",
+        ).as_json_schema_extra(),
+    )
+    pgbouncer_port: int = Field(
+        default=...,
+        json_schema_extra=SchemaExtraMetadata(
+            description="Port of the PGBouncer instance.",
+            title="PGBouncer Port",
+        ).as_json_schema_extra(),
+    )
 
 
 class CrunchyPostgresUserCredentials(BasePostgresUserCredentials):
