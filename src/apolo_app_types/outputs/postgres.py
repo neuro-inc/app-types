@@ -17,6 +17,7 @@ from apolo_app_types.protocols.postgres import (
 logger = logging.getLogger()
 
 MAX_SLEEP_SEC = 10
+POSTGRES_ADMIN_USERNAME = "postgres"
 
 
 def get_postgres_cluster_users() -> dict[str, t.Any]:
@@ -90,9 +91,13 @@ async def get_postgres_outputs(
 
     requested_users = get_postgres_cluster_users()
     users = []
+    admin_user = None
 
     for item in secrets.items:
         user = postgres_creds_from_kube_secret_data(item.data)
+        if user.user == POSTGRES_ADMIN_USERNAME:
+            admin_user = user
+            continue
         users.append(user)
         # currently, postgres operator does not create all combinations of
         # user <> database accesses, we need to expand this
@@ -103,5 +108,8 @@ async def get_postgres_outputs(
             users.append(user.with_database(db))
 
     return PostgresOutputs(
-        postgres_users=PostgresUsers(users=users),
+        postgres_users=PostgresUsers(
+            users=users,
+            postgres_admin_user=admin_user,
+        ),
     ).model_dump()

@@ -2,6 +2,7 @@ from datetime import datetime
 from unittest.mock import AsyncMock
 
 import apolo_sdk
+import pydantic
 import pytest
 
 from apolo_app_types import PostgresInputs
@@ -80,7 +81,7 @@ async def test_values_postgresql_generation(setup_clients, mock_get_preset_cpu):
 
 
 @pytest.mark.asyncio
-async def test_values_postgresql_generation_without_user(
+async def test_values_postgresql_generation_with_user(
     setup_clients, mock_get_preset_cpu
 ):
     from apolo_app_types.inputs.args import app_type_to_vals
@@ -95,7 +96,7 @@ async def test_values_postgresql_generation_without_user(
                 postgres_version=PostgresSupportedVersions.v16,
                 instance_replicas=3,
                 instance_size=1,
-                db_users=[],
+                db_users=[PostgresDBUser(name="user1", db_names=["db1"])],
             ),
             pg_bouncer=PGBouncer(
                 preset=Preset(
@@ -130,10 +131,85 @@ async def test_values_postgresql_generation_without_user(
     assert "podAntiAffinity" in helm_params["instances"][0]["affinity"]
     assert helm_params["users"] == [
         {"name": "postgres"},
+        {"databases": ["db1"], "name": "user1", "password": {"type": "AlphaNumeric"}},
     ]
     assert "s3" not in helm_params
     assert "gcs" not in helm_params
     assert "azure" not in helm_params
+
+
+@pytest.mark.asyncio
+async def test_values_postgresql_generation_without_user(
+    setup_clients, mock_get_preset_cpu
+):
+    from apolo_app_types.inputs.args import app_type_to_vals
+
+    apolo_client = setup_clients
+    with pytest.raises(pydantic.ValidationError):
+        _, helm_params = await app_type_to_vals(
+            input_=PostgresInputs(
+                preset=Preset(
+                    name="cpu-large",
+                ),
+                postgres_config=PostgresConfig(
+                    postgres_version=PostgresSupportedVersions.v16,
+                    instance_replicas=3,
+                    instance_size=1,
+                    db_users=[],
+                ),
+                pg_bouncer=PGBouncer(
+                    preset=Preset(
+                        name="cpu-large",
+                    ),
+                ),
+                backup=PGBackupConfig(
+                    enable=False,
+                ),
+            ),
+            apolo_client=apolo_client,
+            app_type=AppType.PostgreSQL,
+            app_name="psdb",
+            namespace=DEFAULT_NAMESPACE,
+            app_secrets_name=APP_SECRETS_NAME,
+            app_id=APP_ID,
+        )
+
+
+@pytest.mark.asyncio
+async def test_values_postgresql_generation_with_postgres_user(
+    setup_clients, mock_get_preset_cpu
+):
+    from apolo_app_types.inputs.args import app_type_to_vals
+
+    apolo_client = setup_clients
+    with pytest.raises(pydantic.ValidationError):
+        _, helm_params = await app_type_to_vals(
+            input_=PostgresInputs(
+                preset=Preset(
+                    name="cpu-large",
+                ),
+                postgres_config=PostgresConfig(
+                    postgres_version=PostgresSupportedVersions.v16,
+                    instance_replicas=3,
+                    instance_size=1,
+                    db_users=[PostgresDBUser(name="postgres", db_names=["postgres"])],
+                ),
+                pg_bouncer=PGBouncer(
+                    preset=Preset(
+                        name="cpu-large",
+                    ),
+                ),
+                backup=PGBackupConfig(
+                    enable=False,
+                ),
+            ),
+            apolo_client=apolo_client,
+            app_type=AppType.PostgreSQL,
+            app_name="psdb",
+            namespace=DEFAULT_NAMESPACE,
+            app_secrets_name=APP_SECRETS_NAME,
+            app_id=APP_ID,
+        )
 
 
 @pytest.mark.asyncio
@@ -187,7 +263,7 @@ async def test_values_postgresql_generation_with_minio(
                 postgres_version=PostgresSupportedVersions.v16,
                 instance_replicas=3,
                 instance_size=1,
-                db_users=[],
+                db_users=[PostgresDBUser(name="user1", db_names=["db1"])],
             ),
             pg_bouncer=PGBouncer(preset=Preset(name="cpu-large")),
             backup=PGBackupConfig(enable=True),
@@ -216,6 +292,7 @@ async def test_values_postgresql_generation_with_minio(
     assert "podAntiAffinity" in helm_params["instances"][0]["affinity"]
     assert helm_params["users"] == [
         {"name": "postgres"},
+        {"databases": ["db1"], "name": "user1", "password": {"type": "AlphaNumeric"}},
     ]
     assert helm_params["s3"] == {
         "bucket": "test-bucket",

@@ -19,6 +19,7 @@ async def test_postgres_outputs(setup_clients, mock_kubernetes_client, app_insta
             "postgres_uri": {
                 "uri": "postgresql://admin:supersecret@pgbouncer.example.com:6432/mydatabase"
             },
+            "user_type": "user",
         },
         {
             "dbname": "otherdatabase",
@@ -35,6 +36,7 @@ async def test_postgres_outputs(setup_clients, mock_kubernetes_client, app_insta
             "postgres_uri": {
                 "uri": "postgresql://admin:supersecret@pgbouncer.example.com:6432/otherdatabase"
             },
+            "user_type": "user",
         },
     ]
     mock = mock_kubernetes_client["mock_custom_objects"]
