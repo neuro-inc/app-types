@@ -8,6 +8,7 @@ from apolo_app_types import (
 )
 from apolo_app_types.clients.kube import get_crd_objects, get_secret
 from apolo_app_types.protocols.postgres import (
+    PostgresAdminUser,
     PostgresOutputs,
     PostgresURI,
     PostgresUsers,
@@ -106,10 +107,15 @@ async def get_postgres_outputs(
             if user.dbname == db:
                 continue
             users.append(user.with_database(db))
-
+    if not admin_user:
+        admin = PostgresAdminUser(
+            **{**admin_user.model_dump(exclude={"dbname"}), "user_type": "admin"}
+        )
+    else:
+        admin = None
     return PostgresOutputs(
         postgres_users=PostgresUsers(
             users=users,
-            postgres_admin_user=admin_user,
+            postgres_admin_user=admin,
         ),
     ).model_dump()
