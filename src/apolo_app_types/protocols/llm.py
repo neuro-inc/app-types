@@ -24,6 +24,7 @@ from apolo_app_types.protocols.common.openai_compat import (
 class LLMApi(AbstractAppFieldType):
     replicas: int | None = Field(  # noqa: N815
         default=None,
+        gt=0,
         description="Replicas count.",
         title="API replicas count",
     )
@@ -35,7 +36,7 @@ class LLMApi(AbstractAppFieldType):
 
 
 class Worker(AbstractAppFieldType):
-    replicas: int | None
+    replicas: int | None = Field(default=None, gt=0)
     preset_name: str
 
 
@@ -44,7 +45,7 @@ class Proxy(AbstractAppFieldType):
 
 
 class Web(AbstractAppFieldType):
-    replicas: int | None
+    replicas: int | None = Field(default=None, gt=0)
     preset_name: str
 
 

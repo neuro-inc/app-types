@@ -55,6 +55,7 @@ class PGBouncer(AbstractAppFieldType):
     )
     replicas: int = Field(
         default=2,
+        gt=0,
         description="Number of replicas for the PGBouncer instance.",
         title="PGBouncer replicas",
     )
@@ -98,6 +99,7 @@ class PostgresConfig(AbstractAppFieldType):
     )
     instance_replicas: int = Field(
         default=3,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             description="Set number of replicas for the Postgres instance.",
             title="Postgres instance replicas",
@@ -105,6 +107,7 @@ class PostgresConfig(AbstractAppFieldType):
     )
     instance_size: int = Field(
         default=1,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             description="Set size of the Postgres instance disk (in GB).",
             title="Postgres instance disk size",
@@ -195,6 +198,7 @@ class BasePostgresUserCredentials(AbstractAppFieldType):
     )
     port: int = Field(
         ...,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             description="Port of the Postgres instance.",
             title="Postgres Port",
@@ -209,6 +213,7 @@ class BasePostgresUserCredentials(AbstractAppFieldType):
     )
     pgbouncer_port: int = Field(
         default=...,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             description="Port of the PGBouncer instance.",
             title="PGBouncer Port",

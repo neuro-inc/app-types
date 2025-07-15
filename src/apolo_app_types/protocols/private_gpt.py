@@ -55,6 +55,7 @@ class PrivateGptSpecific(BaseModel):
     )
     embeddings_dimension: int = Field(
         default=768,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Embeddings Dimension",
             description="Configure dimension of embeddings."
@@ -64,6 +65,7 @@ class PrivateGptSpecific(BaseModel):
     )
     llm_max_new_tokens: int = Field(
         default=5000,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="LLM Max New Tokens",
             description="Configure maximum number of new tokens "
@@ -72,6 +74,7 @@ class PrivateGptSpecific(BaseModel):
     )
     llm_context_window: int = Field(
         default=8192,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="LLM Context Window",
             description="Configure context window for LLM inference "

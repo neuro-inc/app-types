@@ -30,6 +30,7 @@ class HealthCheckConfigBase(AbstractAppFieldType):
     )
     port: int = Field(
         default=8080,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Port",
             description="Port to make a connection for the Custom Deployment instance",

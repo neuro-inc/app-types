@@ -56,6 +56,7 @@ class ExecutorConfig(AbstractAppFieldType):
     )
     instances: int = Field(
         default=1,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Instances", description="Specify number of instances"
         ).as_json_schema_extra(),
@@ -170,6 +171,7 @@ class SparkAutoScalingConfig(AbstractAppFieldType):
 
     min_executors: int = Field(
         default=1,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Minimum Executors",
             description="Define the minimum "
@@ -179,6 +181,7 @@ class SparkAutoScalingConfig(AbstractAppFieldType):
 
     max_executors: int = Field(
         default=1,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Maximum Executors",
             description="Set the upper limit on the"
@@ -188,6 +191,7 @@ class SparkAutoScalingConfig(AbstractAppFieldType):
 
     shuffle_tracking_timeout: int = Field(
         ...,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Shuffle Tracking Timeout",
             description="Set the timeout (in seconds)"

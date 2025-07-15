@@ -9,6 +9,7 @@ from apolo_app_types.protocols.common.schema_extra import (
 class AutoscalingBase(AbstractAppFieldType):
     min_replicas: int = Field(
         default=1,
+        ge=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Minimum Replicas",
             description="Set the minimum number of replicas for your deployment.",
@@ -16,6 +17,7 @@ class AutoscalingBase(AbstractAppFieldType):
     )
     max_replicas: int = Field(
         default=5,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Maximum Replicas",
             description="Limit the maximum number of replicas for your deployment.",
@@ -33,6 +35,7 @@ class AutoscalingHPA(AutoscalingBase):
     )
     target_cpu_utilization_percentage: int = Field(
         default=80,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Target CPU Utilization Percentage",
             description="Choose target CPU utilization percentage for autoscaling.",
@@ -40,6 +43,7 @@ class AutoscalingHPA(AutoscalingBase):
     )
     target_memory_utilization_percentage: int | None = Field(
         default=None,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Target Memory Utilization Percentage",
             description="Choose target memory utilization percentage for autoscaling.",
@@ -57,6 +61,7 @@ class RequestRateConfig(AbstractAppFieldType):
     )
     granularity: int = Field(
         default=1,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Granularity",
             description="Time in seconds to calculate request rate.",
@@ -64,6 +69,7 @@ class RequestRateConfig(AbstractAppFieldType):
     )
     target_value: int = Field(
         default=100,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Target Value",
             description="Target request rate per second for autoscaling.",
@@ -71,6 +77,7 @@ class RequestRateConfig(AbstractAppFieldType):
     )
     window_size: int = Field(
         default=60,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Window Size",
             description="Time in seconds to consider for request rate calculation.",
@@ -89,6 +96,7 @@ class AutoscalingKedaHTTP(AutoscalingBase):
     )
     scaledown_period: int = Field(
         300,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Scaledown Period",
             description="Time in seconds to wait before scaling down.",
