@@ -7,7 +7,6 @@ from apolo_app_types import (
     AppOutputs,
 )
 from apolo_app_types.protocols.common import (
-    AbstractAppFieldType,
     IngressHttp,
     Preset,
     SchemaExtraMetadata,
@@ -15,6 +14,7 @@ from apolo_app_types.protocols.common import (
 )
 from apolo_app_types.protocols.common.networking import (
     HttpApi,
+    RestAPI,
     ServiceAPI,
 )
 from apolo_app_types.protocols.common.openai_compat import (
@@ -64,7 +64,7 @@ class LightRAGPersistence(BaseModel):
 
 
 # LLM Provider Types
-class OpenAILLMProvider(AbstractAppFieldType):
+class OpenAILLMProvider(RestAPI):
     """OpenAI LLM provider configuration. Also supports OpenRouter."""
 
     model_config = ConfigDict(
@@ -75,15 +75,17 @@ class OpenAILLMProvider(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    host: str = Field(default="api.openai.com", description="OpenAI API host")
+    port: int = 443
+    protocol: Literal["https"] = "https"
+    timeout: int | None = Field(default=60, description="Connection timeout in seconds")
+    base_path: str = "/v1"
     provider: Literal["openai"] = "openai"
     model: str = Field(default="gpt-4o-mini", description="Model name")
     api_key: OptionalStrOrSecret = Field(default=None, description="API key")
-    base_url: str | None = Field(
-        default=None, description="Custom API base URL (for OpenRouter, etc.)"
-    )
 
 
-class AnthropicLLMProvider(AbstractAppFieldType):
+class AnthropicLLMProvider(RestAPI):
     """Anthropic Claude LLM provider configuration."""
 
     model_config = ConfigDict(
@@ -94,6 +96,11 @@ class AnthropicLLMProvider(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    host: str = Field(default="api.anthropic.com", description="Anthropic API host")
+    port: int = 443
+    protocol: Literal["https"] = "https"
+    timeout: int | None = Field(default=60, description="Connection timeout in seconds")
+    base_path: str = "/v1"
     provider: Literal["anthropic"] = "anthropic"
     model: str = Field(
         default="claude-3-sonnet-20240229", description="Claude model name"
@@ -101,7 +108,7 @@ class AnthropicLLMProvider(AbstractAppFieldType):
     api_key: OptionalStrOrSecret = Field(default=None, description="Anthropic API key")
 
 
-class OllamaLLMProvider(AbstractAppFieldType):
+class OllamaLLMProvider(RestAPI):
     """Ollama local LLM provider configuration."""
 
     model_config = ConfigDict(
@@ -112,12 +119,20 @@ class OllamaLLMProvider(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    host: str = Field(description="Ollama server host")
+    port: int = Field(default=11434, description="Ollama server port")
+    protocol: Literal["http", "https"] = Field(
+        default="http", description="Ollama server protocol"
+    )
+    timeout: int | None = Field(
+        default=300, description="Connection timeout in seconds"
+    )
+    base_path: str = "/api"
     provider: Literal["ollama"] = "ollama"
     model: str = Field(default="llama3.1:8b", description="Ollama model name")
-    host: str = Field(default="http://localhost:11434", description="Ollama server URL")
 
 
-class GeminiLLMProvider(AbstractAppFieldType):
+class GeminiLLMProvider(RestAPI):
     """Google Gemini LLM provider configuration."""
 
     model_config = ConfigDict(
@@ -128,6 +143,13 @@ class GeminiLLMProvider(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    host: str = Field(
+        default="generativelanguage.googleapis.com", description="Google AI API host"
+    )
+    port: int = 443
+    protocol: Literal["https"] = "https"
+    timeout: int | None = Field(default=60, description="Connection timeout in seconds")
+    base_path: str = "/v1"
     provider: Literal["gemini"] = "gemini"
     model: str = Field(default="gemini-1.5-flash", description="Gemini model name")
     api_key: OptionalStrOrSecret = Field(default=None, description="Google AI API key")
@@ -144,7 +166,7 @@ LLMProvider = (
 
 
 # Embedding Provider Types
-class OpenAIEmbeddingProvider(AbstractAppFieldType):
+class OpenAIEmbeddingProvider(RestAPI):
     """OpenAI embedding provider configuration."""
 
     model_config = ConfigDict(
@@ -155,15 +177,19 @@ class OpenAIEmbeddingProvider(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    host: str = Field(default="api.openai.com", description="OpenAI API host")
+    port: int = 443
+    protocol: Literal["https"] = "https"
+    timeout: int | None = Field(default=60, description="Connection timeout in seconds")
+    base_path: str = "/v1"
     provider: Literal["openai"] = "openai"
     model: str = Field(
         default="text-embedding-ada-002", description="Embedding model name"
     )
     api_key: OptionalStrOrSecret = Field(default=None, description="OpenAI API key")
-    base_url: str | None = Field(default=None, description="Custom API base URL")
 
 
-class OllamaEmbeddingProvider(AbstractAppFieldType):
+class OllamaEmbeddingProvider(RestAPI):
     """Ollama embedding provider configuration."""
 
     model_config = ConfigDict(
@@ -174,16 +200,24 @@ class OllamaEmbeddingProvider(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    host: str = Field(description="Ollama server host")
+    port: int = Field(default=11434, description="Ollama server port")
+    protocol: Literal["http", "https"] = Field(
+        default="http", description="Ollama server protocol"
+    )
+    timeout: int | None = Field(
+        default=300, description="Connection timeout in seconds"
+    )
+    base_path: str = "/api"
     provider: Literal["ollama"] = "ollama"
     model: str = Field(
         default="nomic-embed-text", description="Ollama embedding model name"
     )
-    host: str = Field(description="Ollama server URL")
 
 
 # Union type for all embedding providers
 EmbeddingProvider = (
-    OpenAICompatEmbeddingsAPI | OllamaEmbeddingProvider | OpenAIEmbeddingProvider
+    OpenAICompatEmbeddingsAPI | OpenAIEmbeddingProvider | OllamaEmbeddingProvider
 )
 
 
