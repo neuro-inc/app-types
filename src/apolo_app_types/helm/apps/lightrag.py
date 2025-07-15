@@ -35,7 +35,7 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
                 msg = "OpenAI compatible chat API must have hf_model configured"
                 raise ValueError(msg)
             model = llm_config.hf_model.model_hf_name
-            host = f"{llm_config.protocol}://{llm_config.host}:{llm_config.port}/v1"
+            host = llm_config.complete_url
             return {
                 "binding": "openai",
                 "model": model,
@@ -43,7 +43,7 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
                 "api_key": getattr(llm_config, "api_key", None),
             }
         if isinstance(llm_config, OpenAILLMProvider):
-            host = f"{llm_config.protocol}://{llm_config.host}:{llm_config.port}/v1"
+            host = llm_config.complete_url
             return {
                 "binding": "openai",
                 "model": llm_config.model,
@@ -51,7 +51,7 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
                 "api_key": llm_config.api_key,
             }
         if isinstance(llm_config, AnthropicLLMProvider):
-            host = f"{llm_config.protocol}://{llm_config.host}:{llm_config.port}"
+            host = llm_config.complete_url
             return {
                 "binding": "anthropic",
                 "model": llm_config.model,
@@ -59,7 +59,7 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
                 "api_key": llm_config.api_key,
             }
         if isinstance(llm_config, OllamaLLMProvider):
-            host = f"{llm_config.protocol}://{llm_config.host}:{llm_config.port}"
+            host = llm_config.complete_url
             return {
                 "binding": "ollama",
                 "model": llm_config.model,
@@ -67,7 +67,7 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
                 "api_key": None,
             }
         if isinstance(llm_config, GeminiLLMProvider):
-            host = f"{llm_config.protocol}://{llm_config.host}:{llm_config.port}"
+            host = llm_config.complete_url
             return {
                 "binding": "gemini",
                 "model": llm_config.model,
@@ -79,7 +79,9 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
         model = getattr(llm_config, "model", "gpt-4o-mini")
         api_key = getattr(llm_config, "api_key", None)
         host = ""
-        if hasattr(llm_config, "host") and llm_config.host:
+        if hasattr(llm_config, "complete_url"):
+            host = llm_config.complete_url
+        elif hasattr(llm_config, "host") and llm_config.host:
             protocol = getattr(llm_config, "protocol", "https")
             port = getattr(llm_config, "port", 443)
             host = f"{protocol}://{llm_config.host}:{port}"
@@ -93,7 +95,7 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
                 msg = "OpenAI compatible embeddings API must have hf_model configured"
                 raise ValueError(msg)
             model = embedding_config.hf_model.model_hf_name
-            host = f"{embedding_config.protocol}://{embedding_config.host}:{embedding_config.port}/v1"
+            host = embedding_config.complete_url
             return {
                 "binding": "openai",
                 "model": model,
@@ -102,7 +104,7 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
                 "host": host,
             }
         if isinstance(embedding_config, OpenAIEmbeddingProvider):
-            host = f"{embedding_config.protocol}://{embedding_config.host}:{embedding_config.port}/v1"
+            host = embedding_config.complete_url
             return {
                 "binding": "openai",
                 "model": embedding_config.model,
@@ -111,7 +113,7 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
                 "host": host,
             }
         if isinstance(embedding_config, OllamaEmbeddingProvider):
-            host = f"{embedding_config.protocol}://{embedding_config.host}:{embedding_config.port}"
+            host = embedding_config.complete_url
             return {
                 "binding": "ollama",
                 "model": embedding_config.model,
@@ -130,7 +132,9 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
             dimensions = embedding_config.dimensions
 
         host = ""
-        if hasattr(embedding_config, "host") and embedding_config.host:
+        if hasattr(embedding_config, "complete_url"):
+            host = embedding_config.complete_url
+        elif hasattr(embedding_config, "host") and embedding_config.host:
             protocol = getattr(embedding_config, "protocol", "https")
             port = getattr(embedding_config, "port", 443)
             host = f"{protocol}://{embedding_config.host}:{port}"

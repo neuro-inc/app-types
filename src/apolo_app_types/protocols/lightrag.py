@@ -75,12 +75,16 @@ class OpenAILLMProvider(RestAPI):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    host: str = Field(default="api.openai.com", description="OpenAI API host")
     port: int = 443
     protocol: Literal["https"] = "https"
+    timeout: float | None = Field(
+        default=30.0, description="Connection timeout in seconds"
+    )
+    base_path: str = "/v1"
     provider: Literal["openai"] = "openai"
     model: str = Field(default="gpt-4o-mini", description="Model name")
     api_key: OptionalStrOrSecret = Field(default=None, description="API key")
-    host: str = Field(default="api.openai.com", description="OpenAI API host")
 
 
 class AnthropicLLMProvider(RestAPI):
@@ -94,14 +98,18 @@ class AnthropicLLMProvider(RestAPI):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    host: str = Field(default="api.anthropic.com", description="Anthropic API host")
     port: int = 443
     protocol: Literal["https"] = "https"
+    timeout: float | None = Field(
+        default=30.0, description="Connection timeout in seconds"
+    )
+    base_path: str = "/v1"
     provider: Literal["anthropic"] = "anthropic"
     model: str = Field(
         default="claude-3-sonnet-20240229", description="Claude model name"
     )
     api_key: OptionalStrOrSecret = Field(default=None, description="Anthropic API key")
-    host: str = Field(default="api.anthropic.com", description="Anthropic API host")
 
 
 class OllamaLLMProvider(RestAPI):
@@ -115,13 +123,17 @@ class OllamaLLMProvider(RestAPI):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    host: str = Field(description="Ollama server host")
     port: int = Field(default=11434, description="Ollama server port")
     protocol: Literal["http", "https"] = Field(
         default="http", description="Ollama server protocol"
     )
+    timeout: float | None = Field(
+        default=120.0, description="Connection timeout in seconds"
+    )
+    base_path: str = "/api"
     provider: Literal["ollama"] = "ollama"
     model: str = Field(default="llama3.1:8b", description="Ollama model name")
-    host: str = Field(description="Ollama server host")
 
 
 class GeminiLLMProvider(RestAPI):
@@ -135,14 +147,18 @@ class GeminiLLMProvider(RestAPI):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
-    port: int = 443
-    protocol: Literal["https"] = "https"
-    provider: Literal["gemini"] = "gemini"
-    model: str = Field(default="gemini-1.5-flash", description="Gemini model name")
-    api_key: OptionalStrOrSecret = Field(default=None, description="Google AI API key")
     host: str = Field(
         default="generativelanguage.googleapis.com", description="Google AI API host"
     )
+    port: int = 443
+    protocol: Literal["https"] = "https"
+    timeout: float | None = Field(
+        default=30.0, description="Connection timeout in seconds"
+    )
+    base_path: str = "/v1"
+    provider: Literal["gemini"] = "gemini"
+    model: str = Field(default="gemini-1.5-flash", description="Gemini model name")
+    api_key: OptionalStrOrSecret = Field(default=None, description="Google AI API key")
 
 
 # Union type for all LLM providers
@@ -167,14 +183,18 @@ class OpenAIEmbeddingProvider(RestAPI):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    host: str = Field(default="api.openai.com", description="OpenAI API host")
     port: int = 443
     protocol: Literal["https"] = "https"
+    timeout: float | None = Field(
+        default=30.0, description="Connection timeout in seconds"
+    )
+    base_path: str = "/v1"
     provider: Literal["openai"] = "openai"
     model: str = Field(
         default="text-embedding-ada-002", description="Embedding model name"
     )
     api_key: OptionalStrOrSecret = Field(default=None, description="OpenAI API key")
-    host: str = Field(default="api.openai.com", description="OpenAI API host")
 
 
 class OllamaEmbeddingProvider(RestAPI):
@@ -188,15 +208,19 @@ class OllamaEmbeddingProvider(RestAPI):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    host: str = Field(description="Ollama server host")
     port: int = Field(default=11434, description="Ollama server port")
     protocol: Literal["http", "https"] = Field(
         default="http", description="Ollama server protocol"
     )
+    timeout: float | None = Field(
+        default=120.0, description="Connection timeout in seconds"
+    )
+    base_path: str = "/api"
     provider: Literal["ollama"] = "ollama"
     model: str = Field(
         default="nomic-embed-text", description="Ollama embedding model name"
     )
-    host: str = Field(description="Ollama server host")
 
 
 # Union type for all embedding providers
