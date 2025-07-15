@@ -164,7 +164,9 @@ async def update_app_outputs(  # noqa: C901
                         f"({app_output_processor_type}) for posting outputs"
                     )
                     raise ValueError(err_msg)
-                conv_outputs = await postprocessor().generate_outputs(helm_outputs)
+                conv_outputs = await postprocessor().generate_outputs(
+                    helm_outputs, app_instance_id
+                )
         logger.info("Outputs: %s", conv_outputs)
 
         await post_outputs(
