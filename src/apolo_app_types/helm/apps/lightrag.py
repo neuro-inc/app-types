@@ -31,7 +31,7 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
         """Extract LLM configuration from provider-specific config."""
         if isinstance(llm_config, OpenAICompatChatAPI):
             # For OpenAI compatible API, always use hf_model.model_hf_name
-            if llm_config.hf_model is None:
+            if not llm_config.hf_model:
                 msg = "OpenAI compatible chat API must have hf_model configured"
                 raise ValueError(msg)
             model = llm_config.hf_model.model_hf_name
