@@ -107,7 +107,7 @@ async def get_postgres_outputs(
             if user.dbname == db:
                 continue
             users.append(user.with_database(db))
-    if not admin_user:
+    if admin_user:
         admin = PostgresAdminUser(
             **{**admin_user.model_dump(exclude={"dbname"}), "user_type": "admin"}
         )
