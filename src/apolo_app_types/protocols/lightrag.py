@@ -78,9 +78,7 @@ class OpenAILLMProvider(RestAPI):
     host: str = Field(default="api.openai.com", description="OpenAI API host")
     port: int = 443
     protocol: Literal["https"] = "https"
-    timeout: float | None = Field(
-        default=30.0, description="Connection timeout in seconds"
-    )
+    timeout: int | None = Field(default=60, description="Connection timeout in seconds")
     base_path: str = "/v1"
     provider: Literal["openai"] = "openai"
     model: str = Field(default="gpt-4o-mini", description="Model name")
@@ -101,9 +99,7 @@ class AnthropicLLMProvider(RestAPI):
     host: str = Field(default="api.anthropic.com", description="Anthropic API host")
     port: int = 443
     protocol: Literal["https"] = "https"
-    timeout: float | None = Field(
-        default=30.0, description="Connection timeout in seconds"
-    )
+    timeout: int | None = Field(default=60, description="Connection timeout in seconds")
     base_path: str = "/v1"
     provider: Literal["anthropic"] = "anthropic"
     model: str = Field(
@@ -128,8 +124,8 @@ class OllamaLLMProvider(RestAPI):
     protocol: Literal["http", "https"] = Field(
         default="http", description="Ollama server protocol"
     )
-    timeout: float | None = Field(
-        default=120.0, description="Connection timeout in seconds"
+    timeout: int | None = Field(
+        default=300, description="Connection timeout in seconds"
     )
     base_path: str = "/api"
     provider: Literal["ollama"] = "ollama"
@@ -152,9 +148,7 @@ class GeminiLLMProvider(RestAPI):
     )
     port: int = 443
     protocol: Literal["https"] = "https"
-    timeout: float | None = Field(
-        default=30.0, description="Connection timeout in seconds"
-    )
+    timeout: int | None = Field(default=60, description="Connection timeout in seconds")
     base_path: str = "/v1"
     provider: Literal["gemini"] = "gemini"
     model: str = Field(default="gemini-1.5-flash", description="Gemini model name")
@@ -186,9 +180,7 @@ class OpenAIEmbeddingProvider(RestAPI):
     host: str = Field(default="api.openai.com", description="OpenAI API host")
     port: int = 443
     protocol: Literal["https"] = "https"
-    timeout: float | None = Field(
-        default=30.0, description="Connection timeout in seconds"
-    )
+    timeout: int | None = Field(default=60, description="Connection timeout in seconds")
     base_path: str = "/v1"
     provider: Literal["openai"] = "openai"
     model: str = Field(
@@ -213,8 +205,8 @@ class OllamaEmbeddingProvider(RestAPI):
     protocol: Literal["http", "https"] = Field(
         default="http", description="Ollama server protocol"
     )
-    timeout: float | None = Field(
-        default=120.0, description="Connection timeout in seconds"
+    timeout: int | None = Field(
+        default=300, description="Connection timeout in seconds"
     )
     base_path: str = "/api"
     provider: Literal["ollama"] = "ollama"
