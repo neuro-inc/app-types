@@ -252,6 +252,21 @@ def mock_kubernetes_client():
                         }
                     ]
                 }
+            if (
+                label_selector
+                == "app.kubernetes.io/name=lightrag,app.kubernetes.io/instance=test-app-instance-id"  # noqa: E501
+            ):
+                return {
+                    "items": [
+                        {
+                            "metadata": {
+                                "name": "lightrag",
+                                "namespace": namespace,
+                            },
+                            "spec": {"ports": [{"port": 9621}]},
+                        }
+                    ]
+                }
             return {
                 "items": [
                     {
