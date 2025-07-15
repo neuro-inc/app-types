@@ -8,7 +8,19 @@ from apolo_app_types.helm.apps.common import (
     gen_extra_values,
 )
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
+from apolo_app_types.protocols.common.openai_compat import (
+    OpenAICompatChatAPI,
+    OpenAICompatEmbeddingsAPI,
+)
 from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
+from apolo_app_types.protocols.lightrag import (
+    AnthropicLLMProvider,
+    GeminiLLMProvider,
+    OllamaEmbeddingProvider,
+    OllamaLLMProvider,
+    OpenAIEmbeddingProvider,
+    OpenAILLMProvider,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -17,23 +29,97 @@ logger = logging.getLogger(__name__)
 class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
     def _extract_llm_config(self, llm_config: t.Any) -> dict[str, t.Any]:
         """Extract LLM configuration from provider-specific config."""
+        if isinstance(llm_config, OpenAICompatChatAPI):
+            # For OpenAI compatible API, always use hf_model.model_hf_name
+            if llm_config.hf_model is None:
+                msg = "OpenAI compatible chat API must have hf_model configured"
+                raise ValueError(msg)
+            model = llm_config.hf_model.model_hf_name
+            host = f"{llm_config.protocol}://{llm_config.host}:{llm_config.port}/v1"
+            return {
+                "binding": "openai",
+                "model": model,
+                "host": host,
+                "api_key": getattr(llm_config, "api_key", None),
+            }
+        if isinstance(llm_config, OpenAILLMProvider):
+            host = f"{llm_config.protocol}://{llm_config.host}:{llm_config.port}/v1"
+            return {
+                "binding": "openai",
+                "model": llm_config.model,
+                "host": host,
+                "api_key": llm_config.api_key,
+            }
+        if isinstance(llm_config, AnthropicLLMProvider):
+            host = f"{llm_config.protocol}://{llm_config.host}:{llm_config.port}"
+            return {
+                "binding": "anthropic",
+                "model": llm_config.model,
+                "host": host,
+                "api_key": llm_config.api_key,
+            }
+        if isinstance(llm_config, OllamaLLMProvider):
+            host = f"{llm_config.protocol}://{llm_config.host}:{llm_config.port}"
+            return {
+                "binding": "ollama",
+                "model": llm_config.model,
+                "host": host,
+                "api_key": None,
+            }
+        if isinstance(llm_config, GeminiLLMProvider):
+            host = f"{llm_config.protocol}://{llm_config.host}:{llm_config.port}"
+            return {
+                "binding": "gemini",
+                "model": llm_config.model,
+                "host": host,
+                "api_key": llm_config.api_key,
+            }
+        # Fallback to generic extraction
         binding = getattr(llm_config, "provider", "openai")
         model = getattr(llm_config, "model", "gpt-4o-mini")
         api_key = getattr(llm_config, "api_key", None)
-
-        # Handle different host field names
         host = ""
-        if hasattr(llm_config, "base_url") and llm_config.base_url:
-            host = llm_config.base_url
-        elif hasattr(llm_config, "host") and llm_config.host:
-            host = llm_config.host
-        elif hasattr(llm_config, "endpoint") and llm_config.endpoint:
-            host = llm_config.endpoint
-
+        if hasattr(llm_config, "host") and llm_config.host:
+            protocol = getattr(llm_config, "protocol", "https")
+            port = getattr(llm_config, "port", 443)
+            host = f"{protocol}://{llm_config.host}:{port}"
         return {"binding": binding, "model": model, "host": host, "api_key": api_key}
 
     def _extract_embedding_config(self, embedding_config: t.Any) -> dict[str, t.Any]:
         """Extract embedding configuration from provider-specific config."""
+        if isinstance(embedding_config, OpenAICompatEmbeddingsAPI):
+            # For OpenAI compatible API, always use hf_model.model_hf_name
+            if embedding_config.hf_model is None:
+                msg = "OpenAI compatible embeddings API must have hf_model configured"
+                raise ValueError(msg)
+            model = embedding_config.hf_model.model_hf_name
+            host = f"{embedding_config.protocol}://{embedding_config.host}:{embedding_config.port}/v1"
+            return {
+                "binding": "openai",
+                "model": model,
+                "api_key": getattr(embedding_config, "api_key", None),
+                "dimensions": 1536,  # default for OpenAI
+                "host": host,
+            }
+        if isinstance(embedding_config, OpenAIEmbeddingProvider):
+            host = f"{embedding_config.protocol}://{embedding_config.host}:{embedding_config.port}/v1"
+            return {
+                "binding": "openai",
+                "model": embedding_config.model,
+                "api_key": embedding_config.api_key,
+                "dimensions": 1536,  # default for OpenAI
+                "host": host,
+            }
+        if isinstance(embedding_config, OllamaEmbeddingProvider):
+            host = f"{embedding_config.protocol}://{embedding_config.host}:{embedding_config.port}"
+            return {
+                "binding": "ollama",
+                "model": embedding_config.model,
+                "api_key": None,
+                "dimensions": 1024,  # default for most Ollama embeddings
+                "host": host,
+            }
+        # Fallback to generic extraction
         binding = getattr(embedding_config, "provider", "openai")
         model = getattr(embedding_config, "model", "text-embedding-ada-002")
         api_key = getattr(embedding_config, "api_key", None)
@@ -43,11 +129,18 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
         if hasattr(embedding_config, "dimensions"):
             dimensions = embedding_config.dimensions
 
+        host = ""
+        if hasattr(embedding_config, "host") and embedding_config.host:
+            protocol = getattr(embedding_config, "protocol", "https")
+            port = getattr(embedding_config, "port", 443)
+            host = f"{protocol}://{embedding_config.host}:{port}"
+
         return {
             "binding": binding,
             "model": model,
             "api_key": api_key,
             "dimensions": dimensions,
+            "host": host,
         }
 
     async def _get_environment_values(
@@ -75,14 +168,17 @@ class LightRAGChartValueProcessor(BaseChartValueProcessor[LightRAGAppInputs]):
             ),
             "OPENAI_API_KEY": serialize_optional_secret(
                 llm_config["api_key"], app_secrets_name
-            ),
+            )
+            or "",
             # Embedding configuration
             "EMBEDDING_BINDING": embedding_config["binding"],
             "EMBEDDING_MODEL": embedding_config["model"],
             "EMBEDDING_DIM": embedding_config["dimensions"],
+            "EMBEDDING_BINDING_HOST": embedding_config["host"],
             "EMBEDDING_BINDING_API_KEY": serialize_optional_secret(
                 embedding_config["api_key"], app_secrets_name
-            ),
+            )
+            or "",
             # Storage configuration - hardcoded to match minimal setup
             "LIGHTRAG_KV_STORAGE": "PGKVStorage",
             "LIGHTRAG_VECTOR_STORAGE": "PGVectorStorage",

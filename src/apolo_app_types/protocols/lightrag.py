@@ -80,9 +80,7 @@ class OpenAILLMProvider(RestAPI):
     provider: Literal["openai"] = "openai"
     model: str = Field(default="gpt-4o-mini", description="Model name")
     api_key: OptionalStrOrSecret = Field(default=None, description="API key")
-    base_url: str | None = Field(
-        default=None, description="Custom API base URL (for OpenRouter, etc.)"
-    )
+    host: str = Field(default="api.openai.com", description="OpenAI API host")
 
 
 class AnthropicLLMProvider(RestAPI):
@@ -103,6 +101,7 @@ class AnthropicLLMProvider(RestAPI):
         default="claude-3-sonnet-20240229", description="Claude model name"
     )
     api_key: OptionalStrOrSecret = Field(default=None, description="Anthropic API key")
+    host: str = Field(default="api.anthropic.com", description="Anthropic API host")
 
 
 class OllamaLLMProvider(RestAPI):
@@ -122,7 +121,7 @@ class OllamaLLMProvider(RestAPI):
     )
     provider: Literal["ollama"] = "ollama"
     model: str = Field(default="llama3.1:8b", description="Ollama model name")
-    host: str = Field(default="http://localhost:11434", description="Ollama server URL")
+    host: str = Field(description="Ollama server host")
 
 
 class GeminiLLMProvider(RestAPI):
@@ -141,14 +140,18 @@ class GeminiLLMProvider(RestAPI):
     provider: Literal["gemini"] = "gemini"
     model: str = Field(default="gemini-1.5-flash", description="Gemini model name")
     api_key: OptionalStrOrSecret = Field(default=None, description="Google AI API key")
+    host: str = Field(
+        default="generativelanguage.googleapis.com", description="Google AI API host"
+    )
 
 
 # Union type for all LLM providers
 LLMProvider = (
-    OpenAICompatChatAPI | OpenAILLMProvider
-    # | AnthropicLLMProvider
-    # | OllamaLLMProvider
-    # | GeminiLLMProvider
+    OpenAICompatChatAPI
+    | OpenAILLMProvider
+    | AnthropicLLMProvider
+    | OllamaLLMProvider
+    | GeminiLLMProvider
 )
 
 
@@ -171,7 +174,7 @@ class OpenAIEmbeddingProvider(RestAPI):
         default="text-embedding-ada-002", description="Embedding model name"
     )
     api_key: OptionalStrOrSecret = Field(default=None, description="OpenAI API key")
-    base_url: str | None = Field(default=None, description="Custom API base URL")
+    host: str = Field(default="api.openai.com", description="OpenAI API host")
 
 
 class OllamaEmbeddingProvider(RestAPI):
@@ -185,16 +188,20 @@ class OllamaEmbeddingProvider(RestAPI):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
+    port: int = Field(default=11434, description="Ollama server port")
+    protocol: Literal["http", "https"] = Field(
+        default="http", description="Ollama server protocol"
+    )
     provider: Literal["ollama"] = "ollama"
     model: str = Field(
         default="nomic-embed-text", description="Ollama embedding model name"
     )
-    host: str = Field(description="Ollama server URL")
+    host: str = Field(description="Ollama server host")
 
 
 # Union type for all embedding providers
 EmbeddingProvider = (
-    OpenAICompatEmbeddingsAPI | OpenAIEmbeddingProvider  # | OllamaEmbeddingProvider
+    OpenAICompatEmbeddingsAPI | OpenAIEmbeddingProvider | OllamaEmbeddingProvider
 )
 
 
