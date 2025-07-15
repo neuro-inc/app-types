@@ -271,12 +271,7 @@ def mock_kubernetes_client():
         mock_networking_instance.list_namespaced_ingress.side_effect = (
             list_namespace_ingress
         )
-
-        mock_secret = MagicMock()
-        mock_secret.metadata.name = "llm-inference"
-        mock_secret.metadata.namespace = "default"
-        mock_secret.data = {
-            "user": encode_b64("admin"),
+        user_params = {
             "password": encode_b64("supersecret"),
             "host": encode_b64("db.example.com"),
             "port": encode_b64("5432"),
@@ -292,9 +287,26 @@ def mock_kubernetes_client():
             ),
             "uri": encode_b64("postgres://db.example.com:5432/mydatabase"),
         }
+        mock_secret = MagicMock()
+        mock_secret.metadata.name = "llm-inference"
+        mock_secret.metadata.namespace = "default"
+        mock_secret.data = {
+            "user": encode_b64("admin"),
+            **user_params,
+        }
+        mock_postgres_secret = MagicMock()
+        mock_postgres_secret.metadata.name = "llm-inference"
+        mock_postgres_secret.metadata.namespace = "default"
+        mock_postgres_secret.data = {
+            "user": encode_b64("postgres"),
+            **user_params,
+        }
 
         # Set .items to a list containing the mocked secret
-        mock_v1_instance.list_namespaced_secret.return_value.items = [mock_secret]
+        mock_v1_instance.list_namespaced_secret.return_value.items = [
+            mock_secret,
+            mock_postgres_secret,
+        ]
 
         def mock_list_namespaced_custom_object(
             group, version, namespace, plural, **kwargs
@@ -312,7 +324,11 @@ def mock_kubernetes_client():
                                     {
                                         "name": "admin",
                                         "databases": ["mydatabase", "otherdatabase"],
-                                    }
+                                    },
+                                    {
+                                        "name": "postgres",
+                                        "databases": ["postgres"],
+                                    },
                                 ]
                             }
                         }
