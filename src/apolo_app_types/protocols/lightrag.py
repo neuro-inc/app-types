@@ -36,6 +36,7 @@ class LightRAGPersistence(BaseModel):
 
     rag_storage_size: int = Field(
         default=10,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="RAG Storage Size (GB)",
             description="Size of the persistent volume for RAG data storage.",
@@ -44,6 +45,7 @@ class LightRAGPersistence(BaseModel):
 
     inputs_storage_size: int = Field(
         default=5,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Inputs Storage Size (GB)",
             description="Size of the persistent volume for input files.",

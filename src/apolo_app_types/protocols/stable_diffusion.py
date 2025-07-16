@@ -33,6 +33,7 @@ class StableDiffusionParams(AbstractAppFieldType):
 
     replica_count: int = Field(
         default=1,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Replica Count",
             description="Set the number of replicas to "

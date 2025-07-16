@@ -26,6 +26,7 @@ class HttpApi(AbstractAppFieldType):
     )
     port: int = Field(
         default=80,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Port", description="The port of the HTTP endpoint."
         ).as_json_schema_extra(),
