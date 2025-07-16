@@ -18,13 +18,13 @@ from apolo_app_types.protocols.postgres import CrunchyPostgresUserCredentials
 
 
 class DifyApi(AbstractAppFieldType):
-    replicas: int | None = Field(default=None, gt=0)
+    replicas: int = Field(default=1, gt=0)
     preset_name: str
     title: str
 
 
 class DifyWorker(AbstractAppFieldType):
-    replicas: int | None = Field(default=None, gt=0)
+    replicas: int = Field(default=1, gt=0)
     preset_name: str
 
 

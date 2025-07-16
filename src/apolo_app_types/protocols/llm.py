@@ -36,7 +36,7 @@ class LLMApi(AbstractAppFieldType):
 
 
 class Worker(AbstractAppFieldType):
-    replicas: int | None = Field(default=None, gt=0)
+    replicas: int = Field(default=1, gt=0)
     preset_name: str
 
 
@@ -45,7 +45,7 @@ class Proxy(AbstractAppFieldType):
 
 
 class Web(AbstractAppFieldType):
-    replicas: int | None = Field(default=None, gt=0)
+    replicas: int = Field(default=1, gt=0)
     preset_name: str
 
 
