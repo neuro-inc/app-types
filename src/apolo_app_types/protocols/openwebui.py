@@ -1,3 +1,4 @@
+import enum
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -25,6 +26,11 @@ from apolo_app_types.protocols.postgres import (
 )
 
 
+class DBTypes(enum.Enum):
+    SQLITE = "sqlite"
+    POSTGRES = "postgres"
+
+
 class OpenWebUISpecific(BaseModel):
     model_config = ConfigDict(
         protected_namespaces=(),
@@ -43,16 +49,16 @@ class OpenWebUISpecific(BaseModel):
     )
 
 
-class LocalDatabase(AbstractAppFieldType):
+class SQLiteDatabase(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Local Database",
+            title="SQLite Database",
             description="Use a local SQLite database for OpenWebUI.",
         ).as_json_schema_extra(),
     )
     # No additional fields needed for local SQLite database
-    database_type: Literal["sqlite"] = Field(default="sqlite")
+    database_type: Literal[DBTypes.SQLITE] = Field(default=DBTypes.SQLITE)
 
 
 class PostgresDatabase(AbstractAppFieldType):
@@ -64,15 +70,15 @@ class PostgresDatabase(AbstractAppFieldType):
         ).as_json_schema_extra(),
     )
     # Use Crunchy Postgres credentials for the database
-    database_type: Literal["postgres"] = Field(default="postgres")
+    database_type: Literal[DBTypes.POSTGRES] = Field(default=DBTypes.POSTGRES)
     credentials: CrunchyPostgresUserCredentials
 
 
 class OpenWebUIAppInputs(AppInputs):
     preset: Preset
     ingress_http: IngressHttp
-    database: LocalDatabase | PostgresDatabase = Field(
-        default_factory=lambda: LocalDatabase(),
+    database: SQLiteDatabase | PostgresDatabase = Field(
+        default_factory=lambda: SQLiteDatabase(),
         json_schema_extra=SchemaExtraMetadata(
             title="Database Configuration",
             description="Configure the database for OpenWebUI. "

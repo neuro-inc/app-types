@@ -27,7 +27,7 @@ from apolo_app_types.protocols.common.health_check import (
 from apolo_app_types.protocols.common.k8s import Container, Env, Port
 from apolo_app_types.protocols.common.storage import ApoloMountModes
 from apolo_app_types.protocols.custom_deployment import NetworkingConfig
-from apolo_app_types.protocols.openwebui import OpenWebUIAppInputs
+from apolo_app_types.protocols.openwebui import DBTypes, OpenWebUIAppInputs
 
 
 class OpenWebUIChartValueProcessor(BaseChartValueProcessor[OpenWebUIAppInputs]):
@@ -57,7 +57,7 @@ class OpenWebUIChartValueProcessor(BaseChartValueProcessor[OpenWebUIAppInputs]):
             ),
         }
 
-        if input_.database.database_type == "postgres":
+        if input_.database.database_type == DBTypes.POSTGRES:
             database_url = get_postgres_database_url(
                 credentials=input_.database.credentials
             )
