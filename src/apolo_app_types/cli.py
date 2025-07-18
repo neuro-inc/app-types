@@ -112,7 +112,7 @@ def run_preprocessor(
             inputs_dict = json.loads(inputs_json)
             inputs_class = load_app_inputs(app_id, inputs_type)
             if not inputs_class:
-                err_msg = f"Unable to find inputs type for {app_id=}"
+                err_msg = f"Unable to find inputs type for {app_id=}, {inputs_type=}"
                 raise ValueError(err_msg)
 
             loaded_inputs = inputs_class.model_validate(inputs_dict)
@@ -120,7 +120,7 @@ def run_preprocessor(
 
             preprocessor_class = load_app_preprocessor(app_id, preprocessor_type)
             if not preprocessor_class:
-                err_msg = f"Unable to find preprocessor type for {app_id=}"
+                err_msg = f"Unable to find preprocessor {app_id=}, {preprocessor_type=}"
                 raise ValueError(err_msg)
 
             await apolo_sdk.login_with_token(
