@@ -11,6 +11,7 @@ from apolo_app_types import (
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps import CustomDeploymentChartValueProcessor
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
+from apolo_app_types.helm.utils.database import get_postgres_database_url
 from apolo_app_types.helm.utils.storage import get_app_data_files_path_url
 from apolo_app_types.protocols.common import (
     ApoloFilesPath,
@@ -54,10 +55,18 @@ class OpenWebUIChartValueProcessor(BaseChartValueProcessor[OpenWebUIAppInputs]):
             "RAG_OPENAI_API_BASE_URL": str(
                 URL(input_.embeddings_api.complete_url) / "v1"
             ),
-            "DATABASE_URL": input_.pgvector_user.uri,
-            "VECTOR_DB": "pgvector",
-            "PGVECTOR_DB_URL": input_.pgvector_user.uri,
         }
+
+        if input_.database.database_type == "postgres":
+            database_url = get_postgres_database_url(
+                credentials=input_.database.credentials
+            )
+            extra_env = {
+                "DATABASE_URL": database_url,
+                "VECTOR_DB": "pgvector",
+                "PGVECTOR_DB_URL": database_url,
+            }
+            env |= extra_env
         custom_env = {e.name: e.value for e in input_.openwebui_specific.env}
         return {**env, **custom_env}
 
