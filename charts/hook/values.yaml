@@ -6,4 +6,4 @@ appTypesImage:
   tag: "development"
   pullPolicy: "Always"
 
-postProcessorEnvs: {}
+postProcessorEnvs: []
