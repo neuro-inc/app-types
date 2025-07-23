@@ -26,7 +26,7 @@ from apolo_app_types.protocols.postgres import (
 )
 
 
-class DBTypes(enum.Enum):
+class DBTypes(enum.StrEnum):
     SQLITE = "sqlite"
     POSTGRES = "postgres"
 
