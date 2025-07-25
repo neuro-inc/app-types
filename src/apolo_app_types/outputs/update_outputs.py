@@ -85,12 +85,14 @@ async def post_outputs(api_url: str, api_token: str, outputs: dict[str, t.Any]) 
 async def update_app_outputs(  # noqa: C901
     helm_outputs: dict[str, t.Any],
     app_output_processor_type: str | None = None,
-    apolo_apps_url: str | None = None,
+    apolo_app_outputs_endpoint: str | None = None,
     apolo_apps_token: str | None = None,
     apolo_app_type: str | None = None,
 ) -> bool:
     app_type = apolo_app_type or helm_outputs["PLATFORM_APPS_APP_TYPE"]
-    platform_apps_url = apolo_apps_url or helm_outputs["PLATFORM_APPS_URL"]
+    apolo_app_outputs_endpoint = (
+        apolo_app_outputs_endpoint or helm_outputs["PLATFORM_APPS_URL"]
+    )
     platform_apps_token = apolo_apps_token or helm_outputs["PLATFORM_APPS_TOKEN"]
     app_instance_id = os.getenv("K8S_INSTANCE_ID", None)
     if app_instance_id is None:
@@ -170,7 +172,7 @@ async def update_app_outputs(  # noqa: C901
         logger.info("Outputs: %s", conv_outputs)
 
         await post_outputs(
-            platform_apps_url,
+            apolo_app_outputs_endpoint,
             platform_apps_token,
             conv_outputs,
         )
