@@ -51,6 +51,10 @@ from apolo_app_types.protocols.jupyter import (
     JupyterOutputs,
     JupyterTypes,
 )
+from apolo_app_types.protocols.launchpad import (
+    LaunchpadAppInputs,
+    LaunchpadAppOutputs,
+)
 from apolo_app_types.protocols.lightrag import (
     AnthropicLLMProvider,
     EmbeddingProvider,
@@ -217,4 +221,6 @@ __all__ = [
     "LightRAGAppOutputs",
     "OpenWebUIAppInputs",
     "OpenWebUIAppOutputs",
+    "LaunchpadAppInputs",
+    "LaunchpadAppOutputs",
 ]
