@@ -39,6 +39,7 @@ class AppType(enum.StrEnum):
     SparkJob = "spark-job"
     Superset = "superset"
     OpenWebUI = "openwebui"
+    Launchpad = "launchpad"
 
     def __repr__(self) -> str:
         return str(self)
