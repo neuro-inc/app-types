@@ -46,7 +46,6 @@ from apolo_app_types.protocols.huggingface_cache import (
     HuggingFaceCacheOutputs,
 )
 from apolo_app_types.protocols.job import (
-    Container,
     ContainerHTTPServer,
     ContainerResources,
     ContainerTPUResource,

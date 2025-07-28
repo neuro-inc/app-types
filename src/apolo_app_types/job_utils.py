@@ -36,7 +36,8 @@ def prepare_job_run_params(
         container_image = job_input.container.image
 
     if not container_image:
-        raise ValueError("Container image is required")
+        msg = "Container image is required"
+        raise ValueError(msg)
 
     resources = job_input.resources
     if job_input.container:
