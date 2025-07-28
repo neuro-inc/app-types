@@ -36,11 +36,11 @@ async def test_values_llm_generation_gpu_default_preset(
         "serverExtraArgs": [],
         "model": {
             "modelHFName": Llama4ValueProcessor.model_map[model_to_test].model_hf_name,
-            "tokenizerHFName": "",
+            "tokenizerHFName": Llama4ValueProcessor.model_map[model_to_test].model_hf_name,
         },
         "llm": {
             "modelHFName": Llama4ValueProcessor.model_map[model_to_test].model_hf_name,
-            "tokenizerHFName": "",
+            "tokenizerHFName": Llama4ValueProcessor.model_map[model_to_test].model_hf_name,
         },
         "env": {
             "HUGGING_FACE_HUB_TOKEN": {

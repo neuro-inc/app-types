@@ -69,7 +69,7 @@ class Llama4ValueProcessor(BaseChartValueProcessor[LLama4Inputs]):
         preset_chosen = self._get_preset(input_)
         return LLMInputs(
             hugging_face_model=hf_model,
-            tokenizer_hf_name="",
+            tokenizer_hf_name=hf_model.model_hf_name,
             ingress_http=IngressHttp(),
             preset=preset_chosen,
         )
