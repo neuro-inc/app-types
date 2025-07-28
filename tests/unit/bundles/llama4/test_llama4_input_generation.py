@@ -5,6 +5,7 @@ from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.bundles.llm import Llama4ValueProcessor
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.bundles.llm import Llama4Size
+from apolo_app_types.protocols.common import ApoloSecret
 
 from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
@@ -18,7 +19,7 @@ async def test_values_llm_generation_gpu_default_preset(
     helm_args, helm_params = await app_type_to_vals(
         input_=LLama4Inputs(
             size=model_to_test,
-            hf_token="FakeSecret",
+            hf_token=ApoloSecret(key="FakeSecret"),
         ),
         apolo_client=apolo_client,
         app_type=AppType.Llama4,
@@ -41,7 +42,13 @@ async def test_values_llm_generation_gpu_default_preset(
             "modelHFName": Llama4ValueProcessor.model_map[model_to_test].model_hf_name,
             "tokenizerHFName": "",
         },
-        "env": {"HUGGING_FACE_HUB_TOKEN": "FakeSecret"},
+        "env": {
+            "HUGGING_FACE_HUB_TOKEN": {
+                "valueFrom": {
+                    "secretKeyRef": {"name": "apps-secrets", "key": "FakeSecret"}
+                }
+            }
+        },
         "envNvidia": {"CUDA_VISIBLE_DEVICES": "0"},
         "preset_name": preset_a100,
         "resources": {

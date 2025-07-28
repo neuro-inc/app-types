@@ -66,12 +66,12 @@ class Llama4ValueProcessor(BaseChartValueProcessor[LLama4Inputs]):
             model_hf_name=self.model_map[input_.size].model_hf_name,
             hf_token=input_.hf_token,
         )
-        preset_choosen = self._get_preset(input_)
+        preset_chosen = self._get_preset(input_)
         return LLMInputs(
             hugging_face_model=hf_model,
             tokenizer_hf_name="",
             ingress_http=IngressHttp(),
-            preset=preset_choosen,
+            preset=preset_chosen,
         )
 
     async def gen_extra_values(

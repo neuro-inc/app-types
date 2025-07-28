@@ -3,8 +3,8 @@ from enum import Enum
 from pydantic import Field
 
 from apolo_app_types.protocols.common import (
+    ApoloSecret,
     AppInputs,
-    OptionalStrOrSecret,
     SchemaExtraMetadata,
 )
 
@@ -19,8 +19,8 @@ class Llama4Size(str, Enum):
 
 class LLama4Inputs(AppInputs):
     size: Llama4Size
-    hf_token: OptionalStrOrSecret = Field(  # noqa: N815
-        default=None,
+    hf_token: ApoloSecret = Field(  # noqa: N815
+        ...,
         json_schema_extra=SchemaExtraMetadata(
             description="The Hugging Face API token.",
             title="Hugging Face Token",
