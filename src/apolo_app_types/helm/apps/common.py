@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import os
@@ -9,6 +10,7 @@ from decimal import Decimal
 import apolo_sdk
 import yaml
 from apolo_sdk import Preset
+from neuro_config_client import NodePool
 
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.ingress import (
@@ -99,6 +101,11 @@ def preset_to_affinity(preset: apolo_sdk.Preset) -> dict[str, t.Any]:
     return affinity
 
 
+async def get_resource_pools(preset: apolo_sdk.Preset) -> list[NodePool]:
+    async with apolo_sdk.get() as client:
+        return await client._clusters._client.list_node_pools(client.cluster_name)
+
+
 def preset_to_tolerations(preset: apolo_sdk.Preset) -> list[dict[str, t.Any]]:
     tolerations: list[dict[str, t.Any]] = [
         {
@@ -119,11 +126,19 @@ def preset_to_tolerations(preset: apolo_sdk.Preset) -> list[dict[str, t.Any]]:
             "tolerationSeconds": 300,
         },
     ]
-    if preset.amd_gpu:
+
+    try:
+        pool_types = asyncio.run(get_resource_pools(preset))
+    except Exception as e:
+        err = f"Failed to get resource pools: {e}"
+        logger.error(err)
+        pool_types = []
+
+    if preset.amd_gpu or any(p.amd_gpu for p in pool_types):
         tolerations.append(
             {"effect": "NoSchedule", "key": "amd.com/gpu", "operator": "Exists"}
         )
-    if preset.nvidia_gpu:
+    if preset.nvidia_gpu or any(p.nvidia_gpu for p in pool_types):
         tolerations.append(
             {"effect": "NoSchedule", "key": "nvidia.com/gpu", "operator": "Exists"}
         )
