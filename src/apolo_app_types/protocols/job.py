@@ -1,7 +1,5 @@
 from enum import StrEnum
-from typing import Sequence, Mapping
 
-from apolo_app_types.protocols.common import OptionalStrOrSecret, StrOrSecret
 from pydantic import BaseModel
 
 

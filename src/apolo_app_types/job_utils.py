@@ -1,12 +1,7 @@
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
-from yarl import URL
 
-try:
-    import apolo_sdk
-except ImportError:
-    if not TYPE_CHECKING:
-        raise ImportError("apolo_sdk is required for job utilities")
+import apolo_sdk
+from yarl import URL
 
 from apolo_app_types.protocols.job import JobAppInput
 
