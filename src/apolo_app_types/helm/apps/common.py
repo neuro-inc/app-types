@@ -329,6 +329,3 @@ async def gen_extra_values(
         **ingress_vals,
         **app_specific,
     }
-
-
-# async def gen_
