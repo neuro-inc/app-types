@@ -1,19 +1,19 @@
 from dirty_equals import IsStr
 
-from dirty_equals import IsStr
-
 from apolo_app_types import LLama4Inputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.bundles.llm import Llama4ValueProcessor
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.bundles.llm import Llama4Size
+
 from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
 
-async def test_values_llm_generation_gpu_default_preset(setup_clients, mock_get_preset_gpu):
-    hf_token = "test3"
+async def test_values_llm_generation_gpu_default_preset(
+    setup_clients, mock_get_preset_gpu
+):
     model_to_test = Llama4Size.scout
-    preset_a100 = "gpu-a100"
+    preset_a100 = "a100-large"
     apolo_client = setup_clients
     helm_args, helm_params = await app_type_to_vals(
         input_=LLama4Inputs(
@@ -33,8 +33,14 @@ async def test_values_llm_generation_gpu_default_preset(setup_clients, mock_get_
     ]
     assert helm_params == {
         "serverExtraArgs": [],
-        "model": {"modelHFName": Llama4ValueProcessor.model_map[model_to_test].model_hf_name, "tokenizerHFName": ""},
-        "llm": {"modelHFName": Llama4ValueProcessor.model_map[model_to_test].model_hf_name, "tokenizerHFName": ""},
+        "model": {
+            "modelHFName": Llama4ValueProcessor.model_map[model_to_test].model_hf_name,
+            "tokenizerHFName": "",
+        },
+        "llm": {
+            "modelHFName": Llama4ValueProcessor.model_map[model_to_test].model_hf_name,
+            "tokenizerHFName": "",
+        },
         "env": {"HUGGING_FACE_HUB_TOKEN": "FakeSecret"},
         "envNvidia": {"CUDA_VISIBLE_DEVICES": "0"},
         "preset_name": preset_a100,

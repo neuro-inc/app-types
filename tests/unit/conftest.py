@@ -32,22 +32,43 @@ test_presets = {
     "gpu-large": Preset(
         cpu=4.0,
         memory=16,
-        nvidia_gpu=1,
+        nvidia_gpu=4,
         credits_per_hour=Decimal("0.2"),
         available_resource_pool_names=("gpu_pool",),
     ),
     "gpu-xlarge": Preset(
         cpu=8.0,
         memory=32,
-        nvidia_gpu=2,
+        nvidia_gpu=8,
         credits_per_hour=Decimal("0.4"),
         available_resource_pool_names=("gpu_pool",),
     ),
-    "gpu-a100": Preset(
+    "a100-large": Preset(
         cpu=8.0,
         memory=32,
         nvidia_gpu=1,
         credits_per_hour=Decimal("0.3"),
+        available_resource_pool_names=("gpu_pool",),
+    ),
+    "cpu-small": Preset(
+        cpu=2.0,
+        memory=8,
+        nvidia_gpu=0,
+        credits_per_hour=Decimal("0.05"),
+        available_resource_pool_names=("cpu_pool",),
+    ),
+    "cpu-medium": Preset(
+        cpu=2.0,
+        memory=16,
+        nvidia_gpu=0,
+        credits_per_hour=Decimal("0.08"),
+        available_resource_pool_names=("cpu_pool",),
+    ),
+    "t4-medium": Preset(
+        cpu=2.0,
+        memory=16,
+        nvidia_gpu=1,
+        credits_per_hour=Decimal("0.1"),
         available_resource_pool_names=("gpu_pool",),
     ),
 }

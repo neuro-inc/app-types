@@ -59,8 +59,8 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
         },
         "preset_name": "cpu-large",
         "resources": {
-            "limits": {"cpu": "1000.0m", "memory": "0M"},
-            "requests": {"cpu": "1000.0m", "memory": "0M"},
+            "limits": {"cpu": "4000.0m", "memory": "0M"},
+            "requests": {"cpu": "4000.0m", "memory": "0M"},
         },
         "tolerations": [
             {
@@ -107,8 +107,8 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
         },
         "preset_name": "cpu-large",
         "resources": {
-            "limits": {"cpu": "1000.0m", "memory": "0M"},
-            "requests": {"cpu": "1000.0m", "memory": "0M"},
+            "limits": {"cpu": "4000.0m", "memory": "0M"},
+            "requests": {"cpu": "4000.0m", "memory": "0M"},
         },
         "tolerations": [
             {
@@ -155,8 +155,8 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
         },
         "preset_name": "cpu-large",
         "resources": {
-            "limits": {"cpu": "1000.0m", "memory": "0M"},
-            "requests": {"cpu": "1000.0m", "memory": "0M"},
+            "limits": {"cpu": "4000.0m", "memory": "0M"},
+            "requests": {"cpu": "4000.0m", "memory": "0M"},
         },
         "tolerations": [
             {

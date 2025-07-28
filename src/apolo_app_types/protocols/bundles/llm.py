@@ -1,9 +1,12 @@
 from enum import Enum
 
-from apolo_app_types.protocols.common import SchemaExtraMetadata, Preset
 from pydantic import Field
 
-from apolo_app_types import AppInputs, LLMInputs, HuggingFaceModel, OptionalStrOrSecret
+from apolo_app_types.protocols.common import (
+    AppInputs,
+    OptionalStrOrSecret,
+    SchemaExtraMetadata,
+)
 
 
 class Llama4Size(str, Enum):

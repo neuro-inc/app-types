@@ -1,17 +1,16 @@
 import typing as t
-from apolo_app_types.helm.apps import LLMChartValueProcessor
-from apolo_sdk import Preset as SDKPreset
+from typing import NamedTuple
 
-from apolo_app_types import LLMInputs, HuggingFaceModel
+from apolo_app_types import HuggingFaceModel, LLMInputs
 from apolo_app_types.app_types import AppType
+from apolo_app_types.helm.apps import LLMChartValueProcessor
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
-
 from apolo_app_types.helm.utils.text import fuzzy_contains
 from apolo_app_types.protocols.bundles.llm import LLama4Inputs, Llama4Size
 from apolo_app_types.protocols.common import (
-    IngressHttp, Preset,
+    IngressHttp,
+    Preset,
 )
-from typing import NamedTuple
 
 
 class ModelSettings(NamedTuple):
@@ -21,9 +20,7 @@ class ModelSettings(NamedTuple):
 
 class Llama4ValueProcessor(BaseChartValueProcessor[LLama4Inputs]):
     def __init__(self, *args: t.Any, **kwargs: t.Any):
-        self.llm_val_processor = LLMChartValueProcessor(
-            *args, **kwargs
-        )
+        self.llm_val_processor = LLMChartValueProcessor(*args, **kwargs)
         super().__init__(*args, **kwargs)
 
     async def gen_extra_helm_args(self, *_: t.Any) -> list[str]:
@@ -31,47 +28,43 @@ class Llama4ValueProcessor(BaseChartValueProcessor[LLama4Inputs]):
 
     model_map = {
         Llama4Size.scout: ModelSettings(
-            model_hf_name="meta-llama/Llama-4-17B-16E",
-            gpu_compat=["a100", "h100"]
+            model_hf_name="meta-llama/Llama-4-17B-16E", gpu_compat=["a100", "h100"]
         ),
         Llama4Size.scout_instruct: ModelSettings(
             model_hf_name="meta-llama/Llama-4-17B-16E-Instruct",
-            gpu_compat=["a100", "h100"]
+            gpu_compat=["a100", "h100"],
         ),
         Llama4Size.maverick: ModelSettings(
-            model_hf_name="meta-llama/Llama-4-17B-128E",
-            gpu_compat=["a100", "h100"]
+            model_hf_name="meta-llama/Llama-4-17B-128E", gpu_compat=["a100", "h100"]
         ),
         Llama4Size.maverick_instruct: ModelSettings(
             model_hf_name="meta-llama/Llama-4-17B-128E-Instruct",
-            gpu_compat=["a100", "h100"]
+            gpu_compat=["a100", "h100"],
         ),
         Llama4Size.maverick_fp8: ModelSettings(
             model_hf_name="meta-llama/Llama-4-17B-128E-Instruct-FP8",
-            gpu_compat=["l4", "a100", "h100"]
+            gpu_compat=["l4", "a100", "h100"],
         ),
     }
 
     def _get_preset(self, input_: LLama4Inputs) -> Preset:
-        """ Retrieve the appropriate preset based on the
+        """Retrieve the appropriate preset based on the
         input size and GPU compatibility."""
         available_presets = dict(self.client.config.presets)
         model_settings = self.model_map[input_.size]
         compatible_gpus = model_settings.gpu_compat
 
         for gpu_compat in compatible_gpus:
-            for preset_name, preset in available_presets.items():
+            for preset_name, _ in available_presets.items():
                 if fuzzy_contains(gpu_compat, preset_name, cutoff=0.5):
                     return Preset(name=preset_name)
         # If no preset found, return default
         return Preset(name="default")
 
-
     def _llm_inputs(self, input_: LLama4Inputs) -> LLMInputs:
-
         hf_model = HuggingFaceModel(
             model_hf_name=self.model_map[input_.size].model_hf_name,
-            hf_token=input_.hf_token
+            hf_token=input_.hf_token,
         )
         preset_choosen = self._get_preset(input_)
         return LLMInputs(

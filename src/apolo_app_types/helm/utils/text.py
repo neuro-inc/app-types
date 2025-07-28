@@ -16,5 +16,7 @@ def fuzzy_contains(needle: str, haystack: str, cutoff: float = 0.8) -> bool:
         return True
 
     # Fuzzy check with sliding window
-    matches = difflib.get_close_matches(norm_needle, [norm_haystack], n=1, cutoff=cutoff)
+    matches = difflib.get_close_matches(
+        norm_needle, [norm_haystack], n=1, cutoff=cutoff
+    )
     return bool(matches)
