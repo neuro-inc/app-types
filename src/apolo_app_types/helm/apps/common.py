@@ -103,7 +103,8 @@ def preset_to_affinity(preset: apolo_sdk.Preset) -> dict[str, t.Any]:
 
 async def get_resource_pools(preset: apolo_sdk.Preset) -> list[NodePool]:
     async with apolo_sdk.get() as client:
-        return await client._clusters._client.list_node_pools(client.cluster_name)
+        pool_types = await client._clusters._client.list_node_pools(client.cluster_name)
+        return [p for p in pool_types if p.name in preset.resource_pool_names]
 
 
 def preset_to_tolerations(preset: apolo_sdk.Preset) -> list[dict[str, t.Any]]:
