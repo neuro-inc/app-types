@@ -154,6 +154,11 @@ async def update_app_outputs(  # noqa: C901
                 conv_outputs = await get_openwebui_outputs(
                     helm_outputs, app_instance_id
                 )
+            case AppType.Llama4:
+                # Llama4 is a bundle, so we don't have a specific output processor
+                conv_outputs = await get_llm_inference_outputs(
+                    helm_outputs, app_instance_id
+                )
             case _:
                 # Try loading application postprocessor defined in the app repo
                 postprocessor = load_app_postprocessor(

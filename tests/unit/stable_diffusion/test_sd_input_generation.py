@@ -37,7 +37,7 @@ async def test_values_sd_generation(setup_clients, mock_get_preset_cpu):
     )
 
     assert helm_params["preset_name"] == "cpu-large"
-    assert helm_params["api"]["resources"]["requests"]["cpu"] == "1000.0m"
+    assert helm_params["api"]["resources"]["requests"]["cpu"] == "4000.0m"
     tolerations = helm_params["api"]["tolerations"]
     assert len(tolerations) == 3
     assert {
