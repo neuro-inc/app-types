@@ -119,6 +119,20 @@ from apolo_app_types.protocols.vscode import (
     VSCodeOutputs,
 )
 from apolo_app_types.protocols.weaviate import WeaviateInputs, WeaviateOutputs
+from apolo_app_types.protocols.job import (
+    JobAppInput,
+    JobAppOutput,
+    JobPriority,
+    JobRestartPolicy,
+    ContainerTPUResource,
+    ContainerResources,
+    StorageVolume,
+    SecretVolume,
+    DiskVolume,
+    ContainerHTTPServer,
+    Container,
+)
+from apolo_app_types.job_utils import JobRunParams, prepare_job_run_params
 
 
 __all__ = [
@@ -217,4 +231,17 @@ __all__ = [
     "LightRAGAppOutputs",
     "OpenWebUIAppInputs",
     "OpenWebUIAppOutputs",
+    "JobAppInput",
+    "JobAppOutput",
+    "JobPriority",
+    "JobRestartPolicy",
+    "ContainerTPUResource",
+    "ContainerResources",
+    "StorageVolume",
+    "SecretVolume",
+    "DiskVolume",
+    "ContainerHTTPServer",
+    "Container",
+    "JobRunParams",
+    "prepare_job_run_params",
 ]
