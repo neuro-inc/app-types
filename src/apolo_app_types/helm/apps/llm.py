@@ -42,8 +42,6 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
                 "HIP_VISIBLE_DEVICES": device_ids,
                 "ROCR_VISIBLE_DEVICES": device_ids,
             }
-        elif gpu_provider == "nvidia":
-            gpu_env["envNvidia"] = {"CUDA_VISIBLE_DEVICES": device_ids}
 
         return gpu_env
 
