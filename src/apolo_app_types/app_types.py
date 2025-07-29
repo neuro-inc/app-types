@@ -40,6 +40,9 @@ class AppType(enum.StrEnum):
     Superset = "superset"
     OpenWebUI = "openwebui"
 
+    # bundles
+    Llama4 = "llama4"
+
     def __repr__(self) -> str:
         return str(self)
 
