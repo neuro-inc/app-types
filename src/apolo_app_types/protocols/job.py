@@ -77,9 +77,6 @@ class JobAppInput(BaseModel):
     description: str | None = None
     tags: list[str] | None = None
     preset_name: str | None = None
-    cluster_name: str | None = None
-    org_name: str | None = None
-    project_name: str | None = None
     priority: JobPriority = JobPriority.NORMAL
     scheduler_enabled: bool = False
     preemptible_node: bool = False
@@ -92,7 +89,6 @@ class JobAppInput(BaseModel):
     privileged: bool = False
     container: Container | None = None
     image: str | None = None
-    resources: ContainerResources | None = None
     entrypoint: str | None = None
     command: str | None = None
     env: dict[str, str] | None = None

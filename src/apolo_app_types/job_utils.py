@@ -39,7 +39,7 @@ def prepare_job_run_params(
         msg = "Container image is required"
         raise ValueError(msg)
 
-    resources = job_input.resources
+    resources = None
     if job_input.container:
         resources = job_input.container.resources
 
@@ -75,8 +75,7 @@ def prepare_job_run_params(
                 or {}
             ).items()
         },
-        tty=job_input.tty
-        or (job_input.container.tty if job_input.container else False),
+        tty=(job_input.container.tty if job_input.container else False),
     )
 
     job_name = job_input.name or f"{app_instance_name}-{app_instance_id[:8]}"
