@@ -37,6 +37,18 @@ def prepare_job_run_params(
 
     resources = job_input.container.resources
 
+    # Convert StorageMounts to apolo_sdk.Volume objects
+    volumes = []
+    if job_input.container.storage_mounts:
+        for mount in job_input.container.storage_mounts.mounts:
+            read_only = mount.mode.mode.value == "r"
+            volume = apolo_sdk.Volume(
+                storage_uri=URL(mount.storage_uri.path),
+                container_path=mount.mount_path.path,
+                read_only=read_only,
+            )
+            volumes.append(volume)
+
     container = apolo_sdk.Container(
         image=apolo_sdk.RemoteImage.new_external_image(name=job_input.container.image),
         resources=apolo_sdk.Resources(
@@ -55,6 +67,7 @@ def prepare_job_run_params(
         secret_env={
             k: URL(v) for k, v in (job_input.container.secret_env or {}).items()
         },
+        volumes=volumes,
         tty=job_input.container.tty,
     )
 

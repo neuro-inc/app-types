@@ -2,6 +2,8 @@ from enum import StrEnum
 
 from pydantic import BaseModel
 
+from apolo_app_types.protocols.common.storage import StorageMounts
+
 
 class JobPriority(StrEnum):
     LOW = "low"
@@ -34,12 +36,6 @@ class ContainerResources(BaseModel):
     tpu: ContainerTPUResource | None = None
 
 
-class StorageVolume(BaseModel):
-    src_storage_uri: str
-    dst_path: str
-    read_only: bool = False
-
-
 class SecretVolume(BaseModel):
     src_secret_uri: str
     dst_path: str
@@ -64,7 +60,7 @@ class Container(BaseModel):
     command: str | None = None
     env: dict[str, str] | None = None
     secret_env: dict[str, str] | None = None
-    volumes: list[StorageVolume] | None = None
+    storage_mounts: StorageMounts | None = None
     secret_volumes: list[SecretVolume] | None = None
     disk_volumes: list[DiskVolume] | None = None
     http: ContainerHTTPServer | None = None

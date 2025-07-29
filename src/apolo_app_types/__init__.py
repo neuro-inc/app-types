@@ -56,7 +56,6 @@ from apolo_app_types.protocols.job import (
     JobPriority,
     JobRestartPolicy,
     SecretVolume,
-    StorageVolume,
 )
 from apolo_app_types.protocols.jupyter import (
     JupyterAppInputs,
@@ -237,7 +236,6 @@ __all__ = [
     "JobRestartPolicy",
     "ContainerTPUResource",
     "ContainerResources",
-    "StorageVolume",
     "SecretVolume",
     "DiskVolume",
     "ContainerHTTPServer",
