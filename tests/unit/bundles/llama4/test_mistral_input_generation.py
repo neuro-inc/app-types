@@ -1,34 +1,29 @@
+from apolo_app_types.helm.apps.common import APOLO_STORAGE_LABEL, APOLO_ORG_LABEL, APOLO_PROJECT_LABEL
 from dirty_equals import IsStr
 
-from apolo_app_types import LLama4Inputs
 from apolo_app_types.app_types import AppType
-from apolo_app_types.helm.apps.bundles.llm import Llama4ValueProcessor
-from apolo_app_types.helm.apps.common import (
-    APOLO_ORG_LABEL,
-    APOLO_PROJECT_LABEL,
-    APOLO_STORAGE_LABEL,
-)
+from apolo_app_types.helm.apps.bundles.llm import MistralValueProcessor
 from apolo_app_types.inputs.args import app_type_to_vals
-from apolo_app_types.protocols.bundles.llm import Llama4Size
+from apolo_app_types.protocols.bundles.llm import MistralInputs, MistralSize
 from apolo_app_types.protocols.common import ApoloSecret
 
 from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
 
-async def test_values_llm_generation_gpu_default_preset(
+async def test_values_mistral_generation_gpu_default_preset(
     setup_clients, mock_get_preset_gpu
 ):
-    model_to_test = Llama4Size.scout
+    model_to_test = MistralSize.mistral_7b
     preset_a100 = "a100-large"
     apolo_client = setup_clients
     helm_args, helm_params = await app_type_to_vals(
-        input_=LLama4Inputs(
+        input_=MistralInputs(
             size=model_to_test,
             hf_token=ApoloSecret(key="FakeSecret"),
         ),
         apolo_client=apolo_client,
-        app_type=AppType.Llama4,
-        app_name="llm4",
+        app_type=AppType.Mistral,
+        app_name="mistral",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
         app_id=APP_ID,
@@ -40,14 +35,14 @@ async def test_values_llm_generation_gpu_default_preset(
     assert helm_params == {
         "serverExtraArgs": [],
         "model": {
-            "modelHFName": Llama4ValueProcessor.model_map[model_to_test].model_hf_name,
-            "tokenizerHFName": Llama4ValueProcessor.model_map[
+            "modelHFName": MistralValueProcessor.model_map[model_to_test].model_hf_name,
+            "tokenizerHFName": MistralValueProcessor.model_map[
                 model_to_test
             ].model_hf_name,
         },
         "llm": {
-            "modelHFName": Llama4ValueProcessor.model_map[model_to_test].model_hf_name,
-            "tokenizerHFName": Llama4ValueProcessor.model_map[
+            "modelHFName": MistralValueProcessor.model_map[model_to_test].model_hf_name,
+            "tokenizerHFName": MistralValueProcessor.model_map[
                 model_to_test
             ].model_hf_name,
         },
@@ -119,7 +114,7 @@ async def test_values_llm_generation_gpu_default_preset(
             },
         },
         "podAnnotations": {
-            APOLO_STORAGE_LABEL: '[{"storage_uri": "storage://cluster/test-org/test-project/llama4", "mount_path": "/root/.cache/huggingface", "mount_mode": "rw"}]'  # noqa: E501
+            APOLO_STORAGE_LABEL: '[{"storage_uri": "storage://cluster/test-org/test-project/mistral", "mount_path": "/root/.cache/huggingface", "mount_mode": "rw"}]'  # noqa: E501
         },
         "podExtraLabels": {
             APOLO_STORAGE_LABEL: "true",

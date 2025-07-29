@@ -1,16 +1,28 @@
 import typing as t
 from typing import NamedTuple
 
-from apolo_app_types import HuggingFaceModel, LLMInputs
+import apolo_sdk
+
+from apolo_app_types import AppInputs, HuggingFaceModel, LLMInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps import LLMChartValueProcessor
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.utils.text import fuzzy_contains
-from apolo_app_types.protocols.bundles.llm import LLama4Inputs, Llama4Size
+from apolo_app_types.protocols.bundles.llm import (
+    DeepSeekR1Inputs,
+    DeepSeekR1Size,
+    LLama4Inputs,
+    Llama4Size,
+    MistralInputs,
+    MistralSize,
+)
 from apolo_app_types.protocols.common import (
+    ApoloFilesPath,
+    HuggingFaceCache,
     IngressHttp,
     Preset,
 )
+from apolo_app_types.protocols.common.autoscaling import AutoscalingKedaHTTP
 
 
 class ModelSettings(NamedTuple):
@@ -18,7 +30,54 @@ class ModelSettings(NamedTuple):
     gpu_compat: list[str]
 
 
-class Llama4ValueProcessor(BaseChartValueProcessor[LLama4Inputs]):
+T = t.TypeVar("T", bound=AppInputs)
+
+
+class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
+    """
+    Base class for LLM bundle value processors.
+    This class provides common functionality for processing LLM inputs
+    and generating extra values for LLM applications.
+    """
+
+    cache_prefix = None
+
+    def __init__(self, client: "apolo_sdk.Client"):
+        super().__init__(client)
+
+    def _get_storage_path(self) -> str:
+        """
+        Returns the storage path for the LLM inputs.
+        :param input_:
+        :return:
+        """
+        cluster_name = self.client.config.cluster_name
+        project_name = self.client.config.project_name
+        org_name = self.client.config.org_name
+        return f"storage://{cluster_name}/{org_name}/{project_name}/{self.cache_prefix}"
+
+    async def gen_extra_values(
+        self,
+        input_: T,
+        app_name: str,
+        namespace: str,
+        app_id: str,
+        app_secrets_name: str,
+        *args: t.Any,
+        **kwargs: t.Any,
+    ) -> dict[str, t.Any]:
+        """
+        Base implementation of gen_extra_values.
+        This method should be overridden by subclasses to provide
+        specific implementation for generating extra values.
+        """
+        msg = "Subclasses must implement gen_extra_values"
+        raise NotImplementedError(msg)
+
+
+class Llama4ValueProcessor(BaseLLMBundleMixin[LLama4Inputs]):
+    cache_prefix = "llama4"
+
     def __init__(self, *args: t.Any, **kwargs: t.Any):
         self.llm_val_processor = LLMChartValueProcessor(*args, **kwargs)
         super().__init__(*args, **kwargs)
@@ -61,17 +120,24 @@ class Llama4ValueProcessor(BaseChartValueProcessor[LLama4Inputs]):
         # If no preset found, return default
         return Preset(name="default")
 
-    def _llm_inputs(self, input_: LLama4Inputs) -> LLMInputs:
+    async def _llm_inputs(self, input_: LLama4Inputs) -> LLMInputs:
         hf_model = HuggingFaceModel(
             model_hf_name=self.model_map[input_.size].model_hf_name,
             hf_token=input_.hf_token,
         )
         preset_chosen = self._get_preset(input_)
+
         return LLMInputs(
             hugging_face_model=hf_model,
             tokenizer_hf_name=hf_model.model_hf_name,
             ingress_http=IngressHttp(),
             preset=preset_chosen,
+            cache_config=HuggingFaceCache(
+                files_path=ApoloFilesPath(path=self._get_storage_path())
+            ),
+            http_autoscaling=AutoscalingKedaHTTP(scaledown_period=300)
+            if input_.preset.autoscaling
+            else None,
         )
 
     async def gen_extra_values(
@@ -105,10 +171,222 @@ class Llama4ValueProcessor(BaseChartValueProcessor[LLama4Inputs]):
         """
 
         return await self.llm_val_processor.gen_extra_values(
-            input_=self._llm_inputs(input_),
+            input_=await self._llm_inputs(input_),
             app_name=app_name,
             namespace=namespace,
             app_secrets_name=app_secrets_name,
             app_id=app_id,
             app_type=AppType.Llama4,
+        )
+
+
+class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
+    cache_prefix = "deepseek"
+
+    def __init__(self, *args: t.Any, **kwargs: t.Any):
+        self.llm_val_processor = LLMChartValueProcessor(*args, **kwargs)
+        super().__init__(*args, **kwargs)
+
+    async def gen_extra_helm_args(self, *_: t.Any) -> list[str]:
+        return ["--timeout", "30m"]
+
+    model_map = {
+        DeepSeekR1Size.r1_7b: ModelSettings(
+            model_hf_name="deepseek-ai/deepseek-coder-7b-base",
+            gpu_compat=["l4", "a100", "h100"],
+        ),
+        DeepSeekR1Size.r1_70b: ModelSettings(
+            model_hf_name="deepseek-ai/deepseek-coder-70b-base",
+            gpu_compat=["a100", "h100"],
+        ),
+        DeepSeekR1Size.r1_70b_instruct: ModelSettings(
+            model_hf_name="deepseek-ai/deepseek-coder-70b-instruct",
+            gpu_compat=["a100", "h100"],
+        ),
+        DeepSeekR1Size.r1_70b_fp8: ModelSettings(
+            model_hf_name="deepseek-ai/deepseek-coder-70b-instruct-fp8",
+            gpu_compat=["l4", "a100", "h100"],
+        ),
+    }
+
+    def _get_preset(self, input_: DeepSeekR1Inputs) -> Preset:
+        """Retrieve the appropriate preset based on the
+        input size and GPU compatibility."""
+        available_presets = dict(self.client.config.presets)
+        model_settings = self.model_map[input_.size]
+        compatible_gpus = model_settings.gpu_compat
+
+        for gpu_compat in compatible_gpus:
+            for preset_name, _ in available_presets.items():
+                if fuzzy_contains(gpu_compat, preset_name, cutoff=0.5):
+                    return Preset(name=preset_name)
+        # If no preset found, return default
+        return Preset(name="default")
+
+    async def _llm_inputs(self, input_: DeepSeekR1Inputs) -> LLMInputs:
+        hf_model = HuggingFaceModel(
+            model_hf_name=self.model_map[input_.size].model_hf_name,
+            hf_token=input_.hf_token,
+        )
+        preset_chosen = self._get_preset(input_)
+
+        return LLMInputs(
+            hugging_face_model=hf_model,
+            tokenizer_hf_name=hf_model.model_hf_name,
+            ingress_http=IngressHttp(),
+            preset=preset_chosen,
+            cache_config=HuggingFaceCache(
+                files_path=ApoloFilesPath(path=self._get_storage_path())
+            ),
+            http_autoscaling=AutoscalingKedaHTTP(scaledown_period=300)
+            if input_.preset.autoscaling
+            else None,
+        )
+
+    async def gen_extra_values(
+        self,
+        input_: DeepSeekR1Inputs,
+        app_name: str,
+        namespace: str,
+        app_id: str,
+        app_secrets_name: str,
+        *_: t.Any,
+        **kwargs: t.Any,
+    ) -> dict[str, t.Any]:
+        """
+        Generates additional key-value pairs for use in application-specific processing
+        based on the provided input and other parameters.
+
+        :param input_: An instance of DeepSeekR1Inputs containing the
+        input data required
+                       for processing.
+        :param app_name: The name of the application for which the extra values
+                         are being generated.
+        :param namespace: The namespace associated with the application.
+        :param app_id: The identifier of the application.
+        :param app_secrets_name: The name of the application's secret store or
+                                 credentials configuration.
+        :param _: Additional positional arguments.
+        :param kwargs: Additional keyword arguments for further customization or
+                       processing.
+        :return: A dictionary containing the generated key-value pairs as extra
+                 values for the specified application.
+        """
+
+        return await self.llm_val_processor.gen_extra_values(
+            input_=await self._llm_inputs(input_),
+            app_name=app_name,
+            namespace=namespace,
+            app_secrets_name=app_secrets_name,
+            app_id=app_id,
+            app_type=AppType.DeepSeek,
+        )
+
+
+class MistralValueProcessor(BaseLLMBundleMixin[MistralInputs]):
+    cache_prefix = "mistral"
+
+    def __init__(self, *args: t.Any, **kwargs: t.Any):
+        self.llm_val_processor = LLMChartValueProcessor(*args, **kwargs)
+        super().__init__(*args, **kwargs)
+
+    async def gen_extra_helm_args(self, *_: t.Any) -> list[str]:
+        return ["--timeout", "30m"]
+
+    model_map = {
+        MistralSize.mistral_7b: ModelSettings(
+            model_hf_name="mistralai/Mistral-7B-v0.1", gpu_compat=["l4", "a100", "h100"]
+        ),
+        MistralSize.mistral_7b_instruct: ModelSettings(
+            model_hf_name="mistralai/Mistral-7B-Instruct-v0.1",
+            gpu_compat=["l4", "a100", "h100"],
+        ),
+        MistralSize.mistral_7b_fp8: ModelSettings(
+            model_hf_name="mistralai/Mistral-7B-Instruct-v0.1-fp8",
+            gpu_compat=["l4", "a100", "h100"],
+        ),
+        MistralSize.mistral_15b: ModelSettings(
+            model_hf_name="mistralai/Mistral-15B-v0.1",
+            gpu_compat=["a100", "h100"],
+        ),
+        MistralSize.mistral_15b_instruct: ModelSettings(
+            model_hf_name="mistralai/Mistral-15B-Instruct-v0.1",
+            gpu_compat=["a100", "h100"],
+        ),
+        MistralSize.mistral_15b_fp8: ModelSettings(
+            model_hf_name="mistralai/Mistral-15B-Instruct-v0.1-fp8",
+            gpu_compat=["l4", "a100", "h100"],
+        ),
+    }
+
+    def _get_preset(self, input_: MistralInputs) -> Preset:
+        """Retrieve the appropriate preset based on the
+        input size and GPU compatibility."""
+        available_presets = dict(self.client.config.presets)
+        model_settings = self.model_map[input_.size]
+        compatible_gpus = model_settings.gpu_compat
+
+        for gpu_compat in compatible_gpus:
+            for preset_name, _ in available_presets.items():
+                if fuzzy_contains(gpu_compat, preset_name, cutoff=0.5):
+                    return Preset(name=preset_name)
+        # If no preset found, return default
+        return Preset(name="default")
+
+    async def _llm_inputs(self, input_: MistralInputs) -> LLMInputs:
+        hf_model = HuggingFaceModel(
+            model_hf_name=self.model_map[input_.size].model_hf_name,
+            hf_token=input_.hf_token,
+        )
+        preset_chosen = self._get_preset(input_)
+
+        return LLMInputs(
+            hugging_face_model=hf_model,
+            tokenizer_hf_name=hf_model.model_hf_name,
+            ingress_http=IngressHttp(),
+            preset=preset_chosen,
+            cache_config=HuggingFaceCache(
+                files_path=ApoloFilesPath(path=self._get_storage_path())
+            ),
+            http_autoscaling=AutoscalingKedaHTTP(scaledown_period=300)
+            if input_.preset.autoscaling
+            else None,
+        )
+
+    async def gen_extra_values(
+        self,
+        input_: MistralInputs,
+        app_name: str,
+        namespace: str,
+        app_id: str,
+        app_secrets_name: str,
+        *_: t.Any,
+        **kwargs: t.Any,
+    ) -> dict[str, t.Any]:
+        """
+        Generates additional key-value pairs for use in application-specific processing
+        based on the provided input and other parameters.
+
+        :param input_: An instance of MistralInputs containing the input data required
+                       for processing.
+        :param app_name: The name of the application for which the extra values
+                         are being generated.
+        :param namespace: The namespace associated with the application.
+        :param app_id: The identifier of the application.
+        :param app_secrets_name: The name of the application's secret store or
+                                 credentials configuration.
+        :param _: Additional positional arguments.
+        :param kwargs: Additional keyword arguments for further customization or
+                       processing.
+        :return: A dictionary containing the generated key-value pairs as extra
+                 values for the specified application.
+        """
+
+        return await self.llm_val_processor.gen_extra_values(
+            input_=await self._llm_inputs(input_),
+            app_name=app_name,
+            namespace=namespace,
+            app_secrets_name=app_secrets_name,
+            app_id=app_id,
+            app_type=AppType.Mistral,
         )

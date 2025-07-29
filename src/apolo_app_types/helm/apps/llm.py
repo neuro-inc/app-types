@@ -6,6 +6,7 @@ from apolo_app_types import LLMInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
+    KEDA_HTTP_PROXY_SERVICE,
     append_apolo_storage_integration_annotations,
     gen_apolo_storage_integration_labels,
     gen_extra_values,
@@ -19,11 +20,6 @@ from apolo_app_types.protocols.common import (
 )
 from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
 from apolo_app_types.protocols.common.storage import ApoloMountModes
-
-
-KEDA_HTTP_PROXY_SERVICE = (
-    "keda-add-ons-http-interceptor-proxy.platform.svc.cluster.local"
-)
 
 
 class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
