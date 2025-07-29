@@ -41,7 +41,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-apolo-sdk = "^25.7.0"
+apolo-sdk = "^25.7.2"
 click = "^8.0.3"
 httpx = "^0.28.0"
 kubernetes = "^33.1.0"
@@ -60,9 +60,9 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^4.2.0"
 pytest = "^8.4.1"
-pytest-asyncio = "^1.0.0"
+pytest-asyncio = "^1.1.0"
 pytest-cov = "^6.2.1"
-mypy = "^1.16.1"
+mypy = "^1.17.0"
 dirty-equals = "^0.9.0"
 
 [tool.ruff]

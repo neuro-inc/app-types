@@ -1,4 +1,5 @@
 import logging
+import os
 import typing
 from pathlib import Path
 
@@ -9,12 +10,15 @@ from kubernetes.client.rest import ApiException  # type: ignore
 logger = logging.getLogger(__name__)
 
 SERVICE_ACC_NAMESPACE_FILE = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
+NAMESPACE_ENV_VAR = "APOLO_APP_NAMESPACE"
 
 
 def get_current_namespace() -> str:
     """
     Retrieve the current namespace from the Kubernetes service account namespace file.
     """
+    if NAMESPACE_ENV_VAR in os.environ:
+        return os.environ[NAMESPACE_ENV_VAR]
     try:
         with Path.open(Path(SERVICE_ACC_NAMESPACE_FILE)) as f:
             return f.read().strip()

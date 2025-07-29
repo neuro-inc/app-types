@@ -18,13 +18,13 @@ from apolo_app_types.protocols.postgres import CrunchyPostgresUserCredentials
 
 
 class DifyApi(AbstractAppFieldType):
-    replicas: int | None
+    replicas: int = Field(default=1, gt=0)
     preset_name: str
     title: str
 
 
 class DifyWorker(AbstractAppFieldType):
-    replicas: int | None
+    replicas: int = Field(default=1, gt=0)
     preset_name: str
 
 
@@ -33,7 +33,7 @@ class DifyProxy(AbstractAppFieldType):
 
 
 class DifyWeb(AbstractAppFieldType):
-    replicas: int | None
+    replicas: int | None = Field(default=None, gt=0)
     preset_name: str
 
 
@@ -64,6 +64,7 @@ class DifyAppApi(BaseModel):
     )
     replicas: int = Field(
         default=1,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Replicas Count",
             description="Configure Replicas count.",
@@ -82,6 +83,7 @@ class DifyAppWorker(BaseModel):
     )
     replicas: int = Field(
         default=1,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Replicas Count",
             description="Configure Replicas count.",
@@ -111,6 +113,7 @@ class DifyAppWeb(BaseModel):
     )
     replicas: int = Field(
         default=1,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Replicas Count",
             description="Configure Replicas count.",

@@ -27,3 +27,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.labels['app.kubernetes.io/instance']
+        {{- if .Values.postProcessorEnvs }}
+        {{- toYaml .Values.postProcessorEnvs | nindent 8 }}
+        {{- end }}

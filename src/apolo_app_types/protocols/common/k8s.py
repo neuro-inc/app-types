@@ -125,6 +125,7 @@ class Port(AbstractAppFieldType):
 
     port: int = Field(
         default=80,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="HTTP Port",
             description=(

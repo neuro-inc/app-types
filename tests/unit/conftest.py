@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 
 import apolo_sdk
 import pytest
-from apolo_sdk import AppsConfig
+from apolo_sdk import AppsConfig, Preset
 from yarl import URL
 
 from tests.unit.constants import (
@@ -19,6 +19,59 @@ from tests.unit.constants import (
 def encode_b64(value: str) -> str:
     """Helper function to encode a string in Base64."""
     return base64.b64encode(value.encode()).decode()
+
+
+test_presets = {
+    "cpu-large": Preset(
+        cpu=4.0,
+        memory=16,
+        nvidia_gpu=0,
+        credits_per_hour=Decimal("0.1"),
+        available_resource_pool_names=("cpu_pool",),
+    ),
+    "gpu-large": Preset(
+        cpu=4.0,
+        memory=16,
+        nvidia_gpu=4,
+        credits_per_hour=Decimal("0.2"),
+        available_resource_pool_names=("gpu_pool",),
+    ),
+    "gpu-xlarge": Preset(
+        cpu=8.0,
+        memory=32,
+        nvidia_gpu=8,
+        credits_per_hour=Decimal("0.4"),
+        available_resource_pool_names=("gpu_pool",),
+    ),
+    "a100-large": Preset(
+        cpu=8.0,
+        memory=32,
+        nvidia_gpu=1,
+        credits_per_hour=Decimal("0.3"),
+        available_resource_pool_names=("gpu_pool",),
+    ),
+    "cpu-small": Preset(
+        cpu=2.0,
+        memory=8,
+        nvidia_gpu=0,
+        credits_per_hour=Decimal("0.05"),
+        available_resource_pool_names=("cpu_pool",),
+    ),
+    "cpu-medium": Preset(
+        cpu=2.0,
+        memory=16,
+        nvidia_gpu=0,
+        credits_per_hour=Decimal("0.08"),
+        available_resource_pool_names=("cpu_pool",),
+    ),
+    "t4-medium": Preset(
+        cpu=2.0,
+        memory=16,
+        nvidia_gpu=1,
+        credits_per_hour=Decimal("0.1"),
+        available_resource_pool_names=("gpu_pool",),
+    ),
+}
 
 
 @pytest.fixture
@@ -39,6 +92,8 @@ async def setup_clients():
             mock_apolo_client.config.cluster_name = DEFAULT_CLUSTER_NAME
             mock_apolo_client.config.org_name = DEFAULT_ORG_NAME
             mock_apolo_client.config.project_name = DEFAULT_PROJECT_NAME
+
+            mock_apolo_client.config.presets = test_presets
 
             mock_apolo_client.config.get_cluster = MagicMock(return_value=mock_cluster)
             mock_apolo_client.parse.remote_image = MagicMock(
@@ -115,16 +170,10 @@ def mock_get_preset_cpu():
         patch("apolo_app_types.helm.apps.stable_diffusion.get_preset") as mock_sd,
         patch("apolo_app_types.helm.apps.text_embeddings.get_preset") as mock_tei,
     ):
-        from apolo_sdk import Preset
 
         def return_preset(_, preset_name):
-            if preset_name == "cpu-large":
-                return Preset(
-                    credits_per_hour=Decimal("1.0"),
-                    cpu=1.0,
-                    memory=100,
-                    available_resource_pool_names=("cpu_pool",),
-                )
+            if preset_name in test_presets:
+                return test_presets[preset_name]
 
             return Preset(
                 credits_per_hour=Decimal("1.0"),
@@ -152,23 +201,9 @@ def mock_get_preset_gpu():
         from apolo_sdk import Preset
 
         def return_preset(_, preset_name):
-            if preset_name == "gpu-large":
-                return Preset(
-                    credits_per_hour=Decimal("1.0"),
-                    cpu=1.0,
-                    memory=100,
-                    nvidia_gpu=4,
-                    available_resource_pool_names=("gpu_pool",),
-                )
-            if preset_name == "gpu-xlarge":
-                return Preset(
-                    credits_per_hour=Decimal("1.0"),
-                    cpu=1.0,
-                    memory=100,
-                    nvidia_gpu=8,
-                    available_resource_pool_names=("gpu_pool",),
-                )
-            # Fallback (e.g., "gpu-large" = 1 GPU)
+            if preset_name in test_presets:
+                return test_presets[preset_name]
+
             return Preset(
                 credits_per_hour=Decimal("1.0"),
                 cpu=1.0,
@@ -252,6 +287,21 @@ def mock_kubernetes_client():
                         }
                     ]
                 }
+            if (
+                label_selector
+                == "app.kubernetes.io/name=lightrag,app.kubernetes.io/instance=test-app-instance-id"  # noqa: E501
+            ):
+                return {
+                    "items": [
+                        {
+                            "metadata": {
+                                "name": "lightrag",
+                                "namespace": namespace,
+                            },
+                            "spec": {"ports": [{"port": 9621}]},
+                        }
+                    ]
+                }
             return {
                 "items": [
                     {
@@ -271,12 +321,7 @@ def mock_kubernetes_client():
         mock_networking_instance.list_namespaced_ingress.side_effect = (
             list_namespace_ingress
         )
-
-        mock_secret = MagicMock()
-        mock_secret.metadata.name = "llm-inference"
-        mock_secret.metadata.namespace = "default"
-        mock_secret.data = {
-            "user": encode_b64("admin"),
+        user_params = {
             "password": encode_b64("supersecret"),
             "host": encode_b64("db.example.com"),
             "port": encode_b64("5432"),
@@ -292,9 +337,26 @@ def mock_kubernetes_client():
             ),
             "uri": encode_b64("postgres://db.example.com:5432/mydatabase"),
         }
+        mock_secret = MagicMock()
+        mock_secret.metadata.name = "llm-inference"
+        mock_secret.metadata.namespace = "default"
+        mock_secret.data = {
+            "user": encode_b64("admin"),
+            **user_params,
+        }
+        mock_postgres_secret = MagicMock()
+        mock_postgres_secret.metadata.name = "llm-inference"
+        mock_postgres_secret.metadata.namespace = "default"
+        mock_postgres_secret.data = {
+            "user": encode_b64("postgres"),
+            **user_params,
+        }
 
         # Set .items to a list containing the mocked secret
-        mock_v1_instance.list_namespaced_secret.return_value.items = [mock_secret]
+        mock_v1_instance.list_namespaced_secret.return_value.items = [
+            mock_secret,
+            mock_postgres_secret,
+        ]
 
         def mock_list_namespaced_custom_object(
             group, version, namespace, plural, **kwargs
@@ -312,7 +374,11 @@ def mock_kubernetes_client():
                                     {
                                         "name": "admin",
                                         "databases": ["mydatabase", "otherdatabase"],
-                                    }
+                                    },
+                                    {
+                                        "name": "postgres",
+                                        "databases": ["postgres"],
+                                    },
                                 ]
                             }
                         }

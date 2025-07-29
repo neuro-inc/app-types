@@ -37,13 +37,15 @@ def cli() -> None:
 @click.option(
     "--app-output-processor-type", type=str, envvar="APOLO_APP_OUTPUT_PROCESSOR_TYPE"
 )
-@click.option("--apolo-apps-url", type=str, envvar="APOLO_APPS_URL")
+@click.option(
+    "--apolo-app-outputs-endpoint", type=str, envvar="APOLO_APP_OUTPUTS_ENDPOINT"
+)
 @click.option("--apolo-apps-token", type=str, envvar="APOLO_APPS_TOKEN")
 @click.option("--apolo-app-type", type=str, envvar="APOLO_APP_TYPE")
 def update_outputs(
     helm_outputs_json: str,
     app_output_processor_type: str | None,
-    apolo_apps_url: str | None,
+    apolo_app_outputs_endpoint: str | None,
     apolo_apps_token: str | None,
     apolo_app_type: str | None,
 ) -> None:
@@ -58,7 +60,7 @@ def update_outputs(
             update_app_outputs(
                 helm_outputs_dict,
                 app_output_processor_type=app_output_processor_type,
-                apolo_apps_url=apolo_apps_url,
+                apolo_app_outputs_endpoint=apolo_app_outputs_endpoint,
                 apolo_apps_token=apolo_apps_token,
                 apolo_app_type=apolo_app_type,
             )
@@ -112,7 +114,7 @@ def run_preprocessor(
             inputs_dict = json.loads(inputs_json)
             inputs_class = load_app_inputs(app_id, inputs_type)
             if not inputs_class:
-                err_msg = f"Unable to find inputs type for {app_id=}"
+                err_msg = f"Unable to find inputs type for {app_id=}, {inputs_type=}"
                 raise ValueError(err_msg)
 
             loaded_inputs = inputs_class.model_validate(inputs_dict)
@@ -120,7 +122,7 @@ def run_preprocessor(
 
             preprocessor_class = load_app_preprocessor(app_id, preprocessor_type)
             if not preprocessor_class:
-                err_msg = f"Unable to find preprocessor type for {app_id=}"
+                err_msg = f"Unable to find preprocessor {app_id=}, {preprocessor_type=}"
                 raise ValueError(err_msg)
 
             await apolo_sdk.login_with_token(

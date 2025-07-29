@@ -8,6 +8,7 @@ from apolo_app_types import (
 )
 from apolo_app_types.clients.kube import get_crd_objects, get_secret
 from apolo_app_types.protocols.postgres import (
+    PostgresAdminUser,
     PostgresOutputs,
     PostgresURI,
     PostgresUsers,
@@ -17,6 +18,7 @@ from apolo_app_types.protocols.postgres import (
 logger = logging.getLogger()
 
 MAX_SLEEP_SEC = 10
+POSTGRES_ADMIN_USERNAME = "postgres"
 
 
 def get_postgres_cluster_users() -> dict[str, t.Any]:
@@ -25,7 +27,7 @@ def get_postgres_cluster_users() -> dict[str, t.Any]:
         api_version="v1beta1",
         crd_plural_name="postgresclusters",
     )
-    assert len(pg_clusters["items"]) == 1
+    assert len(pg_clusters["items"]) == 1, "Expected exactly one Postgres cluster"
     pg_cluster = pg_clusters["items"][0]
     users = pg_cluster["spec"].get("users", [])
     return {user["name"]: user for user in users}
@@ -79,6 +81,7 @@ async def get_postgres_outputs(
             label="postgres-operator.crunchydata.com/role=pguser"
         )
         if secrets:
+            logger.info("Secrets found")  # noqa: T201
             break
         logger.info(  # noqa: T201
             "Failed to get postgres outputs, retrying in %s seconds", trial
@@ -90,9 +93,13 @@ async def get_postgres_outputs(
 
     requested_users = get_postgres_cluster_users()
     users = []
+    admin_user = None
 
     for item in secrets.items:
         user = postgres_creds_from_kube_secret_data(item.data)
+        if user.user == POSTGRES_ADMIN_USERNAME:
+            admin_user = user
+            continue
         users.append(user)
         # currently, postgres operator does not create all combinations of
         # user <> database accesses, we need to expand this
@@ -101,7 +108,15 @@ async def get_postgres_outputs(
             if user.dbname == db:
                 continue
             users.append(user.with_database(db))
-
+    if admin_user:
+        admin = PostgresAdminUser(
+            **{**admin_user.model_dump(exclude={"dbname"}), "user_type": "admin"}
+        )
+    else:
+        admin = None
     return PostgresOutputs(
-        postgres_users=PostgresUsers(users=users),
+        postgres_users=PostgresUsers(
+            users=users,
+            postgres_admin_user=admin,
+        ),
     ).model_dump()

@@ -8,7 +8,7 @@ from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
 )
-from apolo_app_types.protocols.openwebui import OpenWebUIAppInputs
+from apolo_app_types.protocols.openwebui import OpenWebUIAppInputs, PostgresDatabase
 
 from tests.unit.constants import (
     APP_ID,
@@ -32,14 +32,16 @@ async def test_openwebui_values_generation(setup_clients):
                     tokenizer_hf_name="llm-tokenizer",
                 ),
             ),
-            pgvector_user=CrunchyPostgresUserCredentials(
-                user="pgvector_user",
-                password="pgvector_password",
-                host="pgvector_host",
-                port=5432,
-                pgbouncer_host="pgbouncer_host",
-                pgbouncer_port=4321,
-                dbname="db_name",
+            database=PostgresDatabase(
+                credentials=CrunchyPostgresUserCredentials(
+                    user="pgvector_user",
+                    password="pgvector_password",
+                    host="pgvector_host",
+                    port=5432,
+                    pgbouncer_host="pgbouncer_host",
+                    pgbouncer_port=4321,
+                    dbname="db_name",
+                )
             ),
             embeddings_api=OpenAICompatEmbeddingsAPI(
                 host="text-embeddings-inference-host",
@@ -77,10 +79,16 @@ async def test_openwebui_values_generation(setup_clients):
             "name": "RAG_OPENAI_API_BASE_URL",
             "value": "https://text-embeddings-inference-host:3000/v1",
         },
-        {"name": "DATABASE_URL", "value": ""},  # no url on app install, only outputs
+        {
+            "name": "DATABASE_URL",
+            "value": "postgresql://pgvector_user:pgvector_password@pgbouncer_host:4321/db_name",
+        },  # no url on app install, only outputs
         {
             "name": "VECTOR_DB",
             "value": "pgvector",
         },  # no url on app install, only outputs
-        {"name": "PGVECTOR_DB_URL", "value": ""},  # no url on app install, only outputs
+        {
+            "name": "PGVECTOR_DB_URL",
+            "value": "postgresql://pgvector_user:pgvector_password@pgbouncer_host:4321/db_name",
+        },  # no url on app install, only outputs
     ]

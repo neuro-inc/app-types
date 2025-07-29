@@ -30,6 +30,7 @@ class WeaviatePersistence(AbstractAppFieldType):
     )
     size: int = Field(
         default=WEAVIATE_MIN_GB_STORAGE,
+        gt=0,
         json_schema_extra=SchemaExtraMetadata(
             title="Storage Size (GB)",
             description="Specify the size of the storage volume in gigabytes.",

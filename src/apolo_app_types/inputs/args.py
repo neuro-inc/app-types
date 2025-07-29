@@ -6,6 +6,7 @@ import apolo_sdk
 from apolo_app_types import (
     FooocusAppInputs,
     LightRAGAppInputs,
+    LLama4Inputs,
     LLMInputs,
     PostgresInputs,
     ShellAppInputs,
@@ -19,6 +20,7 @@ from apolo_app_types.helm.apps import (
     StableDiffusionChartValueProcessor,
 )
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
+from apolo_app_types.helm.apps.bundles.llm import Llama4ValueProcessor
 from apolo_app_types.helm.apps.dify import DifyChartValueProcessor
 from apolo_app_types.helm.apps.dockerhub import DockerHubModelChartValueProcessor
 from apolo_app_types.helm.apps.fooocus import FooocusChartValueProcessor
@@ -77,6 +79,7 @@ async def app_type_to_vals(
         AppType.Dify: DifyChartValueProcessor,
         AppType.Superset: SupersetChartValueProcessor,
         AppType.OpenWebUI: OpenWebUIChartValueProcessor,
+        AppType.Llama4: Llama4ValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)
@@ -136,6 +139,7 @@ async def get_installation_vals(
         AppType.Shell: ShellAppInputs,
         AppType.Superset: SupersetInputs,
         AppType.OpenWebUI: OpenWebUIAppInputs,
+        AppType.Llama4: LLama4Inputs,
     }
 
     if app_type not in input_type_map:
