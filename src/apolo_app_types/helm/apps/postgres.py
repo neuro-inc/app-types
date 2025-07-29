@@ -26,7 +26,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
     async def gen_extra_helm_args(self, *_: t.Any) -> list[str]:
         return ["--timeout", "30m"]
 
-    def _gen_instances_config(
+    async def _gen_instances_config(
         self,
         instance_preset_name: str,
         instance_replicas: int,
@@ -34,7 +34,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
     ) -> list[dict[str, t.Any]]:
         preset = get_preset(self.client, instance_preset_name)
         resources = preset_to_resources(preset)
-        tolerations = preset_to_tolerations(preset)
+        tolerations = await preset_to_tolerations(preset)
         affinity = preset_to_affinity(preset)
 
         pod_anti_afinity = {
@@ -99,14 +99,14 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
             )
         return users_config
 
-    def _get_bouncer_config(
+    async def _get_bouncer_config(
         self,
         bouncer_preset_name: str,
         bouncer_repicas: int,
     ) -> dict[str, t.Any]:
         preset = get_preset(self.client, bouncer_preset_name)
         resources = preset_to_resources(preset)
-        tolerations = preset_to_tolerations(preset)
+        tolerations = await preset_to_tolerations(preset)
         affinity = preset_to_affinity(preset)
         pod_anti_afinity = {
             "preferredDuringSchedulingIgnoredDuringExecution": [
@@ -206,7 +206,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
         """
         Generate extra Helm values for postgres configuration.
         """
-        instances = self._gen_instances_config(
+        instances = await self._gen_instances_config(
             instance_preset_name=input_.preset.name,
             instance_replicas=input_.postgres_config.instance_replicas,
             instances_size=input_.postgres_config.instance_size,
@@ -215,7 +215,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
         bouncer_preset_name = input_.pg_bouncer.preset.name
         pgbouncer_config = {}
         if bouncer_preset_name:
-            pgbouncer_config = self._get_bouncer_config(
+            pgbouncer_config = await self._get_bouncer_config(
                 bouncer_preset_name=bouncer_preset_name,
                 bouncer_repicas=int(input_.pg_bouncer.replicas),
             )

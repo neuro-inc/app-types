@@ -1,4 +1,3 @@
-import asyncio
 import json
 import logging
 import os
@@ -62,14 +61,14 @@ def preset_to_resources(preset: apolo_sdk.Preset) -> dict[str, t.Any]:
     return {"requests": requests, "limits": requests.copy()}
 
 
-def get_component_values(preset: Preset, preset_name: str) -> dict[str, t.Any]:
+async def get_component_values(preset: Preset, preset_name: str) -> dict[str, t.Any]:
     return {
         "labels": {
             "platform.apolo.us/component": "app",
             "platform.apolo.us/preset": preset_name,
         },
         "resources": preset_to_resources(preset),
-        "tolerations": preset_to_tolerations(preset),
+        "tolerations": await preset_to_tolerations(preset),
         "affinity": preset_to_affinity(preset),
     }
 
@@ -107,7 +106,7 @@ async def get_resource_pools(preset: apolo_sdk.Preset) -> list[NodePool]:
         return [p for p in pool_types if p.name in preset.resource_pool_names]
 
 
-def preset_to_tolerations(preset: apolo_sdk.Preset) -> list[dict[str, t.Any]]:
+async def preset_to_tolerations(preset: apolo_sdk.Preset) -> list[dict[str, t.Any]]:
     tolerations: list[dict[str, t.Any]] = [
         {
             "effect": "NoSchedule",
@@ -129,7 +128,7 @@ def preset_to_tolerations(preset: apolo_sdk.Preset) -> list[dict[str, t.Any]]:
     ]
 
     try:
-        pool_types = asyncio.run(get_resource_pools(preset))
+        pool_types = await get_resource_pools(preset)
     except Exception as e:
         err = f"Failed to get resource pools: {e}"
         logger.error(err)
@@ -287,7 +286,7 @@ async def gen_extra_values(
         return {}
 
     preset = get_preset(apolo_client, preset_name)
-    tolerations_vals = preset_to_tolerations(preset)
+    tolerations_vals = await preset_to_tolerations(preset)
     affinity_vals = preset_to_affinity(preset)
     resources_vals = preset_to_resources(preset)
     ingress_vals: dict[str, t.Any] = {}

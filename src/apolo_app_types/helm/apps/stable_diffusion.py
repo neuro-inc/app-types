@@ -68,7 +68,7 @@ class StableDiffusionChartValueProcessor(
 
         preset = get_preset(self.client, preset_name)
 
-        component_vals = get_component_values(preset, preset_name)
+        component_vals = await get_component_values(preset, preset_name)
         api_vars = self._get_env_vars(input_, preset, app_secrets_name)
         img_repository = self._get_image_repository(preset)
 
