@@ -53,21 +53,6 @@ class ContainerHTTPServer(BaseModel):
     requires_auth: bool = False
 
 
-class Container(BaseModel):
-    image: str
-    resources: ContainerResources
-    entrypoint: str | None = None
-    command: str | None = None
-    env: dict[str, str] | None = None
-    secret_env: dict[str, str] | None = None
-    storage_mounts: StorageMounts | None = None
-    secret_volumes: list[SecretVolume] | None = None
-    disk_volumes: list[DiskVolume] | None = None
-    http: ContainerHTTPServer | None = None
-    tty: bool = False
-    working_dir: str | None = None
-
-
 class JobAppInput(BaseModel):
     name: str | None = None
     description: str | None = None
@@ -83,7 +68,17 @@ class JobAppInput(BaseModel):
     pass_config: bool = False
     wait_for_jobs_quota: bool = False
     privileged: bool = False
-    container: Container
+    image: str
+    resources: ContainerResources
+    entrypoint: str | None = None
+    command: str | None = None
+    env: dict[str, str] | None = None
+    secret_env: dict[str, str] | None = None
+    storage_mounts: StorageMounts | None = None
+    secret_volumes: list[SecretVolume] | None = None
+    disk_volumes: list[DiskVolume] | None = None
+    http: ContainerHTTPServer | None = None
+    working_dir: str | None = None
 
 
 class JobAppOutput(BaseModel):

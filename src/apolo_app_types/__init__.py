@@ -239,7 +239,6 @@ __all__ = [
     "SecretVolume",
     "DiskVolume",
     "ContainerHTTPServer",
-    "Container",
     "JobRunParams",
     "prepare_job_run_params",
     "LLama4Inputs",

@@ -31,16 +31,16 @@ def prepare_job_run_params(
     project_name: str,
 ) -> JobRunParams:
     """Prepare all parameters for apolo_client.jobs.run() call."""
-    if not job_input.container.image:
+    if not job_input.image:
         msg = "Container image is required"
         raise ValueError(msg)
 
-    resources = job_input.container.resources
+    resources = job_input.resources
 
     # Convert StorageMounts to apolo_sdk.Volume objects
     volumes = []
-    if job_input.container.storage_mounts:
-        for mount in job_input.container.storage_mounts.mounts:
+    if job_input.storage_mounts:
+        for mount in job_input.storage_mounts.mounts:
             read_only = mount.mode.mode.value == "r"
             volume = apolo_sdk.Volume(
                 storage_uri=URL(mount.storage_uri.path),
@@ -50,7 +50,7 @@ def prepare_job_run_params(
             volumes.append(volume)
 
     container = apolo_sdk.Container(
-        image=apolo_sdk.RemoteImage.new_external_image(name=job_input.container.image),
+        image=apolo_sdk.RemoteImage.new_external_image(name=job_input.image),
         resources=apolo_sdk.Resources(
             cpu=resources.cpu,
             memory=resources.memory_mb * 1024 * 1024
@@ -60,15 +60,13 @@ def prepare_job_run_params(
             nvidia_gpu_model=resources.nvidia_gpu_model,
             shm=resources.shm if resources.shm is not None else True,
         ),
-        entrypoint=job_input.container.entrypoint,
-        command=job_input.container.command,
-        working_dir=job_input.container.working_dir,
-        env=job_input.container.env or {},
-        secret_env={
-            k: URL(v) for k, v in (job_input.container.secret_env or {}).items()
-        },
+        entrypoint=job_input.entrypoint,
+        command=job_input.command,
+        working_dir=job_input.working_dir,
+        env=job_input.env or {},
+        secret_env={k: URL(v) for k, v in (job_input.secret_env or {}).items()},
         volumes=volumes,
-        tty=job_input.container.tty,
+        tty=True,
     )
 
     job_name = job_input.name or f"{app_instance_name}-{app_instance_id[:8]}"
