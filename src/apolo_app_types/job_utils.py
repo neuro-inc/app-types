@@ -31,51 +31,31 @@ def prepare_job_run_params(
     project_name: str,
 ) -> JobRunParams:
     """Prepare all parameters for apolo_client.jobs.run() call."""
-    container_image = job_input.image
-    if job_input.container:
-        container_image = job_input.container.image
-
-    if not container_image:
+    if not job_input.container.image:
         msg = "Container image is required"
         raise ValueError(msg)
 
-    resources = None
-    if job_input.container:
-        resources = job_input.container.resources
+    resources = job_input.container.resources
 
     container = apolo_sdk.Container(
-        image=apolo_sdk.RemoteImage.new_external_image(name=container_image),
+        image=apolo_sdk.RemoteImage.new_external_image(name=job_input.container.image),
         resources=apolo_sdk.Resources(
-            cpu=resources.cpu if resources else 0.1,
+            cpu=resources.cpu,
             memory=resources.memory_mb * 1024 * 1024
-            if resources and resources.memory_mb
+            if resources.memory_mb
             else 128 * 1024 * 1024,
-            nvidia_gpu=resources.nvidia_gpu
-            if resources and resources.nvidia_gpu
-            else None,
-            nvidia_gpu_model=resources.nvidia_gpu_model
-            if resources and resources.nvidia_gpu_model
-            else None,
-            shm=resources.shm if resources and resources.shm is not None else True,
+            nvidia_gpu=resources.nvidia_gpu,
+            nvidia_gpu_model=resources.nvidia_gpu_model,
+            shm=resources.shm if resources.shm is not None else True,
         ),
-        entrypoint=job_input.entrypoint
-        or (job_input.container.entrypoint if job_input.container else None),
-        command=job_input.command
-        or (job_input.container.command if job_input.container else None),
-        working_dir=job_input.working_dir
-        or (job_input.container.working_dir if job_input.container else None),
-        env=job_input.env
-        or (job_input.container.env if job_input.container else None)
-        or {},
+        entrypoint=job_input.container.entrypoint,
+        command=job_input.container.command,
+        working_dir=job_input.container.working_dir,
+        env=job_input.container.env or {},
         secret_env={
-            k: URL(v)
-            for k, v in (
-                job_input.secret_env
-                or (job_input.container.secret_env if job_input.container else None)
-                or {}
-            ).items()
+            k: URL(v) for k, v in (job_input.container.secret_env or {}).items()
         },
-        tty=(job_input.container.tty if job_input.container else False),
+        tty=job_input.container.tty,
     )
 
     job_name = job_input.name or f"{app_instance_name}-{app_instance_id[:8]}"

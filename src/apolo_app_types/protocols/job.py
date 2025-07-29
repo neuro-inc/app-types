@@ -87,18 +87,7 @@ class JobAppInput(BaseModel):
     pass_config: bool = False
     wait_for_jobs_quota: bool = False
     privileged: bool = False
-    container: Container | None = None
-    image: str | None = None
-    entrypoint: str | None = None
-    command: str | None = None
-    env: dict[str, str] | None = None
-    secret_env: dict[str, str] | None = None
-    volumes: list[StorageVolume] | None = None
-    secret_volumes: list[SecretVolume] | None = None
-    disk_volumes: list[DiskVolume] | None = None
-    http: ContainerHTTPServer | None = None
-    tty: bool | None = None
-    working_dir: str | None = None
+    container: Container
 
 
 class JobAppOutput(BaseModel):
