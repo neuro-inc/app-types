@@ -120,7 +120,6 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
         "model": {"modelHFName": "test", "tokenizerHFName": "test_tokenizer"},
         "llm": {"modelHFName": "test", "tokenizerHFName": "test_tokenizer"},
         "env": {"HUGGING_FACE_HUB_TOKEN": "test3"},
-        "envNvidia": {"CUDA_VISIBLE_DEVICES": "0"},
         "preset_name": "gpu-small",
         "resources": {
             "requests": {"cpu": "1000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
@@ -401,7 +400,6 @@ async def test_values_llm_generation__storage_integrated(
         "model": {"modelHFName": "test", "tokenizerHFName": ""},
         "llm": {"modelHFName": "test", "tokenizerHFName": ""},
         "env": {"HUGGING_FACE_HUB_TOKEN": "test3"},
-        "envNvidia": {"CUDA_VISIBLE_DEVICES": "0"},
         "preset_name": "gpu-small",
         "resources": {
             "requests": {"cpu": "1000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
