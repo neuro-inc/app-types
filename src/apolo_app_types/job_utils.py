@@ -49,6 +49,16 @@ def prepare_job_run_params(
             )
             volumes.append(volume)
 
+    # Convert SecretVolume to apolo_sdk.SecretFile objects
+    secret_files = []
+    if job_input.secret_volumes:
+        for secret_volume in job_input.secret_volumes:
+            secret_file = apolo_sdk.SecretFile(
+                secret_uri=URL(f"secret://{secret_volume.src_secret_uri.key}"),
+                container_path=secret_volume.dst_path,
+            )
+            secret_files.append(secret_file)
+
     container = apolo_sdk.Container(
         image=apolo_sdk.RemoteImage.new_external_image(name=job_input.image),
         resources=apolo_sdk.Resources(
@@ -64,8 +74,11 @@ def prepare_job_run_params(
         command=job_input.command,
         working_dir=job_input.working_dir,
         env=job_input.env or {},
-        secret_env={k: URL(v) for k, v in (job_input.secret_env or {}).items()},
+        secret_env={
+            k: URL(f"secret://{v.key}") for k, v in (job_input.secret_env or {}).items()
+        },
         volumes=volumes,
+        secret_files=secret_files,
         tty=True,
     )
 

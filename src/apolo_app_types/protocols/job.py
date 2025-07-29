@@ -2,6 +2,7 @@ from enum import StrEnum
 
 from pydantic import BaseModel
 
+from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 from apolo_app_types.protocols.common.storage import StorageMounts
 
 
@@ -37,7 +38,7 @@ class ContainerResources(BaseModel):
 
 
 class SecretVolume(BaseModel):
-    src_secret_uri: str
+    src_secret_uri: ApoloSecret
     dst_path: str
 
 
@@ -73,7 +74,7 @@ class JobAppInput(BaseModel):
     entrypoint: str | None = None
     command: str | None = None
     env: dict[str, str] | None = None
-    secret_env: dict[str, str] | None = None
+    secret_env: dict[str, ApoloSecret] | None = None
     storage_mounts: StorageMounts | None = None
     secret_volumes: list[SecretVolume] | None = None
     disk_volumes: list[DiskVolume] | None = None
