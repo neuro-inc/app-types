@@ -40,7 +40,7 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
     and generating extra values for LLM applications.
     """
 
-    cache_prefix = None
+    cache_prefix: str
 
     def __init__(self, client: "apolo_sdk.Client"):
         super().__init__(client)
