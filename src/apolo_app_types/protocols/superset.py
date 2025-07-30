@@ -91,6 +91,13 @@ class SupersetInputs(AppInputs):
 
     worker_config: WorkerConfig
     web_config: WebConfig
+    redis_preset: Preset = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Redis Preset",
+            description="Set the Redis preset for Superset.",
+        ).as_json_schema_extra(),
+    )
     postgres_config: CrunchyPostgresUserCredentials | SupersetPostgresConfig = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
