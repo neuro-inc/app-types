@@ -83,7 +83,7 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
         secret = _generate_superset_secret_hex()
         logger.debug("Generated extra Superset values: %s", node_values)
         ingress_vals = node_values.pop("ingress", {})
-        additional_values = {}
+        additional_values: dict[str, t.Any] = {}
 
         redis_values = await gen_extra_values(
             self.client,
