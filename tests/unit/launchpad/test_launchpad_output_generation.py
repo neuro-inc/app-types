@@ -11,10 +11,11 @@ async def test_launchpad_output_generation(
     res = await get_openwebui_outputs(
         helm_values={
             "LAUNCHPAD_INITIAL_CONFIG": {
-                "llm_config": {
-                    "llm_model": "meta-llama/Llama-3.1-8B-Instruct",
-                    "llm_preset": {"name": "gpu-small"},
-                    "ui_preset": {"name": "cpu-small"},
+                "vllm": {
+                    "hugging_face_model": {
+                        "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct"
+                    },
+                    "preset": {"name": "gpu-small"},
                 }
             },
         },
@@ -65,10 +66,11 @@ async def test_launchpad_output_generation_no_external_url(
     res = await get_openwebui_outputs(
         helm_values={
             "LAUNCHPAD_INITIAL_CONFIG": {
-                "llm_config": {
-                    "llm_model": "unsloth/Magistral-Small-2506-GGUF",
-                    "llm_preset": {"name": "gpu-medium"},
-                    "ui_preset": {"name": "cpu-small"},
+                "vllm": {
+                    "hugging_face_model": {
+                        "model_hf_name": "unsloth/Magistral-Small-2506-GGUF"
+                    },
+                    "preset": {"name": "gpu-medium"},
                 }
             },
         },
@@ -113,10 +115,11 @@ async def test_launchpad_output_generation_no_service(
     res = await get_openwebui_outputs(
         helm_values={
             "LAUNCHPAD_INITIAL_CONFIG": {
-                "llm_config": {
-                    "llm_model": "meta-llama/Llama-3.1-8B-Instruct",
-                    "llm_preset": {"name": "gpu-small"},
-                    "ui_preset": {"name": "cpu-small"},
+                "vllm": {
+                    "hugging_face_model": {
+                        "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct"
+                    },
+                    "preset": {"name": "gpu-small"},
                 }
             },
         },
@@ -155,10 +158,11 @@ async def test_launchpad_output_generation_custom_ports(
     res = await get_openwebui_outputs(
         helm_values={
             "LAUNCHPAD_INITIAL_CONFIG": {
-                "llm_config": {
-                    "llm_model": "meta-llama/Llama-3.1-8B-Instruct",
-                    "llm_preset": {"name": "gpu-large"},
-                    "ui_preset": {"name": "cpu-medium"},
+                "vllm": {
+                    "hugging_face_model": {
+                        "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct"
+                    },
+                    "preset": {"name": "gpu-large"},
                 }
             },
         },

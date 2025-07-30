@@ -5,7 +5,6 @@ from pydantic import ConfigDict, Field
 from apolo_app_types import (
     AppInputs,
     AppOutputs,
-    Env,
     HuggingFaceModel,
 )
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
@@ -31,14 +30,14 @@ class HuggingFaceLLMModel(AbstractAppFieldType):
             description="Specify a custom LLM model to be used in the Launchpad.",
         ).as_json_schema_extra(),
     )
-    llm_model: HuggingFaceModel = Field(
+    hf_model: HuggingFaceModel = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
             title="Hugging Face Model",
             description="The Hugging Face model to use for the Launchpad.",
         ).as_json_schema_extra(),
     )
-    vllm_extra_args: list[Env] = Field(
+    server_extra_args: list[str] = Field(
         default_factory=list,
         json_schema_extra=SchemaExtraMetadata(
             title="VLLM Extra Arguments",
@@ -55,21 +54,21 @@ class CustomLLMModel(AbstractAppFieldType):
             description="Specify a custom LLM model to be used in the Launchpad.",
         ).as_json_schema_extra(),
     )
-    llm_model_name: str = Field(
+    model_name: str = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
             title="Model Name",
             description="The name of the custom LLM model.",
         ).as_json_schema_extra(),
     )
-    llm_model_apolo_path: ApoloFilesPath = Field(
+    model_apolo_path: ApoloFilesPath = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
             title="Model Path",
             description="Model path within the Apolo Files.",
         ).as_json_schema_extra(),
     )
-    vllm_extra_args: list[str] = Field(
+    server_extra_args: list[str] = Field(
         default_factory=list,
         json_schema_extra=SchemaExtraMetadata(
             title="VLLM Extra Arguments",
@@ -86,7 +85,7 @@ class LLMConfig(AbstractAppFieldType):
             description="Configuration for the LLM model to be used in this Launchpad.",
         ).as_json_schema_extra(),
     )
-    llm_model: PreConfiguredLLMModels | HuggingFaceLLMModel | CustomLLMModel = Field(
+    model: PreConfiguredLLMModels | HuggingFaceLLMModel | CustomLLMModel = Field(
         default=PreConfiguredLLMModels.LLAMA_31_8b,
         json_schema_extra=SchemaExtraMetadata(
             title="Pre-configured LLM Model",
@@ -109,6 +108,84 @@ class LLMConfig(AbstractAppFieldType):
     )
 
 
+class PostgresConfig(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Postgres Configuration",
+            description="Configuration for the Postgres database.",
+        ).as_json_schema_extra(),
+    )
+    preset: Preset = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Postgres Preset",
+            description="Preset to use for the Postgres database.",
+        ).as_json_schema_extra(),
+    )
+    replicas: int = Field(
+        default=2,
+        gt=0,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Postgres Replicas",
+            description="Number of replicas for the Postgres database.",
+        ).as_json_schema_extra(),
+    )
+
+
+class PreConfiguredEmbeddingsModels(enum.StrEnum):
+    BAAI_BGE_M3 = "BAAI/bge-m3"
+
+
+class HuggingFaceEmbeddingsModel(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="HuggingFace Embeddings Model",
+            description="Specify a custom embeddings model to be used"
+            " in the Launchpad.",
+        ).as_json_schema_extra(),
+    )
+    hf_model: HuggingFaceModel = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Hugging Face Model",
+            description="The Hugging Face model to use for text embeddings.",
+        ).as_json_schema_extra(),
+    )
+    server_extra_args: list[str] = Field(
+        default_factory=list,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Embeddings Extra Arguments",
+            description="Additional arguments to pass to the embeddings runtime.",
+        ).as_json_schema_extra(),
+    )
+
+
+class TextEmbeddingsConfig(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Text Embeddings Configuration",
+            description="Configuration for the text embeddings service.",
+        ).as_json_schema_extra(),
+    )
+    preset: Preset = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Text Embeddings Preset",
+            description="Preset to use for the text embeddings service.",
+        ).as_json_schema_extra(),
+    )
+    model: PreConfiguredEmbeddingsModels | HuggingFaceEmbeddingsModel = Field(
+        default=PreConfiguredEmbeddingsModels.BAAI_BGE_M3,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Embeddings Model",
+            description="The Hugging Face model to use for text embeddings.",
+        ).as_json_schema_extra(),
+    )
+
+
 class AppsConfig(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
@@ -119,6 +196,8 @@ class AppsConfig(AbstractAppFieldType):
         ).as_json_schema_extra(),
     )
     llm_config: LLMConfig
+    postgres_config: PostgresConfig
+    embeddings_config: TextEmbeddingsConfig
 
 
 class LaunchpadConfig(AbstractAppFieldType):
