@@ -91,7 +91,7 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
             app_id=app_id,
             app_type=AppType.Superset,
         )
-        additional_values.update({"redis": {"primary": redis_values}})
+        additional_values.update({"redis": {"master": redis_values}})
 
         if isinstance(input_.postgres_config, SupersetPostgresConfig):
             postgres_values = await gen_extra_values(

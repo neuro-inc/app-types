@@ -134,7 +134,7 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
         },
     }
     assert helm_params["redis"] == {
-        "primary": {
+        "master": {
             "preset_name": "cpu-large",
             "apolo_app_id": APP_ID,
             "podLabels": {
