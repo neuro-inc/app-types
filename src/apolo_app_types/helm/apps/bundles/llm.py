@@ -136,7 +136,7 @@ class Llama4ValueProcessor(BaseLLMBundleMixin[LLama4Inputs]):
                 files_path=ApoloFilesPath(path=self._get_storage_path())
             ),
             http_autoscaling=AutoscalingKedaHTTP(scaledown_period=300)
-            if input_.preset.autoscaling
+            if input_.autoscaling_enabled
             else None,
         )
 
@@ -239,7 +239,7 @@ class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
                 files_path=ApoloFilesPath(path=self._get_storage_path())
             ),
             http_autoscaling=AutoscalingKedaHTTP(scaledown_period=300)
-            if input_.preset.autoscaling
+            if input_.autoscaling_enabled
             else None,
         )
 
@@ -349,7 +349,7 @@ class MistralValueProcessor(BaseLLMBundleMixin[MistralInputs]):
                 files_path=ApoloFilesPath(path=self._get_storage_path())
             ),
             http_autoscaling=AutoscalingKedaHTTP(scaledown_period=300)
-            if input_.preset.autoscaling
+            if input_.autoscaling_enabled
             else None,
         )
 

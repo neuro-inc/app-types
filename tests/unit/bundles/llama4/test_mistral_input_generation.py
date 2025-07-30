@@ -1,8 +1,12 @@
-from apolo_app_types.helm.apps.common import APOLO_STORAGE_LABEL, APOLO_ORG_LABEL, APOLO_PROJECT_LABEL
 from dirty_equals import IsStr
 
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.bundles.llm import MistralValueProcessor
+from apolo_app_types.helm.apps.common import (
+    APOLO_ORG_LABEL,
+    APOLO_PROJECT_LABEL,
+    APOLO_STORAGE_LABEL,
+)
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.bundles.llm import MistralInputs, MistralSize
 from apolo_app_types.protocols.common import ApoloSecret

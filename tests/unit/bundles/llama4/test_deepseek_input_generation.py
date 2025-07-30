@@ -1,8 +1,12 @@
-from apolo_app_types.helm.apps.common import APOLO_STORAGE_LABEL, APOLO_ORG_LABEL, APOLO_PROJECT_LABEL
 from dirty_equals import IsStr
 
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.bundles.llm import DeepSeekValueProcessor
+from apolo_app_types.helm.apps.common import (
+    APOLO_ORG_LABEL,
+    APOLO_PROJECT_LABEL,
+    APOLO_STORAGE_LABEL,
+)
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.bundles.llm import DeepSeekR1Inputs, DeepSeekR1Size
 from apolo_app_types.protocols.common import ApoloSecret
@@ -35,13 +39,17 @@ async def test_values_llm_generation_gpu_default_preset(
     assert helm_params == {
         "serverExtraArgs": [],
         "model": {
-            "modelHFName": DeepSeekValueProcessor.model_map[model_to_test].model_hf_name,
+            "modelHFName": DeepSeekValueProcessor.model_map[
+                model_to_test
+            ].model_hf_name,
             "tokenizerHFName": DeepSeekValueProcessor.model_map[
                 model_to_test
             ].model_hf_name,
         },
         "llm": {
-            "modelHFName": DeepSeekValueProcessor.model_map[model_to_test].model_hf_name,
+            "modelHFName": DeepSeekValueProcessor.model_map[
+                model_to_test
+            ].model_hf_name,
             "tokenizerHFName": DeepSeekValueProcessor.model_map[
                 model_to_test
             ].model_hf_name,

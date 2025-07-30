@@ -1,4 +1,4 @@
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from apolo_app_types.protocols.common import (
     AbstractAppFieldType,
@@ -104,10 +104,20 @@ class LLMInputs(AppInputs):
         default=None,
         json_schema_extra=SchemaExtraMetadata(
             title="HTTP Autoscaling",
-            description="Configure autoscaling based on HTTP request rate.",
+            description="Configure autoscaling based on HTTP request rate."
+            " If you enable this, "
+            "please ensure that cache config "
+            "is enabled as well.",
             is_advanced_field=True,
         ).as_json_schema_extra(),
     )
+
+    @model_validator(mode="after")
+    def check_autoscaling_requires_cache(self) -> "LLMInputs":
+        if self.http_autoscaling and not self.cache_config:
+            msg = "If HTTP autoscaling is enabled, cache_config must also be set."
+            raise ValueError(msg)
+        return self
 
 
 class OpenAICompatibleAPI(AppOutputsDeployer):
