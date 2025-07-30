@@ -9,6 +9,7 @@ from decimal import Decimal
 import apolo_sdk
 import yaml
 from apolo_sdk import Preset
+from neuro_config_client import NodePool
 
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.ingress import (
@@ -60,14 +61,14 @@ def preset_to_resources(preset: apolo_sdk.Preset) -> dict[str, t.Any]:
     return {"requests": requests, "limits": requests.copy()}
 
 
-def get_component_values(preset: Preset, preset_name: str) -> dict[str, t.Any]:
+async def get_component_values(preset: Preset, preset_name: str) -> dict[str, t.Any]:
     return {
         "labels": {
             "platform.apolo.us/component": "app",
             "platform.apolo.us/preset": preset_name,
         },
         "resources": preset_to_resources(preset),
-        "tolerations": preset_to_tolerations(preset),
+        "tolerations": await preset_to_tolerations(preset),
         "affinity": preset_to_affinity(preset),
     }
 
@@ -99,7 +100,13 @@ def preset_to_affinity(preset: apolo_sdk.Preset) -> dict[str, t.Any]:
     return affinity
 
 
-def preset_to_tolerations(preset: apolo_sdk.Preset) -> list[dict[str, t.Any]]:
+async def get_resource_pools(preset: apolo_sdk.Preset) -> list[NodePool]:
+    async with apolo_sdk.get() as client:
+        pool_types = await client._clusters._client.list_node_pools(client.cluster_name)
+        return [p for p in pool_types if p.name in preset.resource_pool_names]
+
+
+async def preset_to_tolerations(preset: apolo_sdk.Preset) -> list[dict[str, t.Any]]:
     tolerations: list[dict[str, t.Any]] = [
         {
             "effect": "NoSchedule",
@@ -119,11 +126,19 @@ def preset_to_tolerations(preset: apolo_sdk.Preset) -> list[dict[str, t.Any]]:
             "tolerationSeconds": 300,
         },
     ]
-    if preset.amd_gpu:
+
+    try:
+        pool_types = await get_resource_pools(preset)
+    except Exception as e:
+        err = f"Failed to get resource pools: {e}"
+        logger.error(err)
+        pool_types = []
+
+    if preset.amd_gpu or any(p.amd_gpu for p in pool_types):
         tolerations.append(
             {"effect": "NoSchedule", "key": "amd.com/gpu", "operator": "Exists"}
         )
-    if preset.nvidia_gpu:
+    if preset.nvidia_gpu or any(p.nvidia_gpu for p in pool_types):
         tolerations.append(
             {"effect": "NoSchedule", "key": "nvidia.com/gpu", "operator": "Exists"}
         )
@@ -271,7 +286,7 @@ async def gen_extra_values(
         return {}
 
     preset = get_preset(apolo_client, preset_name)
-    tolerations_vals = preset_to_tolerations(preset)
+    tolerations_vals = await preset_to_tolerations(preset)
     affinity_vals = preset_to_affinity(preset)
     resources_vals = preset_to_resources(preset)
     ingress_vals: dict[str, t.Any] = {}
@@ -329,6 +344,3 @@ async def gen_extra_values(
         **ingress_vals,
         **app_specific,
     }
-
-
-# async def gen_

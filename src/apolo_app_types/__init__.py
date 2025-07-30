@@ -1,4 +1,5 @@
 from apolo_app_types.protocols.apolo_deploy import ApoloDeployInputs, ApoloDeployOutputs
+from apolo_app_types.protocols.bundles import LLama4Inputs
 from apolo_app_types.protocols.common import (
     ApoloFilesMount,
     ApoloSecret,
@@ -223,4 +224,5 @@ __all__ = [
     "OpenWebUIAppOutputs",
     "LaunchpadAppInputs",
     "LaunchpadAppOutputs",
+    "LLama4Inputs",
 ]

@@ -27,7 +27,7 @@ def get_postgres_cluster_users() -> dict[str, t.Any]:
         api_version="v1beta1",
         crd_plural_name="postgresclusters",
     )
-    assert len(pg_clusters["items"]) == 1
+    assert len(pg_clusters["items"]) == 1, "Expected exactly one Postgres cluster"
     pg_cluster = pg_clusters["items"][0]
     users = pg_cluster["spec"].get("users", [])
     return {user["name"]: user for user in users}
@@ -81,6 +81,7 @@ async def get_postgres_outputs(
             label="postgres-operator.crunchydata.com/role=pguser"
         )
         if secrets:
+            logger.info("Secrets found")  # noqa: T201
             break
         logger.info(  # noqa: T201
             "Failed to get postgres outputs, retrying in %s seconds", trial

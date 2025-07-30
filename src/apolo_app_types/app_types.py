@@ -41,6 +41,9 @@ class AppType(enum.StrEnum):
     OpenWebUI = "openwebui"
     Launchpad = "launchpad"
 
+    # bundles
+    Llama4 = "llama4"
+
     def __repr__(self) -> str:
         return str(self)
 

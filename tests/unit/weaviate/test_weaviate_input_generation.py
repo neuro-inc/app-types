@@ -73,7 +73,7 @@ async def test_values_weaviate_generation_basic(setup_clients, mock_get_preset_c
         app_id=APP_ID,
     )
 
-    assert helm_params["resources"]["requests"]["cpu"] == "1000.0m"
+    assert helm_params["resources"]["requests"]["cpu"] == "4000.0m"
     assert helm_params["storage"]["size"] == "64Gi"
     assert helm_params["tolerations"] == [
         {
