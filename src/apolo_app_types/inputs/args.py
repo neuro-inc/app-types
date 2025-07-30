@@ -25,6 +25,7 @@ from apolo_app_types.helm.apps.dify import DifyChartValueProcessor
 from apolo_app_types.helm.apps.dockerhub import DockerHubModelChartValueProcessor
 from apolo_app_types.helm.apps.fooocus import FooocusChartValueProcessor
 from apolo_app_types.helm.apps.jupyter import JupyterChartValueProcessor
+from apolo_app_types.helm.apps.launchpad import LaunchpadChartValueProcessor
 from apolo_app_types.helm.apps.lightrag import LightRAGChartValueProcessor
 from apolo_app_types.helm.apps.mlflow import MLFlowChartValueProcessor
 from apolo_app_types.helm.apps.openwebui import OpenWebUIChartValueProcessor
@@ -41,6 +42,7 @@ from apolo_app_types.protocols.custom_deployment import CustomDeploymentInputs
 from apolo_app_types.protocols.dify import DifyAppInputs
 from apolo_app_types.protocols.dockerhub import DockerHubInputs
 from apolo_app_types.protocols.jupyter import JupyterAppInputs
+from apolo_app_types.protocols.launchpad import LaunchpadAppInputs
 from apolo_app_types.protocols.mlflow import MLFlowAppInputs
 from apolo_app_types.protocols.openwebui import OpenWebUIAppInputs
 from apolo_app_types.protocols.private_gpt import PrivateGPTAppInputs
@@ -79,6 +81,7 @@ async def app_type_to_vals(
         AppType.Dify: DifyChartValueProcessor,
         AppType.Superset: SupersetChartValueProcessor,
         AppType.OpenWebUI: OpenWebUIChartValueProcessor,
+        AppType.Launchpad: LaunchpadChartValueProcessor,
         AppType.Llama4: Llama4ValueProcessor,
     }
 
@@ -139,6 +142,7 @@ async def get_installation_vals(
         AppType.Shell: ShellAppInputs,
         AppType.Superset: SupersetInputs,
         AppType.OpenWebUI: OpenWebUIAppInputs,
+        AppType.Launchpad: LaunchpadAppInputs,
         AppType.Llama4: LLama4Inputs,
     }
 
