@@ -25,6 +25,7 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
             web_config=WebConfig(preset=Preset(name="cpu-large")),
             ingress_http=IngressHttp(),
             postgres_config=SupersetPostgresConfig(preset=Preset(name="cpu-large")),
+            redis_preset=Preset(name="cpu-large"),
         ),
         apolo_client=apolo_client,
         app_type=AppType.Superset,
@@ -83,52 +84,104 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
         ],
     }
     assert helm_params["postgresql"] == {
-        "affinity": {
-            "nodeAffinity": {
-                "requiredDuringSchedulingIgnoredDuringExecution": {
-                    "nodeSelectorTerms": [
-                        {
-                            "matchExpressions": [
-                                {
-                                    "key": "platform.neuromation.io/nodepool",
-                                    "operator": "In",
-                                    "values": ["cpu_pool"],
-                                }
-                            ]
-                        }
-                    ]
+        "primary": {
+            "affinity": {
+                "nodeAffinity": {
+                    "requiredDuringSchedulingIgnoredDuringExecution": {
+                        "nodeSelectorTerms": [
+                            {
+                                "matchExpressions": [
+                                    {
+                                        "key": "platform.neuromation.io/nodepool",
+                                        "operator": "In",
+                                        "values": ["cpu_pool"],
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 }
-            }
-        },
-        "apolo_app_id": APP_ID,
-        "podLabels": {
-            "platform.apolo.us/component": "app",
-            "platform.apolo.us/preset": "cpu-large",
-        },
-        "preset_name": "cpu-large",
-        "resources": {
-            "limits": {"cpu": "4000.0m", "memory": "0M"},
-            "requests": {"cpu": "4000.0m", "memory": "0M"},
-        },
-        "tolerations": [
-            {
-                "effect": "NoSchedule",
-                "key": "platform.neuromation.io/job",
-                "operator": "Exists",
             },
-            {
-                "effect": "NoExecute",
-                "key": "node.kubernetes.io/not-ready",
-                "operator": "Exists",
-                "tolerationSeconds": 300,
+            "resources": {
+                "limits": {"cpu": "4000.0m", "memory": "0M"},
+                "requests": {"cpu": "4000.0m", "memory": "0M"},
             },
-            {
-                "effect": "NoExecute",
-                "key": "node.kubernetes.io/unreachable",
-                "operator": "Exists",
-                "tolerationSeconds": 300,
+            "tolerations": [
+                {
+                    "effect": "NoSchedule",
+                    "key": "platform.neuromation.io/job",
+                    "operator": "Exists",
+                },
+                {
+                    "effect": "NoExecute",
+                    "key": "node.kubernetes.io/not-ready",
+                    "operator": "Exists",
+                    "tolerationSeconds": 300,
+                },
+                {
+                    "effect": "NoExecute",
+                    "key": "node.kubernetes.io/unreachable",
+                    "operator": "Exists",
+                    "tolerationSeconds": 300,
+                },
+            ],
+            "apolo_app_id": APP_ID,
+            "podLabels": {
+                "platform.apolo.us/component": "app",
+                "platform.apolo.us/preset": "cpu-large",
             },
-        ],
+            "preset_name": "cpu-large",
+        },
+    }
+    assert helm_params["redis"] == {
+        "primary": {
+            "preset_name": "cpu-large",
+            "apolo_app_id": APP_ID,
+            "podLabels": {
+                "platform.apolo.us/component": "app",
+                "platform.apolo.us/preset": "cpu-large",
+            },
+            "affinity": {
+                "nodeAffinity": {
+                    "requiredDuringSchedulingIgnoredDuringExecution": {
+                        "nodeSelectorTerms": [
+                            {
+                                "matchExpressions": [
+                                    {
+                                        "key": "platform.neuromation.io/nodepool",
+                                        "operator": "In",
+                                        "values": ["cpu_pool"],
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            "resources": {
+                "limits": {"cpu": "4000.0m", "memory": "0M"},
+                "requests": {"cpu": "4000.0m", "memory": "0M"},
+            },
+            "tolerations": [
+                {
+                    "effect": "NoSchedule",
+                    "key": "platform.neuromation.io/job",
+                    "operator": "Exists",
+                },
+                {
+                    "effect": "NoExecute",
+                    "key": "node.kubernetes.io/not-ready",
+                    "operator": "Exists",
+                    "tolerationSeconds": 300,
+                },
+                {
+                    "effect": "NoExecute",
+                    "key": "node.kubernetes.io/unreachable",
+                    "operator": "Exists",
+                    "tolerationSeconds": 300,
+                },
+            ],
+        }
     }
     assert helm_params["supersetWorker"] == {
         "apolo_app_id": APP_ID,
@@ -219,6 +272,7 @@ async def test_superset_values_generation_with_postgres_integration(
                 pgbouncer_port=4321,
                 dbname="db_name",
             ),
+            redis_preset=Preset(name="cpu-large"),
         ),
         apolo_client=apolo_client,
         app_type=AppType.Superset,
@@ -257,6 +311,7 @@ async def test_superset_values_generation_with_custom_admin_user(
                 email="admin@mail.ua",
             ),
             postgres_config=SupersetPostgresConfig(preset=Preset(name="cpu-large")),
+            redis_preset=Preset(name="cpu-large"),
         ),
         apolo_client=apolo_client,
         app_type=AppType.Superset,

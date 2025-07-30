@@ -84,6 +84,15 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
         logger.debug("Generated extra Superset values: %s", node_values)
         ingress_vals = node_values.pop("ingress", {})
         additional_values = {}
+
+        redis_values = await gen_extra_values(
+            self.client,
+            input_.redis_preset,
+            app_id=app_id,
+            app_type=AppType.Superset,
+        )
+        additional_values.update({"redis": {"primary": redis_values}})
+
         if isinstance(input_.postgres_config, SupersetPostgresConfig):
             postgres_values = await gen_extra_values(
                 self.client,
@@ -91,7 +100,7 @@ class SupersetChartValueProcessor(BaseChartValueProcessor[SupersetInputs]):
                 app_id=app_id,
                 app_type=AppType.Superset,
             )
-            additional_values.update({"postgresql": postgres_values})
+            additional_values.update({"postgresql": {"primary": postgres_values}})
         else:
             node_values.update(
                 {
