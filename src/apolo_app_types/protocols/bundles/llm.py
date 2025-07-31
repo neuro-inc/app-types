@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Literal
 
 from pydantic import Field
 
@@ -17,8 +18,28 @@ class Llama4Size(str, Enum):
     maverick_fp8 = "17B-128E-Instruct-FP8"
 
 
-class LLama4Inputs(AppInputs):
-    size: Llama4Size
+class DeepSeekR1Size(str, Enum):
+    r1_7b = "7B"
+    r1_70b = "70B"
+    r1_70b_instruct = "70B-Instruct"
+    r1_70b_fp8 = "70B-FP8"
+
+
+class MistralSize(str, Enum):
+    mistral_7b = "7B"
+    mistral_7b_instruct = "7B-Instruct"
+    mistral_7b_fp8 = "7B-FP8"
+    mistral_15b = "15B"
+    mistral_15b_instruct = "15B-Instruct"
+    mistral_15b_fp8 = "15B-FP8"
+
+
+class LLMBundleInputs(AppInputs):
+    """
+    Base class for LLM bundle inputs.
+    This class can be extended by specific LLM bundle input classes.
+    """
+
     hf_token: ApoloSecret = Field(  # noqa: N815
         ...,
         json_schema_extra=SchemaExtraMetadata(
@@ -33,3 +54,33 @@ class LLama4Inputs(AppInputs):
             title="Enable Autoscaling",
         ).as_json_schema_extra(),
     )
+
+
+class LLama4Inputs(LLMBundleInputs):
+    """
+    Inputs for the Llama4 bundle.
+    This class extends LLMBundleInputs to include specific fields for Llama4.
+    """
+
+    size: Llama4Size
+    llm_class: Literal["llama4"] = "llama4"
+
+
+class DeepSeekR1Inputs(LLMBundleInputs):
+    """
+    Inputs for the DeepSeekR1 bundle.
+    This class extends LLMBundleInputs to include specific fields for DeepSeekR1.
+    """
+
+    llm_class: Literal["deepseek_r1"] = "deepseek_r1"
+    size: DeepSeekR1Size
+
+
+class MistralInputs(LLMBundleInputs):
+    """
+    Inputs for the Mistral bundle.
+    This class extends LLMBundleInputs to include specific fields for Mistral.
+    """
+
+    llm_class: Literal["mistral"] = "mistral"
+    size: MistralSize
