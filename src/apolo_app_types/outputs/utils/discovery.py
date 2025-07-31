@@ -23,7 +23,7 @@ def load_app_component(
         if name.startswith(apolo_app_package_prefix):
             try:
                 candidate = importlib.import_module(name)
-                candidate_app_id = candidate.APOLO_APP_ID
+                candidate_app_id = candidate.APOLO_APP_TYPE
                 discovered_plugins[candidate_app_id] = candidate
             except (ImportError, AttributeError) as e:
                 msg = f"Failed to import {name}: {e}"
