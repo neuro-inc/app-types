@@ -7,7 +7,7 @@ from apolo_app_types.protocols.common.networking import HttpApi, RestAPI, Servic
 from apolo_app_types.protocols.launchpad import LaunchpadAppOutputs
 
 
-async def get_openwebui_outputs(
+async def get_launchpad_outputs(
     helm_values: dict[str, t.Any],
     app_instance_id: str,
 ) -> dict[str, t.Any]:

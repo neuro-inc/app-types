@@ -21,9 +21,6 @@ from apolo_app_types.protocols.postgres import (
 
 
 class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
-    def __init__(self, *args: t.Any, **kwargs: t.Any):
-        super().__init__(*args, **kwargs)
-
     async def get_vllm_inputs(
         self,
         input_: LaunchpadAppInputs,

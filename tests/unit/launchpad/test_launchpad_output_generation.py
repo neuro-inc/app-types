@@ -1,6 +1,6 @@
 import pytest
 
-from apolo_app_types.outputs.launchpad import get_openwebui_outputs
+from apolo_app_types.outputs.launchpad import get_launchpad_outputs
 
 
 @pytest.mark.asyncio
@@ -8,7 +8,7 @@ async def test_launchpad_output_generation(
     setup_clients, mock_kubernetes_client, app_instance_id
 ):
     """Test launchpad output generation for web_app_url."""
-    res = await get_openwebui_outputs(
+    res = await get_launchpad_outputs(
         helm_values={
             "LAUNCHPAD_INITIAL_CONFIG": {
                 "vllm": {
@@ -63,7 +63,7 @@ async def test_launchpad_output_generation_no_external_url(
         mock_get_ingress_host_port,
     )
 
-    res = await get_openwebui_outputs(
+    res = await get_launchpad_outputs(
         helm_values={
             "LAUNCHPAD_INITIAL_CONFIG": {
                 "vllm": {
@@ -112,7 +112,7 @@ async def test_launchpad_output_generation_no_service(
         mock_get_ingress_host_port,
     )
 
-    res = await get_openwebui_outputs(
+    res = await get_launchpad_outputs(
         helm_values={
             "LAUNCHPAD_INITIAL_CONFIG": {
                 "vllm": {
@@ -155,7 +155,7 @@ async def test_launchpad_output_generation_custom_ports(
         mock_get_ingress_host_port,
     )
 
-    res = await get_openwebui_outputs(
+    res = await get_launchpad_outputs(
         helm_values={
             "LAUNCHPAD_INITIAL_CONFIG": {
                 "vllm": {
