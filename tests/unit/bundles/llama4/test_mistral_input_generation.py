@@ -118,7 +118,7 @@ async def test_values_mistral_generation_gpu_default_preset(
             },
         },
         "podAnnotations": {
-            APOLO_STORAGE_LABEL: '[{"storage_uri": "storage://cluster/test-org/test-project/mistral", "mount_path": "/root/.cache/huggingface", "mount_mode": "rw"}]'  # noqa: E501
+            APOLO_STORAGE_LABEL: '[{"storage_uri": "storage://cluster/test-org/test-project/llm_bundles", "mount_path": "/root/.cache/huggingface", "mount_mode": "rw"}]'  # noqa: E501
         },
         "podExtraLabels": {
             APOLO_STORAGE_LABEL: "true",
