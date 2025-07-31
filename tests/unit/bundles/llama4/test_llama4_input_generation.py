@@ -58,7 +58,6 @@ async def test_values_llm_generation_gpu_default_preset(
                 }
             }
         },
-        "envNvidia": {"CUDA_VISIBLE_DEVICES": "0"},
         "preset_name": preset_a100,
         "resources": {
             "requests": {"cpu": "8000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
