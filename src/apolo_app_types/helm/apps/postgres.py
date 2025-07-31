@@ -18,6 +18,8 @@ from apolo_app_types.protocols.postgres import PostgresDBUser, PostgresInputs
 
 logger = logging.getLogger(__name__)
 
+POSTGRESQL_CRD_NAME_MAX_LENGTH = 37
+
 
 class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
     def __init__(self, *args: t.Any, **kwargs: t.Any):
@@ -221,8 +223,10 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
             )
 
         postgrescluster_crd_name = f"pg-{app_id}"
-        if len(postgrescluster_crd_name) > 37:
-            postgrescluster_crd_name = postgrescluster_crd_name[:37]
+        if len(postgrescluster_crd_name) > POSTGRESQL_CRD_NAME_MAX_LENGTH:
+            postgrescluster_crd_name = postgrescluster_crd_name[
+                :POSTGRESQL_CRD_NAME_MAX_LENGTH
+            ]
 
         values: dict[str, t.Any] = {
             "metadata": {"labels": {"platform.apolo.us/component": "app"}},
