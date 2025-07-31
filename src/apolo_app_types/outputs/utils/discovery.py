@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def load_app_component(
-    app_id: str,
+    app_type: str,
     component_base_type: type[t.Any],
     exact_type_name: str | None = None,
     apolo_app_package_prefix: str = "apolo_apps_",
@@ -28,11 +28,11 @@ def load_app_component(
             except (ImportError, AttributeError) as e:
                 msg = f"Failed to import {name}: {e}"
                 logger.warning(msg)
-    module = discovered_plugins.get(app_id)
+    module = discovered_plugins.get(app_type)
 
     if not module:
         return None
-    msg = f"Found {module} at {module.__file__} for {app_id}"
+    msg = f"Found {module} at {module.__file__} for {app_type}"
     logging.info(msg)
 
     results = []
@@ -42,14 +42,14 @@ def load_app_component(
             and obj is not component_base_type
             and (not exact_type_name or obj.__name__ == exact_type_name)
         ):
-            msg = f"Found {obj} for {app_id}"
+            msg = f"Found {obj} for {app_type}"
             logging.info(msg)
             results.append(obj)
 
     if not results:
         return None
     if len(results) > 1:
-        msg = f"Multiple components found for {app_id}: {results}"
+        msg = f"Multiple components found for {app_type}: {results}"
         raise ValueError(msg)
     return results[0]
 
@@ -65,20 +65,20 @@ def load_app_postprocessor(
 
 
 def load_app_preprocessor(
-    app_id: str,
+    app_type: str,
     exact_type_name: str | None = None,
     apolo_app_package_prefix: str = "apolo_apps_",
 ) -> type[BaseChartValueProcessor] | None:  # type: ignore
     return load_app_component(
-        app_id, BaseChartValueProcessor, exact_type_name, apolo_app_package_prefix
+        app_type, BaseChartValueProcessor, exact_type_name, apolo_app_package_prefix
     )
 
 
 def load_app_inputs(
-    app_id: str,
+    app_type: str,
     exact_type_name: str | None = None,
     apolo_app_package_prefix: str = "apolo_apps_",
 ) -> type[AppInputs] | None:
     return load_app_component(
-        app_id, AppInputs, exact_type_name, apolo_app_package_prefix
+        app_type, AppInputs, exact_type_name, apolo_app_package_prefix
     )
