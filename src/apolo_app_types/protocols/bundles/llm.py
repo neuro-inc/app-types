@@ -63,7 +63,7 @@ class LLama4Inputs(LLMBundleInputs):
     """
 
     size: Llama4Size
-    llm_class: Literal["llama4"] = "llama4"
+    llm_class: Literal["llama4"] = Field("llama4", const=True)
 
 
 class DeepSeekR1Inputs(LLMBundleInputs):
@@ -72,7 +72,7 @@ class DeepSeekR1Inputs(LLMBundleInputs):
     This class extends LLMBundleInputs to include specific fields for DeepSeekR1.
     """
 
-    llm_class: Literal["deepseek_r1"] = "deepseek_r1"
+    llm_class: Literal["deepseek_r1"] = Field("deepseek_r1", const=True)
     size: DeepSeekR1Size
 
 
@@ -82,5 +82,5 @@ class MistralInputs(LLMBundleInputs):
     This class extends LLMBundleInputs to include specific fields for Mistral.
     """
 
-    llm_class: Literal["mistral"] = "mistral"
+    llm_class: Literal["mistral"] = Field("mistral", const=True)
     size: MistralSize
