@@ -54,15 +54,46 @@ async def test_launchpad_values_generation_with_preconfigured_model(setup_client
         app_id=APP_ID,
     )
 
-    # Basic helm parameter structure
-    assert "LAUNCHPAD_INITIAL_CONFIG" in helm_params
-    config = helm_params["LAUNCHPAD_INITIAL_CONFIG"]
+    # Validate the complete helm_params structure at once
+    expected_helm_params = {
+        "LAUNCHPAD_INITIAL_CONFIG": {
+            "vllm": {
+                "hugging_face_model": {
+                    "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct",
+                    "hf_token": None,
+                },
+                "preset": {
+                    "name": "gpu-small",
+                },
+                "server_extra_args": [],
+            },
+            "postgres": {
+                "preset": {
+                    "name": "cpu-small",
+                },
+                "pg_bouncer": {
+                    "preset": {
+                        "name": "cpu-small",
+                    },
+                },
+            },
+            "text-embeddings": {
+                "model": {
+                    "model_hf_name": "BAAI/bge-m3",
+                    "hf_token": None,
+                },
+                "preset": {
+                    "name": "gpu-small",
+                },
+                "server_extra_args": [],
+            },
+        },
+        "appTypesImage": {
+            "tag": helm_params["appTypesImage"]["tag"],  # Dynamic tag, use actual value
+        },
+    }
 
-    assert (
-        config["vllm"]["hugging_face_model"]["model_hf_name"]
-        == "meta-llama/Llama-3.1-8B-Instruct"
-    )
-    assert config["vllm"]["preset"]["name"] == "gpu-small"
+    assert helm_params == expected_helm_params
 
 
 @pytest.mark.asyncio
@@ -106,23 +137,49 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
         app_id=APP_ID,
     )
 
-    config = helm_params["LAUNCHPAD_INITIAL_CONFIG"]
+    # Validate the complete helm_params structure at once
+    expected_helm_params = {
+        "LAUNCHPAD_INITIAL_CONFIG": {
+            "vllm": {
+                "hugging_face_model": {
+                    "model_hf_name": "microsoft/DialoGPT-medium",
+                    "hf_token": None,
+                },
+                "preset": {
+                    "name": "gpu-large",
+                },
+                "server_extra_args": [
+                    "--max-model-len=2048",
+                    "--gpu-memory-utilization=0.9",
+                ],
+            },
+            "postgres": {
+                "preset": {
+                    "name": "cpu-small",
+                },
+                "pg_bouncer": {
+                    "preset": {
+                        "name": "cpu-small",
+                    },
+                },
+            },
+            "text-embeddings": {
+                "model": {
+                    "model_hf_name": "BAAI/bge-m3",
+                    "hf_token": None,
+                },
+                "preset": {
+                    "name": "gpu-small",
+                },
+                "server_extra_args": [],
+            },
+        },
+        "appTypesImage": {
+            "tag": helm_params["appTypesImage"]["tag"],  # Dynamic tag, use actual value
+        },
+    }
 
-    # Check HuggingFace model configuration
-    llm_model_config = config["vllm"]
-    assert (
-        llm_model_config["hugging_face_model"]["model_hf_name"]
-        == "microsoft/DialoGPT-medium"
-    )
-
-    # Check VLLM extra args
-    vllm_args = llm_model_config["server_extra_args"]
-    assert len(vllm_args) == 2
-    assert vllm_args[0] == "--max-model-len=2048"
-    assert vllm_args[1] == "--gpu-memory-utilization=0.9"
-
-    # Check presets
-    assert config["vllm"]["preset"]["name"] == "gpu-large"
+    assert helm_params == expected_helm_params
 
 
 @pytest.mark.asyncio
@@ -201,10 +258,50 @@ async def test_launchpad_values_generation_magistral_model(setup_clients):
         app_id=APP_ID,
     )
 
-    config = helm_params["LAUNCHPAD_INITIAL_CONFIG"]
+    # Validate the complete helm_params structure at once
+    expected_helm_params = {
+        "LAUNCHPAD_INITIAL_CONFIG": {
+            "vllm": {
+                "hugging_face_model": {
+                    "model_hf_name": "unsloth/Magistral-Small-2506-GGUF",
+                    "hf_token": None,
+                },
+                "preset": {
+                    "name": "gpu-medium",
+                },
+                "server_extra_args": [
+                    "--tokenizer_mode=mistral",
+                    "--config_format=mistral",
+                    "--load_format=mistral",
+                    "--tool-call-parser=mistral",
+                    "--enable-auto-tool-choice",
+                    "--tensor-parallel-size=2",
+                ],
+            },
+            "postgres": {
+                "preset": {
+                    "name": "cpu-small",
+                },
+                "pg_bouncer": {
+                    "preset": {
+                        "name": "cpu-small",
+                    },
+                },
+            },
+            "text-embeddings": {
+                "model": {
+                    "model_hf_name": "BAAI/bge-m3",
+                    "hf_token": None,
+                },
+                "preset": {
+                    "name": "gpu-small",
+                },
+                "server_extra_args": [],
+            },
+        },
+        "appTypesImage": {
+            "tag": helm_params["appTypesImage"]["tag"],  # Dynamic tag, use actual value
+        },
+    }
 
-    assert (
-        config["vllm"]["hugging_face_model"]["model_hf_name"]
-        == "unsloth/Magistral-Small-2506-GGUF"
-    )
-    assert config["vllm"]["preset"]["name"] == "gpu-medium"
+    assert helm_params == expected_helm_params

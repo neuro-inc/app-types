@@ -2,6 +2,7 @@ import typing as t
 
 from apolo_app_types import LLMInputs, TextEmbeddingsInferenceAppInputs
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
+from apolo_app_types.helm.utils.dictionaries import get_nested_values
 from apolo_app_types.protocols.common.hugging_face import HuggingFaceModel
 from apolo_app_types.protocols.launchpad import (
     HuggingFaceEmbeddingsModel,
@@ -138,8 +139,17 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
 
         return {
             "LAUNCHPAD_INITIAL_CONFIG": {
-                "vllm": llm_input.model_dump(),
-                "postgres": postgres_inputs.model_dump(),
-                "text-embeddings": text_embeddings_inputs.model_dump(),
+                "vllm": get_nested_values(
+                    llm_input.model_dump(),
+                    ["hugging_face_model", "preset", "server_extra_args"],
+                ),
+                "postgres": get_nested_values(
+                    postgres_inputs.model_dump(),
+                    ["preset", "pg_bouncer.preset"],
+                ),
+                "text-embeddings": get_nested_values(
+                    text_embeddings_inputs.model_dump(),
+                    ["model", "preset", "server_extra_args"],
+                ),
             },
         }
