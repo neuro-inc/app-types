@@ -220,11 +220,18 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
                 bouncer_repicas=int(input_.pg_bouncer.replicas),
             )
 
+        postgrescluster_crd_name = f"pg-{app_id}"
+        if len(postgrescluster_crd_name) > 37:
+            postgrescluster_crd_name = postgrescluster_crd_name[:37]
+
         values: dict[str, t.Any] = {
             "metadata": {"labels": {"platform.apolo.us/component": "app"}},
             "features": {
                 "AutoCreateUserSchema": "true",
             },
+            # empirically measured, postgrescluster crd name is limited to 37 chars
+            # otherwise it will fail to create STSs and other resources
+            "name": postgrescluster_crd_name,
         }
         users_config = self._create_users_config(input_.postgres_config.db_users)
 
