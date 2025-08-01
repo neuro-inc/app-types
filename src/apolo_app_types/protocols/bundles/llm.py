@@ -1,3 +1,4 @@
+import typing
 from enum import Enum
 from typing import Literal
 
@@ -9,6 +10,9 @@ from apolo_app_types.protocols.common import (
     Preset,
     SchemaExtraMetadata,
 )
+
+
+TSize = typing.TypeVar("TSize")
 
 
 class Llama4Size(str, Enum):
@@ -35,7 +39,7 @@ class MistralSize(str, Enum):
     mistral_15b_fp8 = "15B-FP8"
 
 
-class LLMBundleInputs(AppInputs):
+class LLMBundleInputs(AppInputs, typing.Generic[TSize]):
     """
     Base class for LLM bundle inputs.
     This class can be extended by specific LLM bundle input classes.
@@ -57,9 +61,10 @@ class LLMBundleInputs(AppInputs):
     )
 
     preset: Preset | None = None
+    size: TSize
 
 
-class LLama4Inputs(LLMBundleInputs):
+class LLama4Inputs(LLMBundleInputs[Llama4Size]):
     """
     Inputs for the Llama4 bundle.
     This class extends LLMBundleInputs to include specific fields for Llama4.
@@ -69,7 +74,7 @@ class LLama4Inputs(LLMBundleInputs):
     llm_class: Literal["llama4"] = "llama4"
 
 
-class DeepSeekR1Inputs(LLMBundleInputs):
+class DeepSeekR1Inputs(LLMBundleInputs[DeepSeekR1Size]):
     """
     Inputs for the DeepSeekR1 bundle.
     This class extends LLMBundleInputs to include specific fields for DeepSeekR1.
@@ -79,7 +84,7 @@ class DeepSeekR1Inputs(LLMBundleInputs):
     size: DeepSeekR1Size
 
 
-class MistralInputs(LLMBundleInputs):
+class MistralInputs(LLMBundleInputs[MistralSize]):
     """
     Inputs for the Mistral bundle.
     This class extends LLMBundleInputs to include specific fields for Mistral.

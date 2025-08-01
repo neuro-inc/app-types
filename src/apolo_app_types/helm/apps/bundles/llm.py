@@ -44,6 +44,7 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
 
     cache_prefix: str = "llm_bundles"
     model_map: dict[str, ModelSettings]
+    app_type: AppType
 
     def _get_storage_path(self) -> str:
         """
@@ -75,8 +76,27 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
         raise RuntimeError(err_msg)
 
     async def _llm_inputs(self, input_: T) -> LLMInputs:
-        err_msg = "Subclasses must implement _llm_inputs"
-        raise NotImplementedError(err_msg)
+        hf_model = HuggingFaceModel(
+            model_hf_name=self.model_map[input_.size].model_hf_name,
+            hf_token=input_.hf_token,
+        )
+        if not input_.preset:
+            preset_chosen = self._get_preset(input_)
+        else:
+            preset_chosen = input_.preset
+
+        return LLMInputs(
+            hugging_face_model=hf_model,
+            tokenizer_hf_name=hf_model.model_hf_name,
+            ingress_http=IngressHttp(),
+            preset=preset_chosen,
+            cache_config=HuggingFaceCache(
+                files_path=ApoloFilesPath(path=self._get_storage_path())
+            ),
+            http_autoscaling=AutoscalingKedaHTTP(scaledown_period=300)
+            if input_.autoscaling_enabled
+            else None,
+        )
 
     async def gen_extra_values(
         self,
@@ -114,7 +134,7 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
             namespace=namespace,
             app_secrets_name=app_secrets_name,
             app_id=app_id,
-            app_type=AppType.Llama4,
+            app_type=self.app_type,
         )
 
     async def gen_extra_helm_args(self, *_: t.Any) -> list[str]:
@@ -122,6 +142,7 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
 
 
 class Llama4ValueProcessor(BaseLLMBundleMixin[LLama4Inputs]):
+    app_type = AppType.Llama4
     model_map = {
         Llama4Size.scout: ModelSettings(
             model_hf_name="meta-llama/Llama-4-17B-16E", gpu_compat=["a100", "h100"]
@@ -143,31 +164,9 @@ class Llama4ValueProcessor(BaseLLMBundleMixin[LLama4Inputs]):
         ),
     }
 
-    async def _llm_inputs(self, input_: LLama4Inputs) -> LLMInputs:
-        hf_model = HuggingFaceModel(
-            model_hf_name=self.model_map[input_.size].model_hf_name,
-            hf_token=input_.hf_token,
-        )
-        if not input_.preset:
-            preset_chosen = self._get_preset(input_)
-        else:
-            preset_chosen = input_.preset
-
-        return LLMInputs(
-            hugging_face_model=hf_model,
-            tokenizer_hf_name=hf_model.model_hf_name,
-            ingress_http=IngressHttp(),
-            preset=preset_chosen,
-            cache_config=HuggingFaceCache(
-                files_path=ApoloFilesPath(path=self._get_storage_path())
-            ),
-            http_autoscaling=AutoscalingKedaHTTP(scaledown_period=300)
-            if input_.autoscaling_enabled
-            else None,
-        )
-
 
 class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
+    app_type = AppType.DeepSeek
     model_map = {
         DeepSeekR1Size.r1_7b: ModelSettings(
             model_hf_name="deepseek-ai/deepseek-coder-7b-base",
@@ -187,35 +186,9 @@ class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
         ),
     }
 
-    async def _llm_inputs(self, input_: DeepSeekR1Inputs) -> LLMInputs:
-        hf_model = HuggingFaceModel(
-            model_hf_name=self.model_map[input_.size].model_hf_name,
-            hf_token=input_.hf_token,
-        )
-        preset_chosen = self._get_preset(input_)
-
-        return LLMInputs(
-            hugging_face_model=hf_model,
-            tokenizer_hf_name=hf_model.model_hf_name,
-            ingress_http=IngressHttp(),
-            preset=preset_chosen,
-            cache_config=HuggingFaceCache(
-                files_path=ApoloFilesPath(path=self._get_storage_path())
-            ),
-            http_autoscaling=AutoscalingKedaHTTP(scaledown_period=300)
-            if input_.autoscaling_enabled
-            else None,
-        )
-
 
 class MistralValueProcessor(BaseLLMBundleMixin[MistralInputs]):
-    def __init__(self, *args: t.Any, **kwargs: t.Any):
-        self.llm_val_processor = LLMChartValueProcessor(*args, **kwargs)
-        super().__init__(*args, **kwargs)
-
-    async def gen_extra_helm_args(self, *_: t.Any) -> list[str]:
-        return ["--timeout", "30m"]
-
+    app_type = AppType.Mistral
     model_map = {
         MistralSize.mistral_7b: ModelSettings(
             model_hf_name="mistralai/Mistral-7B-v0.1", gpu_compat=["l4", "a100", "h100"]
@@ -241,23 +214,3 @@ class MistralValueProcessor(BaseLLMBundleMixin[MistralInputs]):
             gpu_compat=["l4", "a100", "h100"],
         ),
     }
-
-    async def _llm_inputs(self, input_: MistralInputs) -> LLMInputs:
-        hf_model = HuggingFaceModel(
-            model_hf_name=self.model_map[input_.size].model_hf_name,
-            hf_token=input_.hf_token,
-        )
-        preset_chosen = self._get_preset(input_)
-
-        return LLMInputs(
-            hugging_face_model=hf_model,
-            tokenizer_hf_name=hf_model.model_hf_name,
-            ingress_http=IngressHttp(),
-            preset=preset_chosen,
-            cache_config=HuggingFaceCache(
-                files_path=ApoloFilesPath(path=self._get_storage_path())
-            ),
-            http_autoscaling=AutoscalingKedaHTTP(scaledown_period=300)
-            if input_.autoscaling_enabled
-            else None,
-        )
