@@ -44,6 +44,7 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
 
     cache_prefix: str = "llm_bundles"
     model_map: dict[str, ModelSettings]
+    app_type: AppType
 
     def _get_storage_path(self) -> str:
         """
@@ -133,7 +134,7 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
             namespace=namespace,
             app_secrets_name=app_secrets_name,
             app_id=app_id,
-            app_type=AppType.Llama4,
+            app_type=self.app_type,
         )
 
     async def gen_extra_helm_args(self, *_: t.Any) -> list[str]:
@@ -141,6 +142,7 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
 
 
 class Llama4ValueProcessor(BaseLLMBundleMixin[LLama4Inputs]):
+    app_type = AppType.Llama4
     model_map = {
         Llama4Size.scout: ModelSettings(
             model_hf_name="meta-llama/Llama-4-17B-16E", gpu_compat=["a100", "h100"]
@@ -164,6 +166,7 @@ class Llama4ValueProcessor(BaseLLMBundleMixin[LLama4Inputs]):
 
 
 class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
+    app_type = AppType.DeepSeek
     model_map = {
         DeepSeekR1Size.r1_7b: ModelSettings(
             model_hf_name="deepseek-ai/deepseek-coder-7b-base",
@@ -185,6 +188,7 @@ class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
 
 
 class MistralValueProcessor(BaseLLMBundleMixin[MistralInputs]):
+    app_type = AppType.Mistral
     model_map = {
         MistralSize.mistral_7b: ModelSettings(
             model_hf_name="mistralai/Mistral-7B-v0.1", gpu_compat=["l4", "a100", "h100"]
