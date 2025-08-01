@@ -75,8 +75,27 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
         raise RuntimeError(err_msg)
 
     async def _llm_inputs(self, input_: T) -> LLMInputs:
-        err_msg = "Subclasses must implement _llm_inputs"
-        raise NotImplementedError(err_msg)
+        hf_model = HuggingFaceModel(
+            model_hf_name=self.model_map[input_.size].model_hf_name,
+            hf_token=input_.hf_token,
+        )
+        if not input_.preset:
+            preset_chosen = self._get_preset(input_)
+        else:
+            preset_chosen = input_.preset
+
+        return LLMInputs(
+            hugging_face_model=hf_model,
+            tokenizer_hf_name=hf_model.model_hf_name,
+            ingress_http=IngressHttp(),
+            preset=preset_chosen,
+            cache_config=HuggingFaceCache(
+                files_path=ApoloFilesPath(path=self._get_storage_path())
+            ),
+            http_autoscaling=AutoscalingKedaHTTP(scaledown_period=300)
+            if input_.autoscaling_enabled
+            else None,
+        )
 
     async def gen_extra_values(
         self,
@@ -142,29 +161,6 @@ class Llama4ValueProcessor(BaseLLMBundleMixin[LLama4Inputs]):
             gpu_compat=["l4", "a100", "h100"],
         ),
     }
-
-    async def _llm_inputs(self, input_: LLama4Inputs) -> LLMInputs:
-        hf_model = HuggingFaceModel(
-            model_hf_name=self.model_map[input_.size].model_hf_name,
-            hf_token=input_.hf_token,
-        )
-        if not input_.preset:
-            preset_chosen = self._get_preset(input_)
-        else:
-            preset_chosen = input_.preset
-
-        return LLMInputs(
-            hugging_face_model=hf_model,
-            tokenizer_hf_name=hf_model.model_hf_name,
-            ingress_http=IngressHttp(),
-            preset=preset_chosen,
-            cache_config=HuggingFaceCache(
-                files_path=ApoloFilesPath(path=self._get_storage_path())
-            ),
-            http_autoscaling=AutoscalingKedaHTTP(scaledown_period=300)
-            if input_.autoscaling_enabled
-            else None,
-        )
 
 
 class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
