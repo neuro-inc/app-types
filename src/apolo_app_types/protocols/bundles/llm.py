@@ -6,6 +6,7 @@ from pydantic import Field
 from apolo_app_types.protocols.common import (
     ApoloSecret,
     AppInputs,
+    Preset,
     SchemaExtraMetadata,
 )
 
@@ -54,6 +55,8 @@ class LLMBundleInputs(AppInputs):
             title="Enable Autoscaling",
         ).as_json_schema_extra(),
     )
+
+    preset: Preset | None = None
 
 
 class LLama4Inputs(LLMBundleInputs):
