@@ -148,7 +148,10 @@ class Llama4ValueProcessor(BaseLLMBundleMixin[LLama4Inputs]):
             model_hf_name=self.model_map[input_.size].model_hf_name,
             hf_token=input_.hf_token,
         )
-        preset_chosen = self._get_preset(input_)
+        if not input_.preset:
+            preset_chosen = self._get_preset(input_)
+        else:
+            preset_chosen = input_.preset
 
         return LLMInputs(
             hugging_face_model=hf_model,
