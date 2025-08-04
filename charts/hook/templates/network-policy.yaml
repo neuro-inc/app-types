@@ -1,4 +1,4 @@
-{{- if .Values.enableEgressToKubeAPI }}
+{{- if .Values.networkPolicy.enable }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -15,8 +15,10 @@ spec:
   egress:
     - to:
         - ipBlock:
-            cidr: {{ .Values.kubeApiIP }}/32
+            cidr: 0.0.0.0/0
       ports:
         - protocol: TCP
           port: 443
+        - protocol: TCP
+          port: 80
 {{- end }}

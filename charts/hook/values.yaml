@@ -8,5 +8,5 @@ appTypesImage:
 
 postProcessorEnvs: []
 
-enableEgressToKubeAPI: true
-kubeApiIP: "10.0.0.2"
+networkPolicy:
+  enable: true
