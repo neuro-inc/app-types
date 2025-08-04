@@ -1,0 +1,22 @@
+{{- if .Values.enableEgressToKubeAPI }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "app.fullname" . | trunc 50 }}-ae
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      job-name: {{ include "app.fullname" . }}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: {{ .Values.kubeApiIP }}/32
+      ports:
+        - protocol: TCP
+          port: 443
+{{- end }}
