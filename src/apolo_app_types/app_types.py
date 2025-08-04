@@ -24,6 +24,7 @@ class AppType(enum.StrEnum):
     SparkJob = "spark-job"
     Superset = "superset"
     OpenWebUI = "openwebui"
+    Launchpad = "launchpad"
 
     # bundles
     Llama4 = "llama4"
