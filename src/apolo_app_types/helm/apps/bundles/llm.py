@@ -145,22 +145,16 @@ class Llama4ValueProcessor(BaseLLMBundleMixin[LLama4Inputs]):
     app_type = AppType.Llama4
     model_map = {
         Llama4Size.scout: ModelSettings(
-            model_hf_name="meta-llama/Llama-4-17B-16E", gpu_compat=["a100", "h100"]
+            model_hf_name="meta-llama/Llama-4-Scout-17B-16E",
+            gpu_compat=["a100", "h100"],
         ),
         Llama4Size.scout_instruct: ModelSettings(
-            model_hf_name="meta-llama/Llama-4-17B-16E-Instruct",
+            model_hf_name="meta-llama/Llama-4-Scout-17B-16E-Instruct",
             gpu_compat=["a100", "h100"],
-        ),
-        Llama4Size.maverick: ModelSettings(
-            model_hf_name="meta-llama/Llama-4-17B-128E", gpu_compat=["a100", "h100"]
         ),
         Llama4Size.maverick_instruct: ModelSettings(
-            model_hf_name="meta-llama/Llama-4-17B-128E-Instruct",
+            model_hf_name="meta-llama/Llama-4-Maverick-17B-128E-Instruct",
             gpu_compat=["a100", "h100"],
-        ),
-        Llama4Size.maverick_fp8: ModelSettings(
-            model_hf_name="meta-llama/Llama-4-17B-128E-Instruct-FP8",
-            gpu_compat=["l4", "a100", "h100"],
         ),
     }
 
@@ -168,21 +162,21 @@ class Llama4ValueProcessor(BaseLLMBundleMixin[LLama4Inputs]):
 class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
     app_type = AppType.DeepSeek
     model_map = {
-        DeepSeekR1Size.r1_7b: ModelSettings(
-            model_hf_name="deepseek-ai/deepseek-coder-7b-base",
+        DeepSeekR1Size.r1: ModelSettings(
+            model_hf_name="deepseek-ai/DeepSeek-R1",
             gpu_compat=["l4", "a100", "h100"],
         ),
-        DeepSeekR1Size.r1_70b: ModelSettings(
-            model_hf_name="deepseek-ai/deepseek-coder-70b-base",
+        DeepSeekR1Size.r1_zero: ModelSettings(
+            model_hf_name="deepseek-ai/DeepSeek-R1-Zero",
             gpu_compat=["a100", "h100"],
         ),
-        DeepSeekR1Size.r1_70b_instruct: ModelSettings(
-            model_hf_name="deepseek-ai/deepseek-coder-70b-instruct",
-            gpu_compat=["a100", "h100"],
-        ),
-        DeepSeekR1Size.r1_70b_fp8: ModelSettings(
-            model_hf_name="deepseek-ai/deepseek-coder-70b-instruct-fp8",
+        DeepSeekR1Size.r1_distill_llama_8b: ModelSettings(
+            model_hf_name="deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
             gpu_compat=["l4", "a100", "h100"],
+        ),
+        DeepSeekR1Size.r1_distill_llama_70b: ModelSettings(
+            model_hf_name="deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+            gpu_compat=["a100", "h100"],
         ),
     }
 
@@ -190,27 +184,20 @@ class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
 class MistralValueProcessor(BaseLLMBundleMixin[MistralInputs]):
     app_type = AppType.Mistral
     model_map = {
-        MistralSize.mistral_7b: ModelSettings(
-            model_hf_name="mistralai/Mistral-7B-v0.1", gpu_compat=["l4", "a100", "h100"]
-        ),
-        MistralSize.mistral_7b_instruct: ModelSettings(
-            model_hf_name="mistralai/Mistral-7B-Instruct-v0.1",
+        MistralSize.mistral_7b_v02: ModelSettings(
+            model_hf_name="mistralai/Mistral-7B-Instruct-v0.2",
             gpu_compat=["l4", "a100", "h100"],
         ),
-        MistralSize.mistral_7b_fp8: ModelSettings(
-            model_hf_name="mistralai/Mistral-7B-Instruct-v0.1-fp8",
+        MistralSize.mistral_7b_v03: ModelSettings(
+            model_hf_name="mistralai/Mistral-7B-Instruct-v0.3",
             gpu_compat=["l4", "a100", "h100"],
         ),
-        MistralSize.mistral_15b: ModelSettings(
-            model_hf_name="mistralai/Mistral-15B-v0.1",
+        MistralSize.mistral_7b_v01: ModelSettings(
+            model_hf_name="mistralai/Mistral-7B-v0.1",
+            gpu_compat=["l4", "a100", "h100"],
+        ),
+        MistralSize.mistral_31_24b_instruct: ModelSettings(
+            model_hf_name="mistralai/Mistral-Small-3.1-24B-Instruct-2503",
             gpu_compat=["a100", "h100"],
-        ),
-        MistralSize.mistral_15b_instruct: ModelSettings(
-            model_hf_name="mistralai/Mistral-15B-Instruct-v0.1",
-            gpu_compat=["a100", "h100"],
-        ),
-        MistralSize.mistral_15b_fp8: ModelSettings(
-            model_hf_name="mistralai/Mistral-15B-Instruct-v0.1-fp8",
-            gpu_compat=["l4", "a100", "h100"],
         ),
     }
