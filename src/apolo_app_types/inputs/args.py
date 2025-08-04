@@ -20,7 +20,11 @@ from apolo_app_types.helm.apps import (
     StableDiffusionChartValueProcessor,
 )
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
-from apolo_app_types.helm.apps.bundles.llm import Llama4ValueProcessor
+from apolo_app_types.helm.apps.bundles.llm import (
+    DeepSeekValueProcessor,
+    Llama4ValueProcessor,
+    MistralValueProcessor,
+)
 from apolo_app_types.helm.apps.dify import DifyChartValueProcessor
 from apolo_app_types.helm.apps.dockerhub import DockerHubModelChartValueProcessor
 from apolo_app_types.helm.apps.fooocus import FooocusChartValueProcessor
@@ -37,6 +41,10 @@ from apolo_app_types.helm.apps.superset import SupersetChartValueProcessor
 from apolo_app_types.helm.apps.text_embeddings import TextEmbeddingsChartValueProcessor
 from apolo_app_types.helm.apps.vscode import VSCodeChartValueProcessor
 from apolo_app_types.helm.apps.weaviate import WeaviateChartValueProcessor
+from apolo_app_types.protocols.bundles.llm import (
+    DeepSeekR1Inputs,
+    MistralInputs,
+)
 from apolo_app_types.protocols.common import AppInputs
 from apolo_app_types.protocols.custom_deployment import CustomDeploymentInputs
 from apolo_app_types.protocols.dify import DifyAppInputs
@@ -83,6 +91,8 @@ async def app_type_to_vals(
         AppType.OpenWebUI: OpenWebUIChartValueProcessor,
         AppType.Launchpad: LaunchpadChartValueProcessor,
         AppType.Llama4: Llama4ValueProcessor,
+        AppType.DeepSeek: DeepSeekValueProcessor,
+        AppType.Mistral: MistralValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)
@@ -144,6 +154,8 @@ async def get_installation_vals(
         AppType.OpenWebUI: OpenWebUIAppInputs,
         AppType.Launchpad: LaunchpadAppInputs,
         AppType.Llama4: LLama4Inputs,
+        AppType.DeepSeek: DeepSeekR1Inputs,
+        AppType.Mistral: MistralInputs,
     }
 
     if app_type not in input_type_map:

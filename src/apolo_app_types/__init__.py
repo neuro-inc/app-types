@@ -1,5 +1,10 @@
+from apolo_app_types.job_utils import JobRunParams, prepare_job_run_params
 from apolo_app_types.protocols.apolo_deploy import ApoloDeployInputs, ApoloDeployOutputs
-from apolo_app_types.protocols.bundles import LLama4Inputs
+from apolo_app_types.protocols.bundles import (
+    DeepSeekR1Inputs,
+    LLama4Inputs,
+    MistralInputs,
+)
 from apolo_app_types.protocols.common import (
     ApoloFilesMount,
     ApoloSecret,
@@ -44,6 +49,17 @@ from apolo_app_types.protocols.fooocus import (
 from apolo_app_types.protocols.huggingface_cache import (
     HuggingFaceCacheInputs,
     HuggingFaceCacheOutputs,
+)
+from apolo_app_types.protocols.job import (
+    ContainerHTTPServer,
+    ContainerResources,
+    ContainerTPUResource,
+    DiskVolume,
+    JobAppInput,
+    JobAppOutput,
+    JobPriority,
+    JobRestartPolicy,
+    SecretVolume,
 )
 from apolo_app_types.protocols.jupyter import (
     JupyterAppInputs,
@@ -224,5 +240,18 @@ __all__ = [
     "OpenWebUIAppOutputs",
     "LaunchpadAppInputs",
     "LaunchpadAppOutputs",
+    "JobAppInput",
+    "JobAppOutput",
+    "JobPriority",
+    "JobRestartPolicy",
+    "ContainerTPUResource",
+    "ContainerResources",
+    "SecretVolume",
+    "DiskVolume",
+    "ContainerHTTPServer",
+    "JobRunParams",
+    "prepare_job_run_params",
     "LLama4Inputs",
+    "DeepSeekR1Inputs",
+    "MistralInputs",
 ]

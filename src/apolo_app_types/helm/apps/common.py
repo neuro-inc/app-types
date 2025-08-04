@@ -31,6 +31,10 @@ APOLO_STORAGE_LABEL = "platform.apolo.us/inject-storage"
 APOLO_ORG_LABEL = "platform.apolo.us/org"
 APOLO_PROJECT_LABEL = "platform.apolo.us/project"
 
+KEDA_HTTP_PROXY_SERVICE = (
+    "keda-add-ons-http-interceptor-proxy.platform.svc.cluster.local"
+)
+
 
 def get_preset(client: apolo_sdk.Client, preset_name: str) -> apolo_sdk.Preset:
     if os.environ.get("ENV") == "local":
