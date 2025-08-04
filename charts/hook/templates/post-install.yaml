@@ -12,6 +12,7 @@ spec:
     metadata:
       labels:
         {{- include "app.labels" . | nindent 8 }}
+        job-name: {{ include "app.fullname" . }}
     spec:
       restartPolicy: Never
       serviceAccountName: {{ .Release.Name }}-sa
