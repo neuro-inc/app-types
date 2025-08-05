@@ -71,7 +71,7 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
             for preset_name, _ in available_presets.items():
                 if fuzzy_contains(gpu_compat, preset_name, cutoff=0.5):
                     return Preset(name=preset_name)
-        # If no preset found, return default
+        # If no preset found, raise an error
         err_msg = "No preset found for the given input size and GPU compatibility."
         raise RuntimeError(err_msg)
 
@@ -80,10 +80,7 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
             model_hf_name=self.model_map[input_.size].model_hf_name,
             hf_token=input_.hf_token,
         )
-        if not input_.preset:
-            preset_chosen = self._get_preset(input_)
-        else:
-            preset_chosen = input_.preset
+        preset_chosen = self._get_preset(input_)
 
         return LLMInputs(
             hugging_face_model=hf_model,
@@ -144,16 +141,17 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
 class Llama4ValueProcessor(BaseLLMBundleMixin[LLama4Inputs]):
     app_type = AppType.Llama4
     model_map = {
+        # Small model added for L4 compatibility
+        Llama4Size.tiny: ModelSettings(
+            model_hf_name="meta-llama/Llama-4-8B",
+            gpu_compat=["l4", "a100", "h100"],
+        ),
         Llama4Size.scout: ModelSettings(
             model_hf_name="meta-llama/Llama-4-Scout-17B-16E",
             gpu_compat=["a100", "h100"],
         ),
         Llama4Size.scout_instruct: ModelSettings(
             model_hf_name="meta-llama/Llama-4-Scout-17B-16E-Instruct",
-            gpu_compat=["a100", "h100"],
-        ),
-        Llama4Size.maverick_instruct: ModelSettings(
-            model_hf_name="meta-llama/Llama-4-Maverick-17B-128E-Instruct",
             gpu_compat=["a100", "h100"],
         ),
     }
@@ -168,7 +166,7 @@ class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
         ),
         DeepSeekR1Size.r1_zero: ModelSettings(
             model_hf_name="deepseek-ai/DeepSeek-R1-Zero",
-            gpu_compat=["a100", "h100"],
+            gpu_compat=["a100", "h100"],  # Larger than R1, drop L4
         ),
         DeepSeekR1Size.r1_distill_llama_8b: ModelSettings(
             model_hf_name="deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
@@ -176,7 +174,7 @@ class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
         ),
         DeepSeekR1Size.r1_distill_llama_70b: ModelSettings(
             model_hf_name="deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
-            gpu_compat=["a100", "h100"],
+            gpu_compat=["h100"],  # Safe only on H100
         ),
     }
 
@@ -184,16 +182,16 @@ class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
 class MistralValueProcessor(BaseLLMBundleMixin[MistralInputs]):
     app_type = AppType.Mistral
     model_map = {
+        MistralSize.mistral_7b_v01: ModelSettings(
+            model_hf_name="mistralai/Mistral-7B-v0.1",
+            gpu_compat=["l4", "a100", "h100"],
+        ),
         MistralSize.mistral_7b_v02: ModelSettings(
             model_hf_name="mistralai/Mistral-7B-Instruct-v0.2",
             gpu_compat=["l4", "a100", "h100"],
         ),
         MistralSize.mistral_7b_v03: ModelSettings(
             model_hf_name="mistralai/Mistral-7B-Instruct-v0.3",
-            gpu_compat=["l4", "a100", "h100"],
-        ),
-        MistralSize.mistral_7b_v01: ModelSettings(
-            model_hf_name="mistralai/Mistral-7B-v0.1",
             gpu_compat=["l4", "a100", "h100"],
         ),
         MistralSize.mistral_31_24b_instruct: ModelSettings(
