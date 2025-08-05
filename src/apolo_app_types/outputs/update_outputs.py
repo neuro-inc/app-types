@@ -35,11 +35,12 @@ from apolo_app_types.outputs.weaviate import get_weaviate_outputs
 logger = logging.getLogger()
 
 MAX_RETRIES = 5
-RETRY_DELAY = 5  # seconds
+RETRY_DELAY = 10  # seconds
 
 
 async def post_outputs(api_url: str, api_token: str, outputs: dict[str, t.Any]) -> None:
-    async with httpx.AsyncClient() as client:
+    timeout = httpx.Timeout(30.0)  # increase default timeout
+    async with httpx.AsyncClient(timeout=timeout) as client:
         for attempt in range(1, MAX_RETRIES + 1):
             try:
                 response = await client.post(
@@ -59,6 +60,13 @@ async def post_outputs(api_url: str, api_token: str, outputs: dict[str, t.Any]) 
                     attempt,
                     MAX_RETRIES,
                     response.status_code,
+                )
+            except httpx.TimeoutException as e:
+                logger.warning(
+                    "Timeout on attempt %d/%d: %s",
+                    attempt,
+                    MAX_RETRIES,
+                    e,
                 )
             except httpx.RequestError as e:
                 logger.warning(
