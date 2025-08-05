@@ -7,7 +7,6 @@ from pydantic import Field
 from apolo_app_types.protocols.common import (
     ApoloSecret,
     AppInputs,
-    Preset,
     SchemaExtraMetadata,
 )
 
@@ -16,9 +15,9 @@ TSize = typing.TypeVar("TSize")
 
 
 class Llama4Size(str, Enum):
+    tiny = "4-8B"
     scout = "Scout-17B-16E"
     scout_instruct = "Scout-17B-16E-Instruct"
-    maverick_instruct = "Maverick-17B-128E-Instruct"
 
 
 class DeepSeekR1Size(str, Enum):
@@ -56,7 +55,6 @@ class LLMBundleInputs(AppInputs, typing.Generic[TSize]):
         ).as_json_schema_extra(),
     )
 
-    preset: Preset | None = None
     size: TSize
 
 
