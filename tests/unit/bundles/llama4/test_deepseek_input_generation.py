@@ -109,16 +109,10 @@ async def test_values_llm_generation_gpu_default_preset(
             "className": "traefik",
             "hosts": [
                 {
-                    "host": f"{AppType.LLMInference.value}--"
-                    f"{APP_ID}.apps.some.org.neu.ro",
+                    "host": f"{AppType.DeepSeek.value}--{APP_ID}.apps.some.org.neu.ro",
                     "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
                 }
             ],
-            "annotations": {
-                "traefik.ingress.kubernetes.io/router.middlewares": (
-                    "platform-platform-control-plane-ingress-auth@kubernetescrd"
-                )
-            },
         },
         "podAnnotations": {
             APOLO_STORAGE_LABEL: '[{"storage_uri": "storage://cluster/test-org/test-project/llm_bundles", "mount_path": "/root/.cache/huggingface", "mount_mode": "rw"}]'  # noqa: E501

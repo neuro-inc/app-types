@@ -175,11 +175,12 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
           - Existing autoscaling logic
           - GPU detection for parallel settings
         """
+        app_type = kwargs.get("app_type", AppType.LLMInference)
         values = await gen_extra_values(
             self.client,
             input_.preset,
             app_id,
-            AppType.LLMInference,
+            app_type,
             input_.ingress_http,
             None,
             namespace,

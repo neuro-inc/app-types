@@ -85,7 +85,7 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
         return LLMInputs(
             hugging_face_model=hf_model,
             tokenizer_hf_name=hf_model.model_hf_name,
-            ingress_http=IngressHttp(),
+            ingress_http=IngressHttp(auth=False),
             preset=preset_chosen,
             cache_config=HuggingFaceCache(
                 files_path=ApoloFilesPath(path=self._get_storage_path())
@@ -175,6 +175,10 @@ class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
         DeepSeekR1Size.r1_distill_llama_70b: ModelSettings(
             model_hf_name="deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
             gpu_compat=["h100"],  # Safe only on H100
+        ),
+        DeepSeekR1Size.r1_distill_qwen_1_5_b: ModelSettings(
+            model_hf_name="deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+            gpu_compat=["a100", "h100"],
         ),
     }
 

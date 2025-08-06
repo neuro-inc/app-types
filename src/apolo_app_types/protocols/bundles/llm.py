@@ -25,6 +25,7 @@ class DeepSeekR1Size(str, Enum):
     r1_zero = "R1-Zero"
     r1_distill_llama_70b = "R1-Distill-Llama-70B"
     r1_distill_llama_8b = "R1-Distill-Llama-8B"  # noqa: N815
+    r1_distill_qwen_1_5_b = "R1-Distill-Qwen-1.5B"
 
 
 class MistralSize(str, Enum):
