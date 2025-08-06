@@ -162,7 +162,7 @@ class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
     model_map = {
         DeepSeekR1Size.r1: ModelSettings(
             model_hf_name="deepseek-ai/DeepSeek-R1",
-            gpu_compat=["l4", "a100", "h100"],
+            gpu_compat=["a100", "h100"],
         ),
         DeepSeekR1Size.r1_zero: ModelSettings(
             model_hf_name="deepseek-ai/DeepSeek-R1-Zero",
