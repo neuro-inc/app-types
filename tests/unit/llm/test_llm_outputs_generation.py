@@ -23,9 +23,9 @@ async def test_llm(setup_clients, mock_kubernetes_client, app_instance_id):
     assert res["tokenizer_hf_name"] == "meta-llama/Llama-3.1-8B-Instruct"
     assert res["server_extra_args"] == ["--api-key dummy-api-key"]
     assert res["llm_api_key"] == "dummy-api-key"
-    assert res["chat_internal_api"]["host"] == "llm-inference.default-namespace"
+    assert res["chat_internal_api"]["host"] == "app.default-namespace"
     assert res["chat_internal_api"]["endpoint_url"] == "/v1/chat"
-    assert res["embeddings_internal_api"]["host"] == "llm-inference.default-namespace"
+    assert res["embeddings_internal_api"]["host"] == "app.default-namespace"
     assert res["embeddings_internal_api"]["endpoint_url"] == "/v1/embeddings"
     assert res["chat_external_api"]["host"] == "example.com"
     assert res["embeddings_external_api"]["host"] == "example.com"
@@ -53,9 +53,9 @@ async def test_llm_without_server_args(
     assert res["tokenizer_hf_name"] == "meta-llama/Llama-3.1-8B-Instruct"
     assert not res["server_extra_args"]
     assert res["llm_api_key"] == "dummy-api-key"
-    assert res["chat_internal_api"]["host"] == "llm-inference.default-namespace"
+    assert res["chat_internal_api"]["host"] == "app.default-namespace"
     assert res["chat_internal_api"]["endpoint_url"] == "/v1/chat"
-    assert res["embeddings_internal_api"]["host"] == "llm-inference.default-namespace"
+    assert res["embeddings_internal_api"]["host"] == "app.default-namespace"
     assert res["embeddings_internal_api"]["endpoint_url"] == "/v1/embeddings"
     assert res["chat_external_api"]["host"] == "example.com"
     assert res["embeddings_external_api"]["host"] == "example.com"

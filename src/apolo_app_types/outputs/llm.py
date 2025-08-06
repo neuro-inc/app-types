@@ -23,7 +23,6 @@ async def get_llm_inference_outputs(
 ) -> dict[str, t.Any]:
     internal_host, internal_port = await get_service_host_port(
         match_labels={
-            "application": "llm-inference",
             INSTANCE_LABEL: app_instance_id,
         }
     )
@@ -52,7 +51,9 @@ async def get_llm_inference_outputs(
     )
 
     ingress_host_port = await get_ingress_host_port(
-        match_labels={"application": "llm-inference"}
+        match_labels={
+            INSTANCE_LABEL: app_instance_id,
+        }
     )
     chat_external_api = None
     embeddings_external_api = None
