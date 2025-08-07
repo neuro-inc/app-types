@@ -13,6 +13,7 @@ from apolo_app_types.protocols.common import (
     SchemaExtraMetadata,
 )
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
+from apolo_app_types.protocols.common.ingress import AuthIngressMiddleware
 from apolo_app_types.protocols.common.k8s import Env
 from apolo_app_types.protocols.common.networking import (
     RestAPI,
@@ -74,9 +75,14 @@ class PostgresDatabase(AbstractAppFieldType):
     credentials: CrunchyPostgresUserCredentials
 
 
-class OpenWebUIAppInputs(AppInputs):
-    preset: Preset
-    ingress_http: IngressHttp
+class DataBaseConfig(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Database Configuration",
+            description="Configure the database for OpenWebUI.",
+        ).as_json_schema_extra(),
+    )
     database: SQLiteDatabase | PostgresDatabase = Field(
         default_factory=lambda: SQLiteDatabase(),
         json_schema_extra=SchemaExtraMetadata(
@@ -85,6 +91,42 @@ class OpenWebUIAppInputs(AppInputs):
             "Choose between local SQLite or Postgres.",
         ).as_json_schema_extra(),
     )
+
+
+class AdvancedNetworkConfig(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Advanced Network Configuration",
+            description="Configure advanced networking settings for OpenWebUI.",
+            is_advanced_field=True,
+        ).as_json_schema_extra(),
+    )
+    ingress_middleware: AuthIngressMiddleware | None = None
+
+
+class NetworkConfig(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Network Configuration",
+            description="Configure networking settings for OpenWebUI.",
+        ).as_json_schema_extra(),
+    )
+    ingress_http: IngressHttp = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="HTTP Ingress",
+            description="Configure HTTP ingress settings for OpenWebUI.",
+        ).as_json_schema_extra(),
+    )
+    advanced_networking: AdvancedNetworkConfig
+
+
+class OpenWebUIAppInputs(AppInputs):
+    preset: Preset
+    networking_config: NetworkConfig
+    database_config: DataBaseConfig
     embeddings_api: OpenAICompatEmbeddingsAPI
     llm_chat_api: OpenAICompatChatAPI
     openwebui_specific: OpenWebUISpecific = Field(

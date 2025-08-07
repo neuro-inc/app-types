@@ -1,5 +1,6 @@
 import re
 import typing as t
+from copy import deepcopy
 
 import apolo_sdk
 
@@ -174,3 +175,18 @@ async def get_grpc_ingress_values(
         grpc_vals["annotations"][MIDDLEWARE_ANNOTATION_KEY] = middleware_string
 
     return grpc_vals
+
+
+async def append_ingress_middleware_annotations(
+    current_annotations: dict[str, t.Any], namespace: str, middleware_name: str
+) -> dict[str, t.Any]:
+    curr_annot = deepcopy(current_annotations)
+
+    middleware_annot = f"{namespace}-{middleware_name}@kubernetescrd"
+
+    if MIDDLEWARE_ANNOTATION_KEY in curr_annot:
+        curr_annot[MIDDLEWARE_ANNOTATION_KEY] += f",{middleware_annot}"
+    else:
+        curr_annot[MIDDLEWARE_ANNOTATION_KEY] = middleware_annot
+
+    return curr_annot
