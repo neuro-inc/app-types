@@ -15,9 +15,9 @@ TSize = typing.TypeVar("TSize")
 
 
 class Llama4Size(str, Enum):
-    tiny = "4-8B"
-    scout = "Scout-17B-16E"
-    scout_instruct = "Scout-17B-16E-Instruct"
+    maverick_17b_128e_instruct_fp8 = "Llama-4-Maverick-17B-128E-Instruct-FP8"
+    scout = "Llama-4-Scout-17B-16E"
+    scout_instruct = "Llama-4-Scout-17B-16E-Instruct"
 
 
 class DeepSeekR1Size(str, Enum):
@@ -29,10 +29,10 @@ class DeepSeekR1Size(str, Enum):
 
 
 class MistralSize(str, Enum):
-    mistral_7b_v02 = "7B-v0.3"
-    mistral_7b_v03 = "7B-v0.2"
-    mistral_7b_v01 = "7B-v0.1"
-    mistral_31_24b_instruct = "24B-Instruct"
+    mistral_7b_v02 = "Mistral-7B-Instruct-v0.2"
+    mistral_7b_v03 = "Mistral-7B-Instruct-v0.3"
+    mistral_31_24b_instruct = "Mistral-Small-3.1-24B-Instruct-2503"
+    mistral_32_24b_instruct = "Mistral-Small-3.2-24B-Instruct-2506"
 
 
 class LLMBundleInputs(AppInputs, typing.Generic[TSize]):
