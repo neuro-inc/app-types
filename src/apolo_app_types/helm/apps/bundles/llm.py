@@ -141,10 +141,9 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
 class Llama4ValueProcessor(BaseLLMBundleMixin[LLama4Inputs]):
     app_type = AppType.Llama4
     model_map = {
-        # Small model added for L4 compatibility
-        Llama4Size.tiny: ModelSettings(
-            model_hf_name="meta-llama/Llama-4-8B",
-            gpu_compat=["l4", "a100", "h100"],
+        Llama4Size.maverick_17b_128e_instruct_fp8: ModelSettings(
+            model_hf_name="meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+            gpu_compat=["h100"],
         ),
         Llama4Size.scout: ModelSettings(
             model_hf_name="meta-llama/Llama-4-Scout-17B-16E",
@@ -178,7 +177,7 @@ class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
         ),
         DeepSeekR1Size.r1_distill_qwen_1_5_b: ModelSettings(
             model_hf_name="deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
-            gpu_compat=["a100", "h100"],
+            gpu_compat=["l4", "a100", "h100"],
         ),
     }
 
@@ -186,10 +185,6 @@ class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
 class MistralValueProcessor(BaseLLMBundleMixin[MistralInputs]):
     app_type = AppType.Mistral
     model_map = {
-        MistralSize.mistral_7b_v01: ModelSettings(
-            model_hf_name="mistralai/Mistral-7B-v0.1",
-            gpu_compat=["l4", "a100", "h100"],
-        ),
         MistralSize.mistral_7b_v02: ModelSettings(
             model_hf_name="mistralai/Mistral-7B-Instruct-v0.2",
             gpu_compat=["l4", "a100", "h100"],
@@ -200,6 +195,10 @@ class MistralValueProcessor(BaseLLMBundleMixin[MistralInputs]):
         ),
         MistralSize.mistral_31_24b_instruct: ModelSettings(
             model_hf_name="mistralai/Mistral-Small-3.1-24B-Instruct-2503",
+            gpu_compat=["a100", "h100"],
+        ),
+        MistralSize.mistral_32_24b_instruct: ModelSettings(
+            model_hf_name="mistralai/Mistral-Small-3.2-24B-Instruct-2506",
             gpu_compat=["a100", "h100"],
         ),
     }
