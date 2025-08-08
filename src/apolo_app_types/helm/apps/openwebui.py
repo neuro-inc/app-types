@@ -11,6 +11,7 @@ from apolo_app_types import (
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps import CustomDeploymentChartValueProcessor
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
+from apolo_app_types.helm.apps.ingress import append_ingress_middleware_annotations
 from apolo_app_types.helm.utils.database import get_postgres_database_url
 from apolo_app_types.helm.utils.storage import get_app_data_files_path_url
 from apolo_app_types.protocols.common import (
@@ -57,9 +58,9 @@ class OpenWebUIChartValueProcessor(BaseChartValueProcessor[OpenWebUIAppInputs]):
             ),
         }
 
-        if input_.database.database_type == DBTypes.POSTGRES:
+        if input_.database_config.database.database_type == DBTypes.POSTGRES:
             database_url = get_postgres_database_url(
-                credentials=input_.database.credentials
+                credentials=input_.database_config.database.credentials
             )
             extra_env = {
                 "DATABASE_URL": database_url,
@@ -96,7 +97,7 @@ class OpenWebUIChartValueProcessor(BaseChartValueProcessor[OpenWebUIAppInputs]):
             container=Container(env=[Env(name=k, value=v) for k, v in env.items()]),
             networking=NetworkingConfig(
                 service_enabled=True,
-                ingress_http=input_.ingress_http,
+                ingress_http=input_.networking_config.ingress_http,
                 ports=[
                     Port(name="http", port=self._port),
                 ],
@@ -142,4 +143,13 @@ class OpenWebUIChartValueProcessor(BaseChartValueProcessor[OpenWebUIAppInputs]):
             app_secrets_name=app_secrets_name,
             app_type=AppType.OpenWebUI,
         )
+
+        if input_.networking_config.advanced_networking.ingress_middleware:
+            custom_app_vals["ingress"][
+                "annotations"
+            ] = await append_ingress_middleware_annotations(
+                custom_app_vals["ingress"]["annotations"],
+                namespace,
+                input_.networking_config.advanced_networking.ingress_middleware.name,
+            )
         return {**custom_app_vals, "labels": {"application": "openwebui"}}
