@@ -3,6 +3,15 @@ import pytest
 from apolo_app_types.outputs.launchpad import get_launchpad_outputs
 
 
+KEYCLOAK_HELM_VALUES = {
+    "keycloak": {
+        "auth": {
+            "adminPassword": "test-admin-password",
+        }
+    },
+}
+
+
 @pytest.mark.asyncio
 async def test_launchpad_output_generation(
     setup_clients, mock_kubernetes_client, app_instance_id
@@ -18,6 +27,7 @@ async def test_launchpad_output_generation(
                     "preset": {"name": "gpu-small"},
                 }
             },
+            **KEYCLOAK_HELM_VALUES,
         },
         app_instance_id=app_instance_id,
     )
@@ -73,6 +83,7 @@ async def test_launchpad_output_generation_no_external_url(
                     "preset": {"name": "gpu-medium"},
                 }
             },
+            **KEYCLOAK_HELM_VALUES,
         },
         app_instance_id=app_instance_id,
     )
@@ -122,6 +133,7 @@ async def test_launchpad_output_generation_no_service(
                     "preset": {"name": "gpu-small"},
                 }
             },
+            **KEYCLOAK_HELM_VALUES,
         },
         app_instance_id=app_instance_id,
     )
@@ -132,6 +144,7 @@ async def test_launchpad_output_generation_no_service(
     web_app_url = res["web_app_url"]
     assert web_app_url["internal_url"] is None
     assert web_app_url["external_url"] is None
+    assert res["keycloak_config"]["auth_admin_password"] == "test-admin-password"
 
 
 @pytest.mark.asyncio
@@ -165,6 +178,7 @@ async def test_launchpad_output_generation_custom_ports(
                     "preset": {"name": "gpu-large"},
                 }
             },
+            **KEYCLOAK_HELM_VALUES,
         },
         app_instance_id=app_instance_id,
     )
