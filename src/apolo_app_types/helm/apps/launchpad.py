@@ -1,7 +1,12 @@
+import random
+import string
 import typing as t
 
 from apolo_app_types import LLMInputs, TextEmbeddingsInferenceAppInputs
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
+from apolo_app_types.helm.apps.ingress import (
+    _get_ingress_name_template,
+)
 from apolo_app_types.helm.utils.dictionaries import get_nested_values
 from apolo_app_types.protocols.common.hugging_face import HuggingFaceModel
 from apolo_app_types.protocols.launchpad import (
@@ -18,6 +23,31 @@ from apolo_app_types.protocols.postgres import (
     PostgresDBUser,
     PostgresInputs,
 )
+
+
+def _generate_password(length: int = 12) -> str:
+    if length < 4:
+        err_msg = "Password length must be at least 4"
+        raise ValueError(err_msg)
+
+    # At least one from each category
+    lower = random.choice(string.ascii_lowercase)
+    upper = random.choice(string.ascii_uppercase)
+    digit = random.choice(string.digits)
+    special = random.choice("!@#$%^&*()-_=+[]{};:,.<>?/")
+
+    # Fill the rest
+    remaining = "".join(
+        random.choices(
+            string.ascii_letters + string.digits + "!@#$%^&*()-_=+[]{};:,.<>?/",
+            k=length - 4,
+        )
+    )
+
+    # Shuffle so it’s not predictable
+    password_list = list(lower + upper + digit + special + remaining)
+    random.shuffle(password_list)
+    return "".join(password_list)
 
 
 class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
@@ -118,7 +148,7 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
         *_: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
-        # may need storage later, specially as cache for pulling models
+        # may need storage later, especially as cache for pulling models
         # base_app_storage_path = get_app_data_files_path_url(
         #     client=self.client,
         #     app_type_name=str(AppType.Launchpad.value),
@@ -133,8 +163,19 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
         text_embeddings_inputs = await self.get_text_embeddings_inputs(
             input_,
         )
-
+        ingress_template = await _get_ingress_name_template(
+            client=self.client,
+        )
+        domain = ingress_template.split(".", 1)[1]
         return {
+            "appName": app_name,
+            "dbPassword": _generate_password(),
+            "domain": domain,
+            "keycloak": {
+                "auth": {
+                    "adminPassword": _generate_password(),
+                }
+            },
             "LAUNCHPAD_INITIAL_CONFIG": {
                 "vllm": get_nested_values(
                     llm_input.model_dump(),
