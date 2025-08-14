@@ -1,3 +1,4 @@
+import json
 import random
 import string
 import typing as t
@@ -185,18 +186,21 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
                 },
                 "externalDatabase": {"existingSecret": f"launchpad-{app_id}-db-secret"},
             },
-            "LAUNCHPAD_INITIAL_CONFIG": {
-                "vllm": get_nested_values(
-                    llm_input.model_dump(),
-                    ["hugging_face_model", "preset", "server_extra_args"],
-                ),
-                "postgres": get_nested_values(
-                    postgres_inputs.model_dump(),
-                    ["preset", "pg_bouncer.preset"],
-                ),
-                "text-embeddings": get_nested_values(
-                    text_embeddings_inputs.model_dump(),
-                    ["model", "preset", "server_extra_args"],
-                ),
-            },
+            "image": {"tag": "25.8.1"},
+            "LAUNCHPAD_INITIAL_CONFIG": json.dumps(
+                {
+                    "vllm": get_nested_values(
+                        llm_input.model_dump(),
+                        ["hugging_face_model", "preset", "server_extra_args"],
+                    ),
+                    "postgres": get_nested_values(
+                        postgres_inputs.model_dump(),
+                        ["preset", "pg_bouncer.preset"],
+                    ),
+                    "text-embeddings": get_nested_values(
+                        text_embeddings_inputs.model_dump(),
+                        ["model", "preset", "server_extra_args"],
+                    ),
+                }
+            ),
         }
