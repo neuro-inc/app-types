@@ -168,13 +168,22 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
         )
         domain = ingress_template.split(".", 1)[1]
         return {
-            "appName": app_name,
+            "apolo_app_id": app_id,
+            "dbSecretName": f"launchpad-{app_id}-db-secret",
+            "postgresql": {
+                "fullnameOverride": f"launchpad-{app_id}-db",
+                "auth": {
+                    "existingSecret": f"launchpad-{app_id}-db-secret",
+                },
+            },
             "dbPassword": _generate_password(),
             "domain": domain,
             "keycloak": {
+                "fullnameOverride": f"launchpad-{app_id}-keycloak",
                 "auth": {
                     "adminPassword": _generate_password(),
-                }
+                },
+                "externalDatabase": {"existingSecret": f"launchpad-{app_id}-db-secret"},
             },
             "LAUNCHPAD_INITIAL_CONFIG": {
                 "vllm": get_nested_values(
