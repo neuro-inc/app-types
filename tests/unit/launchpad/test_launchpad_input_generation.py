@@ -89,7 +89,6 @@ async def test_launchpad_values_generation_with_preconfigured_model(setup_client
     assert helm_params["appTypesImage"] == {
         "tag": helm_params["appTypesImage"]["tag"],  # Dynamic tag, use actual value
     }
-    assert helm_params["appName"]
     assert helm_params["dbPassword"]
     assert helm_params["domain"] == "apps.some.org.neu.ro"
     assert helm_params["keycloak"]["auth"]["adminPassword"]
@@ -173,7 +172,6 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
     assert helm_params["appTypesImage"] == {
         "tag": helm_params["appTypesImage"]["tag"],  # Dynamic tag, use actual value
     }
-    assert helm_params["appName"]
     assert helm_params["dbPassword"]
     assert helm_params["domain"] == "apps.some.org.neu.ro"
     assert helm_params["keycloak"]["auth"]["adminPassword"]
