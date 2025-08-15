@@ -186,7 +186,7 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
                 },
                 "externalDatabase": {"existingSecret": f"launchpad-{app_id}-db-secret"},
             },
-            "image": {"tag": "25.8.1"},
+            "image": {"tag": "25.8.2"},
             "LAUNCHPAD_INITIAL_CONFIG": json.dumps(
                 {
                     "vllm": get_nested_values(
