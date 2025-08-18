@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from apolo_app_types.app_types import AppType
@@ -102,42 +104,67 @@ async def test_launchpad_values_generation_with_preconfigured_model(setup_client
             "platform.apolo.us/preset": "cpu-small",
         },
         "apolo_app_id": APP_ID,
-        "LAUNCHPAD_INITIAL_CONFIG": {
-            "vllm": {
-                "hugging_face_model": {
-                    "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct",
-                    "hf_token": None,
+        "LAUNCHPAD_INITIAL_CONFIG": json.dumps(
+            {
+                "vllm": {
+                    "hugging_face_model": {
+                        "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct",
+                        "hf_token": None,
+                    },
+                    "preset": {
+                        "name": "gpu-small",
+                    },
+                    "server_extra_args": [],
                 },
-                "preset": {
-                    "name": "gpu-small",
-                },
-                "server_extra_args": [],
-            },
-            "postgres": {
-                "preset": {
-                    "name": "cpu-small",
-                },
-                "pg_bouncer": {
+                "postgres": {
                     "preset": {
                         "name": "cpu-small",
                     },
+                    "pg_bouncer": {
+                        "preset": {
+                            "name": "cpu-small",
+                        },
+                    },
                 },
-            },
-            "text-embeddings": {
-                "model": {
-                    "model_hf_name": "BAAI/bge-m3",
-                    "hf_token": None,
+                "text-embeddings": {
+                    "model": {
+                        "model_hf_name": "BAAI/bge-m3",
+                        "hf_token": None,
+                    },
+                    "preset": {
+                        "name": "gpu-small",
+                    },
+                    "server_extra_args": [],
                 },
-                "preset": {
-                    "name": "gpu-small",
-                },
-                "server_extra_args": [],
-            },
-        },
-        "appTypesImage": {"tag": "v25.8.8.post1.dev0+ce5a15c"},
+            }
+        ),
+        "appTypesImage": {"tag": "v0.0.0"},
     }
 
-    assert helm_params == expected_helm_params
+    # Check that dynamic fields are present
+    assert "dbPassword" in helm_params
+    assert "dbSecretName" in helm_params
+    assert "domain" in helm_params
+    assert "image" in helm_params
+    assert "keycloak" in helm_params
+    assert "postgresql" in helm_params
+
+    # Remove dynamic fields for comparison
+    helm_params_for_comparison = {
+        k: v
+        for k, v in helm_params.items()
+        if k
+        not in [
+            "dbPassword",
+            "dbSecretName",
+            "domain",
+            "image",
+            "keycloak",
+            "postgresql",
+        ]
+    }
+
+    assert helm_params_for_comparison == expected_helm_params
 
 
 @pytest.mark.asyncio
@@ -229,45 +256,70 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
             "platform.apolo.us/preset": "cpu-small",
         },
         "apolo_app_id": APP_ID,
-        "LAUNCHPAD_INITIAL_CONFIG": {
-            "vllm": {
-                "hugging_face_model": {
-                    "model_hf_name": "microsoft/DialoGPT-medium",
-                    "hf_token": None,
+        "LAUNCHPAD_INITIAL_CONFIG": json.dumps(
+            {
+                "vllm": {
+                    "hugging_face_model": {
+                        "model_hf_name": "microsoft/DialoGPT-medium",
+                        "hf_token": None,
+                    },
+                    "preset": {
+                        "name": "gpu-large",
+                    },
+                    "server_extra_args": [
+                        "--max-model-len=2048",
+                        "--gpu-memory-utilization=0.9",
+                    ],
                 },
-                "preset": {
-                    "name": "gpu-large",
-                },
-                "server_extra_args": [
-                    "--max-model-len=2048",
-                    "--gpu-memory-utilization=0.9",
-                ],
-            },
-            "postgres": {
-                "preset": {
-                    "name": "cpu-small",
-                },
-                "pg_bouncer": {
+                "postgres": {
                     "preset": {
                         "name": "cpu-small",
                     },
+                    "pg_bouncer": {
+                        "preset": {
+                            "name": "cpu-small",
+                        },
+                    },
                 },
-            },
-            "text-embeddings": {
-                "model": {
-                    "model_hf_name": "BAAI/bge-m3",
-                    "hf_token": None,
+                "text-embeddings": {
+                    "model": {
+                        "model_hf_name": "BAAI/bge-m3",
+                        "hf_token": None,
+                    },
+                    "preset": {
+                        "name": "gpu-small",
+                    },
+                    "server_extra_args": [],
                 },
-                "preset": {
-                    "name": "gpu-small",
-                },
-                "server_extra_args": [],
-            },
-        },
-        "appTypesImage": {"tag": "v25.8.8.post1.dev0+ce5a15c"},
+            }
+        ),
+        "appTypesImage": {"tag": "v0.0.0"},
     }
 
-    assert helm_params == expected_helm_params
+    # Check that dynamic fields are present
+    assert "dbPassword" in helm_params
+    assert "dbSecretName" in helm_params
+    assert "domain" in helm_params
+    assert "image" in helm_params
+    assert "keycloak" in helm_params
+    assert "postgresql" in helm_params
+
+    # Remove dynamic fields for comparison
+    helm_params_for_comparison = {
+        k: v
+        for k, v in helm_params.items()
+        if k
+        not in [
+            "dbPassword",
+            "dbSecretName",
+            "domain",
+            "image",
+            "keycloak",
+            "postgresql",
+        ]
+    }
+
+    assert helm_params_for_comparison == expected_helm_params
 
 
 @pytest.mark.asyncio
@@ -394,46 +446,71 @@ async def test_launchpad_values_generation_magistral_model(setup_clients):
             "platform.apolo.us/preset": "cpu-medium",
         },
         "apolo_app_id": APP_ID,
-        "LAUNCHPAD_INITIAL_CONFIG": {
-            "vllm": {
-                "hugging_face_model": {
-                    "model_hf_name": "unsloth/Magistral-Small-2506-GGUF",
-                    "hf_token": None,
+        "LAUNCHPAD_INITIAL_CONFIG": json.dumps(
+            {
+                "vllm": {
+                    "hugging_face_model": {
+                        "model_hf_name": "unsloth/Magistral-Small-2506-GGUF",
+                        "hf_token": None,
+                    },
+                    "preset": {
+                        "name": "gpu-medium",
+                    },
+                    "server_extra_args": [
+                        "--tokenizer_mode=mistral",
+                        "--config_format=mistral",
+                        "--load_format=mistral",
+                        "--tool-call-parser=mistral",
+                        "--enable-auto-tool-choice",
+                        "--tensor-parallel-size=2",
+                    ],
                 },
-                "preset": {
-                    "name": "gpu-medium",
-                },
-                "server_extra_args": [
-                    "--tokenizer_mode=mistral",
-                    "--config_format=mistral",
-                    "--load_format=mistral",
-                    "--tool-call-parser=mistral",
-                    "--enable-auto-tool-choice",
-                    "--tensor-parallel-size=2",
-                ],
-            },
-            "postgres": {
-                "preset": {
-                    "name": "cpu-small",
-                },
-                "pg_bouncer": {
+                "postgres": {
                     "preset": {
                         "name": "cpu-small",
                     },
+                    "pg_bouncer": {
+                        "preset": {
+                            "name": "cpu-small",
+                        },
+                    },
                 },
-            },
-            "text-embeddings": {
-                "model": {
-                    "model_hf_name": "BAAI/bge-m3",
-                    "hf_token": None,
+                "text-embeddings": {
+                    "model": {
+                        "model_hf_name": "BAAI/bge-m3",
+                        "hf_token": None,
+                    },
+                    "preset": {
+                        "name": "gpu-small",
+                    },
+                    "server_extra_args": [],
                 },
-                "preset": {
-                    "name": "gpu-small",
-                },
-                "server_extra_args": [],
-            },
-        },
-        "appTypesImage": {"tag": "v25.8.8.post1.dev0+ce5a15c"},
+            }
+        ),
+        "appTypesImage": {"tag": "v0.0.0"},
     }
 
-    assert helm_params == expected_helm_params
+    # Check that dynamic fields are present
+    assert "dbPassword" in helm_params
+    assert "dbSecretName" in helm_params
+    assert "domain" in helm_params
+    assert "image" in helm_params
+    assert "keycloak" in helm_params
+    assert "postgresql" in helm_params
+
+    # Remove dynamic fields for comparison
+    helm_params_for_comparison = {
+        k: v
+        for k, v in helm_params.items()
+        if k
+        not in [
+            "dbPassword",
+            "dbSecretName",
+            "domain",
+            "image",
+            "keycloak",
+            "postgresql",
+        ]
+    }
+
+    assert helm_params_for_comparison == expected_helm_params

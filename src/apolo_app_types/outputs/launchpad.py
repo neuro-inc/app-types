@@ -4,7 +4,7 @@ from apolo_app_types.clients.kube import get_service_host_port
 from apolo_app_types.outputs.common import INSTANCE_LABEL
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
 from apolo_app_types.protocols.common.networking import HttpApi, RestAPI, ServiceAPI
-from apolo_app_types.protocols.launchpad import LaunchpadAppOutputs
+from apolo_app_types.protocols.launchpad import KeycloakConfig, LaunchpadAppOutputs
 
 
 async def get_launchpad_outputs(
@@ -15,6 +15,7 @@ async def get_launchpad_outputs(
         "application": "launchpad",
         INSTANCE_LABEL: app_instance_id,
     }
+    keycloak_password = helm_values["keycloak"]["auth"]["adminPassword"]
     internal_host, internal_port = await get_service_host_port(match_labels=labels)
     internal_web_app_url = None
     if internal_host:
@@ -39,6 +40,7 @@ async def get_launchpad_outputs(
         web_app_url=ServiceAPI[HttpApi](
             internal_url=internal_web_app_url,
             external_url=external_web_app_url,
-        )
+        ),
+        keycloak_config=KeycloakConfig(auth_admin_password=keycloak_password),
     )
     return outputs.model_dump()

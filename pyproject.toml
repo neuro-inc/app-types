@@ -41,13 +41,13 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-apolo-sdk = "^25.7.2"
+apolo-sdk = "^25.8.0"
 click = "^8.0.3"
 httpx = "^0.28.0"
 kubernetes = "^33.1.0"
 pydantic = "^2.11.7"
 pyyaml = "^6.0.2"
-types-PyYAML = "^6.0.12.20250516"
+types-PyYAML = "^6.0.12.20250809"
 yarl = "^1.20.1"
 
 [tool.poetry-dynamic-versioning]
@@ -58,11 +58,11 @@ vcs = "git"
 optional = true
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^4.2.0"
+pre-commit = "^4.3.0"
 pytest = "^8.4.1"
 pytest-asyncio = "^1.1.0"
 pytest-cov = "^6.2.1"
-mypy = "^1.17.0"
+mypy = "^1.17.1"
 dirty-equals = "^0.9.0"
 
 [tool.ruff]
