@@ -56,6 +56,52 @@ async def test_launchpad_values_generation_with_preconfigured_model(setup_client
 
     # Validate the complete helm_params structure at once
     expected_helm_params = {
+        "preset_name": "cpu-small",
+        "resources": {
+            "requests": {"cpu": "2000.0m", "memory": "0M"},
+            "limits": {"cpu": "2000.0m", "memory": "0M"},
+        },
+        "tolerations": [
+            {
+                "effect": "NoSchedule",
+                "key": "platform.neuromation.io/job",
+                "operator": "Exists",
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300,
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300,
+            },
+        ],
+        "affinity": {
+            "nodeAffinity": {
+                "requiredDuringSchedulingIgnoredDuringExecution": {
+                    "nodeSelectorTerms": [
+                        {
+                            "matchExpressions": [
+                                {
+                                    "key": "platform.neuromation.io/nodepool",
+                                    "operator": "In",
+                                    "values": ["cpu_pool"],
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "podLabels": {
+            "platform.apolo.us/component": "app",
+            "platform.apolo.us/preset": "cpu-small",
+        },
+        "apolo_app_id": APP_ID,
         "LAUNCHPAD_INITIAL_CONFIG": {
             "vllm": {
                 "hugging_face_model": {
@@ -88,9 +134,7 @@ async def test_launchpad_values_generation_with_preconfigured_model(setup_client
                 "server_extra_args": [],
             },
         },
-        "appTypesImage": {
-            "tag": helm_params["appTypesImage"]["tag"],  # Dynamic tag, use actual value
-        },
+        "appTypesImage": {"tag": "v25.8.8.post1.dev0+ce5a15c"},
     }
 
     assert helm_params == expected_helm_params
@@ -139,6 +183,52 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
 
     # Validate the complete helm_params structure at once
     expected_helm_params = {
+        "preset_name": "cpu-small",
+        "resources": {
+            "requests": {"cpu": "2000.0m", "memory": "0M"},
+            "limits": {"cpu": "2000.0m", "memory": "0M"},
+        },
+        "tolerations": [
+            {
+                "effect": "NoSchedule",
+                "key": "platform.neuromation.io/job",
+                "operator": "Exists",
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300,
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300,
+            },
+        ],
+        "affinity": {
+            "nodeAffinity": {
+                "requiredDuringSchedulingIgnoredDuringExecution": {
+                    "nodeSelectorTerms": [
+                        {
+                            "matchExpressions": [
+                                {
+                                    "key": "platform.neuromation.io/nodepool",
+                                    "operator": "In",
+                                    "values": ["cpu_pool"],
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "podLabels": {
+            "platform.apolo.us/component": "app",
+            "platform.apolo.us/preset": "cpu-small",
+        },
+        "apolo_app_id": APP_ID,
         "LAUNCHPAD_INITIAL_CONFIG": {
             "vllm": {
                 "hugging_face_model": {
@@ -174,9 +264,7 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
                 "server_extra_args": [],
             },
         },
-        "appTypesImage": {
-            "tag": helm_params["appTypesImage"]["tag"],  # Dynamic tag, use actual value
-        },
+        "appTypesImage": {"tag": "v25.8.8.post1.dev0+ce5a15c"},
     }
 
     assert helm_params == expected_helm_params
@@ -260,6 +348,52 @@ async def test_launchpad_values_generation_magistral_model(setup_clients):
 
     # Validate the complete helm_params structure at once
     expected_helm_params = {
+        "preset_name": "cpu-medium",
+        "resources": {
+            "requests": {"cpu": "2000.0m", "memory": "0M"},
+            "limits": {"cpu": "2000.0m", "memory": "0M"},
+        },
+        "tolerations": [
+            {
+                "effect": "NoSchedule",
+                "key": "platform.neuromation.io/job",
+                "operator": "Exists",
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300,
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300,
+            },
+        ],
+        "affinity": {
+            "nodeAffinity": {
+                "requiredDuringSchedulingIgnoredDuringExecution": {
+                    "nodeSelectorTerms": [
+                        {
+                            "matchExpressions": [
+                                {
+                                    "key": "platform.neuromation.io/nodepool",
+                                    "operator": "In",
+                                    "values": ["cpu_pool"],
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "podLabels": {
+            "platform.apolo.us/component": "app",
+            "platform.apolo.us/preset": "cpu-medium",
+        },
+        "apolo_app_id": APP_ID,
         "LAUNCHPAD_INITIAL_CONFIG": {
             "vllm": {
                 "hugging_face_model": {
@@ -299,9 +433,7 @@ async def test_launchpad_values_generation_magistral_model(setup_clients):
                 "server_extra_args": [],
             },
         },
-        "appTypesImage": {
-            "tag": helm_params["appTypesImage"]["tag"],  # Dynamic tag, use actual value
-        },
+        "appTypesImage": {"tag": "v25.8.8.post1.dev0+ce5a15c"},
     }
 
     assert helm_params == expected_helm_params

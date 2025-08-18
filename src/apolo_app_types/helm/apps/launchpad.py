@@ -1,7 +1,9 @@
 import typing as t
 
 from apolo_app_types import LLMInputs, TextEmbeddingsInferenceAppInputs
+from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
+from apolo_app_types.helm.apps.common import gen_extra_values
 from apolo_app_types.helm.utils.dictionaries import get_nested_values
 from apolo_app_types.protocols.common.hugging_face import HuggingFaceModel
 from apolo_app_types.protocols.launchpad import (
@@ -134,7 +136,15 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
             input_,
         )
 
+        values = await gen_extra_values(
+            apolo_client=self.client,
+            preset_type=input_.launchpad_config.preset,
+            namespace=namespace,
+            app_id=app_id,
+            app_type=AppType.Launchpad,
+        )
         return {
+            **values,
             "LAUNCHPAD_INITIAL_CONFIG": {
                 "vllm": get_nested_values(
                     llm_input.model_dump(),
