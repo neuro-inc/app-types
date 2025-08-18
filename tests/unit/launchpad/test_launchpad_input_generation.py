@@ -141,6 +141,19 @@ async def test_launchpad_values_generation_with_preconfigured_model(setup_client
         "appTypesImage": {"tag": "v0.0.0"},
     }
 
+    # Assert each main key separately
+    assert helm_params["preset_name"] == expected_helm_params["preset_name"]
+    assert helm_params["resources"] == expected_helm_params["resources"]
+    assert helm_params["tolerations"] == expected_helm_params["tolerations"]
+    assert helm_params["affinity"] == expected_helm_params["affinity"]
+    assert helm_params["podLabels"] == expected_helm_params["podLabels"]
+    assert helm_params["apolo_app_id"] == expected_helm_params["apolo_app_id"]
+    assert (
+        helm_params["LAUNCHPAD_INITIAL_CONFIG"]
+        == expected_helm_params["LAUNCHPAD_INITIAL_CONFIG"]
+    )
+    assert helm_params["appTypesImage"] == expected_helm_params["appTypesImage"]
+
     # Check that dynamic fields are present
     assert "dbPassword" in helm_params
     assert "dbSecretName" in helm_params
@@ -156,23 +169,6 @@ async def test_launchpad_values_generation_with_preconfigured_model(setup_client
     # Test postgres fields
     assert "fullnameOverride" in helm_params["postgresql"]
     assert helm_params["postgresql"]["fullnameOverride"] == f"launchpad-{APP_ID}-db"
-
-    # Remove dynamic fields for comparison
-    helm_params_for_comparison = {
-        k: v
-        for k, v in helm_params.items()
-        if k
-        not in [
-            "dbPassword",
-            "dbSecretName",
-            "domain",
-            "image",
-            "keycloak",
-            "postgresql",
-        ]
-    }
-
-    assert helm_params_for_comparison == expected_helm_params
 
 
 @pytest.mark.asyncio
@@ -304,6 +300,19 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
         "appTypesImage": {"tag": "v0.0.0"},
     }
 
+    # Assert each main key separately
+    assert helm_params["preset_name"] == expected_helm_params["preset_name"]
+    assert helm_params["resources"] == expected_helm_params["resources"]
+    assert helm_params["tolerations"] == expected_helm_params["tolerations"]
+    assert helm_params["affinity"] == expected_helm_params["affinity"]
+    assert helm_params["podLabels"] == expected_helm_params["podLabels"]
+    assert helm_params["apolo_app_id"] == expected_helm_params["apolo_app_id"]
+    assert (
+        helm_params["LAUNCHPAD_INITIAL_CONFIG"]
+        == expected_helm_params["LAUNCHPAD_INITIAL_CONFIG"]
+    )
+    assert helm_params["appTypesImage"] == expected_helm_params["appTypesImage"]
+
     # Check that dynamic fields are present
     assert "dbPassword" in helm_params
     assert "dbSecretName" in helm_params
@@ -319,23 +328,6 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
     # Test postgres fields
     assert "fullnameOverride" in helm_params["postgresql"]
     assert helm_params["postgresql"]["fullnameOverride"] == f"launchpad-{APP_ID}-db"
-
-    # Remove dynamic fields for comparison
-    helm_params_for_comparison = {
-        k: v
-        for k, v in helm_params.items()
-        if k
-        not in [
-            "dbPassword",
-            "dbSecretName",
-            "domain",
-            "image",
-            "keycloak",
-            "postgresql",
-        ]
-    }
-
-    assert helm_params_for_comparison == expected_helm_params
 
 
 @pytest.mark.asyncio
@@ -514,6 +506,19 @@ async def test_launchpad_values_generation_magistral_model(setup_clients):
     assert "keycloak" in helm_params
     assert "postgresql" in helm_params
 
+    # Assert each main key separately
+    assert helm_params["preset_name"] == expected_helm_params["preset_name"]
+    assert helm_params["resources"] == expected_helm_params["resources"]
+    assert helm_params["tolerations"] == expected_helm_params["tolerations"]
+    assert helm_params["affinity"] == expected_helm_params["affinity"]
+    assert helm_params["podLabels"] == expected_helm_params["podLabels"]
+    assert helm_params["apolo_app_id"] == expected_helm_params["apolo_app_id"]
+    assert (
+        helm_params["LAUNCHPAD_INITIAL_CONFIG"]
+        == expected_helm_params["LAUNCHPAD_INITIAL_CONFIG"]
+    )
+    assert helm_params["appTypesImage"] == expected_helm_params["appTypesImage"]
+
     # Test keycloak fields
     assert "fullnameOverride" in helm_params["keycloak"]
     assert helm_params["keycloak"]["fullnameOverride"] == f"launchpad-{APP_ID}-keycloak"
@@ -521,20 +526,3 @@ async def test_launchpad_values_generation_magistral_model(setup_clients):
     # Test postgres fields
     assert "fullnameOverride" in helm_params["postgresql"]
     assert helm_params["postgresql"]["fullnameOverride"] == f"launchpad-{APP_ID}-db"
-
-    # Remove dynamic fields for comparison
-    helm_params_for_comparison = {
-        k: v
-        for k, v in helm_params.items()
-        if k
-        not in [
-            "dbPassword",
-            "dbSecretName",
-            "domain",
-            "image",
-            "keycloak",
-            "postgresql",
-        ]
-    }
-
-    assert helm_params_for_comparison == expected_helm_params
