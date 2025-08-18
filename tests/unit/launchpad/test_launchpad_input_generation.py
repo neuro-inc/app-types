@@ -149,6 +149,14 @@ async def test_launchpad_values_generation_with_preconfigured_model(setup_client
     assert "keycloak" in helm_params
     assert "postgresql" in helm_params
 
+    # Test keycloak fields
+    assert "fullnameOverride" in helm_params["keycloak"]
+    assert helm_params["keycloak"]["fullnameOverride"] == f"launchpad-{APP_ID}-keycloak"
+
+    # Test postgres fields
+    assert "fullnameOverride" in helm_params["postgresql"]
+    assert helm_params["postgresql"]["fullnameOverride"] == f"launchpad-{APP_ID}-db"
+
     # Remove dynamic fields for comparison
     helm_params_for_comparison = {
         k: v
@@ -303,6 +311,14 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
     assert "image" in helm_params
     assert "keycloak" in helm_params
     assert "postgresql" in helm_params
+
+    # Test keycloak fields
+    assert "fullnameOverride" in helm_params["keycloak"]
+    assert helm_params["keycloak"]["fullnameOverride"] == f"launchpad-{APP_ID}-keycloak"
+
+    # Test postgres fields
+    assert "fullnameOverride" in helm_params["postgresql"]
+    assert helm_params["postgresql"]["fullnameOverride"] == f"launchpad-{APP_ID}-db"
 
     # Remove dynamic fields for comparison
     helm_params_for_comparison = {
@@ -497,6 +513,14 @@ async def test_launchpad_values_generation_magistral_model(setup_clients):
     assert "image" in helm_params
     assert "keycloak" in helm_params
     assert "postgresql" in helm_params
+
+    # Test keycloak fields
+    assert "fullnameOverride" in helm_params["keycloak"]
+    assert helm_params["keycloak"]["fullnameOverride"] == f"launchpad-{APP_ID}-keycloak"
+
+    # Test postgres fields
+    assert "fullnameOverride" in helm_params["postgresql"]
+    assert helm_params["postgresql"]["fullnameOverride"] == f"launchpad-{APP_ID}-db"
 
     # Remove dynamic fields for comparison
     helm_params_for_comparison = {
