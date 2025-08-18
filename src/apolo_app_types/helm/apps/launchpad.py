@@ -4,7 +4,9 @@ import string
 import typing as t
 
 from apolo_app_types import LLMInputs, TextEmbeddingsInferenceAppInputs
+from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
+from apolo_app_types.helm.apps.common import gen_extra_values
 from apolo_app_types.helm.apps.ingress import (
     _get_ingress_name_template,
 )
@@ -164,12 +166,20 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
         text_embeddings_inputs = await self.get_text_embeddings_inputs(
             input_,
         )
+
+        values = await gen_extra_values(
+            apolo_client=self.client,
+            preset_type=input_.launchpad_config.preset,
+            namespace=namespace,
+            app_id=app_id,
+            app_type=AppType.Launchpad,
+        )
         ingress_template = await _get_ingress_name_template(
             client=self.client,
         )
         domain = ingress_template.split(".", 1)[1]
         return {
-            "apolo_app_id": app_id,
+            **values,
             "dbSecretName": f"launchpad-{app_id}-db-secret",
             "postgresql": {
                 "fullnameOverride": f"launchpad-{app_id}-db",

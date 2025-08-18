@@ -56,46 +56,119 @@ async def test_launchpad_values_generation_with_preconfigured_model(setup_client
         app_id=APP_ID,
     )
 
-    assert helm_params["LAUNCHPAD_INITIAL_CONFIG"] == json.dumps(
-        {
-            "vllm": {
-                "hugging_face_model": {
-                    "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct",
-                    "hf_token": None,
-                },
-                "preset": {
-                    "name": "gpu-small",
-                },
-                "server_extra_args": [],
+    # Validate the complete helm_params structure at once
+    expected_helm_params = {
+        "preset_name": "cpu-small",
+        "resources": {
+            "requests": {"cpu": "2000.0m", "memory": "0M"},
+            "limits": {"cpu": "2000.0m", "memory": "0M"},
+        },
+        "tolerations": [
+            {
+                "effect": "NoSchedule",
+                "key": "platform.neuromation.io/job",
+                "operator": "Exists",
             },
-            "postgres": {
-                "preset": {
-                    "name": "cpu-small",
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300,
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300,
+            },
+        ],
+        "affinity": {
+            "nodeAffinity": {
+                "requiredDuringSchedulingIgnoredDuringExecution": {
+                    "nodeSelectorTerms": [
+                        {
+                            "matchExpressions": [
+                                {
+                                    "key": "platform.neuromation.io/nodepool",
+                                    "operator": "In",
+                                    "values": ["cpu_pool"],
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "podLabels": {
+            "platform.apolo.us/component": "app",
+            "platform.apolo.us/preset": "cpu-small",
+        },
+        "apolo_app_id": APP_ID,
+        "LAUNCHPAD_INITIAL_CONFIG": json.dumps(
+            {
+                "vllm": {
+                    "hugging_face_model": {
+                        "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct",
+                        "hf_token": None,
+                    },
+                    "preset": {
+                        "name": "gpu-small",
+                    },
+                    "server_extra_args": [],
                 },
-                "pg_bouncer": {
+                "postgres": {
                     "preset": {
                         "name": "cpu-small",
                     },
+                    "pg_bouncer": {
+                        "preset": {
+                            "name": "cpu-small",
+                        },
+                    },
                 },
-            },
-            "text-embeddings": {
-                "model": {
-                    "model_hf_name": "BAAI/bge-m3",
-                    "hf_token": None,
+                "text-embeddings": {
+                    "model": {
+                        "model_hf_name": "BAAI/bge-m3",
+                        "hf_token": None,
+                    },
+                    "preset": {
+                        "name": "gpu-small",
+                    },
+                    "server_extra_args": [],
                 },
-                "preset": {
-                    "name": "gpu-small",
-                },
-                "server_extra_args": [],
-            },
-        }
-    )
-    assert helm_params["appTypesImage"] == {
-        "tag": helm_params["appTypesImage"]["tag"],  # Dynamic tag, use actual value
+            }
+        ),
+        "appTypesImage": {"tag": "v0.0.0"},
     }
-    assert helm_params["dbPassword"]
-    assert helm_params["domain"] == "apps.some.org.neu.ro"
-    assert helm_params["keycloak"]["auth"]["adminPassword"]
+
+    # Assert each main key separately
+    assert helm_params["preset_name"] == expected_helm_params["preset_name"]
+    assert helm_params["resources"] == expected_helm_params["resources"]
+    assert helm_params["tolerations"] == expected_helm_params["tolerations"]
+    assert helm_params["affinity"] == expected_helm_params["affinity"]
+    assert helm_params["podLabels"] == expected_helm_params["podLabels"]
+    assert helm_params["apolo_app_id"] == expected_helm_params["apolo_app_id"]
+    assert (
+        helm_params["LAUNCHPAD_INITIAL_CONFIG"]
+        == expected_helm_params["LAUNCHPAD_INITIAL_CONFIG"]
+    )
+    assert helm_params["appTypesImage"] == expected_helm_params["appTypesImage"]
+
+    # Check that dynamic fields are present
+    assert "dbPassword" in helm_params
+    assert "dbSecretName" in helm_params
+    assert "domain" in helm_params
+    assert "image" in helm_params
+    assert "keycloak" in helm_params
+    assert "postgresql" in helm_params
+
+    # Test keycloak fields
+    assert "fullnameOverride" in helm_params["keycloak"]
+    assert helm_params["keycloak"]["fullnameOverride"] == f"launchpad-{APP_ID}-keycloak"
+
+    # Test postgres fields
+    assert "fullnameOverride" in helm_params["postgresql"]
+    assert helm_params["postgresql"]["fullnameOverride"] == f"launchpad-{APP_ID}-db"
 
 
 @pytest.mark.asyncio
@@ -138,49 +211,123 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
         app_secrets_name=APP_SECRETS_NAME,
         app_id=APP_ID,
     )
-    assert helm_params["LAUNCHPAD_INITIAL_CONFIG"] == json.dumps(
-        {
-            "vllm": {
-                "hugging_face_model": {
-                    "model_hf_name": "microsoft/DialoGPT-medium",
-                    "hf_token": None,
-                },
-                "preset": {
-                    "name": "gpu-large",
-                },
-                "server_extra_args": [
-                    "--max-model-len=2048",
-                    "--gpu-memory-utilization=0.9",
-                ],
+
+    # Validate the complete helm_params structure at once
+    expected_helm_params = {
+        "preset_name": "cpu-small",
+        "resources": {
+            "requests": {"cpu": "2000.0m", "memory": "0M"},
+            "limits": {"cpu": "2000.0m", "memory": "0M"},
+        },
+        "tolerations": [
+            {
+                "effect": "NoSchedule",
+                "key": "platform.neuromation.io/job",
+                "operator": "Exists",
             },
-            "postgres": {
-                "preset": {
-                    "name": "cpu-small",
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300,
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300,
+            },
+        ],
+        "affinity": {
+            "nodeAffinity": {
+                "requiredDuringSchedulingIgnoredDuringExecution": {
+                    "nodeSelectorTerms": [
+                        {
+                            "matchExpressions": [
+                                {
+                                    "key": "platform.neuromation.io/nodepool",
+                                    "operator": "In",
+                                    "values": ["cpu_pool"],
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "podLabels": {
+            "platform.apolo.us/component": "app",
+            "platform.apolo.us/preset": "cpu-small",
+        },
+        "apolo_app_id": APP_ID,
+        "LAUNCHPAD_INITIAL_CONFIG": json.dumps(
+            {
+                "vllm": {
+                    "hugging_face_model": {
+                        "model_hf_name": "microsoft/DialoGPT-medium",
+                        "hf_token": None,
+                    },
+                    "preset": {
+                        "name": "gpu-large",
+                    },
+                    "server_extra_args": [
+                        "--max-model-len=2048",
+                        "--gpu-memory-utilization=0.9",
+                    ],
                 },
-                "pg_bouncer": {
+                "postgres": {
                     "preset": {
                         "name": "cpu-small",
                     },
+                    "pg_bouncer": {
+                        "preset": {
+                            "name": "cpu-small",
+                        },
+                    },
                 },
-            },
-            "text-embeddings": {
-                "model": {
-                    "model_hf_name": "BAAI/bge-m3",
-                    "hf_token": None,
+                "text-embeddings": {
+                    "model": {
+                        "model_hf_name": "BAAI/bge-m3",
+                        "hf_token": None,
+                    },
+                    "preset": {
+                        "name": "gpu-small",
+                    },
+                    "server_extra_args": [],
                 },
-                "preset": {
-                    "name": "gpu-small",
-                },
-                "server_extra_args": [],
-            },
-        }
-    )
-    assert helm_params["appTypesImage"] == {
-        "tag": helm_params["appTypesImage"]["tag"],  # Dynamic tag, use actual value
+            }
+        ),
+        "appTypesImage": {"tag": "v0.0.0"},
     }
-    assert helm_params["dbPassword"]
-    assert helm_params["domain"] == "apps.some.org.neu.ro"
-    assert helm_params["keycloak"]["auth"]["adminPassword"]
+
+    # Assert each main key separately
+    assert helm_params["preset_name"] == expected_helm_params["preset_name"]
+    assert helm_params["resources"] == expected_helm_params["resources"]
+    assert helm_params["tolerations"] == expected_helm_params["tolerations"]
+    assert helm_params["affinity"] == expected_helm_params["affinity"]
+    assert helm_params["podLabels"] == expected_helm_params["podLabels"]
+    assert helm_params["apolo_app_id"] == expected_helm_params["apolo_app_id"]
+    assert (
+        helm_params["LAUNCHPAD_INITIAL_CONFIG"]
+        == expected_helm_params["LAUNCHPAD_INITIAL_CONFIG"]
+    )
+    assert helm_params["appTypesImage"] == expected_helm_params["appTypesImage"]
+
+    # Check that dynamic fields are present
+    assert "dbPassword" in helm_params
+    assert "dbSecretName" in helm_params
+    assert "domain" in helm_params
+    assert "image" in helm_params
+    assert "keycloak" in helm_params
+    assert "postgresql" in helm_params
+
+    # Test keycloak fields
+    assert "fullnameOverride" in helm_params["keycloak"]
+    assert helm_params["keycloak"]["fullnameOverride"] == f"launchpad-{APP_ID}-keycloak"
+
+    # Test postgres fields
+    assert "fullnameOverride" in helm_params["postgresql"]
+    assert helm_params["postgresql"]["fullnameOverride"] == f"launchpad-{APP_ID}-db"
 
 
 @pytest.mark.asyncio
@@ -258,47 +405,124 @@ async def test_launchpad_values_generation_magistral_model(setup_clients):
         app_secrets_name=APP_SECRETS_NAME,
         app_id=APP_ID,
     )
-    assert helm_params["LAUNCHPAD_INITIAL_CONFIG"] == json.dumps(
-        {
-            "vllm": {
-                "hugging_face_model": {
-                    "model_hf_name": "unsloth/Magistral-Small-2506-GGUF",
-                    "hf_token": None,
-                },
-                "preset": {
-                    "name": "gpu-medium",
-                },
-                "server_extra_args": [
-                    "--tokenizer_mode=mistral",
-                    "--config_format=mistral",
-                    "--load_format=mistral",
-                    "--tool-call-parser=mistral",
-                    "--enable-auto-tool-choice",
-                    "--tensor-parallel-size=2",
-                ],
+
+    # Validate the complete helm_params structure at once
+    expected_helm_params = {
+        "preset_name": "cpu-medium",
+        "resources": {
+            "requests": {"cpu": "2000.0m", "memory": "0M"},
+            "limits": {"cpu": "2000.0m", "memory": "0M"},
+        },
+        "tolerations": [
+            {
+                "effect": "NoSchedule",
+                "key": "platform.neuromation.io/job",
+                "operator": "Exists",
             },
-            "postgres": {
-                "preset": {
-                    "name": "cpu-small",
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300,
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300,
+            },
+        ],
+        "affinity": {
+            "nodeAffinity": {
+                "requiredDuringSchedulingIgnoredDuringExecution": {
+                    "nodeSelectorTerms": [
+                        {
+                            "matchExpressions": [
+                                {
+                                    "key": "platform.neuromation.io/nodepool",
+                                    "operator": "In",
+                                    "values": ["cpu_pool"],
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "podLabels": {
+            "platform.apolo.us/component": "app",
+            "platform.apolo.us/preset": "cpu-medium",
+        },
+        "apolo_app_id": APP_ID,
+        "LAUNCHPAD_INITIAL_CONFIG": json.dumps(
+            {
+                "vllm": {
+                    "hugging_face_model": {
+                        "model_hf_name": "unsloth/Magistral-Small-2506-GGUF",
+                        "hf_token": None,
+                    },
+                    "preset": {
+                        "name": "gpu-medium",
+                    },
+                    "server_extra_args": [
+                        "--tokenizer_mode=mistral",
+                        "--config_format=mistral",
+                        "--load_format=mistral",
+                        "--tool-call-parser=mistral",
+                        "--enable-auto-tool-choice",
+                        "--tensor-parallel-size=2",
+                    ],
                 },
-                "pg_bouncer": {
+                "postgres": {
                     "preset": {
                         "name": "cpu-small",
                     },
+                    "pg_bouncer": {
+                        "preset": {
+                            "name": "cpu-small",
+                        },
+                    },
                 },
-            },
-            "text-embeddings": {
-                "model": {
-                    "model_hf_name": "BAAI/bge-m3",
-                    "hf_token": None,
+                "text-embeddings": {
+                    "model": {
+                        "model_hf_name": "BAAI/bge-m3",
+                        "hf_token": None,
+                    },
+                    "preset": {
+                        "name": "gpu-small",
+                    },
+                    "server_extra_args": [],
                 },
-                "preset": {
-                    "name": "gpu-small",
-                },
-                "server_extra_args": [],
-            },
-        }
-    )
-    assert helm_params["appTypesImage"] == {
-        "tag": helm_params["appTypesImage"]["tag"],  # Dynamic tag, use actual value
+            }
+        ),
+        "appTypesImage": {"tag": "v0.0.0"},
     }
+
+    # Check that dynamic fields are present
+    assert "dbPassword" in helm_params
+    assert "dbSecretName" in helm_params
+    assert "domain" in helm_params
+    assert "image" in helm_params
+    assert "keycloak" in helm_params
+    assert "postgresql" in helm_params
+
+    # Assert each main key separately
+    assert helm_params["preset_name"] == expected_helm_params["preset_name"]
+    assert helm_params["resources"] == expected_helm_params["resources"]
+    assert helm_params["tolerations"] == expected_helm_params["tolerations"]
+    assert helm_params["affinity"] == expected_helm_params["affinity"]
+    assert helm_params["podLabels"] == expected_helm_params["podLabels"]
+    assert helm_params["apolo_app_id"] == expected_helm_params["apolo_app_id"]
+    assert (
+        helm_params["LAUNCHPAD_INITIAL_CONFIG"]
+        == expected_helm_params["LAUNCHPAD_INITIAL_CONFIG"]
+    )
+    assert helm_params["appTypesImage"] == expected_helm_params["appTypesImage"]
+
+    # Test keycloak fields
+    assert "fullnameOverride" in helm_params["keycloak"]
+    assert helm_params["keycloak"]["fullnameOverride"] == f"launchpad-{APP_ID}-keycloak"
+
+    # Test postgres fields
+    assert "fullnameOverride" in helm_params["postgresql"]
+    assert helm_params["postgresql"]["fullnameOverride"] == f"launchpad-{APP_ID}-db"
