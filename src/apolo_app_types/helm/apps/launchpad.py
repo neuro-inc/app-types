@@ -195,6 +195,7 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
                     "adminPassword": _generate_password(),
                 },
                 "externalDatabase": {"existingSecret": f"launchpad-{app_id}-db-secret"},
+                **values,
             },
             "image": {"tag": "25.8.2"},
             "LAUNCHPAD_INITIAL_CONFIG": json.dumps(
