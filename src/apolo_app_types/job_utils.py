@@ -3,7 +3,6 @@ from dataclasses import dataclass
 import apolo_sdk
 from yarl import URL
 
-from apolo_app_types.helm.apps.common import get_preset
 from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 from apolo_app_types.protocols.job import JobAppInput
 
@@ -73,6 +72,8 @@ def prepare_job_run_params(
             secret_env_dict[env_var.name] = URL(f"secret://{env_var.value.key}")
 
     # Get preset and configure resources
+    from apolo_app_types.helm.apps.common import get_preset
+
     preset = get_preset(client, job_input.preset.name)
 
     container = apolo_sdk.Container(
