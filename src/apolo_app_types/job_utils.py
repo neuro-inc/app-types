@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import apolo_sdk
 from yarl import URL
 
+from apolo_app_types.helm.apps.common import get_preset
 from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 from apolo_app_types.protocols.job import JobAppInput
 
@@ -30,13 +31,12 @@ def prepare_job_run_params(
     app_instance_name: str,
     org_name: str,
     project_name: str,
+    client: apolo_sdk.Client,
 ) -> JobRunParams:
     """Prepare all parameters for apolo_client.jobs.run() call."""
     if not job_input.image:
         msg = "Container image is required"
         raise ValueError(msg)
-
-    resources = job_input.resources
 
     # Convert StorageMounts to apolo_sdk.Volume objects
     volumes = []
@@ -72,18 +72,23 @@ def prepare_job_run_params(
         if isinstance(env_var.value, ApoloSecret):
             secret_env_dict[env_var.name] = URL(f"secret://{env_var.value.key}")
 
+    # Get preset and configure resources
+    preset = get_preset(client, job_input.preset.name)
+
     container = apolo_sdk.Container(
         image=apolo_sdk.RemoteImage.new_external_image(name=job_input.image),
         resources=apolo_sdk.Resources(
-            cpu=resources.cpu,
-            memory=resources.memory_mb * 1024 * 1024
-            if resources.memory_mb > 0
-            else 128 * 1024 * 1024,
-            nvidia_gpu=resources.nvidia_gpu if resources.nvidia_gpu > 0 else None,
-            nvidia_gpu_model=resources.nvidia_gpu_model
-            if resources.nvidia_gpu_model
-            else None,
-            shm=resources.shm if resources.shm else True,
+            cpu=preset.cpu,
+            memory=preset.memory,
+            nvidia_gpu=preset.nvidia_gpu,
+            amd_gpu=preset.amd_gpu,
+            intel_gpu=preset.intel_gpu,
+            nvidia_gpu_model=preset.nvidia_gpu_model,
+            amd_gpu_model=preset.amd_gpu_model,
+            intel_gpu_model=preset.intel_gpu_model,
+            tpu_type=preset.tpu_type,
+            tpu_software_version=preset.tpu_software_version,
+            shm=True,  # Default to True as before
         ),
         entrypoint=job_input.entrypoint if job_input.entrypoint else None,
         command=job_input.command if job_input.command else None,

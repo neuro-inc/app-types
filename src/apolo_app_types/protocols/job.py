@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 
 from apolo_app_types.protocols.common.k8s import Env
 from apolo_app_types.protocols.common.preset import Preset
+from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
 from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 from apolo_app_types.protocols.common.storage import StorageMounts
 
@@ -24,31 +25,6 @@ class JobRestartPolicy(StrEnum):
     NEVER = "never"
 
 
-class ContainerTPUResource(BaseModel):
-    type: str = Field(description="TPU type specification")
-    software_version: str = Field(description="TPU software version")
-
-
-class ContainerResources(BaseModel):
-    cpu: float = Field(description="Number of CPU cores")
-    memory: int = Field(default=0, description="Memory in bytes")
-    memory_mb: int = Field(default=0, description="Memory in megabytes")
-    nvidia_gpu: int = Field(default=0, description="Number of NVIDIA GPUs")
-    amd_gpu: int = Field(default=0, description="Number of AMD GPUs")
-    intel_gpu: int = Field(default=0, description="Number of Intel GPUs")
-    nvidia_gpu_model: str = Field(
-        default="", description="NVIDIA GPU model specification"
-    )
-    amd_gpu_model: str = Field(default="", description="AMD GPU model specification")
-    intel_gpu_model: str = Field(
-        default="", description="Intel GPU model specification"
-    )
-    shm: bool = Field(default=False, description="Enable shared memory")
-    tpu: ContainerTPUResource | None = Field(
-        default=None, description="TPU resource configuration"
-    )
-
-
 class SecretVolume(BaseModel):
     src_secret_uri: ApoloSecret
     dst_path: str
@@ -67,52 +43,171 @@ class ContainerHTTPServer(BaseModel):
 
 
 class JobAppInput(BaseModel):
-    image: str = Field(description="Container image to run")
-    entrypoint: str = Field(default="", description="Container entrypoint")
-    command: str = Field(default="", description="Container command")
-    env: list[Env] = Field(default_factory=list, description="Environment variables")
+    image: str = Field(
+        json_schema_extra=SchemaExtraMetadata(
+            title="Container Image",
+            description="Container image to run",
+        ).as_json_schema_extra(),
+    )
+    entrypoint: str = Field(
+        default="",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Entrypoint",
+            description="Container entrypoint",
+        ).as_json_schema_extra(),
+    )
+    command: str = Field(
+        default="",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Command",
+            description="Container command",
+        ).as_json_schema_extra(),
+    )
+    env: list[Env] = Field(
+        default_factory=list,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Environment Variables",
+            description="Environment variables",
+        ).as_json_schema_extra(),
+    )
     secret_env: list[Env] = Field(
-        default_factory=list, description="Secret environment variables"
+        default_factory=list,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Secret Environment Variables",
+            description="Secret environment variables",
+        ).as_json_schema_extra(),
     )
     working_dir: str = Field(
-        default="", description="Working directory inside container"
+        default="",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Working Directory",
+            description="Working directory inside container",
+        ).as_json_schema_extra(),
     )
-    name: str = Field(default="", description="Job name")
-    description: str = Field(default="", description="Job description")
-    tags: list[str] = Field(default_factory=list, description="Job tags")
-    preset: Preset = Field(description="Resource preset configuration")
+    name: str = Field(
+        default="",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Job Name",
+            description="Job name",
+        ).as_json_schema_extra(),
+    )
+    description: str = Field(
+        default="",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Job Description",
+            description="Job description",
+        ).as_json_schema_extra(),
+    )
+    tags: list[str] = Field(
+        default_factory=list,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Job Tags",
+            description="Job tags",
+        ).as_json_schema_extra(),
+    )
+    preset: Preset = Field(
+        json_schema_extra=SchemaExtraMetadata(
+            title="Resource Preset",
+            description="Resource preset configuration",
+        ).as_json_schema_extra(),
+    )
     priority: JobPriority = Field(
-        default=JobPriority.NORMAL, description="Job priority level"
+        default=JobPriority.NORMAL,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Job Priority",
+            description="Job priority level",
+        ).as_json_schema_extra(),
     )
-    scheduler_enabled: bool = Field(default=False, description="Enable job scheduler")
-    preemptible_node: bool = Field(default=False, description="Use preemptible nodes")
+    scheduler_enabled: bool = Field(
+        default=False,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Scheduler Enabled",
+            description="Enable job scheduler",
+        ).as_json_schema_extra(),
+    )
+    preemptible_node: bool = Field(
+        default=False,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Preemptible Node",
+            description="Use preemptible nodes",
+        ).as_json_schema_extra(),
+    )
     restart_policy: JobRestartPolicy = Field(
-        default=JobRestartPolicy.NEVER, description="Job restart policy"
+        default=JobRestartPolicy.NEVER,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Restart Policy",
+            description="Job restart policy",
+        ).as_json_schema_extra(),
     )
     max_run_time_minutes: int = Field(
-        default=0, description="Maximum runtime in minutes (0 for unlimited)"
+        default=0,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Max Runtime (Minutes)",
+            description="Maximum runtime in minutes (0 for unlimited)",
+        ).as_json_schema_extra(),
     )
     schedule_timeout: float = Field(
-        default=0.0, description="Schedule timeout in seconds"
+        default=0.0,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Schedule Timeout",
+            description="Schedule timeout in seconds",
+        ).as_json_schema_extra(),
     )
-    energy_schedule_name: str = Field(default="", description="Energy schedule name")
-    pass_config: bool = Field(default=False, description="Pass configuration to job")
-    wait_for_jobs_quota: bool = Field(default=False, description="Wait for jobs quota")
+    energy_schedule_name: str = Field(
+        default="",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Energy Schedule Name",
+            description="Energy schedule name",
+        ).as_json_schema_extra(),
+    )
+    pass_config: bool = Field(
+        default=False,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Pass Config",
+            description="Pass configuration to job",
+        ).as_json_schema_extra(),
+    )
+    wait_for_jobs_quota: bool = Field(
+        default=False,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Wait for Jobs Quota",
+            description="Wait for jobs quota",
+        ).as_json_schema_extra(),
+    )
     privileged: bool = Field(
-        default=False, description="Run container in privileged mode"
+        default=False,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Privileged Mode",
+            description="Run container in privileged mode",
+        ).as_json_schema_extra(),
     )
-    resources: ContainerResources = Field(description="Container resource requirements")
     storage_mounts: StorageMounts | None = Field(
-        default=None, description="Storage mount configuration"
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Storage Mounts",
+            description="Storage mount configuration",
+        ).as_json_schema_extra(),
     )
     secret_volumes: list[SecretVolume] | None = Field(
-        default=None, description="Secret volume mounts"
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Secret Volumes",
+            description="Secret volume mounts",
+        ).as_json_schema_extra(),
     )
     disk_volumes: list[DiskVolume] | None = Field(
-        default=None, description="Disk volume mounts"
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Disk Volumes",
+            description="Disk volume mounts",
+        ).as_json_schema_extra(),
     )
     http: ContainerHTTPServer | None = Field(
-        default=None, description="HTTP server configuration"
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="HTTP Server",
+            description="HTTP server configuration",
+        ).as_json_schema_extra(),
     )
 
 
