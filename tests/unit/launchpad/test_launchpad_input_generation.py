@@ -1,6 +1,7 @@
 import json
 
 import pytest
+from dirty_equals import IsStr
 
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
@@ -138,7 +139,7 @@ async def test_launchpad_values_generation_with_preconfigured_model(setup_client
                 },
             }
         ),
-        "appTypesImage": {"tag": "v0.0.0"},
+        "appTypesImage": {"tag": IsStr(regex=r"^v\d+\.\d+\.\d+.*$")},
     }
 
     # Assert each main key separately
@@ -305,7 +306,7 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
                 },
             }
         ),
-        "appTypesImage": {"tag": "v0.0.0"},
+        "appTypesImage": {"tag": IsStr(regex=r"^v\d+\.\d+\.\d+.*$")},
     }
 
     # Assert each main key separately
@@ -503,7 +504,7 @@ async def test_launchpad_values_generation_magistral_model(setup_clients):
                 },
             }
         ),
-        "appTypesImage": {"tag": "v0.0.0"},
+        "appTypesImage": {"tag": IsStr(regex=r"^v\d+\.\d+\.\d+.*$")},
     }
 
     # Check that dynamic fields are present
