@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 import pytest
 from apolo_sdk import Preset as ApoloPreset
+from apolo_sdk._server_cfg import AMDGPUPreset, NvidiaGPUPreset
 
 from apolo_app_types import HuggingFaceModel
 from apolo_app_types.app_types import AppType
@@ -108,8 +109,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=2.0,
             memory=8192,
-            nvidia_gpu=1,
-            nvidia_gpu_model=None,
+            nvidia_gpu=NvidiaGPUPreset(count=1, model=None),
         )
         assert _detect_gpu_architecture(preset, "gpu-unspecified") == TEIArch.CPU
 
@@ -119,8 +119,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=8.0,
             memory=32768,
-            nvidia_gpu=1,
-            nvidia_gpu_model="Tesla V100",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="Tesla V100"),
         )
         assert _detect_gpu_architecture(preset, "gpu-v100-x1") == TEIArch.CPU
 
@@ -130,8 +129,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=4.0,
             memory=16384,
-            nvidia_gpu=1,
-            nvidia_gpu_model="Tesla T4",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="Tesla T4"),
         )
         assert _detect_gpu_architecture(preset, "gpu-t4-x1") == TEIArch.TURING
 
@@ -141,8 +139,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=6.0,
             memory=24576,
-            nvidia_gpu=1,
-            nvidia_gpu_model="GeForce RTX 2080 Ti",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="GeForce RTX 2080 Ti"),
         )
         assert _detect_gpu_architecture(preset, "gpu-rtx-2080-x1") == TEIArch.TURING
 
@@ -152,8 +149,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=16.0,
             memory=65536,
-            nvidia_gpu=1,
-            nvidia_gpu_model="NVIDIA A100",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="NVIDIA A100"),
         )
         assert _detect_gpu_architecture(preset, "gpu-a100-x1") == TEIArch.AMPERE_80
 
@@ -163,8 +159,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=8.0,
             memory=32768,
-            nvidia_gpu=1,
-            nvidia_gpu_model="NVIDIA A30",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="NVIDIA A30"),
         )
         assert _detect_gpu_architecture(preset, "gpu-a30-x1") == TEIArch.AMPERE_80
 
@@ -174,8 +169,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=6.0,
             memory=24576,
-            nvidia_gpu=1,
-            nvidia_gpu_model="NVIDIA A10",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="NVIDIA A10"),
         )
         assert _detect_gpu_architecture(preset, "gpu-a10g-x1") == TEIArch.AMPERE_86
 
@@ -185,8 +179,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=12.0,
             memory=49152,
-            nvidia_gpu=1,
-            nvidia_gpu_model="NVIDIA A40",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="NVIDIA A40"),
         )
         assert _detect_gpu_architecture(preset, "gpu-a40-x1") == TEIArch.AMPERE_86
 
@@ -196,8 +189,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=8.0,
             memory=32768,
-            nvidia_gpu=1,
-            nvidia_gpu_model="GeForce RTX 3080",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="GeForce RTX 3080"),
         )
         assert _detect_gpu_architecture(preset, "gpu-rtx-3080-x1") == TEIArch.AMPERE_86
 
@@ -207,8 +199,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=16.0,
             memory=65536,
-            nvidia_gpu=1,
-            nvidia_gpu_model="GeForce RTX 4090",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="GeForce RTX 4090"),
         )
         assert (
             _detect_gpu_architecture(preset, "gpu-rtx-4090-x1") == TEIArch.ADA_LOVELACE
@@ -220,8 +211,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=12.0,
             memory=49152,
-            nvidia_gpu=1,
-            nvidia_gpu_model="GeForce RTX 4070",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="GeForce RTX 4070"),
         )
         assert (
             _detect_gpu_architecture(preset, "gpu-rtx-4070-x1") == TEIArch.ADA_LOVELACE
@@ -233,8 +223,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=32.0,
             memory=131072,
-            nvidia_gpu=1,
-            nvidia_gpu_model="NVIDIA H100",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="NVIDIA H100"),
         )
         assert _detect_gpu_architecture(preset, "gpu-h100-x1") == TEIArch.HOPPER
 
@@ -244,8 +233,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=8.0,
             memory=32768,
-            nvidia_gpu=1,
-            nvidia_gpu_model="Unknown GPU Model",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="Unknown GPU Model"),
         )
         assert _detect_gpu_architecture(preset, "gpu-unknown-x1") == TEIArch.CPU
 
@@ -255,8 +243,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=16.0,
             memory=65536,
-            nvidia_gpu=1,
-            nvidia_gpu_model="GEFORCE RTX 4090",  # Uppercase
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="GEFORCE RTX 4090"),
         )
         assert (
             _detect_gpu_architecture(preset_rtx40, "GPU-RTX-4090-X1")
@@ -270,8 +257,7 @@ class TestGPUArchitectureDetection:
             cpu=8.0,
             memory=32768,
             nvidia_gpu=0,
-            amd_gpu=1,
-            amd_gpu_model="AMD Radeon RX 6800",
+            amd_gpu=AMDGPUPreset(count=1, model="AMD Radeon RX 6800"),
         )
         assert _detect_gpu_architecture(preset, "amd-gpu-preset") == TEIArch.CPU
 
@@ -282,8 +268,7 @@ class TestGPUArchitectureDetection:
             cpu=8.0,
             memory=32768,
             nvidia_gpu=0,
-            amd_gpu=1,
-            amd_gpu_model=None,
+            amd_gpu=AMDGPUPreset(count=1, model=None),
         )
         assert _detect_gpu_architecture(preset, "amd-gpu-preset") == TEIArch.CPU
 
@@ -293,8 +278,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=8.0,
             memory=32768,
-            nvidia_gpu=1,
-            nvidia_gpu_model="Tesla V100-PCIE",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="Tesla V100-PCIE"),
         )
         assert _detect_gpu_architecture(preset, "gpu-v100-pcie-x1") == TEIArch.CPU
 
@@ -304,8 +288,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=16.0,
             memory=65536,
-            nvidia_gpu=1,
-            nvidia_gpu_model="NVIDIA-A100-SXM4",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="NVIDIA-A100-SXM4"),
         )
         assert _detect_gpu_architecture(preset, "gpu-a100-sxm4-x1") == TEIArch.AMPERE_80
 
@@ -315,8 +298,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=32.0,
             memory=131072,
-            nvidia_gpu=1,
-            nvidia_gpu_model="NVIDIA-DGX-H100",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="NVIDIA-DGX-H100"),
         )
         assert _detect_gpu_architecture(preset, "gpu-dgx-h100-x1") == TEIArch.HOPPER
 
@@ -326,8 +308,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=32.0,
             memory=131072,
-            nvidia_gpu=1,
-            nvidia_gpu_model="NVIDIA-H100-PCIE",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="NVIDIA-H100-PCIE"),
         )
         assert _detect_gpu_architecture(preset, "gpu-h100-pcie-x1") == TEIArch.HOPPER
 
@@ -338,8 +319,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=6.0,
             memory=24576,
-            nvidia_gpu=1,
-            nvidia_gpu_model="GeForce RTX 2080",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="GeForce RTX 2080"),
         )
         assert _detect_gpu_architecture(preset_rtx20, "gpu-rtx-2080") == TEIArch.TURING
 
@@ -348,8 +328,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=8.0,
             memory=32768,
-            nvidia_gpu=1,
-            nvidia_gpu_model="GeForce RTX 3080",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="GeForce RTX 3080"),
         )
         assert (
             _detect_gpu_architecture(preset_rtx30, "gpu-rtx-3080") == TEIArch.AMPERE_86
@@ -360,8 +339,7 @@ class TestGPUArchitectureDetection:
             credits_per_hour=Decimal("1.0"),
             cpu=16.0,
             memory=65536,
-            nvidia_gpu=1,
-            nvidia_gpu_model="GeForce RTX 4090",
+            nvidia_gpu=NvidiaGPUPreset(count=1, model="GeForce RTX 4090"),
         )
         assert (
             _detect_gpu_architecture(preset_rtx40, "gpu-rtx-4090")
@@ -442,8 +420,7 @@ async def test_tei_dynamic_image_selection_a100(setup_clients):
                 credits_per_hour=Decimal("1.0"),
                 cpu=16.0,
                 memory=65536,
-                nvidia_gpu=1,
-                nvidia_gpu_model="NVIDIA A100",
+                nvidia_gpu=NvidiaGPUPreset(count=1, model="NVIDIA A100"),
             )
 
         mock_get_preset.side_effect = return_a100_preset
@@ -499,8 +476,7 @@ async def test_tei_dynamic_image_selection_t4(setup_clients):
                 credits_per_hour=Decimal("1.0"),
                 cpu=4.0,
                 memory=16384,
-                nvidia_gpu=1,
-                nvidia_gpu_model="Tesla T4",
+                nvidia_gpu=NvidiaGPUPreset(count=1, model="Tesla T4"),
             )
 
         mock_get_preset.side_effect = return_t4_preset

@@ -55,7 +55,7 @@ def get_preset(client: apolo_sdk.Client, preset_name: str) -> apolo_sdk.Preset:
 def preset_to_resources(preset: apolo_sdk.Preset) -> dict[str, t.Any]:
     requests = {
         "cpu": f"{preset.cpu * 1000}m",
-        "memory": f"{preset.memory_mb}M",
+        "memory": f"{preset.memory / (1 << 20):.0f}M",
     }
     if preset.nvidia_gpu:
         requests["nvidia.com/gpu"] = str(preset.nvidia_gpu)
