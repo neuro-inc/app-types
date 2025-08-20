@@ -41,7 +41,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-apolo-sdk = "25.8.0"
+apolo-sdk = "^25.8.0"
 click = "^8.0.3"
 httpx = "^0.28.0"
 kubernetes = "^33.1.0"
@@ -149,6 +149,7 @@ markers = [
     "e2e_job",
     "require_admin",
     "xdist_group",
+    "asyncio",
 ]
 filterwarnings = [
     "error",
