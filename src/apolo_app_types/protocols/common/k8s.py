@@ -47,7 +47,28 @@ class Env(AbstractAppFieldType):
             "variable to inject into the container.",
         ).as_json_schema_extra(),
     )
-    value: str | int | ApoloSecret | None = Field(
+    value: (
+        typing.Annotated[
+            str,
+            Field(
+                json_schema_extra=SchemaExtraMetadata(
+                    title="String variable Value",
+                    description="Specify the value of the environment variable.",
+                ).as_json_schema_extra()
+            ),
+        ]
+        | typing.Annotated[
+            str,
+            Field(
+                json_schema_extra=SchemaExtraMetadata(
+                    title="Integer variable Value",
+                    description="Specify the value of the environment variable.",
+                ).as_json_schema_extra()
+            ),
+        ]
+        | ApoloSecret
+        | None
+    ) = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
             title="Variable Value",
