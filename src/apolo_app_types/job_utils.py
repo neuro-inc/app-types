@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import apolo_sdk
 from yarl import URL
 
+from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 from apolo_app_types.protocols.job import JobAppInput
 
 
@@ -29,13 +30,12 @@ def prepare_job_run_params(
     app_instance_name: str,
     org_name: str,
     project_name: str,
+    client: apolo_sdk.Client,
 ) -> JobRunParams:
     """Prepare all parameters for apolo_client.jobs.run() call."""
     if not job_input.image:
         msg = "Container image is required"
         raise ValueError(msg)
-
-    resources = job_input.resources
 
     # Convert StorageMounts to apolo_sdk.Volume objects
     volumes = []
@@ -59,32 +59,55 @@ def prepare_job_run_params(
             )
             secret_files.append(secret_file)
 
+    # Convert env list to dict
+    env_dict = {}
+    for env_var in job_input.env:
+        if isinstance(env_var.value, str) and env_var.value:
+            env_dict[env_var.name] = env_var.value
+
+    # Convert secret_env list to dict
+    secret_env_dict = {}
+    for env_var in job_input.secret_env:
+        if isinstance(env_var.value, ApoloSecret):
+            secret_env_dict[env_var.name] = URL(f"secret://{env_var.value.key}")
+
+    # Get preset and configure resources
+    from apolo_app_types.helm.apps.common import get_preset
+
+    preset = get_preset(client, job_input.preset.name)
+
     container = apolo_sdk.Container(
         image=apolo_sdk.RemoteImage.new_external_image(name=job_input.image),
         resources=apolo_sdk.Resources(
-            cpu=resources.cpu,
-            memory=resources.memory_mb * 1024 * 1024
-            if resources.memory_mb
-            else 128 * 1024 * 1024,
-            nvidia_gpu=resources.nvidia_gpu,
-            nvidia_gpu_model=resources.nvidia_gpu_model,
-            shm=resources.shm if resources.shm is not None else True,
+            cpu=preset.cpu,
+            memory=preset.memory,
+            nvidia_gpu=preset.nvidia_gpu,
+            amd_gpu=preset.amd_gpu,
+            intel_gpu=preset.intel_gpu,
+            nvidia_gpu_model=preset.nvidia_gpu_model,
+            amd_gpu_model=preset.amd_gpu_model,
+            intel_gpu_model=preset.intel_gpu_model,
+            tpu_type=preset.tpu_type,
+            tpu_software_version=preset.tpu_software_version,
+            shm=True,  # Default to True as before
         ),
-        entrypoint=job_input.entrypoint,
-        command=job_input.command,
-        working_dir=job_input.working_dir,
-        env=job_input.env or {},
-        secret_env={
-            k: URL(f"secret://{v.key}") for k, v in (job_input.secret_env or {}).items()
-        },
+        entrypoint=job_input.entrypoint if job_input.entrypoint else None,
+        command=job_input.command if job_input.command else None,
+        working_dir=job_input.working_dir if job_input.working_dir else None,
+        env=env_dict,
+        secret_env=secret_env_dict,
         volumes=volumes,
         secret_files=secret_files,
         tty=True,
     )
 
-    job_name = job_input.name or f"{app_instance_name}-{app_instance_id[:8]}"
+    job_name = (
+        job_input.name
+        if job_input.name
+        else f"{app_instance_name}-{app_instance_id[:8]}"
+    )
 
-    tags = (job_input.tags or []) + [f"instance_id:{app_instance_id}"]
+    tags = job_input.tags + [f"instance_id:{app_instance_id}"]
 
     return JobRunParams(
         container=container,
@@ -97,7 +120,7 @@ def prepare_job_run_params(
         schedule_timeout=job_input.schedule_timeout,
         restart_policy=apolo_sdk.JobRestartPolicy(job_input.restart_policy),
         life_span=job_input.max_run_time_minutes * 60
-        if job_input.max_run_time_minutes
+        if job_input.max_run_time_minutes > 0
         else None,
         org_name=org_name,
         priority=apolo_sdk.JobPriority[job_input.priority.value.upper()],

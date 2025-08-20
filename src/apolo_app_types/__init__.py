@@ -52,8 +52,6 @@ from apolo_app_types.protocols.huggingface_cache import (
 )
 from apolo_app_types.protocols.job import (
     ContainerHTTPServer,
-    ContainerResources,
-    ContainerTPUResource,
     DiskVolume,
     JobAppInput,
     JobAppOutput,
@@ -244,8 +242,6 @@ __all__ = [
     "JobAppOutput",
     "JobPriority",
     "JobRestartPolicy",
-    "ContainerTPUResource",
-    "ContainerResources",
     "SecretVolume",
     "DiskVolume",
     "ContainerHTTPServer",
