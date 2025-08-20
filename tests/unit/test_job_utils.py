@@ -32,7 +32,6 @@ def test_prepare_job_run_params_minimal():
         mock_preset = apolo_sdk.Preset(
             cpu=2.0,
             memory=8,
-            nvidia_gpu=0,
             credits_per_hour=Decimal("0.05"),
             available_resource_pool_names=("cpu_pool",),
         )
@@ -60,7 +59,6 @@ def test_prepare_job_run_params_minimal():
     assert container.image.name == "python:3.9"
     assert container.resources.cpu == 2.0
     assert container.resources.memory == 8
-    assert container.resources.nvidia_gpu == 0
     assert container.resources.shm is True
     assert container.env == {}
     assert container.secret_env == {}
@@ -80,7 +78,6 @@ def test_prepare_job_run_params_with_custom_name():
         mock_preset = apolo_sdk.Preset(
             cpu=2.0,
             memory=8,
-            nvidia_gpu=0,
             credits_per_hour=Decimal("0.05"),
             available_resource_pool_names=("cpu_pool",),
         )
@@ -117,7 +114,6 @@ def test_prepare_job_run_params_with_env_vars():
         mock_preset = apolo_sdk.Preset(
             cpu=2.0,
             memory=8,
-            nvidia_gpu=0,
             credits_per_hour=Decimal("0.05"),
             available_resource_pool_names=("cpu_pool",),
         )
@@ -168,7 +164,6 @@ def test_prepare_job_run_params_with_storage_mounts():
         mock_preset = apolo_sdk.Preset(
             cpu=2.0,
             memory=8,
-            nvidia_gpu=0,
             credits_per_hour=Decimal("0.05"),
             available_resource_pool_names=("cpu_pool",),
         )
@@ -222,7 +217,6 @@ def test_prepare_job_run_params_with_secret_volumes():
         mock_preset = apolo_sdk.Preset(
             cpu=2.0,
             memory=8,
-            nvidia_gpu=0,
             credits_per_hour=Decimal("0.05"),
             available_resource_pool_names=("cpu_pool",),
         )
@@ -282,7 +276,6 @@ def test_prepare_job_run_params_with_all_options():
         mock_preset = apolo_sdk.Preset(
             cpu=4.0,
             memory=16,
-            nvidia_gpu=4,
             credits_per_hour=Decimal("0.2"),
             available_resource_pool_names=("gpu_pool",),
         )
@@ -316,7 +309,6 @@ def test_prepare_job_run_params_with_all_options():
     assert container.secret_env == {"API_KEY": URL("secret://api-credentials")}
     assert container.resources.cpu == 4.0
     assert container.resources.memory == 16
-    assert container.resources.nvidia_gpu == 4
 
 
 def test_prepare_job_run_params_no_image_raises_error():
@@ -351,7 +343,6 @@ def test_prepare_job_run_params_unlimited_runtime():
         mock_preset = apolo_sdk.Preset(
             cpu=2.0,
             memory=8,
-            nvidia_gpu=0,
             credits_per_hour=Decimal("0.05"),
             available_resource_pool_names=("cpu_pool",),
         )
