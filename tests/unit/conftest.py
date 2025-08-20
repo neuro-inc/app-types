@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 import apolo_sdk
 import pytest
 from apolo_sdk import AppsConfig, Preset
+from apolo_sdk._server_cfg import NvidiaGPUPreset
 from yarl import URL
 
 from tests.unit.constants import (
@@ -25,49 +26,49 @@ test_presets = {
     "cpu-large": Preset(
         cpu=4.0,
         memory=16,
-        nvidia_gpu=0,
+        nvidia_gpu=NvidiaGPUPreset(count=0),
         credits_per_hour=Decimal("0.1"),
         available_resource_pool_names=("cpu_pool",),
     ),
     "gpu-large": Preset(
         cpu=4.0,
         memory=16,
-        nvidia_gpu=4,
+        nvidia_gpu=NvidiaGPUPreset(count=4),
         credits_per_hour=Decimal("0.2"),
         available_resource_pool_names=("gpu_pool",),
     ),
     "gpu-xlarge": Preset(
         cpu=8.0,
         memory=32,
-        nvidia_gpu=8,
+        nvidia_gpu=NvidiaGPUPreset(count=8),
         credits_per_hour=Decimal("0.4"),
         available_resource_pool_names=("gpu_pool",),
     ),
     "a100-large": Preset(
         cpu=8.0,
         memory=32,
-        nvidia_gpu=1,
+        nvidia_gpu=NvidiaGPUPreset(count=1),
         credits_per_hour=Decimal("0.3"),
         available_resource_pool_names=("gpu_pool",),
     ),
     "cpu-small": Preset(
         cpu=2.0,
         memory=8,
-        nvidia_gpu=0,
+        nvidia_gpu=NvidiaGPUPreset(count=0),
         credits_per_hour=Decimal("0.05"),
         available_resource_pool_names=("cpu_pool",),
     ),
     "cpu-medium": Preset(
         cpu=2.0,
         memory=16,
-        nvidia_gpu=0,
+        nvidia_gpu=NvidiaGPUPreset(count=0),
         credits_per_hour=Decimal("0.08"),
         available_resource_pool_names=("cpu_pool",),
     ),
     "t4-medium": Preset(
         cpu=2.0,
         memory=16,
-        nvidia_gpu=1,
+        nvidia_gpu=NvidiaGPUPreset(count=1),
         credits_per_hour=Decimal("0.1"),
         available_resource_pool_names=("gpu_pool",),
     ),
@@ -208,7 +209,7 @@ def mock_get_preset_gpu():
                 credits_per_hour=Decimal("1.0"),
                 cpu=1.0,
                 memory=100,
-                nvidia_gpu=1,
+                nvidia_gpu=NvidiaGPUPreset(count=1),
                 available_resource_pool_names=("gpu_pool",),
             )
 

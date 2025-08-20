@@ -57,10 +57,10 @@ def preset_to_resources(preset: apolo_sdk.Preset) -> dict[str, t.Any]:
         "cpu": f"{preset.cpu * 1000}m",
         "memory": f"{preset.memory / (1 << 20):.0f}M",
     }
-    if preset.nvidia_gpu:
-        requests["nvidia.com/gpu"] = str(preset.nvidia_gpu)
-    if preset.amd_gpu:
-        requests["amd.com/gpu"] = str(preset.amd_gpu)
+    if preset.nvidia_gpu and preset.nvidia_gpu.count > 0:
+        requests["nvidia.com/gpu"] = str(preset.nvidia_gpu.count)
+    if preset.amd_gpu and preset.amd_gpu.count > 0:
+        requests["amd.com/gpu"] = str(preset.amd_gpu.count)
 
     return {"requests": requests, "limits": requests.copy()}
 
@@ -138,11 +138,15 @@ async def preset_to_tolerations(preset: apolo_sdk.Preset) -> list[dict[str, t.An
         logger.error(err)
         pool_types = []
 
-    if preset.amd_gpu or any(p.amd_gpu for p in pool_types):
+    if (preset.amd_gpu and preset.amd_gpu.count > 0) or any(
+        p.amd_gpu for p in pool_types
+    ):
         tolerations.append(
             {"effect": "NoSchedule", "key": "amd.com/gpu", "operator": "Exists"}
         )
-    if preset.nvidia_gpu or any(p.nvidia_gpu for p in pool_types):
+    if (preset.nvidia_gpu and preset.nvidia_gpu.count > 0) or any(
+        p.nvidia_gpu for p in pool_types
+    ):
         tolerations.append(
             {"effect": "NoSchedule", "key": "nvidia.com/gpu", "operator": "Exists"}
         )
