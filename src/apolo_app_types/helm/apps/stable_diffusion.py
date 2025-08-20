@@ -21,9 +21,9 @@ class StableDiffusionChartValueProcessor(
         self, input_: StableDiffusionInputs, preset: Preset, app_secrets_name: str
     ) -> dict[str, t.Any]:
         default_cmd_args = "--docs --cors-origins=*"
-        if preset.nvidia_gpu:
+        if preset.nvidia_gpu and preset.nvidia_gpu.count > 0:
             commandline_args = "--use-cuda"
-        elif preset.amd_gpu:
+        elif preset.amd_gpu and preset.amd_gpu.count > 0:
             commandline_args = "--use-rocm"
         else:
             commandline_args = "--lowvram"

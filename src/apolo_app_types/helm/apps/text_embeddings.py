@@ -37,11 +37,11 @@ def _detect_gpu_architecture(
     # If no NVIDIA GPU, use CPU image
     if not preset.nvidia_gpu:
         # Check for AMD GPU - not supported by TEI, fall back to CPU
-        if preset.amd_gpu and preset.amd_gpu > 0:
+        if preset.amd_gpu and preset.amd_gpu.count > 0:
             logger.warning(
                 "AMD GPU detected (%s) is not supported by HuggingFace Text "
                 "Embeddings Inference. Falling back to CPU image.",
-                preset.amd_gpu_model or "Unknown AMD GPU",
+                preset.amd_gpu.model or "Unknown AMD GPU",
             )
         return TextEmbeddingsInferenceArchitecture.CPU
 

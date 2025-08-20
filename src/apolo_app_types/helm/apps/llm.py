@@ -191,8 +191,8 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
 
         preset_name = input_.preset.name
         preset: Preset = get_preset(self.client, preset_name)
-        nvidia_gpus = preset.nvidia_gpu or 0
-        amd_gpus = preset.amd_gpu or 0
+        nvidia_gpus = preset.nvidia_gpu.count if preset.nvidia_gpu else 0
+        amd_gpus = preset.amd_gpu.count if preset.amd_gpu else 0
 
         gpu_count = nvidia_gpus + amd_gpus
         if amd_gpus > 0:

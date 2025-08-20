@@ -41,7 +41,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
         )
         mount_path = "/opt/spark/app"
         main_app_file_mount = ApoloFilesMount(
-            storage_uri=ApoloFilesPath(path=str(main_app_file_path.parent)),  # type: ignore
+            storage_uri=ApoloFilesPath(path=str(main_app_file_path.parent)),
             mount_path=MountPath(path=mount_path),
             mode=ApoloMountMode(mode="r"),
         )
@@ -51,7 +51,7 @@ class SparkJobValueProcessor(BaseChartValueProcessor[SparkJobInputs]):
             self.client,
         )
 
-        main_application_file = f"local://{mount_path}/{main_app_file_path.name}"  # type: ignore
+        main_application_file = f"local://{mount_path}/{main_app_file_path.name}"
         return extra_annotations, main_application_file
 
     def _get_default_container_image(self) -> ContainerImage:
