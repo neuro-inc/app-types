@@ -7,7 +7,7 @@ from apolo_app_types.protocols.common.schema_extra import (
     SchemaExtraMetadata,
     SchemaMetaType,
 )
-from apolo_app_types.protocols.common.secrets_ import StrOrSecret
+from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 
 
 class CredentialsType(str, enum.Enum):
@@ -29,7 +29,7 @@ class BucketCredentials(AbstractAppFieldType):
 
 
 class GCPBucketCredentials(BucketCredentials):
-    key_data: StrOrSecret = Field(
+    key_data: ApoloSecret = Field(
         ...,
         description="The key data of the bucket.",
         title="Bucket key data",
@@ -42,7 +42,7 @@ class MinioBucketCredentials(BucketCredentials):
         description="The access key ID of the bucket.",
         title="Bucket access key ID",
     )
-    secret_access_key: StrOrSecret = Field(
+    secret_access_key: ApoloSecret = Field(
         ...,
         description="The secret access key of the bucket.",
         title="Bucket secret access key",
@@ -60,12 +60,12 @@ class MinioBucketCredentials(BucketCredentials):
 
 
 class S3BucketCredentials(BucketCredentials):
-    access_key_id: StrOrSecret = Field(
+    access_key_id: ApoloSecret = Field(
         ...,
         description="The access key ID of the bucket.",
         title="Bucket access key ID",
     )
-    secret_access_key: StrOrSecret = Field(
+    secret_access_key: ApoloSecret = Field(
         ...,
         description="The secret access key of the bucket.",
         title="Bucket secret access key",

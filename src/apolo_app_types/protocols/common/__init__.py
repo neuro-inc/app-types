@@ -19,7 +19,7 @@ from .postgres import Postgres
 from .preset import Preset
 from .redis import Redis, RedisMaster
 from .schema_extra import SchemaExtraMetadata, SchemaMetaType
-from .secrets_ import ApoloSecret, OptionalStrOrSecret, StrOrSecret
+from .secrets_ import ApoloSecret, OptionalSecret
 from .storage import (
     ApoloFilesFile,
     ApoloFilesMount,
@@ -52,8 +52,7 @@ __all__ = [
     "GraphQLAPI",
     "ServiceAPI",
     "ApoloSecret",
-    "StrOrSecret",
-    "OptionalStrOrSecret",
+    "OptionalSecret",
     "Bucket",
     "AppOutputsDeployer",
     "AppInputs",

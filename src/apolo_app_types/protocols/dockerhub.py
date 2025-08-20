@@ -9,7 +9,7 @@ from apolo_app_types.protocols.common.schema_extra import (
     SchemaExtraMetadata,
     SchemaMetaType,
 )
-from apolo_app_types.protocols.common.secrets_ import StrOrSecret
+from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 
 
 class DockerHubModel(AbstractAppFieldType):
@@ -38,7 +38,7 @@ class DockerHubModel(AbstractAppFieldType):
         ).as_json_schema_extra(),
     )
 
-    password: StrOrSecret = Field(  # noqa: N815
+    password: ApoloSecret = Field(  # noqa: N815
         ...,
         json_schema_extra=SchemaExtraMetadata(
             title="Password",

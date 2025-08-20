@@ -18,8 +18,7 @@ from apolo_app_types.protocols.common import (
     HuggingFaceModel,
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
-    OptionalStrOrSecret,
-    StrOrSecret,
+    OptionalSecret,
 )
 from apolo_app_types.protocols.custom_deployment import (
     Container,
@@ -199,8 +198,7 @@ __all__ = [
     "PrivateGPTInputs",
     "PrivateGPTOutputs",
     "ApoloSecret",
-    "StrOrSecret",
-    "OptionalStrOrSecret",
+    "OptionalSecret",
     "StableDiffusionOutputs",
     "HuggingFaceModel",
     "VLLMOutputsV2",

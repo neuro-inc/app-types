@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from yarl import URL
 
-from apolo_app_types import AppOutputs, OptionalStrOrSecret
+from apolo_app_types import AppOutputs, OptionalSecret
 from apolo_app_types.protocols.common import (
     AppInputs,
     AppInputsDeployer,
@@ -33,7 +33,7 @@ class FooocusSpecificAppInputs(BaseModel):
         ).as_json_schema_extra(),
     )
 
-    huggingface_token_secret: OptionalStrOrSecret = Field(  # noqa: N815
+    huggingface_token_secret: OptionalSecret = Field(  # noqa: N815
         default=None,
         json_schema_extra=SchemaExtraMetadata(
             title="Hugging Face Token",

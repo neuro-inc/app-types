@@ -1,6 +1,7 @@
 import typing as t
 
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
+from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
 from apolo_app_types.protocols.dockerhub import DockerHubInputs
 
 
@@ -16,6 +17,8 @@ class DockerHubModelChartValueProcessor(BaseChartValueProcessor[DockerHubInputs]
         input_: DockerHubInputs,
         app_name: str,
         namespace: str,
+        app_id: str,
+        app_secrets_name: str,
         *_: t.Any,
         **kwargs: t.Any,
     ) -> dict[str, t.Any]:
@@ -36,7 +39,9 @@ class DockerHubModelChartValueProcessor(BaseChartValueProcessor[DockerHubInputs]
                     "registry_provider_host": self._REGISTRY_PROVIDER_HOST,
                     "registry_api_url": self._DOCKERHUB_API_URL,
                     "registry_user": input_.dockerhub.username,
-                    "registry_secret": input_.dockerhub.password,
+                    "registry_secret": serialize_optional_secret(
+                        input_.dockerhub.password, app_secrets_name
+                    ),
                 }
             }
         }
