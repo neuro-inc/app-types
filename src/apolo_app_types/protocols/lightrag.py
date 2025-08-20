@@ -21,7 +21,6 @@ from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
 )
-from apolo_app_types.protocols.common.secrets_ import OptionalSecret
 from apolo_app_types.protocols.postgres import CrunchyPostgresUserCredentials
 
 
@@ -108,8 +107,8 @@ class OpenAILLMProvider(RestAPI):
             description="Model name",
         ).as_json_schema_extra(),
     )
-    api_key: OptionalSecret = Field(
-        default=None,
+    api_key: str = Field(
+        default="",
         json_schema_extra=SchemaExtraMetadata(
             title="API Key",
             description="API key",
@@ -159,8 +158,8 @@ class AnthropicLLMProvider(RestAPI):
             description="Claude model name",
         ).as_json_schema_extra(),
     )
-    api_key: OptionalSecret = Field(
-        default=None,
+    api_key: str = Field(
+        default="",
         json_schema_extra=SchemaExtraMetadata(
             title="API Key",
             description="Anthropic API key",
@@ -259,8 +258,8 @@ class GeminiLLMProvider(RestAPI):
             description="Set the Gemini model name",
         ).as_json_schema_extra(),
     )
-    api_key: OptionalSecret = Field(
-        default=None,
+    api_key: str = Field(
+        default="",
         json_schema_extra=SchemaExtraMetadata(
             title="API Key",
             description="Set the Google AI API key.",
@@ -321,8 +320,8 @@ class OpenAIEmbeddingProvider(RestAPI):
             description="Embedding model name",
         ).as_json_schema_extra(),
     )
-    api_key: OptionalSecret = Field(
-        default=None,
+    api_key: str = Field(
+        default="",
         json_schema_extra=SchemaExtraMetadata(
             title="API Key",
             description="Set the OpenAI API key.",

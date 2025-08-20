@@ -70,7 +70,7 @@ class PrivateGptChartValueProcessor(BaseChartValueProcessor[PrivateGPTAppInputs]
             "POSTGRES_DB": input_.pgvector_user.dbname or "postgres",
             "POSTGRES_USER": input_.pgvector_user.user,
             "POSTGRES_PASSWORD": input_.pgvector_user.password,
-            "HUGGINGFACE_TOKEN": input_.llm_chat_api.hf_model.hf_token,
+            "HUGGINGFACE_TOKEN": input_.llm_chat_api.hf_model.hf_token or "",
         }
 
     async def gen_extra_values(

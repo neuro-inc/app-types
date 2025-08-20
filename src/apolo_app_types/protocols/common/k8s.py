@@ -57,19 +57,9 @@ class Env(AbstractAppFieldType):
                 ).as_json_schema_extra()
             ),
         ]
-        | typing.Annotated[
-            str,
-            Field(
-                json_schema_extra=SchemaExtraMetadata(
-                    title="Integer variable Value",
-                    description="Specify the value of the environment variable.",
-                ).as_json_schema_extra()
-            ),
-        ]
         | ApoloSecret
-        | None
     ) = Field(
-        default=None,
+        default="",
         json_schema_extra=SchemaExtraMetadata(
             title="Variable Value",
             description="Specify the value of the environment variable.",

@@ -43,11 +43,11 @@ async def test_lightrag_openai_llm_provider(setup_clients, mock_get_preset_cpu):
             ),
             llm_config=OpenAILLMProvider(
                 model="gpt-4",
-                api_key=ApoloSecret(key="test-openai-key"),
+                api_key="test-openai-key",
             ),
             embedding_config=OpenAIEmbeddingProvider(
                 model="text-embedding-3-small",
-                api_key=ApoloSecret(key="test-openai-key"),
+                api_key="test-openai-key",
                 dimensions=1536,
             ),
         ),
@@ -63,16 +63,8 @@ async def test_lightrag_openai_llm_provider(setup_clients, mock_get_preset_cpu):
     assert helm_params["env"]["LLM_BINDING"] == "openai"
     assert helm_params["env"]["LLM_MODEL"] == "gpt-4"
     assert helm_params["env"]["LLM_BINDING_HOST"] == "https://api.openai.com:443/v1"
-    assert helm_params["env"]["LLM_BINDING_API_KEY"] == {
-        "valueFrom": {
-            "secretKeyRef": {"key": "test-openai-key", "name": "apps-secrets"}
-        }
-    }
-    assert helm_params["env"]["OPENAI_API_KEY"] == {
-        "valueFrom": {
-            "secretKeyRef": {"key": "test-openai-key", "name": "apps-secrets"}
-        }
-    }
+    assert helm_params["env"]["LLM_BINDING_API_KEY"] == "test-openai-key"
+    assert helm_params["env"]["OPENAI_API_KEY"] == "test-openai-key"
 
     # Verify embedding configuration
     assert helm_params["env"]["EMBEDDING_BINDING"] == "openai"
@@ -81,11 +73,7 @@ async def test_lightrag_openai_llm_provider(setup_clients, mock_get_preset_cpu):
     assert (
         helm_params["env"]["EMBEDDING_BINDING_HOST"] == "https://api.openai.com:443/v1"
     )
-    assert helm_params["env"]["EMBEDDING_BINDING_API_KEY"] == {
-        "valueFrom": {
-            "secretKeyRef": {"key": "test-openai-key", "name": "apps-secrets"}
-        }
-    }
+    assert helm_params["env"]["EMBEDDING_BINDING_API_KEY"] == "test-openai-key"
 
 
 @pytest.mark.asyncio
@@ -107,11 +95,11 @@ async def test_lightrag_anthropic_llm_provider(setup_clients, mock_get_preset_cp
             ),
             llm_config=AnthropicLLMProvider(
                 model="claude-3-opus-20240229",
-                api_key=ApoloSecret(key="test-anthropic-key"),
+                api_key="test-anthropic-key",
             ),
             embedding_config=OpenAIEmbeddingProvider(
                 model="text-embedding-ada-002",
-                api_key=ApoloSecret(key="test-openai-key"),
+                api_key="test-openai-key",
             ),
         ),
         apolo_client=apolo_client,
@@ -126,16 +114,8 @@ async def test_lightrag_anthropic_llm_provider(setup_clients, mock_get_preset_cp
     assert helm_params["env"]["LLM_BINDING"] == "anthropic"
     assert helm_params["env"]["LLM_MODEL"] == "claude-3-opus-20240229"
     assert helm_params["env"]["LLM_BINDING_HOST"] == "https://api.anthropic.com:443/v1"
-    assert helm_params["env"]["LLM_BINDING_API_KEY"] == {
-        "valueFrom": {
-            "secretKeyRef": {"key": "test-anthropic-key", "name": "apps-secrets"}
-        }
-    }
-    assert helm_params["env"]["OPENAI_API_KEY"] == {
-        "valueFrom": {
-            "secretKeyRef": {"key": "test-anthropic-key", "name": "apps-secrets"}
-        }
-    }  # OPENAI_API_KEY uses LLM provider key
+    assert helm_params["env"]["LLM_BINDING_API_KEY"] == "test-anthropic-key"
+    assert helm_params["env"]["OPENAI_API_KEY"] == "test-anthropic-key"
 
 
 @pytest.mark.asyncio
@@ -214,11 +194,11 @@ async def test_lightrag_gemini_llm_provider(setup_clients, mock_get_preset_cpu):
             ),
             llm_config=GeminiLLMProvider(
                 model="gemini-1.5-pro",
-                api_key=ApoloSecret(key="test-gemini-key"),
+                api_key="test-gemini-key",
             ),
             embedding_config=OpenAIEmbeddingProvider(
                 model="text-embedding-ada-002",
-                api_key=ApoloSecret(key="test-openai-key"),
+                api_key="test-openai-key",
             ),
         ),
         apolo_client=apolo_client,
@@ -236,11 +216,7 @@ async def test_lightrag_gemini_llm_provider(setup_clients, mock_get_preset_cpu):
         helm_params["env"]["LLM_BINDING_HOST"]
         == "https://generativelanguage.googleapis.com:443/v1"
     )
-    assert helm_params["env"]["LLM_BINDING_API_KEY"] == {
-        "valueFrom": {
-            "secretKeyRef": {"key": "test-gemini-key", "name": "apps-secrets"}
-        }
-    }
+    assert helm_params["env"]["LLM_BINDING_API_KEY"] == "test-gemini-key"
 
 
 @pytest.mark.asyncio
@@ -326,11 +302,11 @@ async def test_lightrag_secret_handling(setup_clients, mock_get_preset_cpu):
             ),
             llm_config=OpenAILLMProvider(
                 model="gpt-4",
-                api_key=ApoloSecret(key="openai_api_key"),
+                api_key="openai_api_key",
             ),
             embedding_config=OpenAIEmbeddingProvider(
                 model="text-embedding-3-small",
-                api_key=ApoloSecret(key="openai_api_key"),
+                api_key="openai_api_key",
             ),
         ),
         apolo_client=apolo_client,
@@ -342,23 +318,11 @@ async def test_lightrag_secret_handling(setup_clients, mock_get_preset_cpu):
     )
 
     # Verify LLM configuration uses secret references
-    assert helm_params["env"]["LLM_BINDING_API_KEY"] == {
-        "valueFrom": {
-            "secretKeyRef": {"name": APP_SECRETS_NAME, "key": "openai_api_key"}
-        }
-    }
-    assert helm_params["env"]["OPENAI_API_KEY"] == {
-        "valueFrom": {
-            "secretKeyRef": {"name": APP_SECRETS_NAME, "key": "openai_api_key"}
-        }
-    }
+    assert helm_params["env"]["LLM_BINDING_API_KEY"] == "openai_api_key"
+    assert helm_params["env"]["OPENAI_API_KEY"] == "openai_api_key"
 
     # Verify embedding configuration uses secret references
-    assert helm_params["env"]["EMBEDDING_BINDING_API_KEY"] == {
-        "valueFrom": {
-            "secretKeyRef": {"name": APP_SECRETS_NAME, "key": "openai_api_key"}
-        }
-    }
+    assert helm_params["env"]["EMBEDDING_BINDING_API_KEY"] == "openai_api_key"
 
 
 @pytest.mark.asyncio
@@ -378,13 +342,10 @@ async def test_lightrag_persistence_configuration(setup_clients, mock_get_preset
                 pgbouncer_port=6432,
                 dbname="test_db",
             ),
-            llm_config=OpenAILLMProvider(
-                model="gpt-4",
-                api_key=ApoloSecret(key="test-key"),
-            ),
+            llm_config=OpenAILLMProvider(model="gpt-4", api_key="test-key"),
             embedding_config=OpenAIEmbeddingProvider(
                 model="text-embedding-ada-002",
-                api_key=ApoloSecret(key="test-key"),
+                api_key="test-key",
             ),
             persistence=LightRAGPersistence(
                 rag_storage_size=20,
@@ -424,11 +385,11 @@ async def test_lightrag_postgres_configuration(setup_clients, mock_get_preset_cp
             ),
             llm_config=OpenAILLMProvider(
                 model="gpt-4",
-                api_key=ApoloSecret(key="test-key"),
+                api_key="test-key",
             ),
             embedding_config=OpenAIEmbeddingProvider(
                 model="text-embedding-ada-002",
-                api_key=ApoloSecret(key="test-key"),
+                api_key="test-key",
             ),
         ),
         apolo_client=apolo_client,
@@ -467,11 +428,11 @@ async def test_lightrag_storage_configuration(setup_clients, mock_get_preset_cpu
             ),
             llm_config=OpenAILLMProvider(
                 model="gpt-4",
-                api_key=ApoloSecret(key="test-key"),
+                api_key="test-key",
             ),
             embedding_config=OpenAIEmbeddingProvider(
                 model="text-embedding-ada-002",
-                api_key=ApoloSecret(key="test-key"),
+                api_key="test-key",
             ),
         ),
         apolo_client=apolo_client,
@@ -508,11 +469,11 @@ async def test_lightrag_web_ui_configuration(setup_clients, mock_get_preset_cpu)
             ),
             llm_config=OpenAILLMProvider(
                 model="gpt-4",
-                api_key=ApoloSecret(key="test-key"),
+                api_key="test-key",
             ),
             embedding_config=OpenAIEmbeddingProvider(
                 model="text-embedding-ada-002",
-                api_key=ApoloSecret(key="test-key"),
+                api_key="test-key",
             ),
         ),
         apolo_client=apolo_client,
@@ -552,11 +513,11 @@ async def test_lightrag_basic_chart_values(setup_clients, mock_get_preset_cpu):
             ),
             llm_config=OpenAILLMProvider(
                 model="gpt-4",
-                api_key=ApoloSecret(key="test-key"),
+                api_key="test-key",
             ),
             embedding_config=OpenAIEmbeddingProvider(
                 model="text-embedding-ada-002",
-                api_key=ApoloSecret(key="test-key"),
+                api_key="test-key",
             ),
         ),
         apolo_client=apolo_client,
@@ -598,11 +559,11 @@ async def test_lightrag_embedding_dimensions(setup_clients, mock_get_preset_cpu)
             ),
             llm_config=OpenAILLMProvider(
                 model="gpt-4",
-                api_key=ApoloSecret(key="test-key"),
+                api_key="test-key",
             ),
             embedding_config=OpenAIEmbeddingProvider(
                 model="text-embedding-3-large",
-                api_key=ApoloSecret(key="test-key"),
+                api_key="test-key",
             ),
         ),
         apolo_client=apolo_client,
@@ -684,7 +645,7 @@ async def test_lightrag_error_handling_missing_hf_model(
                 ),
                 embedding_config=OpenAIEmbeddingProvider(
                     model="text-embedding-ada-002",
-                    api_key=ApoloSecret(key="test-key"),
+                    api_key="test-key",
                 ),
             ),
             apolo_client=apolo_client,
@@ -723,7 +684,7 @@ async def test_lightrag_error_handling_missing_embedding_hf_model(
                 ),
                 llm_config=OpenAILLMProvider(
                     model="gpt-4",
-                    api_key=ApoloSecret(key="test-key"),
+                    api_key="test-key",
                 ),
                 embedding_config=OpenAICompatEmbeddingsAPI(
                     host="my-embedding-server.com",

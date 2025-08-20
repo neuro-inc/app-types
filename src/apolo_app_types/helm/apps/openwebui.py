@@ -42,7 +42,7 @@ class OpenWebUIChartValueProcessor(BaseChartValueProcessor[OpenWebUIAppInputs]):
 
     async def _configure_env(
         self, input_: OpenWebUIAppInputs
-    ) -> dict[str, str | int | ApoloSecret | None]:
+    ) -> dict[str, str | ApoloSecret]:
         if not input_.llm_chat_api.hf_model:
             err_msg = "llm_chat_api.hf_model is required"
             raise ValueError(err_msg)
