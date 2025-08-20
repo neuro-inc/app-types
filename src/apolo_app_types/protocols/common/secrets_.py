@@ -21,12 +21,11 @@ class ApoloSecret(AbstractAppFieldType):
     key: str
 
 
-StrOrSecret = str | ApoloSecret
-OptionalStrOrSecret = StrOrSecret | None
+OptionalSecret = ApoloSecret | None
 
 
 def serialize_optional_secret(
-    value: OptionalStrOrSecret, secret_name: str
+    value: OptionalSecret, secret_name: str
 ) -> dict[str, Any] | str:
     if value is None:
         return ""

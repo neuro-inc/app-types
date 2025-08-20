@@ -5,7 +5,7 @@ from apolo_app_types.protocols.common.schema_extra import (
     SchemaExtraMetadata,
     SchemaMetaType,
 )
-from apolo_app_types.protocols.common.secrets_ import OptionalStrOrSecret
+from apolo_app_types.protocols.common.secrets_ import OptionalSecret
 from apolo_app_types.protocols.common.storage import ApoloFilesPath
 
 
@@ -28,7 +28,7 @@ class HuggingFaceModel(AbstractAppFieldType):
             title="Hugging Face Model Name",
         ).as_json_schema_extra(),
     )
-    hf_token: OptionalStrOrSecret = Field(  # noqa: N815
+    hf_token: OptionalSecret = Field(  # noqa: N815
         default=None,
         json_schema_extra=SchemaExtraMetadata(
             description="The Hugging Face API token.",

@@ -3,7 +3,7 @@ import pytest
 from apolo_app_types import HuggingFaceModel, StableDiffusionInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import _get_match_expressions
-from apolo_app_types.protocols.common import IngressHttp, Preset
+from apolo_app_types.protocols.common import ApoloSecret, IngressHttp, Preset
 from apolo_app_types.protocols.stable_diffusion import StableDiffusionParams
 
 from tests.unit.constants import APP_ID, APP_SECRETS_NAME, CPU_POOL, DEFAULT_NAMESPACE
@@ -24,7 +24,7 @@ async def test_values_sd_generation(setup_clients, mock_get_preset_cpu):
                 replica_count=1,
                 stablestudio=None,
                 hugging_face_model=HuggingFaceModel(
-                    model_hf_name="test", hf_token="test3"
+                    model_hf_name="test", hf_token=ApoloSecret(key="test3")
                 ),
             ),
         ),
@@ -92,7 +92,7 @@ async def test_values_sd_generation_with_gpu(setup_clients, mock_get_preset_gpu)
                 replicaCount=1,
                 stablestudio=None,
                 hugging_face_model=HuggingFaceModel(
-                    model_hf_name="test", hf_token="test3"
+                    model_hf_name="test", hf_token=ApoloSecret(key="test3")
                 ),
             ),
         ),

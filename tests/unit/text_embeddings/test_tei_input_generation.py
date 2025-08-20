@@ -13,7 +13,7 @@ from apolo_app_types.helm.apps.text_embeddings import (
     _get_tei_image_for_architecture,
 )
 from apolo_app_types.inputs.args import app_type_to_vals
-from apolo_app_types.protocols.common import IngressHttp, Preset
+from apolo_app_types.protocols.common import ApoloSecret, IngressHttp, Preset
 from apolo_app_types.protocols.text_embeddings import (
     TextEmbeddingsInferenceAppInputs,
     TextEmbeddingsInferenceArchitecture as TEIArch,
@@ -47,7 +47,8 @@ async def test_tei_values_generation(setup_clients):
                 preset=Preset(name="cpu-small"),
                 ingress_http=IngressHttp(),
                 model=HuggingFaceModel(
-                    model_hf_name="random/name", hf_token="random-token"
+                    model_hf_name="random/name",
+                    hf_token=ApoloSecret(key="random-token"),
                 ),
                 server_extra_args=[
                     "--max-concurrent-requests=512",
@@ -70,7 +71,11 @@ async def test_tei_values_generation(setup_clients):
             "modelHFName": "random/name",
         }
         assert helm_params["env"] == {
-            "HUGGING_FACE_HUB_TOKEN": "random-token",
+            "HUGGING_FACE_HUB_TOKEN": {
+                "valueFrom": {
+                    "secretKeyRef": {"key": "random-token", "name": "apps-secrets"}
+                }
+            }
         }
         assert helm_params["serverExtraArgs"] == [
             "--max-concurrent-requests=512",
@@ -431,7 +436,7 @@ async def test_tei_dynamic_image_selection_a100(setup_clients):
                 ingress_http=IngressHttp(),
                 model=HuggingFaceModel(
                     model_hf_name="sentence-transformers/all-MiniLM-L6-v2",
-                    hf_token="test-token",
+                    hf_token=ApoloSecret(key="test-token"),
                 ),
                 server_extra_args=[
                     "--max-concurrent-requests=512",
@@ -455,7 +460,11 @@ async def test_tei_dynamic_image_selection_a100(setup_clients):
             "modelHFName": "sentence-transformers/all-MiniLM-L6-v2",
         }
         assert helm_params["env"] == {
-            "HUGGING_FACE_HUB_TOKEN": "test-token",
+            "HUGGING_FACE_HUB_TOKEN": {
+                "valueFrom": {
+                    "secretKeyRef": {"key": "test-token", "name": "apps-secrets"}
+                }
+            }
         }
         assert helm_params["serverExtraArgs"] == [
             "--max-concurrent-requests=512",
@@ -487,7 +496,7 @@ async def test_tei_dynamic_image_selection_t4(setup_clients):
                 ingress_http=IngressHttp(),
                 model=HuggingFaceModel(
                     model_hf_name="sentence-transformers/all-MiniLM-L6-v2",
-                    hf_token="test-token",
+                    hf_token=ApoloSecret(key="test-token"),
                 ),
             ),
             apolo_client=setup_clients,
@@ -528,7 +537,7 @@ async def test_tei_dynamic_image_selection_cpu(setup_clients):
                 ingress_http=IngressHttp(),
                 model=HuggingFaceModel(
                     model_hf_name="sentence-transformers/all-MiniLM-L6-v2",
-                    hf_token="test-token",
+                    hf_token=ApoloSecret(key="test-token"),
                 ),
             ),
             apolo_client=setup_clients,

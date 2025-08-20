@@ -115,9 +115,7 @@ async def test_lightrag_anthropic_llm_provider(setup_clients, mock_get_preset_cp
     assert helm_params["env"]["LLM_MODEL"] == "claude-3-opus-20240229"
     assert helm_params["env"]["LLM_BINDING_HOST"] == "https://api.anthropic.com:443/v1"
     assert helm_params["env"]["LLM_BINDING_API_KEY"] == "test-anthropic-key"
-    assert (
-        helm_params["env"]["OPENAI_API_KEY"] == "test-anthropic-key"
-    )  # OPENAI_API_KEY uses LLM provider key
+    assert helm_params["env"]["OPENAI_API_KEY"] == "test-anthropic-key"
 
 
 @pytest.mark.asyncio
@@ -244,7 +242,7 @@ async def test_lightrag_openai_compatible_providers(setup_clients, mock_get_pres
                 protocol="https",
                 hf_model=HuggingFaceModel(
                     model_hf_name="meta-llama/Llama-3.1-8B-Instruct",
-                    hf_token="test-hf-token",
+                    hf_token=ApoloSecret(key="test-hf-token"),
                 ),
             ),
             embedding_config=OpenAICompatEmbeddingsAPI(
@@ -253,7 +251,7 @@ async def test_lightrag_openai_compatible_providers(setup_clients, mock_get_pres
                 protocol="https",
                 hf_model=HuggingFaceModel(
                     model_hf_name="sentence-transformers/all-MiniLM-L6-v2",
-                    hf_token="test-hf-token",
+                    hf_token=ApoloSecret(key="test-hf-token"),
                 ),
             ),
         ),
@@ -304,11 +302,11 @@ async def test_lightrag_secret_handling(setup_clients, mock_get_preset_cpu):
             ),
             llm_config=OpenAILLMProvider(
                 model="gpt-4",
-                api_key=ApoloSecret(key="openai_api_key"),
+                api_key="openai_api_key",
             ),
             embedding_config=OpenAIEmbeddingProvider(
                 model="text-embedding-3-small",
-                api_key=ApoloSecret(key="openai_api_key"),
+                api_key="openai_api_key",
             ),
         ),
         apolo_client=apolo_client,
@@ -320,23 +318,11 @@ async def test_lightrag_secret_handling(setup_clients, mock_get_preset_cpu):
     )
 
     # Verify LLM configuration uses secret references
-    assert helm_params["env"]["LLM_BINDING_API_KEY"] == {
-        "valueFrom": {
-            "secretKeyRef": {"name": APP_SECRETS_NAME, "key": "openai_api_key"}
-        }
-    }
-    assert helm_params["env"]["OPENAI_API_KEY"] == {
-        "valueFrom": {
-            "secretKeyRef": {"name": APP_SECRETS_NAME, "key": "openai_api_key"}
-        }
-    }
+    assert helm_params["env"]["LLM_BINDING_API_KEY"] == "openai_api_key"
+    assert helm_params["env"]["OPENAI_API_KEY"] == "openai_api_key"
 
     # Verify embedding configuration uses secret references
-    assert helm_params["env"]["EMBEDDING_BINDING_API_KEY"] == {
-        "valueFrom": {
-            "secretKeyRef": {"name": APP_SECRETS_NAME, "key": "openai_api_key"}
-        }
-    }
+    assert helm_params["env"]["EMBEDDING_BINDING_API_KEY"] == "openai_api_key"
 
 
 @pytest.mark.asyncio
@@ -356,10 +342,7 @@ async def test_lightrag_persistence_configuration(setup_clients, mock_get_preset
                 pgbouncer_port=6432,
                 dbname="test_db",
             ),
-            llm_config=OpenAILLMProvider(
-                model="gpt-4",
-                api_key="test-key",
-            ),
+            llm_config=OpenAILLMProvider(model="gpt-4", api_key="test-key"),
             embedding_config=OpenAIEmbeddingProvider(
                 model="text-embedding-ada-002",
                 api_key="test-key",

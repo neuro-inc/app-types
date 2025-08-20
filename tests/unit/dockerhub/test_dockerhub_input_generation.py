@@ -2,6 +2,7 @@ import pytest
 
 from apolo_app_types import DockerHubInputs
 from apolo_app_types.app_types import AppType
+from apolo_app_types.protocols.common import ApoloSecret
 from apolo_app_types.protocols.dockerhub import DockerHubModel
 
 from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
@@ -14,7 +15,9 @@ async def test_values_dockerhub_generation_(setup_clients, mock_get_preset_cpu):
     apolo_client = setup_clients
     helm_args, helm_params = await app_type_to_vals(
         input_=DockerHubInputs(
-            dockerhub=DockerHubModel(username="test", password="test")
+            dockerhub=DockerHubModel(
+                username="test", password=ApoloSecret(key="test_key")
+            )
         ),
         apolo_client=apolo_client,
         app_type=AppType.DockerHub,
@@ -35,4 +38,6 @@ async def test_values_dockerhub_generation_(setup_clients, mock_get_preset_cpu):
     )
     assert helm_params["job"]["args"]["registry_api_url"] == "https://hub.docker.com"
     assert helm_params["job"]["args"]["registry_user"] == "test"
-    assert helm_params["job"]["args"]["registry_secret"] == "test"
+    assert helm_params["job"]["args"]["registry_secret"] == {
+        "valueFrom": {"secretKeyRef": {"key": "test_key", "name": "apps-secrets"}}
+    }

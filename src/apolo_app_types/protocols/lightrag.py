@@ -21,7 +21,6 @@ from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
 )
-from apolo_app_types.protocols.common.secrets_ import OptionalStrOrSecret
 from apolo_app_types.protocols.postgres import CrunchyPostgresUserCredentials
 
 
@@ -77,14 +76,44 @@ class OpenAILLMProvider(RestAPI):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
-    host: str = Field(default="api.openai.com", description="OpenAI API host")
-    port: int = 443
+    host: str = Field(
+        default="api.openai.com",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Host",
+            description="OpenAI API host",
+        ).as_json_schema_extra(),
+    )
+    port: int = Field(
+        default=443,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Port",
+            description="Set the port.",
+        ).as_json_schema_extra(),
+    )
     protocol: Literal["https"] = "https"
-    timeout: int | None = Field(default=60, description="Connection timeout in seconds")
+    timeout: int | None = Field(
+        default=60,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Timeout",
+            description="Connection timeout in seconds",
+        ).as_json_schema_extra(),
+    )
     base_path: str = "/v1"
     provider: Literal["openai"] = "openai"
-    model: str = Field(default="gpt-4o-mini", description="Model name")
-    api_key: OptionalStrOrSecret = Field(default=None, description="API key")
+    model: str = Field(
+        default="gpt-4o-mini",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Model",
+            description="Model name",
+        ).as_json_schema_extra(),
+    )
+    api_key: str = Field(
+        default="",
+        json_schema_extra=SchemaExtraMetadata(
+            title="API Key",
+            description="API key",
+        ).as_json_schema_extra(),
+    )
 
 
 class AnthropicLLMProvider(RestAPI):
@@ -98,16 +127,44 @@ class AnthropicLLMProvider(RestAPI):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
-    host: str = Field(default="api.anthropic.com", description="Anthropic API host")
-    port: int = 443
+    host: str = Field(
+        default="api.anthropic.com",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Host",
+            description="Anthropic API host",
+        ).as_json_schema_extra(),
+    )
+    port: int = Field(
+        default=443,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Port",
+            description="Set the port.",
+        ).as_json_schema_extra(),
+    )
     protocol: Literal["https"] = "https"
-    timeout: int | None = Field(default=60, description="Connection timeout in seconds")
+    timeout: int | None = Field(
+        default=60,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Timeout",
+            description="Connection timeout in seconds",
+        ).as_json_schema_extra(),
+    )
     base_path: str = "/v1"
     provider: Literal["anthropic"] = "anthropic"
     model: str = Field(
-        default="claude-3-sonnet-20240229", description="Claude model name"
+        default="claude-3-sonnet-20240229",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Model",
+            description="Claude model name",
+        ).as_json_schema_extra(),
     )
-    api_key: OptionalStrOrSecret = Field(default=None, description="Anthropic API key")
+    api_key: str = Field(
+        default="",
+        json_schema_extra=SchemaExtraMetadata(
+            title="API Key",
+            description="Anthropic API key",
+        ).as_json_schema_extra(),
+    )
 
 
 class OllamaLLMProvider(RestAPI):
@@ -121,17 +178,42 @@ class OllamaLLMProvider(RestAPI):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
-    host: str = Field(description="Ollama server host")
-    port: int = Field(default=11434, description="Ollama server port")
+    host: str = Field(
+        json_schema_extra=SchemaExtraMetadata(
+            title="Host",
+            description="Ollama server host",
+        ).as_json_schema_extra(),
+    )
+    port: int = Field(
+        default=11434,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Port",
+            description="Ollama server port",
+        ).as_json_schema_extra(),
+    )
     protocol: Literal["http", "https"] = Field(
-        default="http", description="Ollama server protocol"
+        default="http",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Protocol",
+            description="Ollama server protocol",
+        ).as_json_schema_extra(),
     )
     timeout: int | None = Field(
-        default=300, description="Connection timeout in seconds"
+        default=300,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Timeout",
+            description="Connection timeout in seconds",
+        ).as_json_schema_extra(),
     )
     base_path: str = "/api"
     provider: Literal["ollama"] = "ollama"
-    model: str = Field(default="llama3.1:8b", description="Ollama model name")
+    model: str = Field(
+        default="llama3.1:8b",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Model",
+            description="Ollama model name",
+        ).as_json_schema_extra(),
+    )
 
 
 class GeminiLLMProvider(RestAPI):
@@ -146,15 +228,43 @@ class GeminiLLMProvider(RestAPI):
         ).as_json_schema_extra(),
     )
     host: str = Field(
-        default="generativelanguage.googleapis.com", description="Google AI API host"
+        default="generativelanguage.googleapis.com",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Host",
+            description="Google AI API host",
+        ).as_json_schema_extra(),
     )
-    port: int = 443
+    port: int = Field(
+        default=443,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Port",
+            description="Set the port.",
+        ).as_json_schema_extra(),
+    )
     protocol: Literal["https"] = "https"
-    timeout: int | None = Field(default=60, description="Connection timeout in seconds")
+    timeout: int | None = Field(
+        default=60,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Timeout",
+            description="Configure connection timeout in seconds",
+        ).as_json_schema_extra(),
+    )
     base_path: str = "/v1"
     provider: Literal["gemini"] = "gemini"
-    model: str = Field(default="gemini-1.5-flash", description="Gemini model name")
-    api_key: OptionalStrOrSecret = Field(default=None, description="Google AI API key")
+    model: str = Field(
+        default="gemini-1.5-flash",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Model",
+            description="Set the Gemini model name",
+        ).as_json_schema_extra(),
+    )
+    api_key: str = Field(
+        default="",
+        json_schema_extra=SchemaExtraMetadata(
+            title="API Key",
+            description="Set the Google AI API key.",
+        ).as_json_schema_extra(),
+    )
 
 
 # Union type for all LLM providers
@@ -179,16 +289,44 @@ class OpenAIEmbeddingProvider(RestAPI):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
-    host: str = Field(default="api.openai.com", description="OpenAI API host")
-    port: int = 443
+    host: str = Field(
+        default="api.openai.com",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Host",
+            description="OpenAI API host",
+        ).as_json_schema_extra(),
+    )
+    port: int = Field(
+        default=443,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Port",
+            description="Set the port.",
+        ).as_json_schema_extra(),
+    )
     protocol: Literal["https"] = "https"
-    timeout: int | None = Field(default=60, description="Connection timeout in seconds")
+    timeout: int | None = Field(
+        default=60,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Timeout",
+            description="Set the connection timeout in seconds.",
+        ).as_json_schema_extra(),
+    )
     base_path: str = "/v1"
     provider: Literal["openai"] = "openai"
     model: str = Field(
-        default="text-embedding-ada-002", description="Embedding model name"
+        default="text-embedding-ada-002",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Model",
+            description="Embedding model name",
+        ).as_json_schema_extra(),
     )
-    api_key: OptionalStrOrSecret = Field(default=None, description="OpenAI API key")
+    api_key: str = Field(
+        default="",
+        json_schema_extra=SchemaExtraMetadata(
+            title="API Key",
+            description="Set the OpenAI API key.",
+        ).as_json_schema_extra(),
+    )
 
 
 class OllamaEmbeddingProvider(RestAPI):
@@ -202,18 +340,41 @@ class OllamaEmbeddingProvider(RestAPI):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
-    host: str = Field(description="Ollama server host")
-    port: int = Field(default=11434, description="Ollama server port")
+    host: str = Field(
+        json_schema_extra=SchemaExtraMetadata(
+            title="Host",
+            description="Set the Ollama server host.",
+        ).as_json_schema_extra(),
+    )
+    port: int = Field(
+        default=11434,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Port",
+            description="Set the Ollama server port.",
+        ).as_json_schema_extra(),
+    )
     protocol: Literal["http", "https"] = Field(
-        default="http", description="Ollama server protocol"
+        default="http",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Protocol",
+            description="Set the Ollama server protocol.",
+        ).as_json_schema_extra(),
     )
     timeout: int | None = Field(
-        default=300, description="Connection timeout in seconds"
+        default=300,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Timeout",
+            description="Configure the connection timeout in seconds.",
+        ).as_json_schema_extra(),
     )
     base_path: str = "/api"
     provider: Literal["ollama"] = "ollama"
     model: str = Field(
-        default="nomic-embed-text", description="Ollama embedding model name"
+        default="nomic-embed-text",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Model",
+            description="Ollama embedding model name",
+        ).as_json_schema_extra(),
     )
 
 
@@ -237,13 +398,25 @@ class LightRAGAppInputs(AppInputs):
     pgvector_user: CrunchyPostgresUserCredentials
     llm_config: LightRAGLLMConfig = Field(
         default=OpenAICompatChatAPI(host="", port=443, protocol="https"),
-        description="LLM provider configuration",
+        json_schema_extra=SchemaExtraMetadata(
+            title="LLM Configuration",
+            description="LLM provider configuration",
+        ).as_json_schema_extra(),
     )
     embedding_config: LightRAGEmbeddingConfig = Field(
         default=OpenAICompatEmbeddingsAPI(host="", port=443, protocol="https"),
-        description="Embedding provider configuration",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Embedding Configuration",
+            description="Configure the embedding provider.",
+        ).as_json_schema_extra(),
     )
-    persistence: LightRAGPersistence = Field(default_factory=LightRAGPersistence)
+    persistence: LightRAGPersistence = Field(
+        default_factory=LightRAGPersistence,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Persistence Configuration",
+            description="Configure persistent storage for LightRAG data and inputs.",
+        ).as_json_schema_extra(),
+    )
 
 
 class LightRAGAppOutputs(AppOutputs):

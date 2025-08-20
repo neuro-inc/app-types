@@ -4,7 +4,7 @@ import pytest
 
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
-from apolo_app_types.protocols.common import IngressHttp, Preset
+from apolo_app_types.protocols.common import ApoloSecret, IngressHttp, Preset
 from apolo_app_types.protocols.fooocus import (
     FooocusAppInputs,
     FooocusSpecificAppInputs,
@@ -28,7 +28,7 @@ async def test_fooocus_values_generation(setup_clients):
                 clusterName="default",
             ),
             fooocus_specific=FooocusSpecificAppInputs(
-                huggingface_token_secret="RAW_STRING"
+                huggingface_token_secret=ApoloSecret(key="RAW_STRING")
             ),
         ),
         apolo_client=setup_clients,
