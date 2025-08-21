@@ -187,7 +187,14 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
             },
             "externalDatabase": {"existingSecret": f"launchpad-{app_id}-db-secret"},
             **values,
-            "service": {"extraLabels": {}},
+            "labels": {
+                "application": "launchpad",
+            },
+            "service": {
+                "extraLabels": {
+                    "service": "keycloak",
+                }
+            },
         }
 
         return {
