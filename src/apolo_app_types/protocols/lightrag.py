@@ -1,3 +1,4 @@
+import typing
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -142,13 +143,18 @@ class AnthropicLLMProvider(RestAPI):
         ).as_json_schema_extra(),
     )
     protocol: Literal["https"] = "https"
-    timeout: int | None = Field(
-        default=60,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Timeout",
-            description="Connection timeout in seconds",
-        ).as_json_schema_extra(),
-    )
+    timeout: (
+        typing.Annotated[
+            int,
+            Field(
+                json_schema_extra=SchemaExtraMetadata(
+                    title="Timeout",
+                    description="Set the connection timeout in seconds.",
+                ).as_json_schema_extra()
+            ),
+        ]
+        | None
+    ) = 60
     base_path: str = "/v1"
     provider: Literal["anthropic"] = "anthropic"
     model: str = Field(
