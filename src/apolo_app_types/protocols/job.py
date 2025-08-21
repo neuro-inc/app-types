@@ -138,7 +138,7 @@ class ContainerHTTPServer(AbstractAppFieldType):
     )
 
 
-class JobInputs(AppInputs):
+class JobAppInput(AppInputs):
     """Top-level configuration for a generic batch/Job container."""
 
     model_config = ConfigDict(
@@ -378,7 +378,7 @@ class JobInputs(AppInputs):
     )
 
 
-class JobOutputs(AppOutputs):
+class JobAppOutput(AppOutputs):
     """Outputs produced after job submission/execution."""
 
     model_config = ConfigDict(
