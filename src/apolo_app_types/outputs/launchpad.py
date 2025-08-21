@@ -14,6 +14,7 @@ async def get_launchpad_outputs(
     labels = {
         "application": "launchpad",
         INSTANCE_LABEL: app_instance_id,
+        "service": "launchpad",
     }
     keycloak_password = helm_values["keycloak"]["auth"]["adminPassword"]
     internal_host, internal_port = await get_service_host_port(match_labels=labels)
@@ -41,6 +42,7 @@ async def get_launchpad_outputs(
     labels = {
         "application": "keycloak",
         INSTANCE_LABEL: app_instance_id,
+        "service": "keycloak",
     }
 
     host_port = await get_ingress_host_port(match_labels=labels)
