@@ -223,6 +223,7 @@ class LaunchpadAppInputs(AppInputs):
 
 
 class KeycloakConfig(AbstractAppFieldType):
+    web_app_url: ServiceAPI[HttpApi]
     auth_admin_password: str = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(

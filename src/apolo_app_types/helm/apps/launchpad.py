@@ -178,6 +178,18 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
             client=self.client,
         )
         domain = ingress_template.split(".", 1)[1]
+        keycloak_admin_password = _generate_password()
+
+        keycloak_values = {
+            "fullnameOverride": f"launchpad-{app_id}-keycloak",
+            "auth": {
+                "adminPassword": keycloak_admin_password,
+            },
+            "externalDatabase": {"existingSecret": f"launchpad-{app_id}-db-secret"},
+            **values,
+            "service": {"extraLabels": {}},
+        }
+
         return {
             **values,
             "dbSecretName": f"launchpad-{app_id}-db-secret",
@@ -189,14 +201,8 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
             },
             "dbPassword": _generate_password(),
             "domain": domain,
-            "keycloak": {
-                "fullnameOverride": f"launchpad-{app_id}-keycloak",
-                "auth": {
-                    "adminPassword": _generate_password(),
-                },
-                "externalDatabase": {"existingSecret": f"launchpad-{app_id}-db-secret"},
-                **values,
-            },
+            "keycloak": keycloak_values,  # keeping this for backwards compatibility
+            "mlops-keycloak": keycloak_values,
             "image": {"tag": "25.8.2"},
             "LAUNCHPAD_INITIAL_CONFIG": json.dumps(
                 {
