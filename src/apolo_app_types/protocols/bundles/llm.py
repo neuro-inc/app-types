@@ -9,6 +9,7 @@ from apolo_app_types.protocols.common import (
     AppInputs,
     SchemaExtraMetadata,
 )
+from apolo_app_types.protocols.common.hugging_face import HF_TOKEN_SCHEMA_EXTRA
 
 
 TSize = typing.TypeVar("TSize")
@@ -43,10 +44,7 @@ class LLMBundleInputs(AppInputs, typing.Generic[TSize]):
 
     hf_token: ApoloSecret = Field(  # noqa: N815
         ...,
-        json_schema_extra=SchemaExtraMetadata(
-            description="The Hugging Face API token.",
-            title="Hugging Face Token",
-        ).as_json_schema_extra(),
+        json_schema_extra=HF_TOKEN_SCHEMA_EXTRA.as_json_schema_extra(),
     )
     autoscaling_enabled: bool = Field(  # noqa: N815
         default=False,
