@@ -175,6 +175,31 @@ async def test_launchpad_values_generation_with_preconfigured_model(setup_client
         helm_params["keycloak"]["apolo_app_id"] == expected_helm_params["apolo_app_id"]
     )
 
+    assert "fullnameOverride" in helm_params["mlops-keycloak"]
+    assert (
+        helm_params["mlops-keycloak"]["fullnameOverride"]
+        == f"launchpad-{APP_ID}-keycloak"
+    )
+    assert (
+        helm_params["mlops-keycloak"]["preset_name"]
+        == expected_helm_params["preset_name"]
+    )
+    assert (
+        helm_params["mlops-keycloak"]["resources"] == expected_helm_params["resources"]
+    )
+    assert (
+        helm_params["mlops-keycloak"]["tolerations"]
+        == expected_helm_params["tolerations"]
+    )
+    assert helm_params["mlops-keycloak"]["affinity"] == expected_helm_params["affinity"]
+    assert (
+        helm_params["mlops-keycloak"]["podLabels"] == expected_helm_params["podLabels"]
+    )
+    assert (
+        helm_params["mlops-keycloak"]["apolo_app_id"]
+        == expected_helm_params["apolo_app_id"]
+    )
+
     # Test postgres fields
     assert "fullnameOverride" in helm_params["postgresql"]
     assert helm_params["postgresql"]["fullnameOverride"] == f"launchpad-{APP_ID}-db"
