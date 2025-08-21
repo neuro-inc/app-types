@@ -11,8 +11,18 @@ from apolo_app_types.protocols.common.storage import ApoloFilesPath
 
 HF_SCHEMA_EXTRA = SchemaExtraMetadata(
     title="Hugging Face Model",
-    description="Hugging Face Model Configuration.",
+    description="Configure the Hugging Face model. "
+    "Ensure it is available on the Hugging Face Hub and provide"
+    " an API token with access rights if the repository is gated.",
     meta_type=SchemaMetaType.INTEGRATION,
+)
+HF_TOKEN_SCHEMA_EXTRA = SchemaExtraMetadata(
+    description="Provide a Hugging Face API token linked "
+    "to an account with access to the model "
+    "specified above. This token will be used to download model"
+    " files from the Hugging Face Hub, including "
+    "gated or private repositories where applicable.",
+    title="Hugging Face Token",
 )
 
 
@@ -30,10 +40,7 @@ class HuggingFaceModel(AbstractAppFieldType):
     )
     hf_token: OptionalSecret = Field(  # noqa: N815
         default=None,
-        json_schema_extra=SchemaExtraMetadata(
-            description="The Hugging Face API token.",
-            title="Hugging Face Token",
-        ).as_json_schema_extra(),
+        json_schema_extra=HF_TOKEN_SCHEMA_EXTRA.as_json_schema_extra(),
     )
 
 
