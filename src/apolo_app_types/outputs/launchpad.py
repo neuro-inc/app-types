@@ -14,10 +14,15 @@ async def get_launchpad_outputs(
     labels = {
         "application": "launchpad",
         INSTANCE_LABEL: app_instance_id,
+    }
+
+    launchpad_labels = {
+        **labels,
         "service": "launchpad",
     }
-    keycloak_password = helm_values["keycloak"]["auth"]["adminPassword"]
-    internal_host, internal_port = await get_service_host_port(match_labels=labels)
+    internal_host, internal_port = await get_service_host_port(
+        match_labels=launchpad_labels
+    )
     internal_web_app_url = None
     if internal_host:
         internal_web_app_url = RestAPI(
@@ -27,7 +32,7 @@ async def get_launchpad_outputs(
             protocol="http",
         )
 
-    host_port = await get_ingress_host_port(match_labels=labels)
+    host_port = await get_ingress_host_port(match_labels=launchpad_labels)
     external_web_app_url = None
     if host_port:
         host, port = host_port
@@ -39,13 +44,12 @@ async def get_launchpad_outputs(
         )
 
     # keycloak urls
-    labels = {
-        "application": "keycloak",
-        INSTANCE_LABEL: app_instance_id,
+    keycloak_labels = {
+        **labels,
         "service": "keycloak",
     }
 
-    host_port = await get_ingress_host_port(match_labels=labels)
+    host_port = await get_ingress_host_port(match_labels=keycloak_labels)
     keycloak_external_web_app_url = None
     if host_port:
         host, port = host_port
@@ -56,7 +60,9 @@ async def get_launchpad_outputs(
             protocol="https",
         )
 
-    internal_host, internal_port = await get_service_host_port(match_labels=labels)
+    internal_host, internal_port = await get_service_host_port(
+        match_labels=keycloak_labels
+    )
     keycloak_internal_web_app_url = None
     if internal_host:
         keycloak_internal_web_app_url = RestAPI(
@@ -66,6 +72,7 @@ async def get_launchpad_outputs(
             protocol="http",
         )
 
+    keycloak_password = helm_values["keycloak"]["auth"]["adminPassword"]
     outputs = LaunchpadAppOutputs(
         web_app_url=ServiceAPI[HttpApi](
             internal_url=internal_web_app_url,
