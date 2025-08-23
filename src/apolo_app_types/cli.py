@@ -14,6 +14,7 @@ from apolo_app_types.outputs.utils.discovery import (
     load_app_inputs,
     load_app_preprocessor,
 )
+from apolo_app_types.schema.schema_dumper import type_schema_dumper
 
 
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
@@ -159,6 +160,41 @@ def run_preprocessor(
             sys.exit(1)
 
     asyncio.run(_run_preprocessor())
+
+
+@cli.command("dump-types-schema")
+@click.argument("app_package_path", type=Path)
+@click.argument("expected_app_type_name", type=str)
+@click.argument("exact_type_name", type=str)
+@click.argument("output_path", type=Path)
+def dump_types_schema(
+    app_package_path: Path,
+    expected_app_type_name: str,
+    exact_type_name: str,
+    output_path: Path,
+) -> None:
+    """Dump the schema of the given application input/output type
+    from the given app package.
+
+    Args:
+        app_package_path (Path): The path to the application package,
+        absolute or relative to the current working directory.
+            expected_app_type_name (str): The expected application type name.
+        exact_type_name (str): The exact type name to dump the schema for.
+        output_path (Path): The path to the output file.
+
+    Raises:
+        ValueError: If the package path does not exist or does not contain __init__.py.
+        ValueError: If the expected application type name does not match the actual
+            application type name.
+        ValueError: If the exact type name is not found in the application package.
+    """
+    type_schema_dumper(
+        app_package_path=app_package_path,
+        expected_app_type_name=expected_app_type_name,
+        exact_type_name=exact_type_name,
+        output_path=output_path,
+    )
 
 
 if __name__ == "__main__":
