@@ -15,7 +15,7 @@ APOLO_APP_TYPE_ATTR_NAME = "APOLO_APP_TYPE"
 logger = logging.getLogger(__name__)
 
 
-def type_schema_dumper(
+def dump_schema_type(
     app_package_path: Path,
     expected_app_type_name: str,
     exact_type_name: str,

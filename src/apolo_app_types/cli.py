@@ -14,7 +14,7 @@ from apolo_app_types.outputs.utils.discovery import (
     load_app_inputs,
     load_app_preprocessor,
 )
-from apolo_app_types.schema.schema_dumper import type_schema_dumper
+from apolo_app_types.schema.schema_dumper import dump_schema_type
 
 
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
@@ -189,7 +189,7 @@ def dump_types_schema(
             application type name.
         ValueError: If the exact type name is not found in the application package.
     """
-    type_schema_dumper(
+    dump_schema_type(
         app_package_path=app_package_path,
         expected_app_type_name=expected_app_type_name,
         exact_type_name=exact_type_name,
