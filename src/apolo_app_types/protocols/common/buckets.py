@@ -96,7 +96,7 @@ class Bucket(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Bucket",
             description="Configuration for Bucket.",
-            meta_type=SchemaMetaType.INTEGRATION,
+            meta_type=SchemaMetaType.DYNAMIC,
         ).as_json_schema_extra(),
     )
     id: str = Field(
