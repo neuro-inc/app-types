@@ -104,7 +104,9 @@ class CustomDeploymentChartValueProcessor(
                         "containerPort": _.port,
                     }
                     for _ in input_.networking.ports
-                ] if input_.networking.ports else [{"name": "http", "containerPort": 80}],
+                ]
+                if input_.networking.ports
+                else [{"name": "http", "containerPort": 80}],
             }
 
         if input_.autoscaling:
