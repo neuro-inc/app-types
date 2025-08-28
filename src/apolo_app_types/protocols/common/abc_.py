@@ -1,13 +1,33 @@
 import abc
+from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    SerializationInfo,
+    SerializerFunctionWrapHandler,
+    model_serializer,
+)
 
 from apolo_app_types.protocols.common.schema_extra import (
     SchemaExtraMetadata,
 )
 
 
-class AbstractAppFieldType(BaseModel, abc.ABC):
+class ApoloBaseModel(BaseModel):
+    @model_serializer(when_used="always", mode="wrap")
+    def _serialize(
+        self, serializer: SerializerFunctionWrapHandler, info: SerializationInfo
+    ) -> dict[str, Any]:
+        model: dict[str, Any] = serializer(self)
+        model["__type__"] = self.__class__.model_config.get(
+            "title", self.__class__.__name__
+        )
+        return model
+
+
+class AbstractAppFieldType(ApoloBaseModel, abc.ABC):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
