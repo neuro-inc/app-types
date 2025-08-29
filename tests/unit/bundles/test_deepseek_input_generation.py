@@ -17,7 +17,7 @@ from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
 async def test_values_llm_generation_gpu_default_preset(
     setup_clients, mock_get_preset_gpu
 ):
-    model_to_test = DeepSeekR1Size.r1
+    model_to_test = DeepSeekR1Size.r1_distill_qwen_1_5_b
     preset_a100 = "a100-large"
     apolo_client = setup_clients
     helm_args, helm_params = await app_type_to_vals(

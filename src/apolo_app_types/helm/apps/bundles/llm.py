@@ -5,7 +5,6 @@ from apolo_app_types import HuggingFaceModel, LLMInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps import LLMChartValueProcessor
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
-from apolo_app_types.helm.utils.text import fuzzy_contains
 from apolo_app_types.protocols.bundles.llm import (
     DeepSeekR1Inputs,
     DeepSeekR1Size,
@@ -25,7 +24,7 @@ from apolo_app_types.protocols.common.autoscaling import AutoscalingKedaHTTP
 
 class ModelSettings(NamedTuple):
     model_hf_name: str
-    gpu_compat: list[str]
+    vram_min_required: float
 
 
 T = t.TypeVar("T", LLama4Inputs, DeepSeekR1Inputs, MistralInputs)
@@ -65,15 +64,34 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
         input size and GPU compatibility."""
         available_presets = dict(self.client.config.presets)
         model_settings = self.model_map[input_.size]
-        compatible_gpus = model_settings.gpu_compat
+        min_total_vram = model_settings.vram_min_required
 
-        for gpu_compat in compatible_gpus:
-            for preset_name, _ in available_presets.items():
-                if fuzzy_contains(gpu_compat, preset_name, cutoff=0.5):
-                    return Preset(name=preset_name)
-        # If no preset found, raise an error
-        err_msg = "No preset found for the given input size and GPU compatibility."
-        raise RuntimeError(err_msg)
+        candidates: list[tuple[float, int, str]] = []
+        for preset_name, available_preset in available_presets.items():
+            # TODO: add more vendors
+            gpu = available_preset.nvidia_gpu
+            if not gpu:
+                continue
+
+            mem = getattr(gpu, "memory", None) or 0
+            cnt = getattr(gpu, "count", None) or 0
+            if mem <= 0 or cnt <= 0:
+                continue
+
+            total_vram = float(mem) * int(cnt)
+            if total_vram >= min_total_vram:
+                candidates.append((total_vram, cnt, preset_name))
+
+        if not candidates:
+            err_msg = (
+                f"No preset satisfies total VRAM ≥ "
+                f"{min_total_vram} for size={input_.size!r}."
+            )
+            raise RuntimeError(err_msg)
+
+        # Prefer smallest total VRAM
+        best_name = min(candidates, key=lambda x: (x[0], x[1], x[2]))[2]
+        return Preset(name=best_name)
 
     async def _llm_inputs(self, input_: T) -> LLMInputs:
         hf_model = HuggingFaceModel(
@@ -141,17 +159,13 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
 class Llama4ValueProcessor(BaseLLMBundleMixin[LLama4Inputs]):
     app_type = AppType.Llama4
     model_map = {
-        Llama4Size.maverick_17b_128e_instruct_fp8: ModelSettings(
-            model_hf_name="meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
-            gpu_compat=["h100"],
-        ),
         Llama4Size.scout: ModelSettings(
             model_hf_name="meta-llama/Llama-4-Scout-17B-16E",
-            gpu_compat=["a100", "h100"],
+            vram_min_required=80,
         ),
         Llama4Size.scout_instruct: ModelSettings(
             model_hf_name="meta-llama/Llama-4-Scout-17B-16E-Instruct",
-            gpu_compat=["a100", "h100"],
+            vram_min_required=80,
         ),
     }
 
@@ -160,24 +174,22 @@ class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
     app_type = AppType.DeepSeek
     model_map = {
         DeepSeekR1Size.r1: ModelSettings(
-            model_hf_name="deepseek-ai/DeepSeek-R1",
-            gpu_compat=["a100", "h100"],
+            model_hf_name="deepseek-ai/DeepSeek-R1", vram_min_required=1342.0
         ),
         DeepSeekR1Size.r1_zero: ModelSettings(
-            model_hf_name="deepseek-ai/DeepSeek-R1-Zero",
-            gpu_compat=["a100", "h100"],  # Larger than R1, drop L4
+            model_hf_name="deepseek-ai/DeepSeek-R1-Zero", vram_min_required=1342.0
         ),
         DeepSeekR1Size.r1_distill_llama_8b: ModelSettings(
             model_hf_name="deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
-            gpu_compat=["l4", "a100", "h100"],
+            vram_min_required=18.0,
         ),
         DeepSeekR1Size.r1_distill_llama_70b: ModelSettings(
             model_hf_name="deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
-            gpu_compat=["h100"],  # Safe only on H100
+            vram_min_required=161.0,
         ),
         DeepSeekR1Size.r1_distill_qwen_1_5_b: ModelSettings(
             model_hf_name="deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
-            gpu_compat=["l4", "a100", "h100"],
+            vram_min_required=3.9,
         ),
     }
 
@@ -187,18 +199,18 @@ class MistralValueProcessor(BaseLLMBundleMixin[MistralInputs]):
     model_map = {
         MistralSize.mistral_7b_v02: ModelSettings(
             model_hf_name="mistralai/Mistral-7B-Instruct-v0.2",
-            gpu_compat=["l4", "a100", "h100"],
+            vram_min_required=5,
         ),
         MistralSize.mistral_7b_v03: ModelSettings(
             model_hf_name="mistralai/Mistral-7B-Instruct-v0.3",
-            gpu_compat=["l4", "a100", "h100"],
+            vram_min_required=5,
         ),
         MistralSize.mistral_31_24b_instruct: ModelSettings(
             model_hf_name="mistralai/Mistral-Small-3.1-24B-Instruct-2503",
-            gpu_compat=["a100", "h100"],
+            vram_min_required=16,
         ),
         MistralSize.mistral_32_24b_instruct: ModelSettings(
             model_hf_name="mistralai/Mistral-Small-3.2-24B-Instruct-2506",
-            gpu_compat=["a100", "h100"],
+            vram_min_required=16,
         ),
     }

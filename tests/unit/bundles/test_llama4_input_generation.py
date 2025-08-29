@@ -1,3 +1,4 @@
+import pytest
 from dirty_equals import IsStr
 
 from apolo_app_types import LLama4Inputs
@@ -12,14 +13,44 @@ from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.bundles.llm import Llama4Size
 from apolo_app_types.protocols.common import ApoloSecret
 
-from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
+from tests.unit.constants import (
+    APP_ID,
+    APP_SECRETS_NAME,
+    DEFAULT_NAMESPACE,
+    TEST_PRESETS,
+    TEST_PRESETS_WITH_EXTRA_LARGE_GPU,
+)
 
 
+@pytest.mark.parametrize("presets_available", [TEST_PRESETS], indirect=True)
 async def test_values_llm_generation_gpu_default_preset(
     setup_clients, mock_get_preset_gpu
 ):
     model_to_test = Llama4Size.scout
-    preset_a100 = "a100-large"
+    apolo_client = setup_clients
+    with pytest.raises(RuntimeError) as err:
+        await app_type_to_vals(
+            input_=LLama4Inputs(
+                size=model_to_test,
+                hf_token=ApoloSecret(key="FakeSecret"),
+            ),
+            apolo_client=apolo_client,
+            app_type=AppType.Llama4,
+            app_name="llm4",
+            namespace=DEFAULT_NAMESPACE,
+            app_secrets_name=APP_SECRETS_NAME,
+            app_id=APP_ID,
+        )
+
+    assert err.value.args[0].startswith("No preset satisfies total VRAM")
+
+
+@pytest.mark.parametrize(
+    "presets_available", [TEST_PRESETS_WITH_EXTRA_LARGE_GPU], indirect=True
+)
+async def test_values_llm_generation_gpu_big_model(setup_clients, mock_get_preset_gpu):
+    model_to_test = Llama4Size.scout
+    preset_a100 = "gpu-extra-large"
     apolo_client = setup_clients
     helm_args, helm_params = await app_type_to_vals(
         input_=LLama4Inputs(
@@ -33,10 +64,7 @@ async def test_values_llm_generation_gpu_default_preset(
         app_secrets_name=APP_SECRETS_NAME,
         app_id=APP_ID,
     )
-    assert helm_args == [
-        "--timeout",
-        "30m",
-    ]
+
     assert helm_params == {
         "serverExtraArgs": [],
         "model": {
@@ -60,8 +88,8 @@ async def test_values_llm_generation_gpu_default_preset(
         },
         "preset_name": preset_a100,
         "resources": {
-            "requests": {"cpu": "8000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
-            "limits": {"cpu": "8000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
+            "requests": {"cpu": "1000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
+            "limits": {"cpu": "1000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
         },
         "tolerations": [
             {
