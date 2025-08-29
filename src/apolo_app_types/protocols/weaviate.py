@@ -5,15 +5,18 @@ from apolo_app_types.protocols.common import (
     AbstractAppFieldType,
     AppOutputs,
     BasicAuth,
-    GraphQLAPI,
-    GrpcAPI,
     IngressHttp,
     Preset,
-    RestAPI,
     SchemaExtraMetadata,
 )
 from apolo_app_types.protocols.common.ingress import (
     INGRESS_HTTP_SCHEMA_EXTRA,
+)
+from apolo_app_types.protocols.common.networking import (
+    GraphQLAPI,
+    GrpcAPI,
+    RestAPI,
+    ServiceAPI,
 )
 
 
@@ -78,35 +81,19 @@ class WeaviateInputs(AppInputs):
 
 
 class WeaviateOutputs(AppOutputs):
-    external_graphql_endpoint: GraphQLAPI | None = Field(
+    graphql_endpoint: ServiceAPI[GraphQLAPI] | None = Field(
         default=None,
-        description="The external GraphQL endpoint.",
-        title="External GraphQL endpoint",
+        description="The GraphQL endpoint.",
+        title="GraphQL endpoint",
     )
-    external_rest_endpoint: RestAPI | None = Field(
+    rest_endpoint: ServiceAPI[RestAPI] | None = Field(
         default=None,
-        description="The external REST endpoint.",
-        title="External REST endpoint",
+        description="The REST endpoint.",
+        title="REST endpoint",
     )
-    ## TODO: add this back when we make it work with platform auth
-    # external_grpc_endpoint: GrpcAPI | None = Field(
-    #     default=None,
-    #     description="The external GRPC endpoint.",
-    #     title="External GRPC endpoint",
-    # )
-    internal_graphql_endpoint: GraphQLAPI | None = Field(
+    grpc_endpoint: ServiceAPI[GrpcAPI] | None = Field(
         default=None,
-        description="The internal GraphQL endpoint.",
-        title="Internal GraphQL endpoint",
-    )
-    internal_rest_endpoint: RestAPI | None = Field(
-        default=None,
-        description="The internal REST endpoint.",
-        title="Internal REST endpoint",
-    )
-    internal_grpc_endpoint: GrpcAPI | None = Field(
-        default=None,
-        description="The internal GRPC endpoint.",
-        title="Internal GRPC endpoint",
+        description="The GRPC endpoint.",
+        title="GRPC endpoint",
     )
     auth: BasicAuth = Field(default_factory=BasicAuth)

@@ -7,11 +7,11 @@ from apolo_app_types.outputs.dify import get_dify_outputs
 async def test_dify(setup_clients, mock_kubernetes_client, app_instance_id):
     res = await get_dify_outputs(helm_values={}, app_instance_id=app_instance_id)
 
-    assert res["internal_web_app_url"]["host"] == "app.default-namespace"
-    assert res["internal_web_app_url"]["port"] == 80
+    assert res["web_app_url"]["internal_url"]["host"] == "app.default-namespace"
+    assert res["web_app_url"]["internal_url"]["port"] == 80
 
-    assert res["external_web_app_url"]["host"] == "example.com"
-    assert res["external_web_app_url"]["port"] == 80
+    assert res["web_app_url"]["external_url"]["host"] == "example.com"
+    assert res["web_app_url"]["external_url"]["port"] == 80
 
 
 @pytest.mark.asyncio
@@ -25,15 +25,15 @@ async def test_dify_with_password(
         app_instance_id=app_instance_id,
     )
 
-    assert res["internal_web_app_url"]["host"] == "app.default-namespace"
-    assert res["internal_web_app_url"]["port"] == 80
+    assert res["web_app_url"]["internal_url"]["host"] == "app.default-namespace"
+    assert res["web_app_url"]["internal_url"]["port"] == 80
 
-    assert res["external_web_app_url"]["host"] == "example.com"
-    assert res["external_web_app_url"]["port"] == 80
+    assert res["web_app_url"]["external_url"]["host"] == "example.com"
+    assert res["web_app_url"]["external_url"]["port"] == 80
 
     assert res["dify_specific"]["init_password"] == "some_password"
 
-    assert res["internal_api_url"]["host"] == "app.default-namespace"
-    assert res["internal_api_url"]["port"] == 80
-    assert res["external_api_url"]["host"] == "example.com"
-    assert res["external_api_url"]["port"] == 80
+    assert res["api_url"]["internal_url"]["host"] == "app.default-namespace"
+    assert res["api_url"]["internal_url"]["port"] == 80
+    assert res["api_url"]["external_url"]["host"] == "example.com"
+    assert res["api_url"]["external_url"]["port"] == 80

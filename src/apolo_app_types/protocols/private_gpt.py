@@ -15,6 +15,7 @@ from apolo_app_types.protocols.common import (
 )
 from apolo_app_types.protocols.common.networking import (
     RestAPI,
+    ServiceAPI,
 )
 from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
@@ -113,9 +114,7 @@ class PrivateGPTOutputs(AppOutputsDeployer):
 class PrivateGPTAppOutputs(AppOutputs):
     """
     PrivateGPT outputs:
-      - internal_web_app_url
-      - external_web_app_url
+      - web_app_url
     """
 
-    internal_web_app_url: RestAPI | None = None
-    external_web_app_url: RestAPI | None = None
+    web_app_url: ServiceAPI[RestAPI] | None = None

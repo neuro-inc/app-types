@@ -8,9 +8,9 @@ from apolo_app_types.protocols.common import (
     AppOutputsDeployer,
     IngressHttp,
     Preset,
-    RestAPI,
     SchemaExtraMetadata,
 )
+from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI
 
 
 class FooocusInputs(AppInputsDeployer):
@@ -50,8 +50,7 @@ class FooocusAppInputs(AppInputs):
 
 
 class FooocusAppOutputs(AppOutputs):
-    internal_web_app_url: RestAPI | None = None
-    external_web_app_url: RestAPI | None = None
+    web_app_url: ServiceAPI[HttpApi] | None = None
 
 
 class FooocusOutputs(AppOutputsDeployer):

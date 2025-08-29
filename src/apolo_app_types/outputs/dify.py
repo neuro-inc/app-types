@@ -3,7 +3,7 @@ import typing as t
 from apolo_app_types.clients.kube import get_service_host_port
 from apolo_app_types.outputs.common import INSTANCE_LABEL
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
-from apolo_app_types.protocols.common import RestAPI
+from apolo_app_types.protocols.common.networking import HttpApi, RestAPI, ServiceAPI
 from apolo_app_types.protocols.dify import DifyAppOutputs, DifySpecificOutputs
 
 
@@ -47,15 +47,26 @@ async def get_dify_outputs(
             protocol="https",
         )
 
-    init_password = helm_values.get("api", {}).get("initPassword", "")
-    outputs = DifyAppOutputs(
-        internal_web_app_url=internal_web_app_url,
-        external_web_app_url=external_web_app_url,
-        internal_api_url=internal_api_url,
-        external_api_url=external_web_app_url.model_copy(
+    # Create external API URL if external web app URL exists
+    external_api_url = None
+    if external_web_app_url:
+        external_api_url = external_web_app_url.model_copy(
             update={"base_path": external_web_app_url.base_path + "/v1"}
         )
-        if external_web_app_url
+
+    init_password = helm_values.get("api", {}).get("initPassword", "")
+    outputs = DifyAppOutputs(
+        web_app_url=ServiceAPI[HttpApi](
+            internal_url=internal_web_app_url,
+            external_url=external_web_app_url,
+        )
+        if internal_web_app_url or external_web_app_url
+        else None,
+        api_url=ServiceAPI[RestAPI](
+            internal_url=internal_api_url,
+            external_url=external_api_url,
+        )
+        if internal_api_url or external_api_url
         else None,
         dify_specific=DifySpecificOutputs(
             init_password=init_password,

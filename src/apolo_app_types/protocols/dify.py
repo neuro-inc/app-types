@@ -10,10 +10,10 @@ from apolo_app_types.protocols.common import (
     Postgres,
     Preset,
     Redis,
-    RestAPI,
     SchemaExtraMetadata,
     SchemaMetaType,
 )
+from apolo_app_types.protocols.common.networking import HttpApi, RestAPI, ServiceAPI
 from apolo_app_types.protocols.postgres import CrunchyPostgresUserCredentials
 
 
@@ -183,32 +183,18 @@ class DifySpecificOutputs(BaseModel):
 
 
 class DifyAppOutputs(AppOutputs):
-    internal_web_app_url: RestAPI | None = Field(
-        None,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Internal Web App URL",
-            description="The URL of the internal web app.",
-        ).as_json_schema_extra(),
-    )
-    external_web_app_url: RestAPI | None = Field(
+    web_app_url: ServiceAPI[HttpApi] | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="External Web App URL",
-            description="The URL of the external web app.",
+            title="Web App URL",
+            description="The URL of the web app.",
         ).as_json_schema_extra(),
     )
-    internal_api_url: RestAPI | None = Field(
+    api_url: ServiceAPI[RestAPI] | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="Internal API URL",
-            description="The URL of the internal API.",
-        ).as_json_schema_extra(),
-    )
-    external_api_url: RestAPI | None = Field(
-        default=None,
-        json_schema_extra=SchemaExtraMetadata(
-            title="External API URL",
-            description="The URL of the external API.",
+            title="API URL",
+            description="The URL of the API.",
         ).as_json_schema_extra(),
     )
     dify_specific: DifySpecificOutputs

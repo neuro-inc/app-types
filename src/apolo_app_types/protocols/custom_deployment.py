@@ -8,7 +8,6 @@ from apolo_app_types.protocols.common import (
     ContainerImage,
     IngressHttp,
     Preset,
-    RestAPI,
     SchemaExtraMetadata,
     StorageMounts,
 )
@@ -17,6 +16,7 @@ from apolo_app_types.protocols.common.health_check import (
     HealthCheckProbesConfig,
 )
 from apolo_app_types.protocols.common.k8s import Port
+from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI
 from apolo_app_types.protocols.common.storage import MountPath
 
 
@@ -145,25 +145,10 @@ class CustomDeploymentInputs(AppInputs):
 
 
 class CustomDeploymentOutputs(AppOutputs):
-    internal_web_app_url: RestAPI | None = Field(
+    web_app_url: ServiceAPI[HttpApi] | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="Web App inter-cluster URL",
-            description=(
-                "Use this endpoint to reach out to your app via internal network "
-                "within the cluster. Platform authorization is not applied here "
-                "but only the workloads from the same project can access it."
-            ),
-        ).as_json_schema_extra(),
-    )
-    external_web_app_url: RestAPI | None = Field(
-        default=None,
-        json_schema_extra=SchemaExtraMetadata(
-            title="External Web App URL",
-            description=(
-                "Use this endpoint to reach out to your app via public network "
-                "from outside the cluster. Platform authorization is applied "
-                "here if you enabled it during the deployment."
-            ),
+            title="Web App URL",
+            description="The URL of the web app.",
         ).as_json_schema_extra(),
     )

@@ -4,7 +4,7 @@ from apolo_app_types import AppInputs, AppOutputs
 from apolo_app_types.helm.utils.storage import get_app_data_files_relative_path_url
 from apolo_app_types.protocols.common import AppInputsDeployer, AppOutputsDeployer
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
-from apolo_app_types.protocols.common.networking import RestAPI
+from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI
 from apolo_app_types.protocols.common.preset import Preset
 from apolo_app_types.protocols.common.schema_extra import (
     SchemaExtraMetadata,
@@ -106,5 +106,4 @@ class VSCodeAppInputs(AppInputs):
 
 
 class VSCodeAppOutputs(AppOutputs):
-    internal_web_app_url: RestAPI
-    external_web_app_url: RestAPI
+    web_app_url: ServiceAPI[HttpApi]

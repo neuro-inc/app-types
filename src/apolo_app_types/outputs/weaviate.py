@@ -8,7 +8,12 @@ from apolo_app_types import (
 from apolo_app_types.clients.kube import get_services
 from apolo_app_types.outputs.common import INSTANCE_LABEL
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
-from apolo_app_types.protocols.common.networking import GraphQLAPI, GrpcAPI, RestAPI
+from apolo_app_types.protocols.common.networking import (
+    GraphQLAPI,
+    GrpcAPI,
+    RestAPI,
+    ServiceAPI,
+)
 
 
 logger = logging.getLogger()
@@ -95,12 +100,23 @@ async def get_weaviate_outputs(
     )
 
     return WeaviateOutputs(
-        external_graphql_endpoint=graphql_external,
-        internal_graphql_endpoint=graphql_internal,
-        external_rest_endpoint=rest_external,
-        internal_rest_endpoint=rest_internal,
-        # TODO: disabled for now till we fix grpc
-        # external_grpc_endpoint=grpc_external,
-        internal_grpc_endpoint=grpc_internal,
+        graphql_endpoint=ServiceAPI[GraphQLAPI](
+            internal_url=graphql_internal,
+            external_url=graphql_external,
+        )
+        if graphql_internal or graphql_external
+        else None,
+        rest_endpoint=ServiceAPI[RestAPI](
+            internal_url=rest_internal,
+            external_url=rest_external,
+        )
+        if rest_internal or rest_external
+        else None,
+        grpc_endpoint=ServiceAPI[GrpcAPI](
+            internal_url=grpc_internal,
+            external_url=None,  # GRPC external is not yet supported
+        )
+        if grpc_internal
+        else None,
         auth=auth,
     ).model_dump()
