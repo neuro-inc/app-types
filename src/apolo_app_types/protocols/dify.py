@@ -13,7 +13,7 @@ from apolo_app_types.protocols.common import (
     SchemaExtraMetadata,
     SchemaMetaType,
 )
-from apolo_app_types.protocols.common.networking import HttpApi, RestAPI, ServiceAPI
+from apolo_app_types.protocols.common.networking import RestAPI, ServiceAPI
 from apolo_app_types.protocols.postgres import CrunchyPostgresUserCredentials
 
 
@@ -183,13 +183,6 @@ class DifySpecificOutputs(BaseModel):
 
 
 class DifyAppOutputs(AppOutputs):
-    web_app_url: ServiceAPI[HttpApi] | None = Field(
-        default=None,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Web App URL",
-            description="The URL of the web app.",
-        ).as_json_schema_extra(),
-    )
     api_url: ServiceAPI[RestAPI] | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(

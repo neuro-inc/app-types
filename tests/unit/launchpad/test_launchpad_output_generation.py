@@ -16,7 +16,7 @@ KEYCLOAK_HELM_VALUES = {
 async def test_launchpad_output_generation(
     setup_clients, mock_kubernetes_client, app_instance_id
 ):
-    """Test launchpad output generation for web_app_url."""
+    """Test launchpad output generation for app_url."""
     res = await get_launchpad_outputs(
         helm_values={
             "LAUNCHPAD_INITIAL_CONFIG": {
@@ -33,17 +33,17 @@ async def test_launchpad_output_generation(
     )
 
     assert res
-    assert "web_app_url" in res
+    assert "app_url" in res
 
-    web_app_url = res["web_app_url"]
-    assert web_app_url["internal_url"] == {
+    app_url = res["app_url"]
+    assert app_url["internal_url"] == {
         "base_path": "/",
         "host": "app.default-namespace",
         "port": 80,
         "protocol": "http",
         "timeout": 30.0,
     }
-    assert web_app_url["external_url"] == {
+    assert app_url["external_url"] == {
         "base_path": "/",
         "host": "example.com",
         "port": 80,
@@ -89,17 +89,17 @@ async def test_launchpad_output_generation_no_external_url(
     )
 
     assert res
-    assert "web_app_url" in res
+    assert "app_url" in res
 
-    web_app_url = res["web_app_url"]
-    assert web_app_url["internal_url"] == {
+    app_url = res["app_url"]
+    assert app_url["internal_url"] == {
         "base_path": "/",
         "host": "app.default-namespace",
         "port": 80,
         "protocol": "http",
         "timeout": 30.0,
     }
-    assert web_app_url["external_url"] is None
+    assert app_url["external_url"] is None
 
 
 @pytest.mark.asyncio
@@ -139,11 +139,11 @@ async def test_launchpad_output_generation_no_service(
     )
 
     assert res
-    assert "web_app_url" in res
+    assert "app_url" in res
 
-    web_app_url = res["web_app_url"]
-    assert web_app_url["internal_url"] is None
-    assert web_app_url["external_url"] is None
+    app_url = res["app_url"]
+    assert app_url["internal_url"] is None
+    assert app_url["external_url"] is None
     assert res["keycloak_config"]["auth_admin_password"] == "test-admin-password"
 
 
@@ -184,17 +184,17 @@ async def test_launchpad_output_generation_custom_ports(
     )
 
     assert res
-    assert "web_app_url" in res
+    assert "app_url" in res
 
-    web_app_url = res["web_app_url"]
-    assert web_app_url["internal_url"] == {
+    app_url = res["app_url"]
+    assert app_url["internal_url"] == {
         "base_path": "/",
         "host": "launchpad-service.namespace",
         "port": 8080,
         "protocol": "http",
         "timeout": 30.0,
     }
-    assert web_app_url["external_url"] == {
+    assert app_url["external_url"] == {
         "base_path": "/",
         "host": "launchpad.custom.domain",
         "port": 443,

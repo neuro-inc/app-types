@@ -15,10 +15,12 @@ from apolo_app_types.protocols.common import (
     BasicAuth,
     Bucket,
     Env,
+    HttpApi,
     HuggingFaceModel,
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
     OptionalSecret,
+    ServiceAPI,
 )
 from apolo_app_types.protocols.custom_deployment import (
     Container,
@@ -198,7 +200,9 @@ __all__ = [
     "PrivateGPTInputs",
     "PrivateGPTOutputs",
     "ApoloSecret",
+    "HttpApi",
     "OptionalSecret",
+    "ServiceAPI",
     "StableDiffusionOutputs",
     "HuggingFaceModel",
     "VLLMOutputsV2",

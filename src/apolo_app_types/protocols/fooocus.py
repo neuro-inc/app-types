@@ -10,7 +10,6 @@ from apolo_app_types.protocols.common import (
     Preset,
     SchemaExtraMetadata,
 )
-from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI
 
 
 class FooocusInputs(AppInputsDeployer):
@@ -50,7 +49,7 @@ class FooocusAppInputs(AppInputs):
 
 
 class FooocusAppOutputs(AppOutputs):
-    web_app_url: ServiceAPI[HttpApi] | None = None
+    pass
 
 
 class FooocusOutputs(AppOutputsDeployer):

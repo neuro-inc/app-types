@@ -26,10 +26,10 @@ async def get_custom_deployment_outputs(
         labels
     )
     return CustomDeploymentOutputs(
-        web_app_url=ServiceAPI[HttpApi](
+        app_url=ServiceAPI[HttpApi](
             internal_url=internal_web_app_url,
             external_url=external_web_app_url,
         )
         if internal_web_app_url or external_web_app_url
-        else None,
+        else None
     ).model_dump()

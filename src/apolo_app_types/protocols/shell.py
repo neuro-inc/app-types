@@ -8,7 +8,6 @@ from apolo_app_types.protocols.common import (
     Preset,
     SchemaExtraMetadata,
 )
-from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI
 from apolo_app_types.protocols.jupyter import Networking
 
 
@@ -34,4 +33,4 @@ class ShellAppInputs(AppInputs):
 
 
 class ShellAppOutputs(AppOutputs):
-    web_app_url: ServiceAPI[HttpApi]
+    pass

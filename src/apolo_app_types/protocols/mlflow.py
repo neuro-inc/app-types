@@ -16,7 +16,7 @@ from apolo_app_types.protocols.common import (
     RestAPI,
     SchemaExtraMetadata,
 )
-from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI
+from apolo_app_types.protocols.common.networking import ServiceAPI
 from apolo_app_types.protocols.common.schema_extra import SchemaMetaType
 from apolo_app_types.protocols.postgres import PostgresURI
 
@@ -499,14 +499,6 @@ class MLFlowAppOutputs(AppOutputs):
         json_schema_extra=SchemaExtraMetadata(
             title="MLFlow Outputs",
             description="Outputs produced by the MLFlow application.",
-        ).as_json_schema_extra(),
-    )
-
-    web_app_url: ServiceAPI[HttpApi] = Field(
-        default=ServiceAPI[HttpApi](),
-        json_schema_extra=SchemaExtraMetadata(
-            title="MLFlow Web App URL",
-            description="URL to access the MLFlow web application.",
         ).as_json_schema_extra(),
     )
 

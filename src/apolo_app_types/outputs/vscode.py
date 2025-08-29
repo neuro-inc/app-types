@@ -21,7 +21,7 @@ async def get_vscode_outputs(
         labels
     )
     outputs = VSCodeAppOutputs(
-        web_app_url=ServiceAPI[HttpApi](
+        app_url=ServiceAPI[HttpApi](
             internal_url=internal_web_app_url,
             external_url=external_web_app_url,
         ),

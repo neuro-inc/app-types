@@ -428,9 +428,8 @@ class LightRAGAppInputs(AppInputs):
 class LightRAGAppOutputs(AppOutputs):
     """
     LightRAG outputs:
-      - web_app_url: URL to access the web interface
+      - app_url: URL to access the web interface (inherited from AppOutputs)
       - server_url: URL to access the API server
     """
 
-    web_app_url: ServiceAPI[HttpApi] | None = None
     server_url: ServiceAPI[HttpApi] | None = None

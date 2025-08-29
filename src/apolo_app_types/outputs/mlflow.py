@@ -40,7 +40,7 @@ async def get_mlflow_outputs(
         )
 
     return MLFlowAppOutputs(
-        web_app_url=ServiceAPI[HttpApi](
+        app_url=ServiceAPI[HttpApi](
             internal_url=internal_web_app_url,
             external_url=external_web_app_url,
         ),

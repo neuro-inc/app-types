@@ -12,7 +12,6 @@ from apolo_app_types.protocols.common import (
     SchemaExtraMetadata,
 )
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
-from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI
 from apolo_app_types.protocols.common.schema_extra import SchemaMetaType
 from apolo_app_types.protocols.common.storage import (
     ApoloFilesMount,
@@ -181,4 +180,4 @@ class JupyterAppInputs(AppInputs):
 
 
 class JupyterAppOutputs(AppOutputs):
-    web_app_url: ServiceAPI[HttpApi]
+    pass

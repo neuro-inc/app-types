@@ -41,16 +41,16 @@ async def test_mlflow_outputs_generation(
     helm_values = {"labels": {"application": "mlflow"}}
 
     result = await get_mlflow_outputs(helm_values, app_instance_id=app_instance_id)
-    assert result["web_app_url"]["internal_url"] is not None
+    assert result["app_url"]["internal_url"] is not None
     assert (
-        result["web_app_url"]["internal_url"]["host"]
+        result["app_url"]["internal_url"]["host"]
         == "mlflow-deploy.default.svc.cluster.local"
     )
-    assert result["web_app_url"]["internal_url"]["port"] == 5000
+    assert result["app_url"]["internal_url"]["port"] == 5000
 
-    assert result["web_app_url"]["external_url"] is not None
-    assert result["web_app_url"]["external_url"]["host"] == "mlflow.example.com"
-    assert result["web_app_url"]["external_url"]["port"] == 443
+    assert result["app_url"]["external_url"] is not None
+    assert result["app_url"]["external_url"]["host"] == "mlflow.example.com"
+    assert result["app_url"]["external_url"]["port"] == 443
 
     assert result["server_url"]["internal_url"] is not None
     assert (
