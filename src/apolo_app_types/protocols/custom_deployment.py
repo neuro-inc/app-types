@@ -16,7 +16,6 @@ from apolo_app_types.protocols.common.health_check import (
     HealthCheckProbesConfig,
 )
 from apolo_app_types.protocols.common.k8s import Port
-from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI
 from apolo_app_types.protocols.common.storage import MountPath
 
 
@@ -145,10 +144,4 @@ class CustomDeploymentInputs(AppInputs):
 
 
 class CustomDeploymentOutputs(AppOutputs):
-    web_app_url: ServiceAPI[HttpApi] | None = Field(
-        default=None,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Web App URL",
-            description="The URL of the web app.",
-        ).as_json_schema_extra(),
-    )
+    pass
