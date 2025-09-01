@@ -1,19 +1,18 @@
 from .abc_ import (
     AbstractAppFieldType,
-    AppInputs,
     AppInputsDeployer,
-    AppOutputs,
     AppOutputsDeployer,
 )
 from .apis import OpenAICompatibleEmbeddingsRestAPI
 from .auth import BasicAuth
 from .autoscaling import AutoscalingHPA
+from .base import AppInputs, AppOutputs
 from .buckets import Bucket
 from .containers import ContainerImage
 from .hugging_face import HuggingFaceCache, HuggingFaceModel
 from .ingress import IngressGrpc, IngressHttp
 from .k8s import Container, DeploymentName, Env
-from .networking import GraphQLAPI, GrpcAPI, RestAPI, ServiceAPI
+from .networking import GraphQLAPI, GrpcAPI, HttpApi, RestAPI, ServiceAPI
 from .openai_compat import OpenAICompatChatAPI, OpenAICompatEmbeddingsAPI
 from .postgres import Postgres
 from .preset import Preset
@@ -48,6 +47,7 @@ __all__ = [
     "ApoloMountMode",
     "MountPath",
     "GrpcAPI",
+    "HttpApi",
     "RestAPI",
     "GraphQLAPI",
     "ServiceAPI",

@@ -12,7 +12,6 @@ from apolo_app_types.protocols.common import (
     SchemaExtraMetadata,
 )
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
-from apolo_app_types.protocols.common.networking import RestAPI
 from apolo_app_types.protocols.common.schema_extra import SchemaMetaType
 from apolo_app_types.protocols.common.storage import (
     ApoloFilesMount,
@@ -181,5 +180,4 @@ class JupyterAppInputs(AppInputs):
 
 
 class JupyterAppOutputs(AppOutputs):
-    internal_web_app_url: RestAPI
-    external_web_app_url: RestAPI
+    pass

@@ -234,5 +234,4 @@ class KeycloakConfig(AbstractAppFieldType):
 
 
 class LaunchpadAppOutputs(AppOutputs):
-    web_app_url: ServiceAPI[HttpApi] | None = None
     keycloak_config: KeycloakConfig | None = None

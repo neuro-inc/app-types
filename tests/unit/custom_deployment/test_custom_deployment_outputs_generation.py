@@ -32,11 +32,11 @@ async def test_custom_deployment_outputs_generation_with_ingress(
     res = await get_custom_deployment_outputs(
         helm_values=helm_values, app_instance_id=app_instance_id
     )
-    assert res["external_web_app_url"]["host"] == "custom-deployment.example.com"
-    assert res["external_web_app_url"]["port"] == 443
+    assert res["app_url"]["external_url"]["host"] == "custom-deployment.example.com"
+    assert res["app_url"]["external_url"]["port"] == 443
 
     assert (
-        res["internal_web_app_url"]["host"]
+        res["app_url"]["internal_url"]["host"]
         == "custom-deployment.default.svc.cluster.local"
     )
-    assert res["internal_web_app_url"]["port"] == 80
+    assert res["app_url"]["internal_url"]["port"] == 80

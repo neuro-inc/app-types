@@ -5,7 +5,7 @@ from apolo_app_types import HuggingFaceModel
 from apolo_app_types.clients.kube import get_service_host_port
 from apolo_app_types.outputs.common import INSTANCE_LABEL
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
-from apolo_app_types.protocols.common.networking import RestAPI
+from apolo_app_types.protocols.common.networking import HttpApi, RestAPI, ServiceAPI
 from apolo_app_types.protocols.stable_diffusion import StableDiffusionOutputs
 
 
@@ -29,21 +29,33 @@ async def get_stable_diffusion_outputs(
     else:
         external_host = ""
 
-    internal_api = RestAPI(
-        host=internal_host,
-        port=int(internal_port),
-        base_path="/sdapi/v1",
-        protocol="http",
-    )
-    external_api = RestAPI(
-        host=external_host,
-        base_path="/sdapi/v1",
-        port=443,
-        protocol="https",
-    )
+    internal_api = None
+    if internal_host and internal_port:
+        internal_api = RestAPI(
+            host=internal_host,
+            port=int(internal_port),
+            base_path="/sdapi/v1",
+            protocol="http",
+        )
+
+    external_api = None
+    if external_host:
+        external_api = RestAPI(
+            host=external_host,
+            base_path="/sdapi/v1",
+            port=443,
+            protocol="https",
+        )
+
     model = HuggingFaceModel(model_hf_name=helm_values["model"]["modelHFName"])
     stable_diffusion_output = StableDiffusionOutputs(
-        internal_api=internal_api, external_api=external_api, hf_model=model
+        api_url=ServiceAPI[HttpApi](
+            internal_url=internal_api,
+            external_url=external_api,
+        )
+        if internal_api or external_api
+        else None,
+        hf_model=model,
     )
 
     return stable_diffusion_output.model_dump()

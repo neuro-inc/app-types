@@ -13,9 +13,6 @@ from apolo_app_types.protocols.common import (
     Preset,
     SchemaExtraMetadata,
 )
-from apolo_app_types.protocols.common.networking import (
-    RestAPI,
-)
 from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
@@ -113,9 +110,5 @@ class PrivateGPTOutputs(AppOutputsDeployer):
 class PrivateGPTAppOutputs(AppOutputs):
     """
     PrivateGPT outputs:
-      - internal_web_app_url
-      - external_web_app_url
+      - app_url (inherited from AppOutputs)
     """
-
-    internal_web_app_url: RestAPI | None = None
-    external_web_app_url: RestAPI | None = None

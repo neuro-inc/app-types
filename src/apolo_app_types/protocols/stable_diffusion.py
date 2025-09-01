@@ -9,11 +9,11 @@ from apolo_app_types.protocols.common import (
     HuggingFaceModel,
     IngressHttp,
     Preset,
-    RestAPI,
     SchemaExtraMetadata,
     SchemaMetaType,
 )
 from apolo_app_types.protocols.common.hugging_face import HF_SCHEMA_EXTRA
+from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI
 
 
 class StableStudio(AppInputsDeployer):
@@ -86,8 +86,7 @@ class SDOutputs(AppOutputsDeployer):
 
 
 class StableDiffusionOutputs(AppOutputs):
-    internal_api: RestAPI | None = None
-    external_api: RestAPI | None = None
+    api_url: ServiceAPI[HttpApi] | None = None
     hf_model: HuggingFaceModel | None = Field(
         default=None,
         json_schema_extra=HF_SCHEMA_EXTRA.as_json_schema_extra(),

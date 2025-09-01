@@ -3,7 +3,7 @@ import typing as t
 from apolo_app_types.clients.kube import get_service_host_port
 from apolo_app_types.outputs.common import INSTANCE_LABEL
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
-from apolo_app_types.protocols.common import RestAPI, ServiceAPI
+from apolo_app_types.protocols.common import ServiceAPI
 from apolo_app_types.protocols.common.networking import HttpApi
 from apolo_app_types.protocols.superset import SupersetOutputs, SupersetUserConfig
 
@@ -16,7 +16,7 @@ async def get_superset_outputs(
     internal_host, internal_port = await get_service_host_port(match_labels=labels)
     internal_web_app_url = None
     if internal_host:
-        internal_web_app_url = RestAPI(
+        internal_web_app_url = HttpApi(
             host=internal_host,
             port=int(internal_port),
             base_path="/",
@@ -27,7 +27,7 @@ async def get_superset_outputs(
     external_web_app_url = None
     if host_port:
         host, port = host_port
-        external_web_app_url = RestAPI(
+        external_web_app_url = HttpApi(
             host=host,
             port=int(port),
             base_path="/",
@@ -35,7 +35,7 @@ async def get_superset_outputs(
         )
     admin_config = helm_values.get("init", {}).get("adminUser", {})
     return SupersetOutputs(
-        web_app_url=ServiceAPI[HttpApi](
+        app_url=ServiceAPI[HttpApi](
             internal_url=internal_web_app_url,
             external_url=external_web_app_url,
         ),

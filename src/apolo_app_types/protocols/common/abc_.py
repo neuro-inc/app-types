@@ -21,10 +21,6 @@ class AppInputsDeployer(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, protected_namespaces=())
 
 
-class AppInputs(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, protected_namespaces=())
-
-
 class AppOutputsDeployer(BaseModel):
     model_config = ConfigDict(protected_namespaces=())
 
@@ -33,7 +29,3 @@ class AppOutputsDeployer(BaseModel):
         description="The URL of the external web app.",
         title="External web app URL",
     )
-
-
-class AppOutputs(BaseModel):
-    model_config = ConfigDict(protected_namespaces=())
