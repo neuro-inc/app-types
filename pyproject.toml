@@ -49,6 +49,7 @@ pydantic = "^2.11.7"
 pyyaml = "^6.0.2"
 types-PyYAML = "^6.0.12.20250822"
 yarl = "^1.20.1"
+jsonref = "^1.1.0"
 
 [tool.poetry-dynamic-versioning]
 enable = true
@@ -105,6 +106,10 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = "aiodocker.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "jsonref"
 ignore_missing_imports = true
 
 [tool.flake8]
