@@ -210,7 +210,7 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
             "domain": domain,
             "keycloak": keycloak_values,  # keeping this for backwards compatibility
             "mlops-keycloak": keycloak_values,
-            "image": {"tag": "25.9.0"},
+            "image": {"tag": "25.9.1"},
             "LAUNCHPAD_INITIAL_CONFIG": json.dumps(
                 {
                     "vllm": get_nested_values(
