@@ -27,6 +27,7 @@ from apolo_app_types.protocols.postgres import (
     PostgresInputs,
 )
 
+
 PASSWORD_CHAR_POOL = string.ascii_letters + string.digits
 
 
@@ -40,8 +41,8 @@ def _generate_password(length: int = 12) -> str:
 
 class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
     async def get_vllm_inputs(
-            self,
-            input_: LaunchpadAppInputs,
+        self,
+        input_: LaunchpadAppInputs,
     ) -> LLMInputs:
         llm_extra_args: list[str] = []
         if isinstance(input_.apps_config.llm_config.model, PreConfiguredLLMModels):
@@ -79,8 +80,8 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
         )
 
     async def get_postgres_inputs(
-            self,
-            input_: LaunchpadAppInputs,
+        self,
+        input_: LaunchpadAppInputs,
     ) -> PostgresInputs:
         return PostgresInputs(
             preset=input_.apps_config.postgres_config.preset,
@@ -98,21 +99,21 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
         )
 
     async def get_text_embeddings_inputs(
-            self,
-            input_: LaunchpadAppInputs,
+        self,
+        input_: LaunchpadAppInputs,
     ) -> TextEmbeddingsInferenceAppInputs:
         extra_args: list[str] = []
         if isinstance(
-                input_.apps_config.embeddings_config.model,
-                PreConfiguredEmbeddingsModels,
+            input_.apps_config.embeddings_config.model,
+            PreConfiguredEmbeddingsModels,
         ):
             model_name = input_.apps_config.embeddings_config.model.value
             model = HuggingFaceModel(
                 model_hf_name=model_name,
             )
         elif isinstance(
-                input_.apps_config.embeddings_config.model,
-                HuggingFaceEmbeddingsModel,
+            input_.apps_config.embeddings_config.model,
+            HuggingFaceEmbeddingsModel,
         ):
             model = input_.apps_config.embeddings_config.model.hf_model
             extra_args = input_.apps_config.embeddings_config.model.server_extra_args
@@ -127,14 +128,14 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
         )
 
     async def gen_extra_values(
-            self,
-            input_: LaunchpadAppInputs,
-            app_name: str,
-            namespace: str,
-            app_id: str,
-            app_secrets_name: str,
-            *_: t.Any,
-            **kwargs: t.Any,
+        self,
+        input_: LaunchpadAppInputs,
+        app_name: str,
+        namespace: str,
+        app_id: str,
+        app_secrets_name: str,
+        *_: t.Any,
+        **kwargs: t.Any,
     ) -> dict[str, t.Any]:
         # may need storage later, especially as cache for pulling models
         # base_app_storage_path = get_app_data_files_path_url(
