@@ -28,29 +28,15 @@ from apolo_app_types.protocols.postgres import (
 )
 
 
+PASSWORD_CHAR_POOL = string.ascii_letters + string.digits
+
+
 def _generate_password(length: int = 12) -> str:
     if length < 4:
         err_msg = "Password length must be at least 4"
         raise ValueError(err_msg)
 
-    # At least one from each category
-    lower = random.choice(string.ascii_lowercase)
-    upper = random.choice(string.ascii_uppercase)
-    digit = random.choice(string.digits)
-    special = random.choice("!@#$%^&*()-_=+[]{};:,.<>?/")
-
-    # Fill the rest
-    remaining = "".join(
-        random.choices(
-            string.ascii_letters + string.digits + "!@#$%^&*()-_=+[]{};:,.<>?/",
-            k=length - 4,
-        )
-    )
-
-    # Shuffle so it’s not predictable
-    password_list = list(lower + upper + digit + special + remaining)
-    random.shuffle(password_list)
-    return "".join(password_list)
+    return "".join([random.choice(PASSWORD_CHAR_POOL) for _ in range(length)])
 
 
 class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
