@@ -33,14 +33,14 @@ def prepare_job_run_params(
     client: apolo_sdk.Client,
 ) -> JobRunParams:
     """Prepare all parameters for apolo_client.jobs.run() call."""
-    if not job_input.image:
+    if not job_input.image.image or job_input.image.image.strip() == "":
         msg = "Container image is required"
         raise ValueError(msg)
 
     # Convert StorageMounts to apolo_sdk.Volume objects
     volumes = []
-    if job_input.storage_mounts:
-        for mount in job_input.storage_mounts.mounts:
+    if job_input.resources.storage_mounts:
+        for mount in job_input.resources.storage_mounts.mounts:
             read_only = mount.mode.mode.value == "r"
             volume = apolo_sdk.Volume(
                 storage_uri=URL(mount.storage_uri.path),
@@ -51,8 +51,8 @@ def prepare_job_run_params(
 
     # Convert SecretVolume to apolo_sdk.SecretFile objects
     secret_files = []
-    if job_input.secret_volumes:
-        for secret_volume in job_input.secret_volumes:
+    if job_input.resources.secret_volumes:
+        for secret_volume in job_input.resources.secret_volumes:
             secret_file = apolo_sdk.SecretFile(
                 secret_uri=URL(f"secret://{secret_volume.src_secret_uri.key}"),
                 container_path=secret_volume.dst_path,
@@ -61,23 +61,23 @@ def prepare_job_run_params(
 
     # Convert env list to dict
     env_dict = {}
-    for env_var in job_input.env:
+    for env_var in job_input.image.env:
         if isinstance(env_var.value, str) and env_var.value:
             env_dict[env_var.name] = env_var.value
 
     # Convert secret_env list to dict
     secret_env_dict = {}
-    for env_var in job_input.secret_env:
+    for env_var in job_input.image.secret_env:
         if isinstance(env_var.value, ApoloSecret):
             secret_env_dict[env_var.name] = URL(f"secret://{env_var.value.key}")
 
     # Get preset and configure resources
     from apolo_app_types.helm.apps.common import get_preset
 
-    preset = get_preset(client, job_input.preset.name)
+    preset = get_preset(client, job_input.resources.preset.name)
 
     container = apolo_sdk.Container(
-        image=apolo_sdk.RemoteImage.new_external_image(name=job_input.image),
+        image=apolo_sdk.RemoteImage.new_external_image(name=job_input.image.image),
         resources=apolo_sdk.Resources(
             cpu=preset.cpu,
             memory=preset.memory,
@@ -91,9 +91,13 @@ def prepare_job_run_params(
             tpu_software_version=preset.tpu.software_version if preset.tpu else None,
             shm=True,  # Default to True as before
         ),
-        entrypoint=job_input.entrypoint if job_input.entrypoint else None,
-        command=job_input.command if job_input.command else None,
-        working_dir=job_input.working_dir if job_input.working_dir else None,
+        entrypoint=job_input.image.entrypoint
+        if job_input.image.entrypoint.strip()
+        else None,
+        command=job_input.image.command if job_input.image.command.strip() else None,
+        working_dir=job_input.image.working_dir
+        if job_input.image.working_dir.strip()
+        else None,
         env=env_dict,
         secret_env=secret_env_dict,
         volumes=volumes,
@@ -102,27 +106,29 @@ def prepare_job_run_params(
     )
 
     job_name = (
-        job_input.name
-        if job_input.name
+        job_input.metadata.name
+        if job_input.metadata.name.strip()
         else f"{app_instance_name}-{app_instance_id[:8]}"
     )
 
-    tags = job_input.tags + [f"instance_id:{app_instance_id}"]
+    tags = job_input.metadata.tags + [f"instance_id:{app_instance_id}"]
 
     return JobRunParams(
         container=container,
         name=job_name,
         tags=tags,
-        description=job_input.description,
-        scheduler_enabled=job_input.scheduler_enabled,
-        pass_config=job_input.pass_config,
-        wait_for_jobs_quota=job_input.wait_for_jobs_quota,
-        schedule_timeout=job_input.schedule_timeout,
-        restart_policy=apolo_sdk.JobRestartPolicy(job_input.restart_policy),
-        life_span=job_input.max_run_time_minutes * 60
-        if job_input.max_run_time_minutes > 0
+        description=job_input.metadata.description
+        if job_input.metadata.description.strip()
+        else None,
+        scheduler_enabled=job_input.scheduling.scheduler_enabled,
+        pass_config=job_input.advanced.pass_config,
+        wait_for_jobs_quota=job_input.advanced.wait_for_jobs_quota,
+        schedule_timeout=job_input.scheduling.schedule_timeout,
+        restart_policy=apolo_sdk.JobRestartPolicy(job_input.scheduling.restart_policy),
+        life_span=job_input.scheduling.max_run_time_minutes * 60
+        if job_input.scheduling.max_run_time_minutes > 0
         else None,
         org_name=org_name,
-        priority=apolo_sdk.JobPriority[job_input.priority.value.upper()],
+        priority=apolo_sdk.JobPriority[job_input.scheduling.priority.value.upper()],
         project_name=project_name,
     )
