@@ -165,13 +165,15 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
         )
         domain = ingress_template.split(".", 1)[1]
         keycloak_admin_password = _generate_password()
+        db_secret_name = f"launchpad-{app_id}-db-secret"
+        realm_import_config_map_name = f"launchpad-{app_id}-keycloak-realm"
 
         keycloak_values = {
             "fullnameOverride": f"launchpad-{app_id}-keycloak",
             "auth": {
                 "adminPassword": keycloak_admin_password,
             },
-            "externalDatabase": {"existingSecret": f"launchpad-{app_id}-db-secret"},
+            "externalDatabase": {"existingSecret": db_secret_name},
             **values,
             "labels": {
                 "application": "launchpad",
@@ -181,15 +183,30 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
                     "service": "keycloak",
                 }
             },
+            "extraVolumes": [
+                {
+                    "name": "realm-import",
+                    "configMap": {
+                        "name": realm_import_config_map_name,
+                        "items": [
+                            {
+                                "key": "realm.json",
+                                "path": "realm.json",
+                            }
+                        ],
+                    },
+                }
+            ],
         }
 
         return {
             **values,
-            "dbSecretName": f"launchpad-{app_id}-db-secret",
+            "dbSecretName": db_secret_name,
+            "keycloakRealmImportConfigMapName": realm_import_config_map_name,
             "postgresql": {
                 "fullnameOverride": f"launchpad-{app_id}-db",
                 "auth": {
-                    "existingSecret": f"launchpad-{app_id}-db-secret",
+                    "existingSecret": db_secret_name,
                 },
             },
             "dbPassword": _generate_password(),
