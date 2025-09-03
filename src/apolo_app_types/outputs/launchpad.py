@@ -18,7 +18,7 @@ async def get_launchpad_outputs(
 
     launchpad_labels = {
         **labels,
-        "service": "launchpad",
+        "service": "client",
     }
     internal_host, internal_port = await get_service_host_port(
         match_labels=launchpad_labels
