@@ -109,6 +109,18 @@ async def setup_clients(presets_available):
             mock_apolo_client.buckets.persistent_credentials_get = AsyncMock(
                 return_value=p_credentials
             )
+            mock_apolo_client.jobs.get_capacity = AsyncMock(
+                return_value={
+                    "cpu-large": 1,
+                    "gpu-large": 1,
+                    "gpu-xlarge": 1,
+                    "a100-large": 1,
+                    "cpu-small": 1,
+                    "cpu-medium": 1,
+                    "t4-medium": 1,
+                    "gpu-extra-large": 1,
+                },
+            )
 
             mock_get.return_value.__aenter__.return_value = mock_apolo_client
             apolo_client = await stack.enter_async_context(mock_get())

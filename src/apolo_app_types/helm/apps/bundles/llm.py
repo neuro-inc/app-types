@@ -1,4 +1,6 @@
+import logging
 import typing as t
+from decimal import Decimal
 from typing import NamedTuple
 
 from apolo_app_types import HuggingFaceModel, LLMInputs
@@ -24,10 +26,13 @@ from apolo_app_types.protocols.common.autoscaling import AutoscalingKedaHTTP
 
 class ModelSettings(NamedTuple):
     model_hf_name: str
-    vram_min_required: float
+    vram_min_required_gb: float
 
 
 T = t.TypeVar("T", LLama4Inputs, DeepSeekR1Inputs, MistralInputs)
+
+
+logger = logging.getLogger(__name__)
 
 
 class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
@@ -56,41 +61,64 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
         org_name = self.client.config.org_name
         return f"storage://{cluster_name}/{org_name}/{project_name}/{self.cache_prefix}"
 
-    def _get_preset(
+    async def _get_preset(
         self,
         input_: T,
     ) -> Preset:
         """Retrieve the appropriate preset based on the
         input size and GPU compatibility."""
         available_presets = dict(self.client.config.presets)
+        jobs_capacity = await self.client.jobs.get_capacity()
         model_settings = self.model_map[input_.size]
-        min_total_vram = model_settings.vram_min_required
+        min_total_vram_gb = model_settings.vram_min_required_gb
 
-        candidates: list[tuple[float, int, str]] = []
+        candidates: list[tuple[Decimal, int, float, int, str]] = []
         for preset_name, available_preset in available_presets.items():
-            # TODO: add more vendors
-            gpu = available_preset.nvidia_gpu
+            gpu = available_preset.nvidia_gpu or available_preset.amd_gpu
             if not gpu:
+                msg = f"Ignoring preset {preset_name} because it has no GPU"
+                logger.info(msg)
                 continue
 
-            mem = getattr(gpu, "memory", None) or 0
-            cnt = getattr(gpu, "count", None) or 0
-            if mem <= 0 or cnt <= 0:
+            instances_capacity = jobs_capacity.get(preset_name, 0)
+            if instances_capacity <= 0:
+                msg = f"Ignoring preset {preset_name} because it has no capacity"
+                logger.info(msg)
                 continue
 
-            total_vram = float(mem) * int(cnt)
-            if total_vram >= min_total_vram:
-                candidates.append((total_vram, cnt, preset_name))
+            mem_bytes = gpu.memory or 0
+            cnt = gpu.count
+            if mem_bytes <= 0 or cnt <= 0:
+                msg = f"Ignoring preset {preset_name} because its GPU memory is <= 0"
+                logger.info(msg)
+                continue
+
+            mem_gb = mem_bytes / 1e9
+            total_vram = float(mem_gb) * int(cnt)
+            if not total_vram >= min_total_vram_gb:
+                msg = f"Preset {preset_name} has not enough VRAM"
+                logger.info(msg)
+                continue
+                # in most of the cases, credits price will be different for each preset
+            candidates.append(
+                (
+                    available_preset.credits_per_hour,
+                    -instances_capacity,
+                    total_vram,
+                    cnt,
+                    preset_name,
+                )
+            )
 
         if not candidates:
             err_msg = (
                 f"No preset satisfies total VRAM ≥ "
-                f"{min_total_vram} for size={input_.size!r}."
+                f"{min_total_vram_gb} for size={input_.size!r}."
             )
             raise RuntimeError(err_msg)
 
         # Prefer smallest total VRAM
-        best_name = min(candidates, key=lambda x: (x[0], x[1], x[2]))[2]
+        best_name = min(candidates)[-1]
         return Preset(name=best_name)
 
     async def _llm_inputs(self, input_: T) -> LLMInputs:
@@ -98,7 +126,7 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
             model_hf_name=self.model_map[input_.size].model_hf_name,
             hf_token=input_.hf_token,
         )
-        preset_chosen = self._get_preset(input_)
+        preset_chosen = await self._get_preset(input_)
 
         return LLMInputs(
             hugging_face_model=hf_model,
@@ -161,11 +189,11 @@ class Llama4ValueProcessor(BaseLLMBundleMixin[LLama4Inputs]):
     model_map = {
         Llama4Size.scout: ModelSettings(
             model_hf_name="meta-llama/Llama-4-Scout-17B-16E",
-            vram_min_required=80,
+            vram_min_required_gb=80,
         ),
         Llama4Size.scout_instruct: ModelSettings(
             model_hf_name="meta-llama/Llama-4-Scout-17B-16E-Instruct",
-            vram_min_required=80,
+            vram_min_required_gb=80,
         ),
     }
 
@@ -174,22 +202,22 @@ class DeepSeekValueProcessor(BaseLLMBundleMixin[DeepSeekR1Inputs]):
     app_type = AppType.DeepSeek
     model_map = {
         DeepSeekR1Size.r1: ModelSettings(
-            model_hf_name="deepseek-ai/DeepSeek-R1", vram_min_required=1342.0
+            model_hf_name="deepseek-ai/DeepSeek-R1", vram_min_required_gb=1342.0
         ),
         DeepSeekR1Size.r1_zero: ModelSettings(
-            model_hf_name="deepseek-ai/DeepSeek-R1-Zero", vram_min_required=1342.0
+            model_hf_name="deepseek-ai/DeepSeek-R1-Zero", vram_min_required_gb=1342.0
         ),
         DeepSeekR1Size.r1_distill_llama_8b: ModelSettings(
             model_hf_name="deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
-            vram_min_required=18.0,
+            vram_min_required_gb=18.0,
         ),
         DeepSeekR1Size.r1_distill_llama_70b: ModelSettings(
             model_hf_name="deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
-            vram_min_required=161.0,
+            vram_min_required_gb=161.0,
         ),
         DeepSeekR1Size.r1_distill_qwen_1_5_b: ModelSettings(
             model_hf_name="deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
-            vram_min_required=3.9,
+            vram_min_required_gb=3.9,
         ),
     }
 
@@ -199,18 +227,18 @@ class MistralValueProcessor(BaseLLMBundleMixin[MistralInputs]):
     model_map = {
         MistralSize.mistral_7b_v02: ModelSettings(
             model_hf_name="mistralai/Mistral-7B-Instruct-v0.2",
-            vram_min_required=5,
+            vram_min_required_gb=5,
         ),
         MistralSize.mistral_7b_v03: ModelSettings(
             model_hf_name="mistralai/Mistral-7B-Instruct-v0.3",
-            vram_min_required=5,
+            vram_min_required_gb=5,
         ),
         MistralSize.mistral_31_24b_instruct: ModelSettings(
             model_hf_name="mistralai/Mistral-Small-3.1-24B-Instruct-2503",
-            vram_min_required=16,
+            vram_min_required_gb=16,
         ),
         MistralSize.mistral_32_24b_instruct: ModelSettings(
             model_hf_name="mistralai/Mistral-Small-3.2-24B-Instruct-2506",
-            vram_min_required=16,
+            vram_min_required_gb=16,
         ),
     }

@@ -16,13 +16,13 @@ from apolo_app_types.protocols.common import ApoloSecret
 from tests.unit.constants import (
     APP_ID,
     APP_SECRETS_NAME,
+    CPU_PRESETS,
     DEFAULT_NAMESPACE,
-    TEST_PRESETS,
     TEST_PRESETS_WITH_EXTRA_LARGE_GPU,
 )
 
 
-@pytest.mark.parametrize("presets_available", [TEST_PRESETS], indirect=True)
+@pytest.mark.parametrize("presets_available", [CPU_PRESETS], indirect=True)
 async def test_values_llm_generation_gpu_default_preset(
     setup_clients, mock_get_preset_gpu
 ):
@@ -50,7 +50,7 @@ async def test_values_llm_generation_gpu_default_preset(
 )
 async def test_values_llm_generation_gpu_big_model(setup_clients, mock_get_preset_gpu):
     model_to_test = Llama4Size.scout
-    preset_a100 = "gpu-extra-large"
+    preset_name = "a100-large"
     apolo_client = setup_clients
     helm_args, helm_params = await app_type_to_vals(
         input_=LLama4Inputs(
@@ -86,10 +86,10 @@ async def test_values_llm_generation_gpu_big_model(setup_clients, mock_get_prese
                 }
             }
         },
-        "preset_name": preset_a100,
+        "preset_name": preset_name,
         "resources": {
-            "requests": {"cpu": "1000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
-            "limits": {"cpu": "1000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
+            "requests": {"cpu": "8000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
+            "limits": {"cpu": "8000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
         },
         "tolerations": [
             {
@@ -152,7 +152,7 @@ async def test_values_llm_generation_gpu_big_model(setup_clients, mock_get_prese
         "gpuProvider": "nvidia",
         "podLabels": {
             "platform.apolo.us/component": "app",
-            "platform.apolo.us/preset": preset_a100,
+            "platform.apolo.us/preset": preset_name,
         },
         "appTypesImage": {"tag": IsStr(regex=r"^v\d+\.\d+\.\d+.*$")},
         "apolo_app_id": APP_ID,

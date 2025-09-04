@@ -18,7 +18,7 @@ async def test_values_mistral_generation_gpu_default_preset(
     setup_clients, mock_get_preset_gpu
 ):
     model_to_test = MistralSize.mistral_7b_v02
-    preset_a100 = "a100-large"
+    preset_name = "t4-medium"
     apolo_client = setup_clients
     helm_args, helm_params = await app_type_to_vals(
         input_=MistralInputs(
@@ -57,10 +57,10 @@ async def test_values_mistral_generation_gpu_default_preset(
                 }
             }
         },
-        "preset_name": preset_a100,
+        "preset_name": preset_name,
         "resources": {
-            "requests": {"cpu": "8000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
-            "limits": {"cpu": "8000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
+            "requests": {"cpu": "2000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
+            "limits": {"cpu": "2000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
         },
         "tolerations": [
             {
@@ -123,7 +123,7 @@ async def test_values_mistral_generation_gpu_default_preset(
         "gpuProvider": "nvidia",
         "podLabels": {
             "platform.apolo.us/component": "app",
-            "platform.apolo.us/preset": preset_a100,
+            "platform.apolo.us/preset": preset_name,
         },
         "appTypesImage": {"tag": IsStr(regex=r"^v\d+\.\d+\.\d+.*$")},
         "apolo_app_id": APP_ID,
