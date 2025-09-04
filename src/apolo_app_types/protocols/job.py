@@ -243,6 +243,7 @@ class JobSchedulingConfig(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Scheduling Configuration",
             description="Priority, timeouts, restart policies, and scheduler settings.",
+            is_advanced_field=True,
         ).as_json_schema_extra(),
     )
 
@@ -306,6 +307,14 @@ class JobSchedulingConfig(AbstractAppFieldType):
         ),
     ] = ""
 
+    wait_for_jobs_quota: bool = Field(
+        default=False,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Wait for Jobs Quota",
+            description="Block submission until sufficient job quota is available.",
+        ).as_json_schema_extra(),
+    )
+
 
 class JobAdvancedConfig(AbstractAppFieldType):
     """Advanced runtime configuration and platform integration."""
@@ -316,6 +325,7 @@ class JobAdvancedConfig(AbstractAppFieldType):
             title="Advanced Configuration",
             description="Security, quotas, configuration injection, "
             "and advanced runtime settings.",
+            is_advanced_field=True,
         ).as_json_schema_extra(),
     )
 
@@ -327,20 +337,13 @@ class JobAdvancedConfig(AbstractAppFieldType):
         ).as_json_schema_extra(),
     )
 
-    wait_for_jobs_quota: bool = Field(
-        default=False,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Wait for Jobs Quota",
-            description="Block submission until sufficient job quota is available.",
-        ).as_json_schema_extra(),
-    )
-
     privileged: bool = Field(
         default=False,
         json_schema_extra=SchemaExtraMetadata(
             title="Privileged Mode",
-            description="Run container in p"
-            "rivileged mode (grants extended capabilities).",
+            description="Run the container in privileged mode if the cluster "
+            "configuration permits. Contact the system administrators to "
+            "confirm whether this feature is enabled in this cluster.",
         ).as_json_schema_extra(),
     )
 
@@ -362,7 +365,8 @@ class JobMetadataConfig(AbstractAppFieldType):
             default="",
             json_schema_extra=SchemaExtraMetadata(
                 title="Job Name",
-                description="Human-readable name for this job.",
+                description="Set a human-readable name for this job. It is also used "
+                "to generate a friendly public domain URL for the job.",
             ).as_json_schema_extra(),
         ),
     ] = ""
@@ -438,6 +442,10 @@ class JobAppInput(AppInputs):
         ).as_json_schema_extra(),
     )
 
+    metadata: JobMetadataConfig = Field(
+        default_factory=JobMetadataConfig,
+    )
+
     image: JobImageConfig
 
     resources: JobResourcesConfig
@@ -452,10 +460,6 @@ class JobAppInput(AppInputs):
 
     advanced: JobAdvancedConfig = Field(
         default_factory=JobAdvancedConfig,
-    )
-
-    metadata: JobMetadataConfig = Field(
-        default_factory=JobMetadataConfig,
     )
 
 

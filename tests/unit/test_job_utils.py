@@ -290,10 +290,10 @@ def test_prepare_job_run_params_with_all_options():
             max_run_time_minutes=120,
             schedule_timeout=60.0,
             energy_schedule_name="green-schedule",
+            wait_for_jobs_quota=True,
         ),
         advanced=JobAdvancedConfig(
             pass_config=True,
-            wait_for_jobs_quota=True,
             privileged=True,
         ),
     )

@@ -122,7 +122,7 @@ def prepare_job_run_params(
         else None,
         scheduler_enabled=job_input.scheduling.scheduler_enabled,
         pass_config=job_input.advanced.pass_config,
-        wait_for_jobs_quota=job_input.advanced.wait_for_jobs_quota,
+        wait_for_jobs_quota=job_input.scheduling.wait_for_jobs_quota,
         schedule_timeout=job_input.scheduling.schedule_timeout,
         restart_policy=apolo_sdk.JobRestartPolicy(job_input.scheduling.restart_policy),
         life_span=job_input.scheduling.max_run_time_minutes * 60
