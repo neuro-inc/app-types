@@ -112,6 +112,7 @@ class MLFlowTrackingServerURL(ServiceAPI[RestAPI]):
         json_schema_extra=SchemaExtraMetadata(
             title="MLFlow Server URL",
             description="The URL to access the MLFlow server.",
+            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
 

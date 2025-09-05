@@ -10,11 +10,13 @@ from apolo_app_types.protocols.common import (
     AppInputs,
     AppOutputs,
     SchemaExtraMetadata,
+    SchemaMetaType,
 )
 from apolo_app_types.protocols.common.k8s import Env
 from apolo_app_types.protocols.common.preset import Preset
 from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 from apolo_app_types.protocols.common.storage import StorageMounts
+from apolo_app_types.protocols.mlflow import MLFlowTrackingServerURL
 
 
 class JobPriority(StrEnum):
@@ -430,6 +432,33 @@ class ContainerHTTPServer(AbstractAppFieldType):
     )
 
 
+class JobIntegrationsConfig(AbstractAppFieldType):
+    """Integrations configuration."""
+
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Job Integrations",
+            description="Integrate your job with applications.",
+            is_advanced_field=True,
+        ).as_json_schema_extra(),
+    )
+
+    mlflow_integration: MLFlowTrackingServerURL = Field(
+        default=MLFlowTrackingServerURL(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="MLFlow Integration",
+            description=(
+                "Preconfigure job to access MLFlow server. "
+                "If enabled, the job will recieve MLFlow tracking server URL "
+                "as an environment variable MLFLOW_TRACKING_URI and will be authorized "
+                "to access it."
+            ),
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+
+
 class JobAppInput(AppInputs):
     """Top-level configuration for a generic batch/Job container."""
 
@@ -452,6 +481,10 @@ class JobAppInput(AppInputs):
 
     networking: JobNetworkingConfig = Field(
         default_factory=JobNetworkingConfig,
+    )
+
+    integrations: JobIntegrationsConfig = Field(
+        default_factory=JobIntegrationsConfig,
     )
 
     scheduling: JobSchedulingConfig = Field(

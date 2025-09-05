@@ -27,32 +27,23 @@ from apolo_app_types.protocols.job import (
 )
 
 
-def test_prepare_job_run_params_minimal():
+def test_prepare_job_run_params_minimal(setup_clients, mock_get_preset_cpu):
     """Test prepare_job_run_params with minimal configuration."""
     job_input = JobAppInput(
         image=JobImageConfig(image="python:3.9"),
         resources=JobResourcesConfig(preset=Preset(name="cpu-small")),
     )
 
-    client = MagicMock()
+    client = setup_clients
 
-    with patch("apolo_app_types.helm.apps.common.get_preset") as mock_get_preset:
-        mock_preset = apolo_sdk.Preset(
-            cpu=2.0,
-            memory=8,
-            credits_per_hour=Decimal("0.05"),
-            available_resource_pool_names=("cpu_pool",),
-        )
-        mock_get_preset.return_value = mock_preset
-
-        result = prepare_job_run_params(
-            job_input=job_input,
-            app_instance_id="test-instance-123",
-            app_instance_name="test-app",
-            org_name="test-org",
-            project_name="test-project",
-            client=client,
-        )
+    result = prepare_job_run_params(
+        job_input=job_input,
+        app_instance_id="test-instance-123",
+        app_instance_name="test-app",
+        org_name="test-org",
+        project_name="test-project",
+        client=client,
+    )
 
     assert isinstance(result, JobRunParams)
     assert result.name == "test-app-test-ins"  # truncated to 8 chars
@@ -78,7 +69,7 @@ def test_prepare_job_run_params_minimal():
     assert container.working_dir is None  # Empty string converted to None
 
 
-def test_prepare_job_run_params_with_custom_name():
+def test_prepare_job_run_params_with_custom_name(setup_clients, mock_get_preset_cpu):
     """Test prepare_job_run_params with custom job name."""
     job_input = JobAppInput(
         image=JobImageConfig(image="python:3.9"),
@@ -86,25 +77,16 @@ def test_prepare_job_run_params_with_custom_name():
         metadata=JobMetadataConfig(name="my-custom-job"),
     )
 
-    client = MagicMock()
+    client = setup_clients
 
-    with patch("apolo_app_types.helm.apps.common.get_preset") as mock_get_preset:
-        mock_preset = apolo_sdk.Preset(
-            cpu=2.0,
-            memory=8,
-            credits_per_hour=Decimal("0.05"),
-            available_resource_pool_names=("cpu_pool",),
-        )
-        mock_get_preset.return_value = mock_preset
-
-        result = prepare_job_run_params(
-            job_input=job_input,
-            app_instance_id="test-instance-123",
-            app_instance_name="test-app",
-            org_name="test-org",
-            project_name="test-project",
-            client=client,
-        )
+    result = prepare_job_run_params(
+        job_input=job_input,
+        app_instance_id="test-instance-123",
+        app_instance_name="test-app",
+        org_name="test-org",
+        project_name="test-project",
+        client=client,
+    )
 
     assert result.name == "my-custom-job"
 
@@ -265,7 +247,7 @@ def test_prepare_job_run_params_with_secret_volumes():
     assert sf2.container_path == "/secrets/db-credentials"
 
 
-def test_prepare_job_run_params_with_all_options():
+def test_prepare_job_run_params_with_all_options(setup_clients, mock_get_preset_gpu):
     """Test prepare_job_run_params with all configuration options."""
     job_input = JobAppInput(
         image=JobImageConfig(
@@ -298,25 +280,16 @@ def test_prepare_job_run_params_with_all_options():
         ),
     )
 
-    client = MagicMock()
+    client = setup_clients
 
-    with patch("apolo_app_types.helm.apps.common.get_preset") as mock_get_preset:
-        mock_preset = apolo_sdk.Preset(
-            cpu=4.0,
-            memory=16,
-            credits_per_hour=Decimal("0.2"),
-            available_resource_pool_names=("gpu_pool",),
-        )
-        mock_get_preset.return_value = mock_preset
-
-        result = prepare_job_run_params(
-            job_input=job_input,
-            app_instance_id="test-instance-123",
-            app_instance_name="test-app",
-            org_name="test-org",
-            project_name="test-project",
-            client=client,
-        )
+    result = prepare_job_run_params(
+        job_input=job_input,
+        app_instance_id="test-instance-123",
+        app_instance_name="test-app",
+        org_name="test-org",
+        project_name="test-project",
+        client=client,
+    )
 
     assert result.name == "full-featured-job"
     assert result.description == "A job with all features enabled"

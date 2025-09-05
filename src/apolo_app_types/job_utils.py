@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import apolo_sdk
 from yarl import URL
 
+from apolo_app_types.helm.apps.common import get_preset
 from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 from apolo_app_types.protocols.job import JobAppInput
 
@@ -24,7 +25,7 @@ class JobRunParams:
     project_name: str
 
 
-def prepare_job_run_params(
+def prepare_job_run_params(  # noqa: C901
     job_input: JobAppInput,
     app_instance_id: str,
     app_instance_name: str,
@@ -71,8 +72,16 @@ def prepare_job_run_params(
         if isinstance(env_var.value, ApoloSecret):
             secret_env_dict[env_var.name] = URL(f"secret://{env_var.value.key}")
 
-    # Get preset and configure resources
-    from apolo_app_types.helm.apps.common import get_preset
+    # Process job integrations envs
+    mlflow_integration = job_input.integrations.mlflow_integration
+    if mlflow_integration.internal_url:
+        if (
+            "MLFLOW_TRACKING_URI" in env_dict
+            or "MLFLOW_TRACKING_URI" in secret_env_dict
+        ):
+            err_msg = "MLFLOW_TRACKING_URI env var conflicts with MLFlow integration."
+            raise ValueError(err_msg)
+        env_dict["MLFLOW_TRACKING_URI"] = mlflow_integration.internal_url.complete_url
 
     preset = get_preset(client, job_input.resources.preset.name)
 
