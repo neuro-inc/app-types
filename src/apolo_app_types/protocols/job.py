@@ -438,7 +438,7 @@ class JobIntegrationsConfig(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Job Integrations",
+            title="Integrations",
             description="Integrate your job with applications.",
             is_advanced_field=True,
         ).as_json_schema_extra(),
@@ -449,10 +449,10 @@ class JobIntegrationsConfig(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="MLFlow Integration",
             description=(
-                "Preconfigure job to access MLFlow server. "
-                "If enabled, the job will recieve MLFlow tracking server URL "
-                "as an environment variable MLFLOW_TRACKING_URI and will be authorized "
-                "to access it."
+                "Preconfigure the job to access the MLflow server. "
+                "If enabled, the job will receive the MLflow tracking server URL"
+                "as the MLFLOW_TRACKING_URI environment variable and will be "
+                "authorized to access it."
             ),
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
