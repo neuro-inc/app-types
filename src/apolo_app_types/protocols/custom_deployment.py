@@ -1,6 +1,5 @@
 from pydantic import BaseModel, ConfigDict, Field
 
-from apolo_app_types import AppInputs
 from apolo_app_types.protocols.common import (
     AppOutputs,
     AutoscalingHPA,
@@ -12,6 +11,7 @@ from apolo_app_types.protocols.common import (
     StorageMounts,
 )
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
+from apolo_app_types.protocols.common.base import AppInputs
 from apolo_app_types.protocols.common.health_check import (
     HealthCheckProbesConfig,
 )

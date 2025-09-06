@@ -1,6 +1,5 @@
 import typing as t
 
-from apolo_app_types import CustomDeploymentInputs, DockerConfigModel
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
@@ -13,6 +12,8 @@ from apolo_app_types.helm.utils.images import (
     get_image_docker_url,
 )
 from apolo_app_types.helm.utils.pods import get_custom_deployment_health_check_values
+from apolo_app_types.protocols.custom_deployment import CustomDeploymentInputs
+from apolo_app_types.protocols.dockerhub import DockerConfigModel
 
 
 class CustomDeploymentChartValueProcessor(

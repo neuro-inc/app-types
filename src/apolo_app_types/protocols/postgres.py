@@ -6,11 +6,12 @@ from typing import Literal
 
 from pydantic import ConfigDict, Field, model_validator
 
-from apolo_app_types import AppInputs, Bucket
 from apolo_app_types.protocols.common import (
     AbstractAppFieldType,
+    AppInputs,
     AppOutputs,
     AppOutputsDeployer,
+    Bucket,
     Preset,
     SchemaExtraMetadata,
     SchemaMetaType,
