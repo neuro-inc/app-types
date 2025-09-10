@@ -111,30 +111,24 @@ async def test_launchpad_values_generation_with_preconfigured_model(setup_client
                     "hugging_face_model": {
                         "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct",
                         "hf_token": None,
+                        "__type__": "HuggingFaceModel",
                     },
-                    "preset": {
-                        "name": "gpu-small",
-                    },
+                    "preset": {"name": "gpu-small", "__type__": "Preset"},
                     "server_extra_args": [],
                 },
                 "postgres": {
-                    "preset": {
-                        "name": "cpu-small",
-                    },
+                    "preset": {"name": "cpu-small", "__type__": "Preset"},
                     "pg_bouncer": {
-                        "preset": {
-                            "name": "cpu-small",
-                        },
+                        "preset": {"name": "cpu-small", "__type__": "Preset"},
                     },
                 },
                 "text-embeddings": {
                     "model": {
                         "model_hf_name": "BAAI/bge-m3",
                         "hf_token": None,
+                        "__type__": "HuggingFaceModel",
                     },
-                    "preset": {
-                        "name": "gpu-small",
-                    },
+                    "preset": {"name": "gpu-small", "__type__": "Preset"},
                     "server_extra_args": [],
                 },
             }
@@ -300,33 +294,27 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
                     "hugging_face_model": {
                         "model_hf_name": "microsoft/DialoGPT-medium",
                         "hf_token": None,
+                        "__type__": "HuggingFaceModel",
                     },
-                    "preset": {
-                        "name": "gpu-large",
-                    },
+                    "preset": {"name": "gpu-large", "__type__": "Preset"},
                     "server_extra_args": [
                         "--max-model-len=2048",
                         "--gpu-memory-utilization=0.9",
                     ],
                 },
                 "postgres": {
-                    "preset": {
-                        "name": "cpu-small",
-                    },
+                    "preset": {"name": "cpu-small", "__type__": "Preset"},
                     "pg_bouncer": {
-                        "preset": {
-                            "name": "cpu-small",
-                        },
+                        "preset": {"name": "cpu-small", "__type__": "Preset"},
                     },
                 },
                 "text-embeddings": {
                     "model": {
                         "model_hf_name": "BAAI/bge-m3",
                         "hf_token": None,
+                        "__type__": "HuggingFaceModel",
                     },
-                    "preset": {
-                        "name": "gpu-small",
-                    },
+                    "preset": {"name": "gpu-small", "__type__": "Preset"},
                     "server_extra_args": [],
                 },
             }
@@ -494,10 +482,9 @@ async def test_launchpad_values_generation_magistral_model(setup_clients):
                     "hugging_face_model": {
                         "model_hf_name": "unsloth/Magistral-Small-2506-GGUF",
                         "hf_token": None,
+                        "__type__": "HuggingFaceModel",
                     },
-                    "preset": {
-                        "name": "gpu-medium",
-                    },
+                    "preset": {"name": "gpu-medium", "__type__": "Preset"},
                     "server_extra_args": [
                         "--tokenizer_mode=mistral",
                         "--config_format=mistral",
@@ -508,23 +495,18 @@ async def test_launchpad_values_generation_magistral_model(setup_clients):
                     ],
                 },
                 "postgres": {
-                    "preset": {
-                        "name": "cpu-small",
-                    },
+                    "preset": {"name": "cpu-small", "__type__": "Preset"},
                     "pg_bouncer": {
-                        "preset": {
-                            "name": "cpu-small",
-                        },
+                        "preset": {"name": "cpu-small", "__type__": "Preset"},
                     },
                 },
                 "text-embeddings": {
                     "model": {
                         "model_hf_name": "BAAI/bge-m3",
                         "hf_token": None,
+                        "__type__": "HuggingFaceModel",
                     },
-                    "preset": {
-                        "name": "gpu-small",
-                    },
+                    "preset": {"name": "gpu-small", "__type__": "Preset"},
                     "server_extra_args": [],
                 },
             }

@@ -37,6 +37,7 @@ async def test_launchpad_output_generation(
 
     app_url = res["app_url"]
     assert app_url["internal_url"] == {
+        "__type__": "HttpApi",
         "base_path": "/",
         "host": "app.default-namespace",
         "port": 80,
@@ -44,6 +45,7 @@ async def test_launchpad_output_generation(
         "timeout": 30.0,
     }
     assert app_url["external_url"] == {
+        "__type__": "HttpApi",
         "base_path": "/",
         "host": "example.com",
         "port": 80,
@@ -93,6 +95,7 @@ async def test_launchpad_output_generation_no_external_url(
 
     app_url = res["app_url"]
     assert app_url["internal_url"] == {
+        "__type__": "HttpApi",
         "base_path": "/",
         "host": "app.default-namespace",
         "port": 80,
@@ -188,6 +191,7 @@ async def test_launchpad_output_generation_custom_ports(
 
     app_url = res["app_url"]
     assert app_url["internal_url"] == {
+        "__type__": "HttpApi",
         "base_path": "/",
         "host": "launchpad-service.namespace",
         "port": 8080,
@@ -195,6 +199,7 @@ async def test_launchpad_output_generation_custom_ports(
         "timeout": 30.0,
     }
     assert app_url["external_url"] == {
+        "__type__": "HttpApi",
         "base_path": "/",
         "host": "launchpad.custom.domain",
         "port": 443,

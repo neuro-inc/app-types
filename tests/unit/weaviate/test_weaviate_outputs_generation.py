@@ -21,6 +21,7 @@ async def test_output_values_weaviate(
     assert res["auth"] == {
         "username": "admin",
         "password": "admin",
+        "__type__": "BasicAuth",
     }
     assert res["rest_endpoint"]
     assert res["rest_endpoint"]["external_url"]["host"] == "example.com"
@@ -48,7 +49,4 @@ async def test_output_values_weaviate_without_cluster_creds(
         },
         app_instance_id=app_instance_id,
     )
-    assert res["auth"] == {
-        "username": "",
-        "password": "",
-    }
+    assert res["auth"] == {"username": "", "password": "", "__type__": "BasicAuth"}
