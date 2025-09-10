@@ -39,8 +39,10 @@ async def test_tei_outputs_with_model(
     assert res["internal_api"]["hf_model"] == {
         "hf_token": None,
         "model_hf_name": "random/name",
+        "__type__": "HuggingFaceModel",
     }
     assert res["external_api"]["hf_model"] == {
         "hf_token": None,
         "model_hf_name": "random/name",
+        "__type__": "HuggingFaceModel",
     }

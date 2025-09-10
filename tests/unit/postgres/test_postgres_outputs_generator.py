@@ -5,6 +5,7 @@ async def test_postgres_outputs(setup_clients, mock_kubernetes_client, app_insta
     res = await get_postgres_outputs(helm_values={}, app_instance_id=app_instance_id)
     assert res["postgres_users"]["users"] == [
         {
+            "__type__": "CrunchyPostgresUserCredentials",
             "dbname": "mydatabase",
             "user": "admin",
             "password": "supersecret",
@@ -17,11 +18,13 @@ async def test_postgres_outputs(setup_clients, mock_kubernetes_client, app_insta
             "pgbouncer_uri": "postgres://pgbouncer.example.com:6432/mydatabase",
             "uri": "postgres://db.example.com:5432/mydatabase",
             "postgres_uri": {
-                "uri": "postgresql://admin:supersecret@pgbouncer.example.com:6432/mydatabase"
+                "__type__": "PostgresURI",
+                "uri": "postgresql://admin:supersecret@pgbouncer.example.com:6432/mydatabase",
             },
             "user_type": "user",
         },
         {
+            "__type__": "CrunchyPostgresUserCredentials",
             "dbname": "otherdatabase",
             "user": "admin",
             "password": "supersecret",
@@ -34,7 +37,8 @@ async def test_postgres_outputs(setup_clients, mock_kubernetes_client, app_insta
             "pgbouncer_uri": "postgres://pgbouncer.example.com:6432/otherdatabase",
             "uri": "postgres://db.example.com:5432/otherdatabase",
             "postgres_uri": {
-                "uri": "postgresql://admin:supersecret@pgbouncer.example.com:6432/otherdatabase"
+                "__type__": "PostgresURI",
+                "uri": "postgresql://admin:supersecret@pgbouncer.example.com:6432/otherdatabase",
             },
             "user_type": "user",
         },
