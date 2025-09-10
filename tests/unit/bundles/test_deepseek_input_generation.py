@@ -1,33 +1,33 @@
 from dirty_equals import IsStr
 
 from apolo_app_types.app_types import AppType
-from apolo_app_types.helm.apps.bundles.llm import MistralValueProcessor
+from apolo_app_types.helm.apps.bundles.llm import DeepSeekValueProcessor
 from apolo_app_types.helm.apps.common import (
     APOLO_ORG_LABEL,
     APOLO_PROJECT_LABEL,
     APOLO_STORAGE_LABEL,
 )
 from apolo_app_types.inputs.args import app_type_to_vals
-from apolo_app_types.protocols.bundles.llm import MistralInputs, MistralSize
+from apolo_app_types.protocols.bundles.llm import DeepSeekR1Inputs, DeepSeekR1Size
 from apolo_app_types.protocols.common import ApoloSecret
 
 from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
 
-async def test_values_mistral_generation_gpu_default_preset(
+async def test_values_llm_generation_gpu_default_preset(
     setup_clients, mock_get_preset_gpu
 ):
-    model_to_test = MistralSize.mistral_7b_v02
-    preset_a100 = "a100-large"
+    model_to_test = DeepSeekR1Size.r1_distill_qwen_1_5_b
+    preset_name = "t4-medium"
     apolo_client = setup_clients
     helm_args, helm_params = await app_type_to_vals(
-        input_=MistralInputs(
+        input_=DeepSeekR1Inputs(
             size=model_to_test,
             hf_token=ApoloSecret(key="FakeSecret"),
         ),
         apolo_client=apolo_client,
-        app_type=AppType.Mistral,
-        app_name="mistral",
+        app_type=AppType.DeepSeek,
+        app_name="deepseek",
         namespace=DEFAULT_NAMESPACE,
         app_secrets_name=APP_SECRETS_NAME,
         app_id=APP_ID,
@@ -39,14 +39,18 @@ async def test_values_mistral_generation_gpu_default_preset(
     assert helm_params == {
         "serverExtraArgs": [],
         "model": {
-            "modelHFName": MistralValueProcessor.model_map[model_to_test].model_hf_name,
-            "tokenizerHFName": MistralValueProcessor.model_map[
+            "modelHFName": DeepSeekValueProcessor.model_map[
+                model_to_test
+            ].model_hf_name,
+            "tokenizerHFName": DeepSeekValueProcessor.model_map[
                 model_to_test
             ].model_hf_name,
         },
         "llm": {
-            "modelHFName": MistralValueProcessor.model_map[model_to_test].model_hf_name,
-            "tokenizerHFName": MistralValueProcessor.model_map[
+            "modelHFName": DeepSeekValueProcessor.model_map[
+                model_to_test
+            ].model_hf_name,
+            "tokenizerHFName": DeepSeekValueProcessor.model_map[
                 model_to_test
             ].model_hf_name,
         },
@@ -57,10 +61,10 @@ async def test_values_mistral_generation_gpu_default_preset(
                 }
             }
         },
-        "preset_name": preset_a100,
+        "preset_name": preset_name,
         "resources": {
-            "requests": {"cpu": "8000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
-            "limits": {"cpu": "8000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
+            "requests": {"cpu": "2000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
+            "limits": {"cpu": "2000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
         },
         "tolerations": [
             {
@@ -105,7 +109,7 @@ async def test_values_mistral_generation_gpu_default_preset(
             "className": "traefik",
             "hosts": [
                 {
-                    "host": f"{AppType.Mistral.value}--{APP_ID}.apps.some.org.neu.ro",
+                    "host": f"{AppType.DeepSeek.value}--{APP_ID}.apps.some.org.neu.ro",
                     "paths": [{"path": "/", "pathType": "Prefix", "portName": "http"}],
                 }
             ],
@@ -123,7 +127,7 @@ async def test_values_mistral_generation_gpu_default_preset(
         "gpuProvider": "nvidia",
         "podLabels": {
             "platform.apolo.us/component": "app",
-            "platform.apolo.us/preset": preset_a100,
+            "platform.apolo.us/preset": preset_name,
         },
         "appTypesImage": {"tag": IsStr(regex=r"^v\d+\.\d+\.\d+.*$")},
         "apolo_app_id": APP_ID,
