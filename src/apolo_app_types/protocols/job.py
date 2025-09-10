@@ -10,11 +10,13 @@ from apolo_app_types.protocols.common import (
     AppInputs,
     AppOutputs,
     SchemaExtraMetadata,
+    SchemaMetaType,
 )
 from apolo_app_types.protocols.common.k8s import Env
 from apolo_app_types.protocols.common.preset import Preset
 from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 from apolo_app_types.protocols.common.storage import StorageMounts
+from apolo_app_types.protocols.mlflow import MLFlowTrackingServerURL
 
 
 class JobPriority(StrEnum):
@@ -99,54 +101,14 @@ class DiskVolume(AbstractAppFieldType):
     )
 
 
-class ContainerHTTPServer(AbstractAppFieldType):
-    """HTTP server configuration exposed by the container."""
+class JobImageConfig(AbstractAppFieldType):
+    """Container image configuration and runtime parameters."""
 
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="HTTP Server",
-            description="Expose an HTTP server from the container for health or API.",
-        ).as_json_schema_extra(),
-    )
-
-    port: int = Field(
-        json_schema_extra=SchemaExtraMetadata(
-            title="Port",
-            description="Container TCP port to expose for the HTTP server.",
-        ).as_json_schema_extra(),
-    )
-    health_check_path: (
-        t.Annotated[
-            str,
-            Field(
-                json_schema_extra=SchemaExtraMetadata(
-                    title="Health Check Path",
-                    description="Optional HTTP path used for "
-                    "readiness/liveness checks (e.g., /healthz).",
-                ).as_json_schema_extra()
-            ),
-        ]
-        | None
-    ) = None
-    requires_auth: bool = Field(
-        default=False,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Requires Auth",
-            description="If enabled, requests to this server must be authenticated.",
-        ).as_json_schema_extra(),
-    )
-
-
-class JobAppInput(AppInputs):
-    """Top-level configuration for a generic batch/Job container."""
-
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Job Configuration",
-            description="Configure the container image, "
-            "command, resources, mounts, and runtime policy.",
+            title="Image Configuration",
+            description="Container image, execution parameters, and environment setup.",
         ).as_json_schema_extra(),
     )
 
@@ -160,33 +122,29 @@ class JobAppInput(AppInputs):
         ),
     ]
 
-    entrypoint: (
-        t.Annotated[
-            str,
-            Field(
-                json_schema_extra=SchemaExtraMetadata(
-                    title="Entrypoint",
-                    description="Override container "
-                    "entrypoint. Leave empty to use image default.",
-                ).as_json_schema_extra()
-            ),
-        ]
-        | None
-    ) = None
+    entrypoint: t.Annotated[
+        str,
+        Field(
+            default="",
+            json_schema_extra=SchemaExtraMetadata(
+                title="Entrypoint",
+                description="Override container "
+                "entrypoint. Leave empty to use image default.",
+            ).as_json_schema_extra(),
+        ),
+    ] = ""
 
-    command: (
-        t.Annotated[
-            str,
-            Field(
-                json_schema_extra=SchemaExtraMetadata(
-                    title="Command",
-                    description="Command/args string passed "
-                    "to the container. Leave empty to use image CMD.",
-                ).as_json_schema_extra()
-            ),
-        ]
-        | None
-    ) = None
+    command: t.Annotated[
+        str,
+        Field(
+            default="",
+            json_schema_extra=SchemaExtraMetadata(
+                title="Command",
+                description="Command/args string passed "
+                "to the container. Leave empty to use image CMD.",
+            ).as_json_schema_extra(),
+        ),
+    ] = ""
 
     env: list[Env] = Field(
         default_factory=list,
@@ -195,6 +153,7 @@ class JobAppInput(AppInputs):
             description="List of environment variables to inject into the container.",
         ).as_json_schema_extra(),
     )
+
     secret_env: list[Env] = Field(
         default_factory=list,
         json_schema_extra=SchemaExtraMetadata(
@@ -203,51 +162,26 @@ class JobAppInput(AppInputs):
         ).as_json_schema_extra(),
     )
 
-    working_dir: (
-        t.Annotated[
-            str,
-            Field(
-                json_schema_extra=SchemaExtraMetadata(
-                    title="Working Directory",
-                    description="Working directory "
-                    "inside the container (absolute path).",
-                ).as_json_schema_extra()
-            ),
-        ]
-        | None
-    ) = None
+    working_dir: t.Annotated[
+        str,
+        Field(
+            default="",
+            json_schema_extra=SchemaExtraMetadata(
+                title="Working Directory",
+                description="Working directory inside the container (absolute path).",
+            ).as_json_schema_extra(),
+        ),
+    ] = ""
 
-    name: (
-        t.Annotated[
-            str,
-            Field(
-                json_schema_extra=SchemaExtraMetadata(
-                    title="Job Name",
-                    description="Human-readable name for this job.",
-                ).as_json_schema_extra()
-            ),
-        ]
-        | None
-    ) = None
 
-    description: (
-        t.Annotated[
-            str,
-            Field(
-                json_schema_extra=SchemaExtraMetadata(
-                    title="Job Description",
-                    description="Optional description for the job purpose.",
-                ).as_json_schema_extra()
-            ),
-        ]
-        | None
-    ) = None
+class JobResourcesConfig(AbstractAppFieldType):
+    """Resource allocation and compute requirements."""
 
-    tags: list[str] = Field(
-        default_factory=list,
+    model_config = ConfigDict(
+        protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Job Tags",
-            description="Set arbitrary tags/labels to help categorize the job.",
+            title="Resources Configuration",
+            description="CPU, memory, GPU, and storage resource specifications.",
         ).as_json_schema_extra(),
     )
 
@@ -255,6 +189,63 @@ class JobAppInput(AppInputs):
         json_schema_extra=SchemaExtraMetadata(
             title="Resource Preset",
             description="Select CPU/GPU/memory/storage resources for the job.",
+        ).as_json_schema_extra(),
+    )
+
+    storage_mounts: StorageMounts | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Storage Mounts",
+            description="Mount object/block filesystems as configured storage.",
+        ).as_json_schema_extra(),
+    )
+
+    secret_volumes: list[SecretVolume] | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Secret Volumes",
+            description="List of secret volumes to mount inside the container.",
+        ).as_json_schema_extra(),
+    )
+
+    disk_volumes: list[DiskVolume] | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Disk Volumes",
+            description="List of persistent disk volumes to mount.",
+        ).as_json_schema_extra(),
+    )
+
+
+class JobNetworkingConfig(AbstractAppFieldType):
+    """Network and storage connectivity configuration."""
+
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Networking Configuration",
+            description="HTTP endpoints and connectivity settings.",
+        ).as_json_schema_extra(),
+    )
+
+    http: ContainerHTTPServer | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="HTTP Server Configuration",
+            description="Expose an HTTP server for health checks or APIs.",
+        ).as_json_schema_extra(),
+    )
+
+
+class JobSchedulingConfig(AbstractAppFieldType):
+    """Job scheduling, priority, and execution policies."""
+
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Scheduling Configuration",
+            description="Priority, timeouts, restart policies, and scheduler settings.",
+            is_advanced_field=True,
         ).as_json_schema_extra(),
     )
 
@@ -307,26 +298,16 @@ class JobAppInput(AppInputs):
         ).as_json_schema_extra(),
     )
 
-    energy_schedule_name: (
-        t.Annotated[
-            str,
-            Field(
-                json_schema_extra=SchemaExtraMetadata(
-                    title="Energy Schedule Name",
-                    description="Optional energy/cost-aware schedule policy name.",
-                ).as_json_schema_extra()
-            ),
-        ]
-        | None
-    ) = None
-
-    pass_config: bool = Field(
-        default=False,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Pass Config",
-            description="Inject platform/application config into the container.",
-        ).as_json_schema_extra(),
-    )
+    energy_schedule_name: t.Annotated[
+        str,
+        Field(
+            default="",
+            json_schema_extra=SchemaExtraMetadata(
+                title="Energy Schedule Name",
+                description="Optional energy/cost-aware schedule policy name.",
+            ).as_json_schema_extra(),
+        ),
+    ] = ""
 
     wait_for_jobs_quota: bool = Field(
         default=False,
@@ -336,45 +317,182 @@ class JobAppInput(AppInputs):
         ).as_json_schema_extra(),
     )
 
+
+class JobAdvancedConfig(AbstractAppFieldType):
+    """Advanced runtime configuration and platform integration."""
+
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Advanced Configuration",
+            description="Security, quotas, configuration injection, "
+            "and advanced runtime settings.",
+            is_advanced_field=True,
+        ).as_json_schema_extra(),
+    )
+
+    pass_config: bool = Field(
+        default=False,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Pass Config",
+            description="Inject platform/application config into the container.",
+        ).as_json_schema_extra(),
+    )
+
     privileged: bool = Field(
         default=False,
         json_schema_extra=SchemaExtraMetadata(
             title="Privileged Mode",
-            description="Run container in p"
-            "rivileged mode (grants extended capabilities).",
+            description="Run the container in privileged mode if the cluster "
+            "configuration permits. Contact the system administrators to "
+            "confirm whether this feature is enabled in this cluster.",
         ).as_json_schema_extra(),
     )
 
-    storage_mounts: StorageMounts | None = Field(
-        default=None,
+
+class JobMetadataConfig(AbstractAppFieldType):
+    """Job identification and organizational metadata."""
+
+    model_config = ConfigDict(
+        protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Storage Mounts",
-            description="Mount object/block filesystems as configured storage.",
+            title="Metadata Configuration",
+            description="Job name, description, tags, and organizational information.",
         ).as_json_schema_extra(),
     )
 
-    secret_volumes: list[SecretVolume] | None = Field(
-        default=None,
+    name: t.Annotated[
+        str,
+        Field(
+            default="",
+            json_schema_extra=SchemaExtraMetadata(
+                title="Job Name",
+                description="Set a human-readable name for this job. It is also used "
+                "to generate a friendly public domain URL for the job.",
+            ).as_json_schema_extra(),
+        ),
+    ] = ""
+
+    description: t.Annotated[
+        str,
+        Field(
+            default="",
+            json_schema_extra=SchemaExtraMetadata(
+                title="Job Description",
+                description="Optional description for the job purpose.",
+            ).as_json_schema_extra(),
+        ),
+    ] = ""
+
+    tags: list[str] = Field(
+        default_factory=list,
         json_schema_extra=SchemaExtraMetadata(
-            title="Secret Volumes",
-            description="List of secret volumes to mount inside the container.",
+            title="Job Tags",
+            description="Set arbitrary tags/labels to help categorize the job.",
         ).as_json_schema_extra(),
     )
 
-    disk_volumes: list[DiskVolume] | None = Field(
-        default=None,
+
+class ContainerHTTPServer(AbstractAppFieldType):
+    """HTTP server configuration exposed by the container."""
+
+    model_config = ConfigDict(
+        protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Disk Volumes",
-            description="List of persistent disk volumes to mount.",
+            title="HTTP Server",
+            description="Expose an HTTP server from the container for health or API.",
         ).as_json_schema_extra(),
     )
 
-    http: ContainerHTTPServer | None = Field(
-        default=None,
+    port: int = Field(
         json_schema_extra=SchemaExtraMetadata(
-            title="HTTP Server Configuration",
-            description="Expose an HTTP server for health checks or APIs.",
+            title="Port",
+            description="Container TCP port to expose for the HTTP server.",
         ).as_json_schema_extra(),
+    )
+    health_check_path: (
+        t.Annotated[
+            str,
+            Field(
+                json_schema_extra=SchemaExtraMetadata(
+                    title="Health Check Path",
+                    description="Optional HTTP path used for "
+                    "readiness/liveness checks (e.g., /healthz).",
+                ).as_json_schema_extra()
+            ),
+        ]
+        | None
+    ) = None
+    requires_auth: bool = Field(
+        default=False,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Requires Auth",
+            description="If enabled, requests to this server must be authenticated.",
+        ).as_json_schema_extra(),
+    )
+
+
+class JobIntegrationsConfig(AbstractAppFieldType):
+    """Integrations configuration."""
+
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Integrations",
+            description="Integrate your job with applications.",
+            is_advanced_field=True,
+        ).as_json_schema_extra(),
+    )
+
+    mlflow_integration: MLFlowTrackingServerURL = Field(
+        default=MLFlowTrackingServerURL(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="MLFlow Integration",
+            description=(
+                "Preconfigure the job to access the MLflow server. "
+                "If enabled, the job will receive the MLflow tracking server URL"
+                "as the MLFLOW_TRACKING_URI environment variable and will be "
+                "authorized to access it."
+            ),
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+
+
+class JobAppInput(AppInputs):
+    """Top-level configuration for a generic batch/Job container."""
+
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Job Configuration",
+            description="Configure the container image, "
+            "command, resources, mounts, and runtime policy.",
+        ).as_json_schema_extra(),
+    )
+
+    metadata: JobMetadataConfig = Field(
+        default_factory=JobMetadataConfig,
+    )
+
+    image: JobImageConfig
+
+    resources: JobResourcesConfig
+
+    networking: JobNetworkingConfig = Field(
+        default_factory=JobNetworkingConfig,
+    )
+
+    integrations: JobIntegrationsConfig = Field(
+        default_factory=JobIntegrationsConfig,
+    )
+
+    scheduling: JobSchedulingConfig = Field(
+        default_factory=JobSchedulingConfig,
+    )
+
+    advanced: JobAdvancedConfig = Field(
+        default_factory=JobAdvancedConfig,
     )
 
 

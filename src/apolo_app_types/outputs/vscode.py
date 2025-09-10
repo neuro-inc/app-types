@@ -6,6 +6,7 @@ from apolo_app_types.outputs.common import (
     INSTANCE_LABEL,
     get_internal_external_web_urls,
 )
+from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI
 
 
 logger = logging.getLogger()
@@ -20,7 +21,9 @@ async def get_vscode_outputs(
         labels
     )
     outputs = VSCodeAppOutputs(
-        internal_web_app_url=internal_web_app_url,
-        external_web_app_url=external_web_app_url,
+        app_url=ServiceAPI[HttpApi](
+            internal_url=internal_web_app_url,
+            external_url=external_web_app_url,
+        ),
     )
     return outputs.model_dump()

@@ -39,3 +39,7 @@ test-unit:
 .PHONY: dist
 dist:
 	poetry build --clean
+
+.PHONY: print-schema
+print-schema:
+	poetry run python -c 'import json; from apolo_app_types import $(type_name); print(json.dumps($(type_name).model_json_schema()))'

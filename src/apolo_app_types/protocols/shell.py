@@ -6,7 +6,6 @@ from apolo_app_types.protocols.common import (
     AppOutputs,
     AppOutputsDeployer,
     Preset,
-    RestAPI,
     SchemaExtraMetadata,
 )
 from apolo_app_types.protocols.jupyter import Networking
@@ -34,5 +33,4 @@ class ShellAppInputs(AppInputs):
 
 
 class ShellAppOutputs(AppOutputs):
-    internal_web_app_url: RestAPI
-    external_web_app_url: RestAPI
+    pass

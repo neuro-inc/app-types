@@ -116,7 +116,7 @@ jobs:
       - name: Checkout commit
         uses: actions/checkout@v5
       - name: Install python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version-file: .python-version
           cache: pip

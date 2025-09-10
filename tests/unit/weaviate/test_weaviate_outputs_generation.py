@@ -22,15 +22,20 @@ async def test_output_values_weaviate(
         "username": "admin",
         "password": "admin",
     }
-    assert res["external_rest_endpoint"]
-    assert res["external_rest_endpoint"]["host"] == "example.com"
-    assert res["external_rest_endpoint"]["base_path"] == "/v1"
-    assert res["external_rest_endpoint"]["protocol"] == "https"
-    assert res["external_graphql_endpoint"]["host"] == "example.com"
-    assert res["external_graphql_endpoint"]["base_path"] == "/v1/graphql"
-    assert res["internal_graphql_endpoint"]["host"] == "weaviate.default-namespace"
-    assert res["internal_grpc_endpoint"]["host"] == "weaviate-grpc.default-namespace"
-    assert res["internal_grpc_endpoint"]["port"] == 443
+    assert res["rest_endpoint"]
+    assert res["rest_endpoint"]["external_url"]["host"] == "example.com"
+    assert res["rest_endpoint"]["external_url"]["base_path"] == "/v1"
+    assert res["rest_endpoint"]["external_url"]["protocol"] == "https"
+    assert res["graphql_endpoint"]["external_url"]["host"] == "example.com"
+    assert res["graphql_endpoint"]["external_url"]["base_path"] == "/v1/graphql"
+    assert (
+        res["graphql_endpoint"]["internal_url"]["host"] == "weaviate.default-namespace"
+    )
+    assert (
+        res["grpc_endpoint"]["internal_url"]["host"]
+        == "weaviate-grpc.default-namespace"
+    )
+    assert res["grpc_endpoint"]["internal_url"]["port"] == 443
 
 
 @pytest.mark.asyncio

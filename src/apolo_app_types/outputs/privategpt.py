@@ -3,7 +3,7 @@ import typing as t
 from apolo_app_types.clients.kube import get_service_host_port
 from apolo_app_types.outputs.common import INSTANCE_LABEL
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
-from apolo_app_types.protocols.common import RestAPI
+from apolo_app_types.protocols.common.networking import HttpApi, RestAPI, ServiceAPI
 from apolo_app_types.protocols.private_gpt import PrivateGPTAppOutputs
 
 
@@ -36,7 +36,11 @@ async def get_privategpt_outputs(
             protocol="https",
         )
     outputs = PrivateGPTAppOutputs(
-        internal_web_app_url=internal_web_app_url,
-        external_web_app_url=external_web_app_url,
+        app_url=ServiceAPI[HttpApi](
+            internal_url=internal_web_app_url,
+            external_url=external_web_app_url,
+        )
+        if internal_web_app_url or external_web_app_url
+        else None,
     )
     return outputs.model_dump()

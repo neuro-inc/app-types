@@ -28,29 +28,15 @@ from apolo_app_types.protocols.postgres import (
 )
 
 
+PASSWORD_CHAR_POOL = string.ascii_letters + string.digits
+
+
 def _generate_password(length: int = 12) -> str:
     if length < 4:
         err_msg = "Password length must be at least 4"
         raise ValueError(err_msg)
 
-    # At least one from each category
-    lower = random.choice(string.ascii_lowercase)
-    upper = random.choice(string.ascii_uppercase)
-    digit = random.choice(string.digits)
-    special = random.choice("!@#$%^&*()-_=+[]{};:,.<>?/")
-
-    # Fill the rest
-    remaining = "".join(
-        random.choices(
-            string.ascii_letters + string.digits + "!@#$%^&*()-_=+[]{};:,.<>?/",
-            k=length - 4,
-        )
-    )
-
-    # Shuffle so it’s not predictable
-    password_list = list(lower + upper + digit + special + remaining)
-    random.shuffle(password_list)
-    return "".join(password_list)
+    return "".join([random.choice(PASSWORD_CHAR_POOL) for _ in range(length)])
 
 
 class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
@@ -179,13 +165,15 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
         )
         domain = ingress_template.split(".", 1)[1]
         keycloak_admin_password = _generate_password()
+        db_secret_name = f"launchpad-{app_id}-db-secret"
+        realm_import_config_map_name = f"launchpad-{app_id}-keycloak-realm"
 
         keycloak_values = {
             "fullnameOverride": f"launchpad-{app_id}-keycloak",
             "auth": {
                 "adminPassword": keycloak_admin_password,
             },
-            "externalDatabase": {"existingSecret": f"launchpad-{app_id}-db-secret"},
+            "externalDatabase": {"existingSecret": db_secret_name},
             **values,
             "labels": {
                 "application": "launchpad",
@@ -195,22 +183,37 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
                     "service": "keycloak",
                 }
             },
+            "extraVolumes": [
+                {
+                    "name": "realm-import",
+                    "configMap": {
+                        "name": realm_import_config_map_name,
+                        "items": [
+                            {
+                                "key": "realm.json",
+                                "path": "realm.json",
+                            }
+                        ],
+                    },
+                }
+            ],
         }
 
         return {
             **values,
-            "dbSecretName": f"launchpad-{app_id}-db-secret",
+            "dbSecretName": db_secret_name,
+            "keycloakRealmImportConfigMapName": realm_import_config_map_name,
             "postgresql": {
                 "fullnameOverride": f"launchpad-{app_id}-db",
                 "auth": {
-                    "existingSecret": f"launchpad-{app_id}-db-secret",
+                    "existingSecret": db_secret_name,
                 },
             },
             "dbPassword": _generate_password(),
             "domain": domain,
             "keycloak": keycloak_values,  # keeping this for backwards compatibility
             "mlops-keycloak": keycloak_values,
-            "image": {"tag": "25.8.2"},
+            "image": {"tag": "25.9.4"},
             "LAUNCHPAD_INITIAL_CONFIG": json.dumps(
                 {
                     "vllm": get_nested_values(

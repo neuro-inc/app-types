@@ -8,9 +8,7 @@ from apolo_app_types.protocols.common import (
     IngressHttp,
     Preset,
     SchemaExtraMetadata,
-    ServiceAPI,
 )
-from apolo_app_types.protocols.common.networking import HttpApi
 
 
 class WebConfig(AbstractAppFieldType):
@@ -113,13 +111,6 @@ class SupersetInputs(AppInputs):
 
 
 class SupersetOutputs(AppOutputs):
-    web_app_url: ServiceAPI[HttpApi] = Field(
-        default=ServiceAPI[HttpApi](),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Superset Web App URL",
-            description=("URL to access the Superset web application. "),
-        ).as_json_schema_extra(),
-    )
     secret: str | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(

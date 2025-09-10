@@ -14,10 +14,10 @@ async def test_sd(setup_clients, mock_kubernetes_client, app_instance_id):
     )
 
     assert res
-    assert res["external_api"]["host"] == "example.com"
-    assert res["external_api"]["base_path"] == "/sdapi/v1"
-    assert res["internal_api"]["host"] == "app.default-namespace"
-    assert res["internal_api"]["base_path"] == "/sdapi/v1"
+    assert res["api_url"]["external_url"]["host"] == "example.com"
+    assert res["api_url"]["external_url"]["base_path"] == "/sdapi/v1"
+    assert res["api_url"]["internal_url"]["host"] == "app.default-namespace"
+    assert res["api_url"]["internal_url"]["base_path"] == "/sdapi/v1"
     assert res["hf_model"] == {
         "model_hf_name": "SD-Model",
         "hf_token": None,
@@ -36,10 +36,10 @@ async def test_sd_without_files(setup_clients, mock_kubernetes_client, app_insta
     )
 
     assert res
-    assert res["external_api"]["host"] == "example.com"
-    assert res["external_api"]["base_path"] == "/sdapi/v1"
-    assert res["internal_api"]["host"] == "app.default-namespace"
-    assert res["internal_api"]["base_path"] == "/sdapi/v1"
+    assert res["api_url"]["external_url"]["host"] == "example.com"
+    assert res["api_url"]["external_url"]["base_path"] == "/sdapi/v1"
+    assert res["api_url"]["internal_url"]["host"] == "app.default-namespace"
+    assert res["api_url"]["internal_url"]["base_path"] == "/sdapi/v1"
     assert res["hf_model"] == {
         "model_hf_name": "SD-Model",
         "hf_token": None,

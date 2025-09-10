@@ -15,9 +15,6 @@ from apolo_app_types.protocols.common import (
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.ingress import AuthIngressMiddleware
 from apolo_app_types.protocols.common.k8s import Env
-from apolo_app_types.protocols.common.networking import (
-    RestAPI,
-)
 from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
@@ -135,11 +132,4 @@ class OpenWebUIAppInputs(AppInputs):
 
 
 class OpenWebUIAppOutputs(AppOutputs):
-    """
-    OpenWebUI outputs:
-      - internal_web_app_url
-      - external_web_app_url
-    """
-
-    internal_web_app_url: RestAPI | None = None
-    external_web_app_url: RestAPI | None = None
+    pass

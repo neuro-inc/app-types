@@ -2,14 +2,16 @@ from __future__ import annotations
 
 import enum
 import typing as t
+from typing import Literal
 
 from pydantic import ConfigDict, Field, model_validator
 
-from apolo_app_types import AppInputs
 from apolo_app_types.protocols.common import (
     AbstractAppFieldType,
+    AppInputs,
     AppOutputs,
     AppOutputsDeployer,
+    Bucket,
     Preset,
     SchemaExtraMetadata,
     SchemaMetaType,
@@ -147,11 +149,11 @@ class PGBackupConfig(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Backup configuration",
-            description="Set up backup configuration for your Postgres cluster.",
+            title="Enable Backups",
+            description="Enable backup for your Postgres cluster.",
         ).as_json_schema_extra(),
     )
-    enable: bool = Field(
+    enable: Literal[True] = Field(
         default=True,
         title="Enable backups",
         description=(
@@ -162,14 +164,21 @@ class PGBackupConfig(AbstractAppFieldType):
             "the app."
         ),
     )
-    # backup_bucket: Bucket
+    backup_bucket: Bucket | None = Field(
+        default=None,
+        title="Custom backup bucket",
+        description=(
+            "Optionally provide your own bucket for backups. "
+            "If not provided, a default bucket will be created."
+        ),
+    )
 
 
 class PostgresInputs(AppInputs):
     preset: Preset
     postgres_config: PostgresConfig
     pg_bouncer: PGBouncer
-    backup: PGBackupConfig
+    backup: PGBackupConfig | None = None
 
 
 class BasePostgresUserCredentials(AbstractAppFieldType):

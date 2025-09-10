@@ -23,7 +23,7 @@ async def test_superset(setup_clients, mock_kubernetes_client, app_instance_id):
 
     assert res
     assert res["secret"] == "some_key"
-    assert res["web_app_url"] == {
+    assert res["app_url"] == {
         "external_url": {
             "base_path": "/",
             "host": "example.com",

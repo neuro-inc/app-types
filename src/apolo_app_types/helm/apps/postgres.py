@@ -154,7 +154,7 @@ class PostgresValueProcessor(BaseChartValueProcessor[PostgresInputs]):
     async def _get_backup_config(
         self, input_: PostgresInputs, app_name: str
     ) -> dict[str, t.Any]:
-        if not input_.backup.enable:
+        if not input_.backup or not input_.backup.enable:
             return {}
 
         name = f"app-pg-backup-{app_name}"

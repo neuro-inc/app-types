@@ -64,13 +64,13 @@ async def test_lightrag_outputs_generation(
     )
 
     # Test web app URLs
-    assert res["web_app_url"]["internal_url"]["host"] == "lightrag.default-namespace"
-    assert res["web_app_url"]["internal_url"]["port"] == 9621
-    assert res["web_app_url"]["internal_url"]["protocol"] == "http"
+    assert res["app_url"]["internal_url"]["host"] == "lightrag.default-namespace"
+    assert res["app_url"]["internal_url"]["port"] == 9621
+    assert res["app_url"]["internal_url"]["protocol"] == "http"
 
-    assert res["web_app_url"]["external_url"]["host"] == "example.com"
-    assert res["web_app_url"]["external_url"]["port"] == 80
-    assert res["web_app_url"]["external_url"]["protocol"] == "https"
+    assert res["app_url"]["external_url"]["host"] == "example.com"
+    assert res["app_url"]["external_url"]["port"] == 80
+    assert res["app_url"]["external_url"]["protocol"] == "https"
 
     # Test server URLs (same as web app for LightRAG)
     assert res["server_url"]["internal_url"]["host"] == "lightrag.default-namespace"
@@ -112,18 +112,18 @@ async def test_lightrag_outputs_minimal_configuration(
     )
 
     # Test that internal URLs are generated correctly
-    assert res["web_app_url"]["internal_url"]["host"] == "lightrag.default-namespace"
-    assert res["web_app_url"]["internal_url"]["port"] == 9621
-    assert res["web_app_url"]["internal_url"]["protocol"] == "http"
+    assert res["app_url"]["internal_url"]["host"] == "lightrag.default-namespace"
+    assert res["app_url"]["internal_url"]["port"] == 9621
+    assert res["app_url"]["internal_url"]["protocol"] == "http"
 
     assert res["server_url"]["internal_url"]["host"] == "lightrag.default-namespace"
     assert res["server_url"]["internal_url"]["port"] == 9621
     assert res["server_url"]["internal_url"]["protocol"] == "http"
 
     # Test that external URLs are generated correctly
-    assert res["web_app_url"]["external_url"]["host"] == "example.com"
-    assert res["web_app_url"]["external_url"]["port"] == 80
-    assert res["web_app_url"]["external_url"]["protocol"] == "https"
+    assert res["app_url"]["external_url"]["host"] == "example.com"
+    assert res["app_url"]["external_url"]["port"] == 80
+    assert res["app_url"]["external_url"]["protocol"] == "https"
 
     assert res["server_url"]["external_url"]["host"] == "example.com"
     assert res["server_url"]["external_url"]["port"] == 80
@@ -190,9 +190,9 @@ async def test_lightrag_outputs_with_different_service_port(
     )
 
     # Test internal URLs use the correct port
-    assert res["web_app_url"]["internal_url"]["host"] == "lightrag.default-namespace"
-    assert res["web_app_url"]["internal_url"]["port"] == 8080
-    assert res["web_app_url"]["internal_url"]["protocol"] == "http"
+    assert res["app_url"]["internal_url"]["host"] == "lightrag.default-namespace"
+    assert res["app_url"]["internal_url"]["port"] == 8080
+    assert res["app_url"]["internal_url"]["protocol"] == "http"
 
     assert res["server_url"]["internal_url"]["host"] == "lightrag.default-namespace"
     assert res["server_url"]["internal_url"]["port"] == 8080
@@ -247,9 +247,9 @@ async def test_lightrag_outputs_with_custom_ingress_host(
 
     # Test that custom external host is used
     assert (
-        res["web_app_url"]["external_url"]["host"] == "example.com"
+        res["app_url"]["external_url"]["host"] == "example.com"
     )  # Still uses mock value
-    assert res["web_app_url"]["external_url"]["protocol"] == "https"
+    assert res["app_url"]["external_url"]["protocol"] == "https"
 
     assert (
         res["server_url"]["external_url"]["host"] == "example.com"
@@ -296,9 +296,9 @@ async def test_lightrag_outputs_with_gemini_provider(
     )
 
     # Test standard output generation works with Gemini
-    assert res["web_app_url"]["internal_url"]["host"] == "lightrag.default-namespace"
-    assert res["web_app_url"]["internal_url"]["port"] == 9621
-    assert res["web_app_url"]["internal_url"]["protocol"] == "http"
+    assert res["app_url"]["internal_url"]["host"] == "lightrag.default-namespace"
+    assert res["app_url"]["internal_url"]["port"] == 9621
+    assert res["app_url"]["internal_url"]["protocol"] == "http"
 
     assert res["server_url"]["internal_url"]["host"] == "lightrag.default-namespace"
     assert res["server_url"]["internal_url"]["port"] == 9621
@@ -347,18 +347,18 @@ async def test_lightrag_outputs_with_openai_compatible_providers(
     )
 
     # Test output generation works with OpenAI compatible providers
-    assert res["web_app_url"]["internal_url"]["host"] == "lightrag.default-namespace"
-    assert res["web_app_url"]["internal_url"]["port"] == 9621
-    assert res["web_app_url"]["internal_url"]["protocol"] == "http"
+    assert res["app_url"]["internal_url"]["host"] == "lightrag.default-namespace"
+    assert res["app_url"]["internal_url"]["port"] == 9621
+    assert res["app_url"]["internal_url"]["protocol"] == "http"
 
     assert res["server_url"]["internal_url"]["host"] == "lightrag.default-namespace"
     assert res["server_url"]["internal_url"]["port"] == 9621
     assert res["server_url"]["internal_url"]["protocol"] == "http"
 
     # Test external URLs
-    assert res["web_app_url"]["external_url"]["host"] == "example.com"
-    assert res["web_app_url"]["external_url"]["port"] == 80
-    assert res["web_app_url"]["external_url"]["protocol"] == "https"
+    assert res["app_url"]["external_url"]["host"] == "example.com"
+    assert res["app_url"]["external_url"]["port"] == 80
+    assert res["app_url"]["external_url"]["protocol"] == "https"
 
     assert res["server_url"]["external_url"]["host"] == "example.com"
     assert res["server_url"]["external_url"]["port"] == 80
@@ -398,9 +398,9 @@ async def test_lightrag_outputs_with_persistence_disabled(
     )
 
     # Test outputs are still generated correctly even without persistence
-    assert res["web_app_url"]["internal_url"]["host"] == "lightrag.default-namespace"
-    assert res["web_app_url"]["internal_url"]["port"] == 9621
-    assert res["web_app_url"]["internal_url"]["protocol"] == "http"
+    assert res["app_url"]["internal_url"]["host"] == "lightrag.default-namespace"
+    assert res["app_url"]["internal_url"]["port"] == 9621
+    assert res["app_url"]["internal_url"]["protocol"] == "http"
 
     assert res["server_url"]["internal_url"]["host"] == "lightrag.default-namespace"
     assert res["server_url"]["internal_url"]["port"] == 9621
@@ -437,17 +437,17 @@ async def test_lightrag_outputs_structure_validation(
     )
 
     # Test that the output structure matches LightRAGAppOutputs
-    assert "web_app_url" in res
+    assert "app_url" in res
     assert "server_url" in res
 
     # Test that both URLs have internal and external components
-    assert "internal_url" in res["web_app_url"]
-    assert "external_url" in res["web_app_url"]
+    assert "internal_url" in res["app_url"]
+    assert "external_url" in res["app_url"]
     assert "internal_url" in res["server_url"]
     assert "external_url" in res["server_url"]
 
     # Test that URL components have required fields
-    for url_key in ["web_app_url", "server_url"]:
+    for url_key in ["app_url", "server_url"]:
         for url_type in ["internal_url", "external_url"]:
             url = res[url_key][url_type]
             assert "host" in url

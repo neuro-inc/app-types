@@ -15,40 +15,40 @@ from apolo_app_types.protocols.common.storage import (
     StorageMounts,
 )
 from apolo_app_types.protocols.job import (
+    JobAdvancedConfig,
     JobAppInput,
+    JobImageConfig,
+    JobMetadataConfig,
     JobPriority,
+    JobResourcesConfig,
     JobRestartPolicy,
+    JobSchedulingConfig,
     SecretVolume,
 )
 
 
-def test_prepare_job_run_params_minimal():
+def test_prepare_job_run_params_minimal(setup_clients, mock_get_preset_cpu):
     """Test prepare_job_run_params with minimal configuration."""
-    job_input = JobAppInput(image="python:3.9", preset=Preset(name="cpu-small"))
+    job_input = JobAppInput(
+        image=JobImageConfig(image="python:3.9"),
+        resources=JobResourcesConfig(preset=Preset(name="cpu-small")),
+    )
 
-    client = MagicMock()
+    client = setup_clients
 
-    with patch("apolo_app_types.helm.apps.common.get_preset") as mock_get_preset:
-        mock_preset = apolo_sdk.Preset(
-            cpu=2.0,
-            memory=8,
-            credits_per_hour=Decimal("0.05"),
-            available_resource_pool_names=("cpu_pool",),
-        )
-        mock_get_preset.return_value = mock_preset
-
-        result = prepare_job_run_params(
-            job_input=job_input,
-            app_instance_id="test-instance-123",
-            app_instance_name="test-app",
-            org_name="test-org",
-            project_name="test-project",
-            client=client,
-        )
+    result = prepare_job_run_params(
+        job_input=job_input,
+        app_instance_id="test-instance-123",
+        app_instance_name="test-app",
+        org_name="test-org",
+        project_name="test-project",
+        client=client,
+    )
 
     assert isinstance(result, JobRunParams)
     assert result.name == "test-app-test-ins"  # truncated to 8 chars
     assert result.tags == ["instance_id:test-instance-123"]
+    assert result.description is None  # Empty string converted to None
     assert result.org_name == "test-org"
     assert result.project_name == "test-project"
     assert result.priority == apolo_sdk.JobPriority.NORMAL
@@ -64,33 +64,29 @@ def test_prepare_job_run_params_minimal():
     assert container.secret_env == {}
     assert container.volumes == []
     assert container.secret_files == []
+    assert container.entrypoint is None  # Empty string converted to None
+    assert container.command is None  # Empty string converted to None
+    assert container.working_dir is None  # Empty string converted to None
 
 
-def test_prepare_job_run_params_with_custom_name():
+def test_prepare_job_run_params_with_custom_name(setup_clients, mock_get_preset_cpu):
     """Test prepare_job_run_params with custom job name."""
     job_input = JobAppInput(
-        image="python:3.9", preset=Preset(name="cpu-small"), name="my-custom-job"
+        image=JobImageConfig(image="python:3.9"),
+        resources=JobResourcesConfig(preset=Preset(name="cpu-small")),
+        metadata=JobMetadataConfig(name="my-custom-job"),
     )
 
-    client = MagicMock()
+    client = setup_clients
 
-    with patch("apolo_app_types.helm.apps.common.get_preset") as mock_get_preset:
-        mock_preset = apolo_sdk.Preset(
-            cpu=2.0,
-            memory=8,
-            credits_per_hour=Decimal("0.05"),
-            available_resource_pool_names=("cpu_pool",),
-        )
-        mock_get_preset.return_value = mock_preset
-
-        result = prepare_job_run_params(
-            job_input=job_input,
-            app_instance_id="test-instance-123",
-            app_instance_name="test-app",
-            org_name="test-org",
-            project_name="test-project",
-            client=client,
-        )
+    result = prepare_job_run_params(
+        job_input=job_input,
+        app_instance_id="test-instance-123",
+        app_instance_name="test-app",
+        org_name="test-org",
+        project_name="test-project",
+        client=client,
+    )
 
     assert result.name == "my-custom-job"
 
@@ -98,14 +94,16 @@ def test_prepare_job_run_params_with_custom_name():
 def test_prepare_job_run_params_with_env_vars():
     """Test prepare_job_run_params with environment variables."""
     job_input = JobAppInput(
-        image="python:3.9",
-        preset=Preset(name="cpu-small"),
-        env=[
-            Env(name="ENV_VAR1", value="value1"),
-            Env(name="ENV_VAR2", value="value2"),
-            Env(name="EMPTY_VAR", value=""),  # Should be excluded
-        ],
-        secret_env=[Env(name="SECRET_VAR", value=ApoloSecret(key="my-secret"))],
+        image=JobImageConfig(
+            image="python:3.9",
+            env=[
+                Env(name="ENV_VAR1", value="value1"),
+                Env(name="ENV_VAR2", value="value2"),
+                Env(name="EMPTY_VAR", value=""),  # Should be excluded
+            ],
+            secret_env=[Env(name="SECRET_VAR", value=ApoloSecret(key="my-secret"))],
+        ),
+        resources=JobResourcesConfig(preset=Preset(name="cpu-small")),
     )
 
     client = MagicMock()
@@ -136,25 +134,27 @@ def test_prepare_job_run_params_with_env_vars():
 def test_prepare_job_run_params_with_storage_mounts():
     """Test prepare_job_run_params with storage mounts."""
     job_input = JobAppInput(
-        image="python:3.9",
-        preset=Preset(name="cpu-small"),
-        storage_mounts=StorageMounts(
-            mounts=[
-                ApoloFilesMount(
-                    storage_uri=ApoloFilesPath(
-                        path="storage://cluster/org/project/data"
+        image=JobImageConfig(image="python:3.9"),
+        resources=JobResourcesConfig(
+            preset=Preset(name="cpu-small"),
+            storage_mounts=StorageMounts(
+                mounts=[
+                    ApoloFilesMount(
+                        storage_uri=ApoloFilesPath(
+                            path="storage://cluster/org/project/data"
+                        ),
+                        mount_path=MountPath(path="/data"),
+                        mode=ApoloMountMode(mode="rw"),
                     ),
-                    mount_path=MountPath(path="/data"),
-                    mode=ApoloMountMode(mode="rw"),
-                ),
-                ApoloFilesMount(
-                    storage_uri=ApoloFilesPath(
-                        path="storage://cluster/org/project/config"
+                    ApoloFilesMount(
+                        storage_uri=ApoloFilesPath(
+                            path="storage://cluster/org/project/config"
+                        ),
+                        mount_path=MountPath(path="/config"),
+                        mode=ApoloMountMode(mode="r"),
                     ),
-                    mount_path=MountPath(path="/config"),
-                    mode=ApoloMountMode(mode="r"),
-                ),
-            ]
+                ]
+            ),
         ),
     )
 
@@ -197,18 +197,20 @@ def test_prepare_job_run_params_with_storage_mounts():
 def test_prepare_job_run_params_with_secret_volumes():
     """Test prepare_job_run_params with secret volumes."""
     job_input = JobAppInput(
-        image="python:3.9",
-        preset=Preset(name="cpu-small"),
-        secret_volumes=[
-            SecretVolume(
-                src_secret_uri=ApoloSecret(key="app-secret"),
-                dst_path="/secrets/app-secret",
-            ),
-            SecretVolume(
-                src_secret_uri=ApoloSecret(key="db-credentials"),
-                dst_path="/secrets/db-credentials",
-            ),
-        ],
+        image=JobImageConfig(image="python:3.9"),
+        resources=JobResourcesConfig(
+            preset=Preset(name="cpu-small"),
+            secret_volumes=[
+                SecretVolume(
+                    src_secret_uri=ApoloSecret(key="app-secret"),
+                    dst_path="/secrets/app-secret",
+                ),
+                SecretVolume(
+                    src_secret_uri=ApoloSecret(key="db-credentials"),
+                    dst_path="/secrets/db-credentials",
+                ),
+            ],
+        ),
     )
 
     client = MagicMock()
@@ -245,50 +247,49 @@ def test_prepare_job_run_params_with_secret_volumes():
     assert sf2.container_path == "/secrets/db-credentials"
 
 
-def test_prepare_job_run_params_with_all_options():
+def test_prepare_job_run_params_with_all_options(setup_clients, mock_get_preset_gpu):
     """Test prepare_job_run_params with all configuration options."""
     job_input = JobAppInput(
-        image="python:3.9",
-        preset=Preset(name="gpu-large"),
-        name="full-featured-job",
-        description="A job with all features enabled",
-        tags=["ml", "training"],
-        entrypoint="/bin/bash",
-        command="-c 'python train.py'",
-        working_dir="/app",
-        priority=JobPriority.HIGH,
-        scheduler_enabled=True,
-        preemptible_node=True,
-        restart_policy=JobRestartPolicy.ON_FAILURE,
-        max_run_time_minutes=120,
-        schedule_timeout=60.0,
-        energy_schedule_name="green-schedule",
-        pass_config=True,
-        wait_for_jobs_quota=True,
-        privileged=True,
-        env=[Env(name="PYTHONPATH", value="/app/src")],
-        secret_env=[Env(name="API_KEY", value=ApoloSecret(key="api-credentials"))],
+        image=JobImageConfig(
+            image="python:3.9",
+            entrypoint="/bin/bash",
+            command="-c 'python train.py'",
+            working_dir="/app",
+            env=[Env(name="PYTHONPATH", value="/app/src")],
+            secret_env=[Env(name="API_KEY", value=ApoloSecret(key="api-credentials"))],
+        ),
+        resources=JobResourcesConfig(preset=Preset(name="gpu-large")),
+        metadata=JobMetadataConfig(
+            name="full-featured-job",
+            description="A job with all features enabled",
+            tags=["ml", "training"],
+        ),
+        scheduling=JobSchedulingConfig(
+            priority=JobPriority.HIGH,
+            scheduler_enabled=True,
+            preemptible_node=True,
+            restart_policy=JobRestartPolicy.ON_FAILURE,
+            max_run_time_minutes=120,
+            schedule_timeout=60.0,
+            energy_schedule_name="green-schedule",
+            wait_for_jobs_quota=True,
+        ),
+        advanced=JobAdvancedConfig(
+            pass_config=True,
+            privileged=True,
+        ),
     )
 
-    client = MagicMock()
+    client = setup_clients
 
-    with patch("apolo_app_types.helm.apps.common.get_preset") as mock_get_preset:
-        mock_preset = apolo_sdk.Preset(
-            cpu=4.0,
-            memory=16,
-            credits_per_hour=Decimal("0.2"),
-            available_resource_pool_names=("gpu_pool",),
-        )
-        mock_get_preset.return_value = mock_preset
-
-        result = prepare_job_run_params(
-            job_input=job_input,
-            app_instance_id="test-instance-123",
-            app_instance_name="test-app",
-            org_name="test-org",
-            project_name="test-project",
-            client=client,
-        )
+    result = prepare_job_run_params(
+        job_input=job_input,
+        app_instance_id="test-instance-123",
+        app_instance_name="test-app",
+        org_name="test-org",
+        project_name="test-project",
+        client=client,
+    )
 
     assert result.name == "full-featured-job"
     assert result.description == "A job with all features enabled"
@@ -314,8 +315,8 @@ def test_prepare_job_run_params_with_all_options():
 def test_prepare_job_run_params_no_image_raises_error():
     """Test that prepare_job_run_params raises ValueError when no image is provided."""
     job_input = JobAppInput(
-        image="",  # Empty image should raise error
-        preset=Preset(name="cpu-small"),
+        image=JobImageConfig(image=""),  # Empty image should raise error
+        resources=JobResourcesConfig(preset=Preset(name="cpu-small")),
     )
 
     client = MagicMock()
@@ -334,7 +335,9 @@ def test_prepare_job_run_params_no_image_raises_error():
 def test_prepare_job_run_params_unlimited_runtime():
     """Test that max_run_time_minutes=0 results in unlimited runtime."""
     job_input = JobAppInput(
-        image="python:3.9", preset=Preset(name="cpu-small"), max_run_time_minutes=0
+        image=JobImageConfig(image="python:3.9"),
+        resources=JobResourcesConfig(preset=Preset(name="cpu-small")),
+        scheduling=JobSchedulingConfig(max_run_time_minutes=0),
     )
 
     client = MagicMock()

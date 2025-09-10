@@ -16,7 +16,6 @@ TSize = typing.TypeVar("TSize")
 
 
 class Llama4Size(str, Enum):
-    maverick_17b_128e_instruct_fp8 = "Llama-4-Maverick-17B-128E-Instruct-FP8"
     scout = "Llama-4-Scout-17B-16E"
     scout_instruct = "Llama-4-Scout-17B-16E-Instruct"
 

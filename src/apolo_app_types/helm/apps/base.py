@@ -4,7 +4,7 @@ import typing as t
 
 import apolo_sdk
 
-from apolo_app_types import AppInputs
+from apolo_app_types.protocols.common.base import AppInputs
 
 
 logger = logging.getLogger()
