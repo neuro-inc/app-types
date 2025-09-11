@@ -24,9 +24,10 @@ async def test_superset(setup_clients, mock_kubernetes_client, app_instance_id):
     assert res
     assert res["secret"] == "some_key"
     assert res["app_url"] == {
-        "__type__": "ServiceAPI[HttpApi]",
+        "__type__": "ServiceAPI[WebApp]",
         "external_url": {
-            "__type__": "HttpApi",
+            "__type__": "WebApp",
+            "api_type": "webapp",
             "base_path": "/",
             "host": "example.com",
             "port": 80,
@@ -34,7 +35,8 @@ async def test_superset(setup_clients, mock_kubernetes_client, app_instance_id):
             "timeout": 30.0,
         },
         "internal_url": {
-            "__type__": "HttpApi",
+            "__type__": "WebApp",
+            "api_type": "webapp",
             "base_path": "/",
             "host": "app.default-namespace",
             "port": 80,

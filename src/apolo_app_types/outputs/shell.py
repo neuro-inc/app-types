@@ -5,7 +5,7 @@ from apolo_app_types.outputs.common import (
     INSTANCE_LABEL,
     get_internal_external_web_urls,
 )
-from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI
+from apolo_app_types.protocols.common.networking import ServiceAPI, WebApp
 
 
 async def get_shell_outputs(
@@ -18,7 +18,7 @@ async def get_shell_outputs(
     )
 
     return ShellAppOutputs(
-        app_url=ServiceAPI[HttpApi](
+        app_url=ServiceAPI[WebApp](
             internal_url=internal_web_app_url,
             external_url=external_web_app_url,
         ),

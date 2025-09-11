@@ -1,6 +1,6 @@
 from apolo_app_types.clients.kube import get_service_host_port
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
-from apolo_app_types.protocols.common import RestAPI
+from apolo_app_types.protocols.common.networking import WebApp
 
 
 INSTANCE_LABEL = "app.kubernetes.io/instance"
@@ -8,11 +8,11 @@ INSTANCE_LABEL = "app.kubernetes.io/instance"
 
 async def get_internal_external_web_urls(
     labels: dict[str, str],
-) -> tuple[RestAPI | None, RestAPI | None]:
+) -> tuple[WebApp | None, WebApp | None]:
     internal_host, internal_port = await get_service_host_port(match_labels=labels)
     internal_web_app_url = None
     if internal_host:
-        internal_web_app_url = RestAPI(
+        internal_web_app_url = WebApp(
             host=internal_host,
             port=int(internal_port),
             base_path="/",
@@ -23,7 +23,7 @@ async def get_internal_external_web_urls(
     external_web_app_url = None
     if host_port:
         host, port = host_port
-        external_web_app_url = RestAPI(
+        external_web_app_url = WebApp(
             host=host,
             port=int(port),
             base_path="/",
