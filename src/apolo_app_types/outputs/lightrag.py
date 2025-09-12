@@ -7,7 +7,7 @@ from apolo_app_types.outputs.common import (
     get_internal_external_web_urls,
 )
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
-from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI
+from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI, WebApp
 
 
 async def get_lightrag_outputs(
@@ -45,7 +45,7 @@ async def get_lightrag_outputs(
         )
 
     return LightRAGAppOutputs(
-        app_url=ServiceAPI[HttpApi](
+        app_url=ServiceAPI[WebApp](
             internal_url=internal_web_app_url,
             external_url=external_web_app_url,
         ),

@@ -63,6 +63,10 @@ class GrpcAPI(HttpApi):
     api_type: Literal["grpc"] = "grpc"
 
 
+class WebApp(HttpApi):
+    api_type: Literal["webapp"] = "webapp"
+
+
 API_TYPE = TypeVar("API_TYPE", bound=HttpApi)
 
 
