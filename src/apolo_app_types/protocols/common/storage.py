@@ -6,7 +6,6 @@ from pydantic import ConfigDict, Field, field_validator
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.schema_extra import (
     SchemaExtraMetadata,
-    SchemaMetaType,
 )
 
 
@@ -84,7 +83,6 @@ class ApoloMountMode(AbstractAppFieldType):
             title="Apolo Files Mount",
             description="Configure how Apolo Files should be "
             "mounted into the application’s workload environment.",
-            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
 
@@ -104,7 +102,6 @@ class ApoloFilesMount(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Apolo Files Mount",
             description="Configure Apolo Files mount within the application workloads.",
-            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     storage_uri: ApoloFilesPath
