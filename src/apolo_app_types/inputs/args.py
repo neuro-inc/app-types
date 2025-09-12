@@ -22,6 +22,7 @@ from apolo_app_types.helm.apps import (
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.bundles.llm import (
     DeepSeekValueProcessor,
+    GPTOSSValueProcessor,
     Llama4ValueProcessor,
     MistralValueProcessor,
 )
@@ -43,6 +44,7 @@ from apolo_app_types.helm.apps.vscode import VSCodeChartValueProcessor
 from apolo_app_types.helm.apps.weaviate import WeaviateChartValueProcessor
 from apolo_app_types.protocols.bundles.llm import (
     DeepSeekR1Inputs,
+    GptOssInputs,
     MistralInputs,
 )
 from apolo_app_types.protocols.common import AppInputs
@@ -93,6 +95,7 @@ async def app_type_to_vals(
         AppType.Llama4: Llama4ValueProcessor,
         AppType.DeepSeek: DeepSeekValueProcessor,
         AppType.Mistral: MistralValueProcessor,
+        AppType.GptOss: GPTOSSValueProcessor,
     }
 
     processor_class = processor_map.get(app_type)
@@ -156,6 +159,7 @@ async def get_installation_vals(
         AppType.Llama4: LLama4Inputs,
         AppType.DeepSeek: DeepSeekR1Inputs,
         AppType.Mistral: MistralInputs,
+        AppType.GptOss: GptOssInputs,
     }
 
     if app_type not in input_type_map:

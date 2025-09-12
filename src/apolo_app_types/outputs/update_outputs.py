@@ -149,7 +149,13 @@ async def update_app_outputs(  # noqa: C901
         raise ValueError(err)
     try:
         match app_type:
-            case AppType.LLMInference:
+            case (
+                AppType.LLMInference
+                | AppType.Llama4
+                | AppType.Mistral
+                | AppType.GptOss
+                | AppType.DeepSeek
+            ):
                 conv_outputs = await get_llm_inference_outputs(
                     helm_outputs, app_instance_id
                 )
@@ -205,21 +211,6 @@ async def update_app_outputs(  # noqa: C901
                 )
             case AppType.Launchpad:
                 conv_outputs = await get_launchpad_outputs(
-                    helm_outputs, app_instance_id
-                )
-            case AppType.Llama4:
-                # Llama4 is a bundle, so we don't have a specific output processor
-                conv_outputs = await get_llm_inference_outputs(
-                    helm_outputs, app_instance_id
-                )
-            case AppType.DeepSeek:
-                # DeepSeek is a bundle, so we don't have a specific output processor
-                conv_outputs = await get_llm_inference_outputs(
-                    helm_outputs, app_instance_id
-                )
-            case AppType.Mistral:
-                # Mistral is a bundle, so we don't have a specific output processor
-                conv_outputs = await get_llm_inference_outputs(
                     helm_outputs, app_instance_id
                 )
             case _:

@@ -10,6 +10,7 @@ from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.protocols.bundles.llm import (
     DeepSeekR1Inputs,
     DeepSeekR1Size,
+    GptOssSize,
     LLama4Inputs,
     Llama4Size,
     MistralInputs,
@@ -240,5 +241,19 @@ class MistralValueProcessor(BaseLLMBundleMixin[MistralInputs]):
         MistralSize.mistral_32_24b_instruct: ModelSettings(
             model_hf_name="mistralai/Mistral-Small-3.2-24B-Instruct-2506",
             vram_min_required_gb=16,
+        ),
+    }
+
+
+class GPTOSSValueProcessor(BaseLLMBundleMixin[MistralInputs]):
+    app_type = AppType.GptOss
+    model_map = {
+        GptOssSize.gpt_oss_20b: ModelSettings(
+            model_hf_name="openai/gpt-oss-20b",
+            vram_min_required_gb=16.0,
+        ),
+        GptOssSize.gpt_oss_120b: ModelSettings(
+            model_hf_name="openai/gpt-oss-120b",
+            vram_min_required_gb=80.0,
         ),
     }
