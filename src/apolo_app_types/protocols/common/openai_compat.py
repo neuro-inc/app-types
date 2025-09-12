@@ -8,6 +8,8 @@ from apolo_app_types.protocols.common.hugging_face import (
 )
 from apolo_app_types.protocols.common.networking import (
     RestAPI,
+)
+from apolo_app_types.protocols.common.schema_extra import (
     SchemaExtraMetadata,
     SchemaMetaType,
 )

@@ -5,7 +5,6 @@ from pydantic import ConfigDict, Field
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.schema_extra import (
     SchemaExtraMetadata,
-    SchemaMetaType,
 )
 
 
@@ -15,7 +14,6 @@ class HttpApi(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="HTTP API",
             description="HTTP API Configuration.",
-            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     host: str = Field(
@@ -76,7 +74,6 @@ class ServiceAPI(AbstractAppFieldType, Generic[API_TYPE]):
         json_schema_extra=SchemaExtraMetadata(
             title="Service APIs",
             description="Service APIs URLs.",
-            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     internal_url: API_TYPE | None = Field(
