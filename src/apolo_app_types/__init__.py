@@ -2,6 +2,7 @@ from apolo_app_types.job_utils import JobRunParams, prepare_job_run_params
 from apolo_app_types.protocols.apolo_deploy import ApoloDeployInputs, ApoloDeployOutputs
 from apolo_app_types.protocols.bundles import (
     DeepSeekR1Inputs,
+    GptOssInputs,
     LLama4Inputs,
     MistralInputs,
 )
@@ -264,4 +265,6 @@ __all__ = [
     "LLama4Inputs",
     "DeepSeekR1Inputs",
     "MistralInputs",
+    "MistralInputs",
+    "GptOssInputs",
 ]

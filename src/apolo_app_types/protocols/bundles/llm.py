@@ -35,6 +35,11 @@ class MistralSize(str, Enum):
     mistral_32_24b_instruct = "Mistral-Small-3.2-24B-Instruct-2506"
 
 
+class GptOssSize(str, Enum):
+    gpt_oss_120b = "gpt-oss-120b"
+    gpt_oss_20b = "gpt-oss-20b"
+
+
 class LLMBundleInputs(AppInputs, typing.Generic[TSize]):
     """
     Base class for LLM bundle inputs.
@@ -64,6 +69,16 @@ class LLama4Inputs(LLMBundleInputs[Llama4Size]):
 
     size: Llama4Size
     llm_class: Literal["llama4"] = "llama4"
+
+
+class GptOssInputs(LLMBundleInputs[GptOssSize]):
+    """
+    Inputs for the GptOss bundle.
+    This class extends LLMBundleInputs to include specific fields for OpenAIs GptOss.
+    """
+
+    size: GptOssSize
+    llm_class: Literal["gpt-oss"] = "gpt-oss"
 
 
 class DeepSeekR1Inputs(LLMBundleInputs[DeepSeekR1Size]):
