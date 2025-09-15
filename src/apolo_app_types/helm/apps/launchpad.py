@@ -11,7 +11,11 @@ from apolo_app_types.helm.apps.ingress import (
     _get_ingress_name_template,
 )
 from apolo_app_types.helm.utils.dictionaries import get_nested_values
-from apolo_app_types.protocols.common.hugging_face import HuggingFaceModel
+from apolo_app_types.protocols.common.hugging_face import (
+    HuggingFaceCache,
+    HuggingFaceModel,
+)
+from apolo_app_types.protocols.common.storage import ApoloFilesPath
 from apolo_app_types.protocols.launchpad import (
     HuggingFaceEmbeddingsModel,
     HuggingFaceLLMModel,
@@ -77,6 +81,9 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
             tokenizer_hf_name=llm_model.model_hf_name,
             preset=input_.apps_config.llm_config.llm_preset,
             server_extra_args=llm_extra_args,
+            cache_config=HuggingFaceCache(
+                files_path=ApoloFilesPath(path="storage:.apps/hugging-face-cache")
+            ),
         )
 
     async def get_postgres_inputs(
@@ -217,7 +224,12 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
                 {
                     "vllm": get_nested_values(
                         llm_input.model_dump(),
-                        ["hugging_face_model", "preset", "server_extra_args"],
+                        [
+                            "hugging_face_model",
+                            "preset",
+                            "server_extra_args",
+                            "cache_config",
+                        ],
                     ),
                     "postgres": get_nested_values(
                         postgres_inputs.model_dump(),

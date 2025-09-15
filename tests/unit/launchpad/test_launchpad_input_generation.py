@@ -115,6 +115,13 @@ async def test_launchpad_values_generation_with_preconfigured_model(setup_client
                     },
                     "preset": {"name": "gpu-small", "__type__": "Preset"},
                     "server_extra_args": [],
+                    "cache_config": {
+                        "files_path": {
+                            "path": "storage:.apps/hugging-face-cache",
+                            "__type__": "ApoloFilesPath",
+                        },
+                        "__type__": "HuggingFaceCache",
+                    },
                 },
                 "postgres": {
                     "preset": {"name": "cpu-small", "__type__": "Preset"},
@@ -300,6 +307,13 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
                         "--max-model-len=2048",
                         "--gpu-memory-utilization=0.9",
                     ],
+                    "cache_config": {
+                        "files_path": {
+                            "path": "storage:.apps/hugging-face-cache",
+                            "__type__": "ApoloFilesPath",
+                        },
+                        "__type__": "HuggingFaceCache",
+                    },
                 },
                 "postgres": {
                     "preset": {"name": "cpu-small", "__type__": "Preset"},
@@ -491,6 +505,13 @@ async def test_launchpad_values_generation_magistral_model(setup_clients):
                         "--enable-auto-tool-choice",
                         "--tensor-parallel-size=2",
                     ],
+                    "cache_config": {
+                        "files_path": {
+                            "path": "storage:.apps/hugging-face-cache",
+                            "__type__": "ApoloFilesPath",
+                        },
+                        "__type__": "HuggingFaceCache",
+                    },
                 },
                 "postgres": {
                     "preset": {"name": "cpu-small", "__type__": "Preset"},
