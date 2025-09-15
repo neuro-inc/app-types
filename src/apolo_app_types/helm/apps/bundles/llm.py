@@ -117,7 +117,7 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
                 f"{min_total_vram_gb} for size={input_.size!r}."
             )
             raise RuntimeError(err_msg)
-
+        logger.info("Candidates: %s", candidates)
         # Prefer smallest total VRAM
         best_name = min(candidates)[-1]
         return Preset(name=best_name)
@@ -128,7 +128,7 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
             hf_token=input_.hf_token,
         )
         preset_chosen = await self._get_preset(input_)
-
+        logger.info("Preset chosen: %s", preset_chosen.name)
         return LLMInputs(
             hugging_face_model=hf_model,
             tokenizer_hf_name=hf_model.model_hf_name,
