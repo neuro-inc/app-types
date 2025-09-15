@@ -36,11 +36,11 @@ def load_app_component(
     logging.info(msg)
 
     results = []
-    for _, obj in inspect.getmembers(module, inspect.isclass):
+    for name, obj in inspect.getmembers(module, inspect.isclass):
         if (
             issubclass(obj, component_base_type)
             and obj is not component_base_type
-            and (not exact_type_name or obj.__name__ == exact_type_name)
+            and (not exact_type_name or name == exact_type_name)
         ):
             msg = f"Found {obj} for {app_type}"
             logging.info(msg)
