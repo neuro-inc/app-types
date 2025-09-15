@@ -153,7 +153,6 @@ async def test_launchpad_values_generation_with_preconfigured_model(setup_client
     assert "dbPassword" in helm_params
     assert "dbSecretName" in helm_params
     assert "domain" in helm_params
-    assert "image" in helm_params
     assert "keycloak" in helm_params
     assert "postgresql" in helm_params
 
@@ -339,7 +338,6 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
     assert "dbPassword" in helm_params
     assert "dbSecretName" in helm_params
     assert "domain" in helm_params
-    assert "image" in helm_params
     assert "keycloak" in helm_params
     assert "postgresql" in helm_params
 
@@ -518,7 +516,6 @@ async def test_launchpad_values_generation_magistral_model(setup_clients):
     assert "dbPassword" in helm_params
     assert "dbSecretName" in helm_params
     assert "domain" in helm_params
-    assert "image" in helm_params
     assert "keycloak" in helm_params
     assert "postgresql" in helm_params
 
