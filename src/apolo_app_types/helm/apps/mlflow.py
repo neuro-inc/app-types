@@ -118,7 +118,10 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
 
         envs: list[Env] = []
         backend_uri = ""
-        pvc_name = "mlflow-sqlite-storage"
+        pvc_name = f"mlflow-sqlite-storage-{app_id}"
+        if len(pvc_name) > 63:
+            pvc_name = pvc_name[:63]
+
         use_sqlite = True
 
         if isinstance(input_.metadata_storage, MLFlowMetadataPostgres):

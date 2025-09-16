@@ -57,7 +57,7 @@ async def test_values_mlflow_generation_default_sqlite(
     assert helm_params["volumes"][0]["name"] == "mlflow-db-pvc"
     assert (
         helm_params["volumes"][0]["persistentVolumeClaim"]["claimName"]
-        == "mlflow-sqlite-storage"
+        == f"mlflow-sqlite-storage-{APP_ID}"
     )
 
     assert "volumeMounts" in helm_params
@@ -121,7 +121,7 @@ async def test_values_mlflow_generation_sqlite_explicit_no_pvc_name(
     # Assert default PVC name
     assert (
         helm_params["volumes"][0]["persistentVolumeClaim"]["claimName"]
-        == "mlflow-sqlite-storage"
+        == f"mlflow-sqlite-storage-{APP_ID}"
     )
 
 
