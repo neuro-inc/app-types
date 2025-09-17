@@ -52,6 +52,9 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
         if isinstance(input_.apps_config.llm_config.model, PreConfiguredLLMModels):
             llm_model = HuggingFaceModel(
                 model_hf_name=input_.apps_config.llm_config.model.value,
+                hf_cache=HuggingFaceCache(
+                    files_path=ApoloFilesPath(path="storage:.apps/hugging-face-cache")
+                ),
             )
             match input_.apps_config.llm_config.model:
                 case PreConfiguredLLMModels.MAGISTRAL_24B:
@@ -81,9 +84,6 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
             tokenizer_hf_name=llm_model.model_hf_name,
             preset=input_.apps_config.llm_config.llm_preset,
             server_extra_args=llm_extra_args,
-            cache_config=HuggingFaceCache(
-                files_path=ApoloFilesPath(path="storage:.apps/hugging-face-cache")
-            ),
         )
 
     async def get_postgres_inputs(
@@ -228,7 +228,6 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
                             "hugging_face_model",
                             "preset",
                             "server_extra_args",
-                            "cache_config",
                         ],
                     ),
                     "postgres": get_nested_values(

@@ -5,7 +5,7 @@ import pytest
 from apolo_sdk import Preset as ApoloPreset
 from apolo_sdk._server_cfg import AMDGPUPreset, NvidiaGPUPreset
 
-from apolo_app_types import HuggingFaceModel
+from apolo_app_types import HuggingFaceModel, HuggingFaceToken
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.text_embeddings import (
     TEI_IMAGE_REPOSITORY,
@@ -48,7 +48,10 @@ async def test_tei_values_generation(setup_clients):
                 ingress_http=IngressHttp(),
                 model=HuggingFaceModel(
                     model_hf_name="random/name",
-                    hf_token=ApoloSecret(key="random-token"),
+                    hf_token=HuggingFaceToken(
+                        token_name="random-token-name",
+                        token=ApoloSecret(key="random-token"),
+                    ),
                 ),
                 server_extra_args=[
                     "--max-concurrent-requests=512",
@@ -436,7 +439,10 @@ async def test_tei_dynamic_image_selection_a100(setup_clients):
                 ingress_http=IngressHttp(),
                 model=HuggingFaceModel(
                     model_hf_name="sentence-transformers/all-MiniLM-L6-v2",
-                    hf_token=ApoloSecret(key="test-token"),
+                    hf_token=HuggingFaceToken(
+                        token_name="test-token-name",
+                        token=ApoloSecret(key="test-token"),
+                    ),
                 ),
                 server_extra_args=[
                     "--max-concurrent-requests=512",
@@ -496,7 +502,10 @@ async def test_tei_dynamic_image_selection_t4(setup_clients):
                 ingress_http=IngressHttp(),
                 model=HuggingFaceModel(
                     model_hf_name="sentence-transformers/all-MiniLM-L6-v2",
-                    hf_token=ApoloSecret(key="test-token"),
+                    hf_token=HuggingFaceToken(
+                        token_name="test-token-name",
+                        token=ApoloSecret(key="test-token"),
+                    ),
                 ),
             ),
             apolo_client=setup_clients,
@@ -537,7 +546,10 @@ async def test_tei_dynamic_image_selection_cpu(setup_clients):
                 ingress_http=IngressHttp(),
                 model=HuggingFaceModel(
                     model_hf_name="sentence-transformers/all-MiniLM-L6-v2",
-                    hf_token=ApoloSecret(key="test-token"),
+                    hf_token=HuggingFaceToken(
+                        token_name="test-token-name",
+                        token=ApoloSecret(key="test-token"),
+                    ),
                 ),
             ),
             apolo_client=setup_clients,
