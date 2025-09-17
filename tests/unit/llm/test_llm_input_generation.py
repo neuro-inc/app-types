@@ -201,6 +201,11 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
         },
         "appTypesImage": {"tag": IsStr(regex=r"^v\d+\.\d+\.\d+.*$")},
         "apolo_app_id": APP_ID,
+        "envNvidia": {
+            "LD_LIBRARY_PATH": "/usr/local/cuda/lib64",
+            "PATH": "/usr/local/cuda/bin:/usr/local/sbin:"
+            "/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        },
     }
 
 
@@ -499,6 +504,11 @@ async def test_values_llm_generation__storage_integrated(
             "tag": IsStr(regex=r"^v\d+\.\d+\.\d+.*$"),
         },
         "apolo_app_id": APP_ID,
+        "envNvidia": {
+            "LD_LIBRARY_PATH": "/usr/local/cuda/lib64",
+            "PATH": "/usr/local/cuda/bin:/usr/local/sbin:"
+            "/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        },
     }
 
 
