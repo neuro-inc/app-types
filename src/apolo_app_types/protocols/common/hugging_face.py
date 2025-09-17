@@ -89,7 +89,10 @@ class HuggingFaceModel(AbstractAppFieldType):
     hf_cache: HuggingFaceCache | None = Field(  # noqa: N815
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="Hugging Face Cache",
-            description="Configuration for the Hugging Face cache.",
+            title="Model Cache",
+            description=(
+                "Enables caching of model files to reduce"
+                " redundant downloads and speed up load times."
+            ),
         ).as_json_schema_extra(),
     )
