@@ -67,6 +67,13 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
                 "HIP_VISIBLE_DEVICES": device_ids,
                 "ROCR_VISIBLE_DEVICES": device_ids,
             }
+        elif gpu_provider == "nvidia":
+            # nvidia/cuda:12.8.1-devel-ubuntu20.04 (vllm after v0.9.0)
+            gpu_env["envNvidia"] = {
+                "PATH": "/usr/local/cuda/bin:/usr/local/sbin:"
+                "/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "LD_LIBRARY_PATH": "/usr/local/cuda/lib64",
+            }
 
         return gpu_env
 
