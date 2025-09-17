@@ -19,6 +19,7 @@ async def test_llm(setup_clients, mock_kubernetes_client, app_instance_id):
     assert res["hugging_face_model"] == {
         "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct",
         "hf_token": None,
+        "hf_cache": None,
         "__type__": "HuggingFaceModel",
     }
     assert res["tokenizer_hf_name"] == "meta-llama/Llama-3.1-8B-Instruct"
@@ -50,6 +51,7 @@ async def test_llm_without_server_args(
     assert res["hugging_face_model"] == {
         "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct",
         "hf_token": None,
+        "hf_cache": None,
         "__type__": "HuggingFaceModel",
     }
     assert res["tokenizer_hf_name"] == "meta-llama/Llama-3.1-8B-Instruct"

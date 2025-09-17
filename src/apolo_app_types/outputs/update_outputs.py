@@ -12,9 +12,6 @@ from apolo_app_types.outputs.custom_deployment import get_custom_deployment_outp
 from apolo_app_types.outputs.dify import get_dify_outputs
 from apolo_app_types.outputs.dockerhub import get_dockerhub_outputs
 from apolo_app_types.outputs.fooocus import get_fooocus_outputs
-from apolo_app_types.outputs.huggingface_cache import (
-    get_app_outputs as get_huggingface_cache_outputs,
-)
 from apolo_app_types.outputs.jupyter import get_jupyter_outputs
 from apolo_app_types.outputs.lightrag import get_lightrag_outputs
 from apolo_app_types.outputs.llm import get_llm_inference_outputs
@@ -196,10 +193,6 @@ async def update_app_outputs(  # noqa: C901
                 )
             case AppType.PostgreSQL:
                 conv_outputs = await get_postgres_outputs(helm_outputs, app_instance_id)
-            case AppType.HuggingFaceCache:
-                conv_outputs = await get_huggingface_cache_outputs(
-                    helm_outputs, app_instance_id
-                )
             case AppType.CustomDeployment:
                 conv_outputs = await get_custom_deployment_outputs(
                     helm_outputs, app_instance_id

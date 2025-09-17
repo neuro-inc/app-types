@@ -38,11 +38,13 @@ async def test_tei_outputs_with_model(
     assert res["external_api"]["endpoint_url"] == "/v1/embeddings"
     assert res["internal_api"]["hf_model"] == {
         "hf_token": None,
+        "hf_cache": None,
         "model_hf_name": "random/name",
         "__type__": "HuggingFaceModel",
     }
     assert res["external_api"]["hf_model"] == {
         "hf_token": None,
+        "hf_cache": None,
         "model_hf_name": "random/name",
         "__type__": "HuggingFaceModel",
     }

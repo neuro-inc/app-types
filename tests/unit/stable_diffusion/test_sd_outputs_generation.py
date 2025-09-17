@@ -22,6 +22,7 @@ async def test_sd(setup_clients, mock_kubernetes_client, app_instance_id):
         "__type__": "HuggingFaceModel",
         "model_hf_name": "SD-Model",
         "hf_token": None,
+        "hf_cache": None,
     }
 
 
@@ -45,6 +46,7 @@ async def test_sd_without_files(setup_clients, mock_kubernetes_client, app_insta
         "__type__": "HuggingFaceModel",
         "model_hf_name": "SD-Model",
         "hf_token": None,
+        "hf_cache": None,
     }
 
 

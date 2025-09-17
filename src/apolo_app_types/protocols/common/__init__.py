@@ -9,7 +9,7 @@ from .autoscaling import AutoscalingHPA
 from .base import AppInputs, AppOutputs
 from .buckets import Bucket
 from .containers import ContainerImage
-from .hugging_face import HuggingFaceCache, HuggingFaceModel
+from .hugging_face import HuggingFaceCache, HuggingFaceModel, HuggingFaceToken
 from .ingress import (
     BaseIngress,
     BasicNetworkingConfig,
@@ -48,6 +48,7 @@ __all__ = [
     "Redis",
     "RedisMaster",
     "HuggingFaceModel",
+    "HuggingFaceToken",
     "HuggingFaceCache",
     "Preset",
     "BasicAuth",
