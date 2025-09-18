@@ -74,9 +74,10 @@ class AuthIngressMiddleware(IngressMiddleware):
     )
     name: str = Field(
         ...,
+        pattern=r"^platform",
         json_schema_extra=SchemaExtraMetadata(
             title="Middleware Name",
-            description="Name of the authentication middleware to"
+            description="Name of the authentication middleware (with namespace) to"
             " apply to ingress traffic.",
         ).as_json_schema_extra(),
     )
