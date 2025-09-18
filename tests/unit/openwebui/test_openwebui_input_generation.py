@@ -114,7 +114,7 @@ async def test_openwebui_values_generation_with_ingress_middleware(setup_clients
                 ingress_http=IngressHttp(),
                 advanced_networking=AdvancedNetworkConfig(
                     ingress_middleware=AuthIngressMiddleware(
-                        name="custom-auth-middleware"
+                        name="platform-custom-auth-middleware"
                     )
                 ),
             ),
@@ -173,9 +173,7 @@ async def test_openwebui_values_generation_with_ingress_middleware(setup_clients
     middleware_annotation = helm_params["ingress"]["annotations"][
         "traefik.ingress.kubernetes.io/router.middlewares"
     ]
-    expected_custom_middleware = (
-        "default-namespace-custom-auth-middleware@kubernetescrd"
-    )
+    expected_custom_middleware = "platform-custom-auth-middleware@kubernetescrd"
 
     # Should contain our custom middleware
     assert expected_custom_middleware in middleware_annotation

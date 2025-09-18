@@ -178,11 +178,11 @@ async def get_grpc_ingress_values(
 
 
 async def append_ingress_middleware_annotations(
-    current_annotations: dict[str, t.Any], namespace: str, middleware_name: str
+    current_annotations: dict[str, t.Any], middleware_name: str
 ) -> dict[str, t.Any]:
     curr_annot = deepcopy(current_annotations)
 
-    middleware_annot = f"{namespace}-{middleware_name}@kubernetescrd"
+    middleware_annot = f"{middleware_name}@kubernetescrd"
 
     if MIDDLEWARE_ANNOTATION_KEY in curr_annot:
         curr_annot[MIDDLEWARE_ANNOTATION_KEY] += f",{middleware_annot}"
