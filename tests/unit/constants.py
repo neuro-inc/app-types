@@ -3,6 +3,8 @@ from decimal import Decimal
 from apolo_sdk import Preset
 from neuro_config_client import NvidiaGPUPreset
 
+from apolo_app_types import CrunchyPostgresUserCredentials
+
 
 CPU_POOL = "cpu_pool"
 GPU_POOL = "gpu_pool"
@@ -85,3 +87,23 @@ TEST_PRESETS_WITH_EXTRA_LARGE_GPU = {
         available_resource_pool_names=("gpu_pool",),
     ),
 }
+
+
+# OpenWebUI Test Constants
+DEFAULT_AUTH_MIDDLEWARE = "platform-platform-control-plane-ingress-auth"
+CUSTOM_AUTH_MIDDLEWARE = "platform-custom-auth-middleware"
+CUSTOM_RATE_LIMITING_MIDDLEWARE = "platform-custom-rate-limiting-middleware"
+
+DATABASE_SQLITE = "sqlite"
+DATABASE_POSTGRES = "postgres"
+
+# Default PostgreSQL credentials for testing
+DEFAULT_POSTGRES_CREDS = CrunchyPostgresUserCredentials(
+    user="pgvector_user",
+    password="pgvector_password",
+    host="pgvector_host",
+    port=5432,
+    pgbouncer_host="pgbouncer_host",
+    pgbouncer_port=4321,
+    dbname="db_name",
+)
