@@ -71,8 +71,9 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
             # nvidia/cuda:12.8.1-devel-ubuntu20.04 (vllm after v0.9.0)
             gpu_env["envNvidia"] = {
                 "PATH": "/usr/local/cuda/bin:/usr/local/sbin:"
-                "/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-                "LD_LIBRARY_PATH": "/usr/local/cuda/lib64",
+                "/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$(PATH)",
+                "LD_LIBRARY_PATH": "/usr/local/cuda/lib64:"
+                "/usr/local/nvidia/lib64:$(LD_LIBRARY_PATH)",
             }
 
         return gpu_env
