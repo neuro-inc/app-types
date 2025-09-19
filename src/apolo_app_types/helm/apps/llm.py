@@ -72,7 +72,8 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
             gpu_env["envNvidia"] = {
                 "PATH": "/usr/local/cuda/bin:/usr/local/sbin:"
                 "/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$(PATH)",
-                "LD_LIBRARY_PATH": "/usr/local/cuda/lib64:/usr/local/nvidia/lib64:$(LD_LIBRARY_PATH)",
+                "LD_LIBRARY_PATH": "/usr/local/cuda/lib64:"
+                "/usr/local/nvidia/lib64:$(LD_LIBRARY_PATH)",
             }
 
         return gpu_env

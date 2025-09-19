@@ -204,7 +204,8 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
         "envNvidia": {
             "PATH": "/usr/local/cuda/bin:/usr/local/sbin:"
             "/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$(PATH)",
-            "LD_LIBRARY_PATH": "/usr/local/cuda/lib64:/usr/local/nvidia/lib64:$(LD_LIBRARY_PATH)",
+            "LD_LIBRARY_PATH": "/usr/local/cuda/lib64:"
+            "/usr/local/nvidia/lib64:$(LD_LIBRARY_PATH)",
         },
     }
 
@@ -507,7 +508,8 @@ async def test_values_llm_generation__storage_integrated(
         "envNvidia": {
             "PATH": "/usr/local/cuda/bin:/usr/local/sbin:"
             "/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$(PATH)",
-            "LD_LIBRARY_PATH": "/usr/local/cuda/lib64:/usr/local/nvidia/lib64:$(LD_LIBRARY_PATH)",
+            "LD_LIBRARY_PATH": "/usr/local/cuda/lib64:"
+            "/usr/local/nvidia/lib64:$(LD_LIBRARY_PATH)",
         },
     }
 
