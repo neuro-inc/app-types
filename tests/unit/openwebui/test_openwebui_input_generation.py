@@ -1,9 +1,6 @@
-import itertools
-from dataclasses import dataclass
-
 import pytest
 
-from apolo_app_types import CrunchyPostgresUserCredentials, HuggingFaceModel
+from apolo_app_types import HuggingFaceModel
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import IngressHttp, Preset
@@ -21,22 +18,18 @@ from apolo_app_types.protocols.openwebui import (
     SQLiteDatabase,
 )
 
+from tests.unit.conftest import (
+    OpenWebUITestCase,
+)
 from tests.unit.constants import (
     APP_ID,
     APP_SECRETS_NAME,
+    DEFAULT_AUTH_MIDDLEWARE,
+    DEFAULT_POSTGRES_CREDS,
 )
 
 
 # Constants
-DEFAULT_POSTGRES_CREDS = CrunchyPostgresUserCredentials(
-    user="pgvector_user",
-    password="pgvector_password",
-    host="pgvector_host",
-    port=5432,
-    pgbouncer_host="pgbouncer_host",
-    pgbouncer_port=4321,
-    dbname="db_name",
-)
 
 
 LLM_API_CONFIG = OpenAICompatChatAPI(
@@ -66,55 +59,12 @@ EXPECTED_SERVICE = {
     "ports": [{"containerPort": 8080, "name": "http"}],
 }
 
-# Test configuration constants
-DEFAULT_AUTH_MIDDLEWARE = "platform-platform-control-plane-ingress-auth"
-CUSTOM_AUTH_MIDDLEWARE = "platform-custom-auth-middleware"
-CUSTOM_RATE_LIMITING_MIDDLEWARE = "platform-custom-rate-limiting-middleware"
-
-DATABASE_SQLITE = "sqlite"
-DATABASE_POSTGRES = "postgres"
+# Test configuration constants (imported from conftest.py)
 
 
 def with_auth_middleware(*additional_middleware: str) -> list[str]:
     """Helper to create expected middleware lists with default auth middleware."""
     return [DEFAULT_AUTH_MIDDLEWARE, *additional_middleware]
-
-
-@dataclass
-class OpenWebUITestCase:
-    """Configuration for a single OpenWebUI test case."""
-
-    auth_enabled: bool
-    middleware_name: str | None
-    database_type: str
-    test_db_urls: bool = False  # Whether to test specific database URLs
-
-    @property
-    def expected_middleware(self) -> list[str]:
-        """Compute expected middleware based on configuration."""
-        middleware = []
-        if self.auth_enabled:
-            middleware.append(DEFAULT_AUTH_MIDDLEWARE)
-        if self.middleware_name:
-            middleware.append(self.middleware_name)
-        return middleware
-
-    @property
-    def expected_db_url(self) -> str | None:
-        """Compute expected database URL for assertions."""
-        if self.database_type == DATABASE_SQLITE:
-            return None
-        if self.database_type == DATABASE_POSTGRES and self.test_db_urls:
-            return "postgresql://pgvector_user:pgvector_password@pgbouncer_host:4321/db_name"
-        return None
-
-    @property
-    def test_id(self) -> str:
-        """Generate a descriptive test ID."""
-        auth_part = "auth_enabled" if self.auth_enabled else "auth_disabled"
-        middleware_part = "with_middleware" if self.middleware_name else "no_middleware"
-        creds_part = "_test_creds" if self.test_db_urls else ""
-        return f"{auth_part}_{middleware_part}_{self.database_type}{creds_part}"
 
 
 def create_database_config(db_type: str):
@@ -266,44 +216,16 @@ def assert_database_env_vars(
             assert pgvector_url["value"] == expected_db_url
 
 
-# Generate test cases by combining all possible inputs
-def _generate_openwebui_test_cases() -> list[OpenWebUITestCase]:
-    """Generate all combinations of OpenWebUI test configurations."""
-    auth_options = [True, False]
-    middleware_options = [None, CUSTOM_AUTH_MIDDLEWARE, CUSTOM_RATE_LIMITING_MIDDLEWARE]
-    database_options = [DATABASE_SQLITE, DATABASE_POSTGRES]
-
-    test_cases = []
-
-    for auth, middleware, db_type in itertools.product(
-        auth_options, middleware_options, database_options
-    ):
-        test_cases.append(
-            OpenWebUITestCase(
-                auth_enabled=auth,
-                middleware_name=middleware,
-                database_type=db_type,
-                test_db_urls=True,  # Always test database URLs
-            )
-        )
-
-    return test_cases
-
-
-OPENWEBUI_TEST_CASES = _generate_openwebui_test_cases()
-
-
-@pytest.mark.parametrize("test_case", OPENWEBUI_TEST_CASES, ids=lambda tc: tc.test_id)
 @pytest.mark.asyncio
 async def test_openwebui_configuration_matrix(
-    setup_clients, test_case: OpenWebUITestCase
+    setup_clients, openwebui_test_case: OpenWebUITestCase
 ):
     """Test OpenWebUI input generation across auth, middleware, and database configs."""
 
     inputs = create_openwebui_inputs(
-        auth_enabled=test_case.auth_enabled,
-        middleware_name=test_case.middleware_name,
-        database_type=test_case.database_type,
+        auth_enabled=openwebui_test_case.auth_enabled,
+        middleware_name=openwebui_test_case.middleware_name,
+        database_type=openwebui_test_case.database_type,
     )
 
     _, helm_params = await app_type_to_vals(
@@ -324,12 +246,16 @@ async def test_openwebui_configuration_matrix(
 
     # Assert middleware configuration
     assert_middleware_annotations(
-        helm_params, test_case.expected_middleware, auth_enabled=test_case.auth_enabled
+        helm_params,
+        openwebui_test_case.expected_middleware,
+        auth_enabled=openwebui_test_case.auth_enabled,
     )
 
     # Assert database-specific configuration with URL assertions when available
     assert_database_env_vars(
-        helm_params, test_case.database_type, test_case.expected_db_url
+        helm_params,
+        openwebui_test_case.database_type,
+        openwebui_test_case.expected_db_url,
     )
 
 
