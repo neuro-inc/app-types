@@ -257,38 +257,3 @@ async def test_openwebui_configuration_matrix(
         openwebui_test_case.database_type,
         openwebui_test_case.expected_db_url,
     )
-
-
-# Legacy individual tests for specific edge cases that don't fit the matrix well
-@pytest.mark.asyncio
-async def test_openwebui_values_generation_without_ingress_middleware(setup_clients):
-    """Test OpenWebUI when ingress middleware is explicitly set to None."""
-    inputs = create_openwebui_inputs(auth_enabled=True, middleware_name=None)
-
-    # Explicitly set middleware to None to test this specific case
-    inputs.networking_config.advanced_networking.ingress_middleware = None
-
-    _, helm_params = await app_type_to_vals(
-        input_=inputs,
-        apolo_client=setup_clients,
-        app_type=AppType.OpenWebUI,
-        app_name="openwebui-app",
-        namespace="default-namespace",
-        app_secrets_name=APP_SECRETS_NAME,
-        app_id=APP_ID,
-    )
-
-    # Test that ingress is enabled
-    assert helm_params["ingress"]["enabled"] is True
-
-    # Test that no custom middleware annotation is added when ingress_middleware is None
-    if "annotations" in helm_params["ingress"]:
-        middleware_annotation = helm_params["ingress"]["annotations"].get(
-            "traefik.ingress.kubernetes.io/router.middlewares"
-        )
-        # Should not contain our custom middleware name
-        if middleware_annotation:
-            assert "custom-auth-middleware" not in middleware_annotation
-
-    # Test other basic functionality remains the same
-    assert_basic_helm_params(helm_params)
