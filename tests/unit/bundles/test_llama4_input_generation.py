@@ -11,7 +11,7 @@ from apolo_app_types.helm.apps.common import (
 )
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.bundles.llm import Llama4Size
-from apolo_app_types.protocols.common import ApoloSecret
+from apolo_app_types.protocols.common import ApoloSecret, HuggingFaceToken
 
 from tests.unit.constants import (
     APP_ID,
@@ -32,7 +32,10 @@ async def test_values_llm_generation_gpu_default_preset(
         await app_type_to_vals(
             input_=LLama4Inputs(
                 size=model_to_test,
-                hf_token=ApoloSecret(key="FakeSecret"),
+                hf_token=HuggingFaceToken(
+                    token_name="test-token",
+                    token=ApoloSecret(key="FakeSecret"),
+                ),
             ),
             apolo_client=apolo_client,
             app_type=AppType.Llama4,
@@ -55,7 +58,10 @@ async def test_values_llm_generation_gpu_big_model(setup_clients, mock_get_prese
     helm_args, helm_params = await app_type_to_vals(
         input_=LLama4Inputs(
             size=model_to_test,
-            hf_token=ApoloSecret(key="FakeSecret"),
+            hf_token=HuggingFaceToken(
+                token_name="test-token",
+                token=ApoloSecret(key="FakeSecret"),
+            ),
         ),
         apolo_client=apolo_client,
         app_type=AppType.Llama4,

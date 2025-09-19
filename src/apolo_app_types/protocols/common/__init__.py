@@ -9,7 +9,7 @@ from .autoscaling import AutoscalingHPA
 from .base import AppInputs, AppOutputs
 from .buckets import Bucket
 from .containers import ContainerImage
-from .hugging_face import HuggingFaceCache, HuggingFaceModel
+from .hugging_face import HuggingFaceCache, HuggingFaceModel, HuggingFaceToken
 from .ingress import IngressGrpc, IngressHttp
 from .k8s import Container, DeploymentName, Env
 from .networking import GraphQLAPI, GrpcAPI, HttpApi, RestAPI, ServiceAPI
@@ -38,6 +38,7 @@ __all__ = [
     "Redis",
     "RedisMaster",
     "HuggingFaceModel",
+    "HuggingFaceToken",
     "HuggingFaceCache",
     "Preset",
     "BasicAuth",

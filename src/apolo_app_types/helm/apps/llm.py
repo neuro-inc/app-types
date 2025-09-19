@@ -106,9 +106,12 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
         self, input_: LLMInputs, app_secrets_name: str
     ) -> dict[str, t.Any]:
         # Start with base environment variables
+        if not input_.hugging_face_model.hf_token:
+            err = "Hugging Face token must be provided."
+            raise ValueError(err)
         env_vars = {
             "HUGGING_FACE_HUB_TOKEN": serialize_optional_secret(
-                input_.hugging_face_model.hf_token, secret_name=app_secrets_name
+                input_.hugging_face_model.hf_token.token, secret_name=app_secrets_name
             )
         }
 
@@ -125,9 +128,9 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
 
     def _configure_extra_annotations(self, input_: LLMInputs) -> dict[str, str]:
         extra_annotations: dict[str, str] = {}
-        if input_.cache_config:
+        if input_.hugging_face_model.hf_cache:
             storage_mount = ApoloFilesMount(
-                storage_uri=input_.cache_config.files_path,
+                storage_uri=input_.hugging_face_model.hf_cache.files_path,
                 mount_path=MountPath(path="/root/.cache/huggingface"),
                 mode=ApoloMountMode(mode=ApoloMountModes.RW),
             )
@@ -138,7 +141,7 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
 
     def _configure_extra_labels(self, input_: LLMInputs) -> dict[str, str]:
         extra_labels: dict[str, str] = {}
-        if input_.cache_config:
+        if input_.hugging_face_model.hf_cache:
             extra_labels.update(
                 **gen_apolo_storage_integration_labels(
                     client=self.client, inject_storage=True
@@ -147,7 +150,7 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
         return extra_labels
 
     def _configure_model_download(self, input_: LLMInputs) -> dict[str, t.Any]:
-        if input_.cache_config:
+        if input_.hugging_face_model.hf_cache:
             return {
                 "modelDownload": {
                     "hookEnabled": True,
