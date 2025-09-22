@@ -148,7 +148,7 @@ class OpenWebUIChartValueProcessor(BaseChartValueProcessor[OpenWebUIAppInputs]):
             custom_app_vals["ingress"][
                 "annotations"
             ] = await append_ingress_middleware_annotations(
-                custom_app_vals["ingress"]["annotations"],
+                custom_app_vals["ingress"].get("annotations", {}),
                 input_.networking_config.advanced_networking.ingress_middleware.name,
             )
         return {**custom_app_vals, "labels": {"application": "openwebui"}}
