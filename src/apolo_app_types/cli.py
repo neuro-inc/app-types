@@ -129,7 +129,10 @@ def run_preprocessor(
                 app_type, package_name, preprocessor_type
             )
             if not preprocessor_class:
-                err_msg = f"Unable to find preprocessor {app_type=}, {preprocessor_type=}, Package: {package_name}"
+                err_msg = (
+                    f"Unable to find preprocessor {app_type=}, {preprocessor_type=},"
+                    f" Package: {package_name}"
+                )
                 raise ValueError(err_msg)
 
             await apolo_sdk.login_with_token(
