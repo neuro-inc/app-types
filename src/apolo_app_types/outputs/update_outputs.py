@@ -28,7 +28,10 @@ from apolo_app_types.outputs.spark_job import get_spark_job_outputs
 from apolo_app_types.outputs.stable_diffusion import get_stable_diffusion_outputs
 from apolo_app_types.outputs.superset import get_superset_outputs
 from apolo_app_types.outputs.tei import get_tei_outputs
-from apolo_app_types.outputs.utils.discovery import load_app_postprocessor
+from apolo_app_types.outputs.utils.discovery import (
+    APOLO_APP_PACKAGE_PREFIX,
+    load_app_postprocessor,
+)
 from apolo_app_types.outputs.vscode import get_vscode_outputs
 from apolo_app_types.outputs.weaviate import get_weaviate_outputs
 
@@ -214,9 +217,13 @@ async def update_app_outputs(  # noqa: C901
                     helm_outputs, app_instance_id
                 )
             case _:
+                package_name = (
+                    f"{APOLO_APP_PACKAGE_PREFIX}_{app_type.replace('-', '_')}"
+                )
                 # Try loading application postprocessor defined in the app repo
                 postprocessor = load_app_postprocessor(
                     app_type=app_type,
+                    package_name=package_name,
                     exact_type_name=app_output_processor_type,
                 )
                 if not postprocessor:

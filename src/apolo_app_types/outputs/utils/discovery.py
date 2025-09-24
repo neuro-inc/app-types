@@ -15,12 +15,13 @@ APOLO_APP_PACKAGE_PREFIX = "apolo_apps_"
 
 def load_app_component(
     app_type: str,
+    package_name: str,
     component_base_type: type[t.Any],
     exact_type_name: str | None = None,
 ) -> type[t.Any] | None:
     discovered_plugins = {}
     for _finder, name, _ispkg in pkgutil.iter_modules():
-        if name.startswith(f"{APOLO_APP_PACKAGE_PREFIX}_{app_type}"):
+        if name == package_name:
             try:
                 candidate = importlib.import_module(name)
                 discovered_plugins[app_type] = candidate
@@ -55,20 +56,27 @@ def load_app_component(
 
 def load_app_postprocessor(
     app_type: str,
+    package_name: str,
     exact_type_name: str | None = None,
 ) -> type[BaseAppOutputsProcessor] | None:  # type: ignore
-    return load_app_component(app_type, BaseAppOutputsProcessor, exact_type_name)
+    return load_app_component(
+        app_type, package_name, BaseAppOutputsProcessor, exact_type_name
+    )
 
 
 def load_app_preprocessor(
     app_type: str,
+    package_name: str,
     exact_type_name: str | None = None,
 ) -> type[BaseChartValueProcessor] | None:  # type: ignore
-    return load_app_component(app_type, BaseChartValueProcessor, exact_type_name)
+    return load_app_component(
+        app_type, package_name, BaseChartValueProcessor, exact_type_name, package_name
+    )
 
 
 def load_app_inputs(
     app_type: str,
+    package_name: str,
     exact_type_name: str | None = None,
 ) -> type[AppInputs] | None:
-    return load_app_component(app_type, AppInputs, exact_type_name)
+    return load_app_component(app_type, package_name, AppInputs, exact_type_name)

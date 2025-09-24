@@ -93,6 +93,7 @@ def update_outputs(
 @click.option("--apolo-org", type=str, envvar="APOLO_ORG", required=True)
 @click.option("--apolo-cluster", type=str, envvar="APOLO_CLUSTER", required=True)
 @click.option("--apolo-project", type=str, envvar="APOLO_PROJECT", required=True)
+@click.option("--package-name", type=str)
 def run_preprocessor(
     app_type: str,
     app_id: str,
@@ -109,13 +110,14 @@ def run_preprocessor(
     apolo_org: str,
     apolo_cluster: str,
     apolo_project: str,
+    package_name: str,
 ) -> None:
     # template method, expanded by installing extra application modules
     async def _run_preprocessor() -> None:
         logging.basicConfig(level=logging.DEBUG)
         try:
             inputs_dict = json.loads(inputs_json)
-            inputs_class = load_app_inputs(app_type, inputs_type)
+            inputs_class = load_app_inputs(app_type, package_name, inputs_type)
             if not inputs_class:
                 err_msg = f"Unable to find inputs type for {app_type=}, {inputs_type=}"
                 raise ValueError(err_msg)
@@ -123,11 +125,11 @@ def run_preprocessor(
             loaded_inputs = inputs_class.model_validate(inputs_dict)
             logger.info("Loaded inputs: %s", loaded_inputs)
 
-            preprocessor_class = load_app_preprocessor(app_type, preprocessor_type)
+            preprocessor_class = load_app_preprocessor(
+                app_type, package_name, preprocessor_type
+            )
             if not preprocessor_class:
-                err_msg = (
-                    f"Unable to find preprocessor {app_type=}, {preprocessor_type=}"
-                )
+                err_msg = f"Unable to find preprocessor {app_type=}, {preprocessor_type=}, Package: {package_name}"
                 raise ValueError(err_msg)
 
             await apolo_sdk.login_with_token(
