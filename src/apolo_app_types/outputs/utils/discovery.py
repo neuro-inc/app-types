@@ -23,8 +23,7 @@ def load_app_component(
         if name.startswith(f"{APOLO_APP_PACKAGE_PREFIX}_{app_type}"):
             try:
                 candidate = importlib.import_module(name)
-                candidate_app_type = app_type
-                discovered_plugins[candidate_app_type] = candidate
+                discovered_plugins[app_type] = candidate
             except (ImportError, AttributeError) as e:
                 msg = f"Failed to import {name}: {e}"
                 logger.warning(msg)
