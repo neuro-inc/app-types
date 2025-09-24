@@ -1,14 +1,19 @@
 from dirty_equals import IsStr
 
 from apolo_app_types.app_types import AppType
-from apolo_app_types.helm.apps.bundles.llm import DeepSeekValueProcessor, GPTOSSValueProcessor
+from apolo_app_types.helm.apps.bundles.llm import (
+    GPTOSSValueProcessor,
+)
 from apolo_app_types.helm.apps.common import (
     APOLO_ORG_LABEL,
     APOLO_PROJECT_LABEL,
     APOLO_STORAGE_LABEL,
 )
 from apolo_app_types.inputs.args import app_type_to_vals
-from apolo_app_types.protocols.bundles.llm import DeepSeekR1Inputs, DeepSeekR1Size, GptOssSize, GptOssInputs
+from apolo_app_types.protocols.bundles.llm import (
+    GptOssInputs,
+    GptOssSize,
+)
 from apolo_app_types.protocols.common import ApoloSecret
 
 from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
@@ -39,17 +44,13 @@ async def test_values_llm_generation_gpu_default_preset(
     assert helm_params == {
         "serverExtraArgs": [],
         "model": {
-            "modelHFName": GPTOSSValueProcessor.model_map[
-                model_to_test
-            ].model_hf_name,
+            "modelHFName": GPTOSSValueProcessor.model_map[model_to_test].model_hf_name,
             "tokenizerHFName": GPTOSSValueProcessor.model_map[
                 model_to_test
             ].model_hf_name,
         },
         "llm": {
-            "modelHFName": GPTOSSValueProcessor.model_map[
-                model_to_test
-            ].model_hf_name,
+            "modelHFName": GPTOSSValueProcessor.model_map[model_to_test].model_hf_name,
             "tokenizerHFName": GPTOSSValueProcessor.model_map[
                 model_to_test
             ].model_hf_name,
@@ -133,7 +134,8 @@ async def test_values_llm_generation_gpu_default_preset(
         "apolo_app_id": APP_ID,
         "envNvidia": {
             "PATH": "/usr/local/cuda/bin:/usr/local/sbin:"
-                    "/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$(PATH)",
-            "LD_LIBRARY_PATH": "/usr/local/cuda/lib64:/usr/local/nvidia/lib64:$(LD_LIBRARY_PATH)",
+            "/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$(PATH)",
+            "LD_LIBRARY_PATH": "/usr/local/cuda/lib64:"
+            "/usr/local/nvidia/lib64:$(LD_LIBRARY_PATH)",
         },
     }
