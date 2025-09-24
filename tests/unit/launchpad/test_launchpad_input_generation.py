@@ -111,17 +111,17 @@ async def test_launchpad_values_generation_with_preconfigured_model(setup_client
                     "hugging_face_model": {
                         "model_hf_name": "meta-llama/Llama-3.1-8B-Instruct",
                         "hf_token": None,
+                        "hf_cache": {
+                            "files_path": {
+                                "path": "storage:.apps/hugging-face-cache",
+                                "__type__": "ApoloFilesPath",
+                            },
+                            "__type__": "HuggingFaceCache",
+                        },
                         "__type__": "HuggingFaceModel",
                     },
                     "preset": {"name": "gpu-small", "__type__": "Preset"},
                     "server_extra_args": [],
-                    "cache_config": {
-                        "files_path": {
-                            "path": "storage:.apps/hugging-face-cache",
-                            "__type__": "ApoloFilesPath",
-                        },
-                        "__type__": "HuggingFaceCache",
-                    },
                 },
                 "postgres": {
                     "preset": {"name": "cpu-small", "__type__": "Preset"},
@@ -133,6 +133,7 @@ async def test_launchpad_values_generation_with_preconfigured_model(setup_client
                     "model": {
                         "model_hf_name": "BAAI/bge-m3",
                         "hf_token": None,
+                        "hf_cache": None,
                         "__type__": "HuggingFaceModel",
                     },
                     "preset": {"name": "gpu-small", "__type__": "Preset"},
@@ -300,6 +301,7 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
                     "hugging_face_model": {
                         "model_hf_name": "microsoft/DialoGPT-medium",
                         "hf_token": None,
+                        "hf_cache": None,
                         "__type__": "HuggingFaceModel",
                     },
                     "preset": {"name": "gpu-large", "__type__": "Preset"},
@@ -307,13 +309,6 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
                         "--max-model-len=2048",
                         "--gpu-memory-utilization=0.9",
                     ],
-                    "cache_config": {
-                        "files_path": {
-                            "path": "storage:.apps/hugging-face-cache",
-                            "__type__": "ApoloFilesPath",
-                        },
-                        "__type__": "HuggingFaceCache",
-                    },
                 },
                 "postgres": {
                     "preset": {"name": "cpu-small", "__type__": "Preset"},
@@ -325,6 +320,7 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
                     "model": {
                         "model_hf_name": "BAAI/bge-m3",
                         "hf_token": None,
+                        "hf_cache": None,
                         "__type__": "HuggingFaceModel",
                     },
                     "preset": {"name": "gpu-small", "__type__": "Preset"},
@@ -494,6 +490,13 @@ async def test_launchpad_values_generation_magistral_model(setup_clients):
                     "hugging_face_model": {
                         "model_hf_name": "unsloth/Magistral-Small-2506-GGUF",
                         "hf_token": None,
+                        "hf_cache": {
+                            "files_path": {
+                                "path": "storage:.apps/hugging-face-cache",
+                                "__type__": "ApoloFilesPath",
+                            },
+                            "__type__": "HuggingFaceCache",
+                        },
                         "__type__": "HuggingFaceModel",
                     },
                     "preset": {"name": "gpu-medium", "__type__": "Preset"},
@@ -505,13 +508,6 @@ async def test_launchpad_values_generation_magistral_model(setup_clients):
                         "--enable-auto-tool-choice",
                         "--tensor-parallel-size=2",
                     ],
-                    "cache_config": {
-                        "files_path": {
-                            "path": "storage:.apps/hugging-face-cache",
-                            "__type__": "ApoloFilesPath",
-                        },
-                        "__type__": "HuggingFaceCache",
-                    },
                 },
                 "postgres": {
                     "preset": {"name": "cpu-small", "__type__": "Preset"},
@@ -523,6 +519,7 @@ async def test_launchpad_values_generation_magistral_model(setup_clients):
                     "model": {
                         "model_hf_name": "BAAI/bge-m3",
                         "hf_token": None,
+                        "hf_cache": None,
                         "__type__": "HuggingFaceModel",
                     },
                     "preset": {"name": "gpu-small", "__type__": "Preset"},

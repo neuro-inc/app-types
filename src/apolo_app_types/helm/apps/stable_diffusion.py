@@ -27,10 +27,13 @@ class StableDiffusionChartValueProcessor(
             commandline_args = "--use-rocm"
         else:
             commandline_args = "--lowvram"
+        if input_.stable_diffusion.hugging_face_model.hf_token is None:
+            err = "Hugging Face token must be provided."
+            raise ValueError(err)
         return {
             "COMMANDLINE_ARGS": " ".join([default_cmd_args, commandline_args]),
             "HUGGING_FACE_HUB_TOKEN": serialize_optional_secret(
-                input_.stable_diffusion.hugging_face_model.hf_token,
+                input_.stable_diffusion.hugging_face_model.hf_token.token,
                 secret_name=app_secrets_name,
             ),
         }

@@ -1,7 +1,11 @@
 import pytest
 from dirty_equals import IsStr
 
-from apolo_app_types import CrunchyPostgresUserCredentials, HuggingFaceModel
+from apolo_app_types import (
+    CrunchyPostgresUserCredentials,
+    HuggingFaceModel,
+    HuggingFaceToken,
+)
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import IngressHttp, Preset
@@ -242,7 +246,10 @@ async def test_lightrag_openai_compatible_providers(setup_clients, mock_get_pres
                 protocol="https",
                 hf_model=HuggingFaceModel(
                     model_hf_name="meta-llama/Llama-3.1-8B-Instruct",
-                    hf_token=ApoloSecret(key="test-hf-token"),
+                    hf_token=HuggingFaceToken(
+                        token_name="test-token",
+                        token=ApoloSecret(key="test-hf-token"),
+                    ),
                 ),
             ),
             embedding_config=OpenAICompatEmbeddingsAPI(
@@ -251,7 +258,10 @@ async def test_lightrag_openai_compatible_providers(setup_clients, mock_get_pres
                 protocol="https",
                 hf_model=HuggingFaceModel(
                     model_hf_name="sentence-transformers/all-MiniLM-L6-v2",
-                    hf_token=ApoloSecret(key="test-hf-token"),
+                    hf_token=HuggingFaceToken(
+                        token_name="test-token",
+                        token=ApoloSecret(key="test-hf-token"),
+                    ),
                 ),
             ),
         ),
