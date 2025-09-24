@@ -216,7 +216,7 @@ async def update_app_outputs(  # noqa: C901
             case _:
                 # Try loading application postprocessor defined in the app repo
                 postprocessor = load_app_postprocessor(
-                    app_id=app_type,
+                    app_type=app_type,
                     exact_type_name=app_output_processor_type,
                 )
                 if not postprocessor:

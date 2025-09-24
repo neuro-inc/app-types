@@ -23,7 +23,7 @@ def load_app_component(
         if name.startswith(apolo_app_package_prefix):
             try:
                 candidate = importlib.import_module(name)
-                candidate_app_type = candidate.APOLO_APP_TYPE
+                candidate_app_type = app_type
                 discovered_plugins[candidate_app_type] = candidate
             except (ImportError, AttributeError) as e:
                 msg = f"Failed to import {name}: {e}"
@@ -55,12 +55,12 @@ def load_app_component(
 
 
 def load_app_postprocessor(
-    app_id: str,
+    app_type: str,
     exact_type_name: str | None = None,
     apolo_app_package_prefix: str = "apolo_apps_",
 ) -> type[BaseAppOutputsProcessor] | None:  # type: ignore
     return load_app_component(
-        app_id, BaseAppOutputsProcessor, exact_type_name, apolo_app_package_prefix
+        app_type, BaseAppOutputsProcessor, exact_type_name, apolo_app_package_prefix
     )
 
 
