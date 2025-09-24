@@ -17,10 +17,12 @@ from apolo_app_types.protocols.common.hugging_face import (
 )
 from apolo_app_types.protocols.common.storage import ApoloFilesPath
 from apolo_app_types.protocols.launchpad import (
+    CustomLLMModel,
     HuggingFaceEmbeddingsModel,
     HuggingFaceLLMModel,
     LaunchpadAppInputs,
     PreConfiguredEmbeddingsModels,
+    PreConfiguredHuggingFaceLLMModel,
     PreConfiguredLLMModels,
 )
 from apolo_app_types.protocols.postgres import (
@@ -49,41 +51,61 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
         input_: LaunchpadAppInputs,
     ) -> LLMInputs:
         llm_extra_args: list[str] = []
-        if isinstance(input_.apps_config.llm_config.model, PreConfiguredLLMModels):
+        if isinstance(
+            input_.apps_config.llm_config.model, PreConfiguredHuggingFaceLLMModel
+        ):
             llm_model = HuggingFaceModel(
-                model_hf_name=input_.apps_config.llm_config.model.value,
+                model_hf_name=input_.apps_config.llm_config.model.model.value,
+                hf_token=input_.apps_config.llm_config.model.hf_token,
             )
-            match input_.apps_config.llm_config.model:
+            llm_extra_args = input_.apps_config.llm_config.model.server_extra_args
+            match input_.apps_config.llm_config.model.model:
                 case PreConfiguredLLMModels.MAGISTRAL_24B:
-                    llm_extra_args = [
-                        "--tokenizer_mode=mistral",
-                        "--config_format=mistral",
-                        "--load_format=mistral",
-                        "--tool-call-parser=mistral",
-                        "--enable-auto-tool-choice",
-                        "--tensor-parallel-size=2",
-                    ]
-                case _:
-                    llm_extra_args = []
+                    llm_extra_args.extend(
+                        [
+                            "--tokenizer_mode=mistral",
+                            "--config_format=mistral",
+                            "--load_format=mistral",
+                            "--tool-call-parser=mistral",
+                            "--enable-auto-tool-choice",
+                            "--tensor-parallel-size=2",
+                        ]
+                    )
         elif isinstance(input_.apps_config.llm_config.model, HuggingFaceLLMModel):
             llm_model = input_.apps_config.llm_config.model.hf_model
             llm_extra_args = input_.apps_config.llm_config.model.server_extra_args
+        elif isinstance(input_.apps_config.llm_config.model, CustomLLMModel):
+            # For custom models, we use the model_name as both model and tokenizer
+            llm_model = HuggingFaceModel(
+                model_hf_name=input_.apps_config.llm_config.model.model_name,
+            )
+            llm_extra_args = input_.apps_config.llm_config.model.server_extra_args
         else:
-            # TODO custom model volumes
             err = (
-                "Unsupported LLM model type. Expected PreConfiguredLLMModels "
-                "or HuggingFaceModel."
+                "Unsupported LLM model type. Expected "
+                "PreConfiguredHuggingFaceLLMModel, HuggingFaceLLMModel, "
+                "or CustomLLMModel."
             )
             raise ValueError(err)
+
+        # Determine cache configuration based on model type
+        if isinstance(input_.apps_config.llm_config.model, CustomLLMModel):
+            # For custom models, mount the model path as cache
+            cache_config = HuggingFaceCache(
+                files_path=input_.apps_config.llm_config.model.model_apolo_path
+            )
+        else:
+            # For HuggingFace models, use the standard cache
+            cache_config = HuggingFaceCache(
+                files_path=ApoloFilesPath(path="storage:.apps/hugging-face-cache")
+            )
 
         return LLMInputs(
             hugging_face_model=llm_model,
             tokenizer_hf_name=llm_model.model_hf_name,
             preset=input_.apps_config.llm_config.llm_preset,
             server_extra_args=llm_extra_args,
-            cache_config=HuggingFaceCache(
-                files_path=ApoloFilesPath(path="storage:.apps/hugging-face-cache")
-            ),
+            cache_config=cache_config,
         )
 
     async def get_postgres_inputs(

@@ -14,12 +14,50 @@ from apolo_app_types.protocols.common.networking import (
 )
 from apolo_app_types.protocols.common.preset import Preset
 from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
+from apolo_app_types.protocols.common.secrets_ import OptionalSecret
 from apolo_app_types.protocols.common.storage import ApoloFilesPath
 
 
 class PreConfiguredLLMModels(enum.StrEnum):
     LLAMA_31_8b = "meta-llama/Llama-3.1-8B-Instruct"
     MAGISTRAL_24B = "unsloth/Magistral-Small-2506-GGUF"
+
+
+class PreConfiguredHuggingFaceLLMModel(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Pre-configured HuggingFace LLM Model",
+            description=(
+                "Select a pre-configured HuggingFace LLM model "
+                "with token authentication."
+            ),
+        ).as_json_schema_extra(),
+    )
+    model: PreConfiguredLLMModels = Field(
+        default=PreConfiguredLLMModels.LLAMA_31_8b,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Pre-configured Model",
+            description="Select a pre-configured LLM model from the available options.",
+        ).as_json_schema_extra(),
+    )
+    hf_token: OptionalSecret = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Hugging Face Token",
+            description=(
+                "Provide a Hugging Face API token for accessing "
+                "gated or private models."
+            ),
+        ).as_json_schema_extra(),
+    )
+    server_extra_args: list[str] = Field(
+        default_factory=list,
+        json_schema_extra=SchemaExtraMetadata(
+            title="VLLM Extra Arguments",
+            description="Additional arguments to pass to the VLLM runtime.",
+        ).as_json_schema_extra(),
+    )
 
 
 class HuggingFaceLLMModel(AbstractAppFieldType):
@@ -85,12 +123,16 @@ class LLMConfig(AbstractAppFieldType):
             description="Configuration for the LLM model to be used in this Launchpad.",
         ).as_json_schema_extra(),
     )
-    model: PreConfiguredLLMModels | HuggingFaceLLMModel | CustomLLMModel = Field(
-        default=PreConfiguredLLMModels.LLAMA_31_8b,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Pre-configured LLM Model",
-            description="Select a pre-configured LLM model for the Launchpad.",
-        ).as_json_schema_extra(),
+    model: PreConfiguredHuggingFaceLLMModel | HuggingFaceLLMModel | CustomLLMModel = (
+        Field(
+            default=PreConfiguredHuggingFaceLLMModel(
+                model=PreConfiguredLLMModels.LLAMA_31_8b
+            ),
+            json_schema_extra=SchemaExtraMetadata(
+                title="Pre-configured LLM Model",
+                description="Select a pre-configured LLM model for the Launchpad.",
+            ).as_json_schema_extra(),
+        )
     )
     llm_preset: Preset = Field(
         ...,

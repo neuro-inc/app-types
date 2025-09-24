@@ -16,6 +16,7 @@ from apolo_app_types.protocols.launchpad import (
     LLMConfig,
     PostgresConfig,
     PreConfiguredEmbeddingsModels,
+    PreConfiguredHuggingFaceLLMModel,
     PreConfiguredLLMModels,
     TextEmbeddingsConfig,
 )
@@ -29,14 +30,16 @@ from tests.unit.constants import (
 @pytest.mark.asyncio
 async def test_launchpad_values_generation_with_preconfigured_model(setup_clients):
     """Test launchpad helm values generation with a pre-configured LLM model."""
-    helm_args, helm_params = await app_type_to_vals(
+    _, helm_params = await app_type_to_vals(
         input_=LaunchpadAppInputs(
             launchpad_config=LaunchpadConfig(
                 preset=Preset(name="cpu-small"),
             ),
             apps_config=AppsConfig(
                 llm_config=LLMConfig(
-                    model=PreConfiguredLLMModels.LLAMA_31_8b,
+                    model=PreConfiguredHuggingFaceLLMModel(
+                        model=PreConfiguredLLMModels.LLAMA_31_8b
+                    ),
                     llm_preset=Preset(name="gpu-small"),
                     ui_preset=Preset(name="cpu-small"),
                 ),
@@ -210,7 +213,7 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
     """Test launchpad helm values generation with a HuggingFace LLM model."""
     from apolo_app_types import HuggingFaceModel
 
-    helm_args, helm_params = await app_type_to_vals(
+    _, helm_params = await app_type_to_vals(
         input_=LaunchpadAppInputs(
             launchpad_config=LaunchpadConfig(
                 preset=Preset(name="cpu-small"),
@@ -367,59 +370,94 @@ async def test_launchpad_values_generation_with_huggingface_model(setup_clients)
 @pytest.mark.asyncio
 async def test_launchpad_values_generation_with_custom_model(setup_clients):
     """Test launchpad helm values generation with a custom LLM model."""
-    # Custom models are not yet supported, so this should raise a ValueError
-    with pytest.raises(ValueError, match="Unsupported LLM model type"):
-        helm_args, helm_params = await app_type_to_vals(
-            input_=LaunchpadAppInputs(
-                launchpad_config=LaunchpadConfig(
+    # Custom models are now supported
+    _, helm_params = await app_type_to_vals(
+        input_=LaunchpadAppInputs(
+            launchpad_config=LaunchpadConfig(
+                preset=Preset(name="cpu-small"),
+            ),
+            apps_config=AppsConfig(
+                llm_config=LLMConfig(
+                    model=CustomLLMModel(
+                        model_name="my-custom-model",
+                        model_apolo_path=ApoloFilesPath(
+                            path="storage://cluster/org/project/models/my-model"
+                        ),
+                        server_extra_args=[
+                            "--max-model-len",
+                            "4096",
+                            "--tensor-parallel-size",
+                            "2",
+                        ],
+                    ),
+                    llm_preset=Preset(name="gpu-xlarge"),
+                    ui_preset=Preset(name="cpu-small"),
+                ),
+                postgres_config=PostgresConfig(
                     preset=Preset(name="cpu-small"),
                 ),
-                apps_config=AppsConfig(
-                    llm_config=LLMConfig(
-                        model=CustomLLMModel(
-                            model_name="my-custom-model",
-                            model_apolo_path=ApoloFilesPath(
-                                path="storage://cluster/org/project/models/my-model"
-                            ),
-                            server_extra_args=[
-                                "--max-model-len",
-                                "4096",
-                                "--tensor-parallel-size",
-                                "2",
-                            ],
-                        ),
-                        llm_preset=Preset(name="gpu-xlarge"),
-                        ui_preset=Preset(name="cpu-small"),
-                    ),
-                    postgres_config=PostgresConfig(
-                        preset=Preset(name="cpu-small"),
-                    ),
-                    embeddings_config=TextEmbeddingsConfig(
-                        model=PreConfiguredEmbeddingsModels.BAAI_BGE_M3,
-                        preset=Preset(name="gpu-small"),
-                    ),
+                embeddings_config=TextEmbeddingsConfig(
+                    model=PreConfiguredEmbeddingsModels.BAAI_BGE_M3,
+                    preset=Preset(name="gpu-small"),
                 ),
             ),
-            apolo_client=setup_clients,
-            app_type=AppType.Launchpad,
-            app_name="launchpad-app",
-            namespace="default-namespace",
-            app_secrets_name=APP_SECRETS_NAME,
-            app_id=APP_ID,
-        )
+        ),
+        apolo_client=setup_clients,
+        app_type=AppType.Launchpad,
+        app_name="launchpad-app",
+        namespace="default-namespace",
+        app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
+    )
+
+    # Validate that custom model configuration works
+    expected_vllm_config = {
+        "hugging_face_model": {
+            "model_hf_name": "my-custom-model",
+            "hf_token": None,
+            "__type__": "HuggingFaceModel",
+        },
+        "preset": {"name": "gpu-xlarge", "__type__": "Preset"},
+        "server_extra_args": [
+            "--max-model-len",
+            "4096",
+            "--tensor-parallel-size",
+            "2",
+        ],
+        "cache_config": {
+            "files_path": {
+                "path": "storage://cluster/org/project/models/my-model",
+                "__type__": "ApoloFilesPath",
+            },
+            "__type__": "HuggingFaceCache",
+        },
+    }
+
+    # Check that the custom model configuration is correct
+    launchpad_config = json.loads(helm_params["LAUNCHPAD_INITIAL_CONFIG"])
+    assert launchpad_config["vllm"] == expected_vllm_config
+
+    # Check that dynamic fields are present
+    assert "dbPassword" in helm_params
+    assert "dbSecretName" in helm_params
+    assert "domain" in helm_params
+    assert "keycloak" in helm_params
+    assert "postgresql" in helm_params
 
 
 @pytest.mark.asyncio
 async def test_launchpad_values_generation_magistral_model(setup_clients):
     """Test launchpad helm values generation with Magistral pre-configured model."""
-    helm_args, helm_params = await app_type_to_vals(
+    _, helm_params = await app_type_to_vals(
         input_=LaunchpadAppInputs(
             launchpad_config=LaunchpadConfig(
                 preset=Preset(name="cpu-medium"),
             ),
             apps_config=AppsConfig(
                 llm_config=LLMConfig(
-                    model=PreConfiguredLLMModels.MAGISTRAL_24B,
+                    model=PreConfiguredHuggingFaceLLMModel(
+                        model=PreConfiguredLLMModels.MAGISTRAL_24B
+                    ),
                     llm_preset=Preset(name="gpu-medium"),
                     ui_preset=Preset(name="cpu-small"),
                 ),
