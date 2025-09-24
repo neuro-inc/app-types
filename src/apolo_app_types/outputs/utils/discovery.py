@@ -70,7 +70,7 @@ def load_app_preprocessor(
     exact_type_name: str | None = None,
 ) -> type[BaseChartValueProcessor] | None:  # type: ignore
     return load_app_component(
-        app_type, package_name, BaseChartValueProcessor, exact_type_name, package_name
+        app_type, package_name, BaseChartValueProcessor, exact_type_name
     )
 
 
