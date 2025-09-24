@@ -10,21 +10,21 @@ from apolo_app_types.outputs.base import BaseAppOutputsProcessor
 
 
 logger = logging.getLogger(__name__)
+APOLO_APP_PACKAGE_PREFIX = "apolo_apps_"
 
 
 def load_app_component(
     app_type: str,
+    package_name: str,
     component_base_type: type[t.Any],
     exact_type_name: str | None = None,
-    apolo_app_package_prefix: str = "apolo_apps_",
 ) -> type[t.Any] | None:
     discovered_plugins = {}
     for _finder, name, _ispkg in pkgutil.iter_modules():
-        if name.startswith(apolo_app_package_prefix):
+        if name == package_name:
             try:
                 candidate = importlib.import_module(name)
-                candidate_app_type = candidate.APOLO_APP_TYPE
-                discovered_plugins[candidate_app_type] = candidate
+                discovered_plugins[app_type] = candidate
             except (ImportError, AttributeError) as e:
                 msg = f"Failed to import {name}: {e}"
                 logger.warning(msg)
@@ -55,30 +55,28 @@ def load_app_component(
 
 
 def load_app_postprocessor(
-    app_id: str,
+    app_type: str,
+    package_name: str,
     exact_type_name: str | None = None,
-    apolo_app_package_prefix: str = "apolo_apps_",
 ) -> type[BaseAppOutputsProcessor] | None:  # type: ignore
     return load_app_component(
-        app_id, BaseAppOutputsProcessor, exact_type_name, apolo_app_package_prefix
+        app_type, package_name, BaseAppOutputsProcessor, exact_type_name
     )
 
 
 def load_app_preprocessor(
     app_type: str,
+    package_name: str,
     exact_type_name: str | None = None,
-    apolo_app_package_prefix: str = "apolo_apps_",
 ) -> type[BaseChartValueProcessor] | None:  # type: ignore
     return load_app_component(
-        app_type, BaseChartValueProcessor, exact_type_name, apolo_app_package_prefix
+        app_type, package_name, BaseChartValueProcessor, exact_type_name
     )
 
 
 def load_app_inputs(
     app_type: str,
+    package_name: str,
     exact_type_name: str | None = None,
-    apolo_app_package_prefix: str = "apolo_apps_",
 ) -> type[AppInputs] | None:
-    return load_app_component(
-        app_type, AppInputs, exact_type_name, apolo_app_package_prefix
-    )
+    return load_app_component(app_type, package_name, AppInputs, exact_type_name)
