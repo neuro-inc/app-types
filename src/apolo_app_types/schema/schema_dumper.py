@@ -10,8 +10,6 @@ from pathlib import Path
 from apolo_app_types import AppInputs, AppOutputs
 
 
-APOLO_APP_TYPE_ATTR_NAME = "APOLO_APP_TYPE"
-
 logger = logging.getLogger(__name__)
 
 
@@ -40,13 +38,7 @@ def dump_schema_type(
     with patch_path_maybe(app_package_path):
         package = importlib.import_module(app_package_path.name)
 
-    app_type = getattr(package, APOLO_APP_TYPE_ATTR_NAME, "")
-    if app_type != expected_app_type_name:
-        msg = (
-            f"Module {app_package_path}/__init__.py has {app_type=} "
-            f"but expected {expected_app_type_name}"
-        )
-        raise ValueError(msg)
+    app_type = expected_app_type_name
 
     cls = None
     for cls_name, cls in inspect.getmembers(package, inspect.isclass):
