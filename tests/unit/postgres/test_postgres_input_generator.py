@@ -33,7 +33,7 @@ async def test_values_postgresql_generation(setup_clients, mock_get_preset_cpu):
                 postgres_version=PostgresSupportedVersions.v16,
                 instance_replicas=3,
                 instance_size=1,
-                db_users=[PostgresDBUser(name="some_name", db_names=["some_db"])],
+                db_users=[PostgresDBUser(name="somename", db_names=["somedb"])],
             ),
             pg_bouncer=PGBouncer(
                 preset=Preset(
@@ -67,9 +67,9 @@ async def test_values_postgresql_generation(setup_clients, mock_get_preset_cpu):
     assert helm_params["users"] == [
         {"name": "postgres"},
         {
-            "name": "some_name",
+            "name": "somename",
             "password": {"type": "AlphaNumeric"},
-            "databases": ["some_db"],
+            "databases": ["somedb"],
         },
     ]
     assert helm_params["gcs"] == {

@@ -4,7 +4,7 @@ import enum
 import typing as t
 from typing import Literal
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, constr, model_validator
 
 from apolo_app_types.protocols.common import (
     AbstractAppFieldType,
@@ -71,13 +71,28 @@ class PostgresSupportedVersions(enum.StrEnum):
     v16 = "16"
 
 
+POSTGRES_RESOURCES_PATTERN = r"^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+
+
 class PostgresDBUser(AbstractAppFieldType):
-    name: str = Field(
+    name: constr(
+        strip_whitespace=True,
+        min_length=1,
+        max_length=63,
+        pattern=POSTGRES_RESOURCES_PATTERN,
+    ) = Field(
         ...,
         description="Name of the database user.",
         title="Database user name",
     )
-    db_names: list[str] = Field(
+    db_names: list[
+        constr(
+            strip_whitespace=True,
+            min_length=1,
+            max_length=63,
+            pattern=POSTGRES_RESOURCES_PATTERN,
+        )
+    ] = Field(
         default_factory=list,
         description="Name of the database.",
         title="Database name",
