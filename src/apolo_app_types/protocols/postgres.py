@@ -86,7 +86,7 @@ class PostgresDBUser(AbstractAppFieldType):
         title="Database user name",
     )
 
-    db_names: t.List[
+    db_names: list[
         constr(
             strip_whitespace=True,
             min_length=1,
