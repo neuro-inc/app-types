@@ -33,7 +33,7 @@ async def test_values_postgresql_generation(setup_clients, mock_get_preset_cpu):
                 postgres_version=PostgresSupportedVersions.v16,
                 instance_replicas=3,
                 instance_size=1,
-                db_users=[PostgresDBUser(name="some_name", db_names=["some_db"])],
+                db_users=[PostgresDBUser(name="somename", db_names=["somedb"])],
             ),
             pg_bouncer=PGBouncer(
                 preset=Preset(
@@ -67,15 +67,54 @@ async def test_values_postgresql_generation(setup_clients, mock_get_preset_cpu):
     assert helm_params["users"] == [
         {"name": "postgres"},
         {
-            "name": "some_name",
+            "name": "somename",
             "password": {"type": "AlphaNumeric"},
-            "databases": ["some_db"],
+            "databases": ["somedb"],
         },
     ]
     assert helm_params["gcs"] == {
         "bucket": "test-bucket",
         "key": "bucket-access-key",
     }
+
+
+@pytest.mark.asyncio
+async def test_values_postgresql_generation_invalid_name(
+    setup_clients, mock_get_preset_cpu
+):
+    from apolo_app_types.inputs.args import app_type_to_vals
+
+    apolo_client = setup_clients
+    with pytest.raises(pydantic.ValidationError) as err:
+        _, helm_params = await app_type_to_vals(
+            input_=PostgresInputs(
+                preset=Preset(
+                    name="cpu-large",
+                ),
+                postgres_config=PostgresConfig(
+                    postgres_version=PostgresSupportedVersions.v16,
+                    instance_replicas=3,
+                    instance_size=1,
+                    db_users=[PostgresDBUser(name="some_name", db_names=["somedb"])],
+                ),
+                pg_bouncer=PGBouncer(
+                    preset=Preset(
+                        name="cpu-large",
+                    ),
+                ),
+                backup=PGBackupConfig(),
+            ),
+            apolo_client=apolo_client,
+            app_type=AppType.PostgreSQL,
+            app_name="psdb",
+            namespace=DEFAULT_NAMESPACE,
+            app_secrets_name=APP_SECRETS_NAME,
+            app_id=APP_ID,
+        )
+    assert (
+        err.value.errors()[0]["msg"]
+        == "String should match pattern '^[a-z0-9]([-a-z0-9]*[a-z0-9])?$'"
+    )
 
 
 @pytest.mark.asyncio

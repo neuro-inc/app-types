@@ -116,9 +116,7 @@ class LaunchpadChartValueProcessor(BaseChartValueProcessor[LaunchpadAppInputs]):
             preset=input_.apps_config.postgres_config.preset,
             postgres_config=PostgresConfig(
                 instance_replicas=input_.apps_config.postgres_config.replicas,
-                db_users=[
-                    PostgresDBUser(name="launchpad_user", db_names=["launchpad"])
-                ],
+                db_users=[PostgresDBUser(name="launchpaduser", db_names=["launchpad"])],
             ),
             pg_bouncer=PGBouncer(
                 preset=input_.apps_config.postgres_config.preset,

@@ -95,7 +95,6 @@ disallow_untyped_defs = true
 follow_imports = "silent"
 strict_optional = true
 warn_redundant_casts = true
-warn_unused_ignores = true
 warn_unused_configs = true
 plugins = ['pydantic.mypy']
 
