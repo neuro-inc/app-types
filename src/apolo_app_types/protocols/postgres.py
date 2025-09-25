@@ -74,29 +74,38 @@ class PostgresSupportedVersions(enum.StrEnum):
 POSTGRES_RESOURCES_PATTERN = r"^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
 
 
+PostgresName = constr(
+    strip_whitespace=True,
+    min_length=1,
+    max_length=63,
+    pattern=POSTGRES_RESOURCES_PATTERN,
+)  # type: ignore[valid-type]
+
+
 class PostgresDBUser(AbstractAppFieldType):
-    name: constr(
-        strip_whitespace=True,
-        min_length=1,
-        max_length=63,
-        pattern=POSTGRES_RESOURCES_PATTERN,
-    ) = Field(  # type: ignore[valid-type]
+    name: PostgresName = Field(  # type: ignore[valid-type]
         ...,
-        description="Name of the database user.",
-        title="Database user name",
+        json_schema_extra=SchemaExtraMetadata(
+            description=(
+                "Name of the database user. "
+                "Must be 1-63 characters long, start and end with a lowercase letter "
+                "or number, and contain only lowercase letters, numbers, or hyphens."
+            ),
+            title="Database user name",
+        ).as_json_schema_extra(),
     )
 
-    db_names: list[
-        constr(
-            strip_whitespace=True,
-            min_length=1,
-            max_length=63,
-            pattern=POSTGRES_RESOURCES_PATTERN,
-        )
+    db_names: list[  # type: ignore[valid-type]
+        PostgresName  # type: ignore[valid-type]
     ] = Field(  # type: ignore[valid-type]
         default_factory=list,
-        description="Name of the database.",
-        title="Database name",
+        json_schema_extra=SchemaExtraMetadata(
+            description=(
+                "List of databases this user should have access to. "
+                "Databases will be created if they do not exist."
+            ),
+            title="Databases",
+        ).as_json_schema_extra(),
     )
 
 
@@ -152,7 +161,7 @@ class PostgresConfig(AbstractAppFieldType):
             raise ValueError(err_msg)
 
         for user in self.db_users:
-            if user.name.lower() == POSTGRES_ADMIN_DEFAULT_USER_NAME:
+            if user.name.lower() == POSTGRES_ADMIN_DEFAULT_USER_NAME:  # type: ignore[attr-defined]
                 err_msg = (
                     f"User name '{POSTGRES_ADMIN_DEFAULT_USER_NAME}'"
                     f" is reserved and this user will be created automatically."
