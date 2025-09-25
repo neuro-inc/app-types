@@ -80,19 +80,20 @@ class PostgresDBUser(AbstractAppFieldType):
         min_length=1,
         max_length=63,
         pattern=POSTGRES_RESOURCES_PATTERN,
-    ) = Field(
+    ) = Field(  # type: ignore[valid-type]
         ...,
         description="Name of the database user.",
         title="Database user name",
     )
-    db_names: list[
+
+    db_names: t.List[
         constr(
             strip_whitespace=True,
             min_length=1,
             max_length=63,
             pattern=POSTGRES_RESOURCES_PATTERN,
         )
-    ] = Field(
+    ] = Field(  # type: ignore[valid-type]
         default_factory=list,
         description="Name of the database.",
         title="Database name",
