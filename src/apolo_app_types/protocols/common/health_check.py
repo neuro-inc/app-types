@@ -1,5 +1,5 @@
+import typing as t
 from enum import Enum
-from typing import Literal
 
 from pydantic import ConfigDict, Field, field_validator
 
@@ -51,7 +51,7 @@ class HTTPHealthCheckConfig(HealthCheckConfigBase):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
-    probe_type: Literal[ProbeType.HTTP] = Field(default=ProbeType.HTTP)
+    probe_type: t.Literal[ProbeType.HTTP] = Field(default=ProbeType.HTTP)
     path: str = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
@@ -59,7 +59,29 @@ class HTTPHealthCheckConfig(HealthCheckConfigBase):
             description="Path to access on the HTTP server",
         ).as_json_schema_extra(),
     )
-    http_headers: dict[str, str] | None = Field(
+    http_headers: (
+        dict[
+            t.Annotated[
+                str,
+                Field(
+                    json_schema_extra=SchemaExtraMetadata(
+                        title="Header Name",
+                        description="Name of the HTTP header",
+                    ).as_json_schema_extra()
+                ),
+            ],
+            t.Annotated[
+                str,
+                Field(
+                    json_schema_extra=SchemaExtraMetadata(
+                        title="Header Value",
+                        description="Value of the HTTP header",
+                    ).as_json_schema_extra()
+                ),
+            ],
+        ]
+        | None
+    ) = Field(
         None,
         json_schema_extra=SchemaExtraMetadata(
             title="HTTP Headers",
@@ -81,7 +103,7 @@ class GRPCHealthCheckConfig(HealthCheckConfigBase):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
-    probe_type: Literal[ProbeType.GRPC] = Field(default=ProbeType.GRPC)
+    probe_type: t.Literal[ProbeType.GRPC] = Field(default=ProbeType.GRPC)
     service: str = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
@@ -104,7 +126,7 @@ class TCPHealthCheckConfig(HealthCheckConfigBase):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
-    probe_type: Literal[ProbeType.TCP] = Field(default=ProbeType.TCP)
+    probe_type: t.Literal[ProbeType.TCP] = Field(default=ProbeType.TCP)
     # No additional fields needed for TCP, just the connection attempt itself
 
 
@@ -121,7 +143,7 @@ class ExecHealthCheckConfig(AbstractAppFieldType):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
-    probe_type: Literal[ProbeType.EXEC] = Field(default=ProbeType.EXEC)
+    probe_type: t.Literal[ProbeType.EXEC] = Field(default=ProbeType.EXEC)
     command: list[str] = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
