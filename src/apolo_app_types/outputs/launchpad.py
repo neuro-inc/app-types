@@ -7,10 +7,14 @@ from apolo_app_types.outputs.common import INSTANCE_LABEL
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
 from apolo_app_types.protocols.apps import AppInstance
 from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI, WebApp
-from apolo_app_types.protocols.launchpad import KeycloakConfig, LaunchpadAppOutputs
+from apolo_app_types.protocols.launchpad import (
+    InstalledApps,
+    KeycloakConfig,
+    LaunchpadAppOutputs,
+)
 
 
-async def _get_installed_apps(admin_password: str, api: HttpApi) -> list[AppInstance]:
+async def _get_installed_apps(admin_password: str, api: HttpApi) -> InstalledApps:
     async with httpx.AsyncClient() as client:
         response = await client.get(
             f"{api.protocol}://{api.host}:{api.port}{api.base_path}instances",
@@ -27,7 +31,7 @@ async def _get_installed_apps(admin_password: str, api: HttpApi) -> list[AppInst
             )
             installed_apps.append(app_instance)
 
-        return installed_apps
+        return InstalledApps(app_list=installed_apps)
 
 
 async def get_launchpad_outputs(

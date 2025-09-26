@@ -276,6 +276,23 @@ class KeycloakConfig(AbstractAppFieldType):
     )
 
 
+class InstalledApps(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Installed Applications",
+            description="Applications that are installed via the Launchpad.",
+        ).as_json_schema_extra(),
+    )
+    app_list: list[AppInstance] = Field(
+        default_factory=list,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Installed Applications",
+            description="List of applications installed via the Launchpad.",
+        ).as_json_schema_extra(),
+    )
+
+
 class LaunchpadAppOutputs(AppOutputs):
     keycloak_config: KeycloakConfig | None = None
-    installed_apps: list[AppInstance] | None = None
+    installed_apps: InstalledApps | None = None
