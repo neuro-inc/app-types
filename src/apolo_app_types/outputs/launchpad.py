@@ -1,10 +1,33 @@
 import typing as t
 
+import httpx
+
 from apolo_app_types.clients.kube import get_service_host_port
 from apolo_app_types.outputs.common import INSTANCE_LABEL
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
+from apolo_app_types.protocols.apps import AppInstance
 from apolo_app_types.protocols.common.networking import HttpApi, ServiceAPI, WebApp
 from apolo_app_types.protocols.launchpad import KeycloakConfig, LaunchpadAppOutputs
+
+
+async def _get_installed_apps(admin_password: str, api: HttpApi) -> list[AppInstance]:
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{api.protocol}://{api.host}:{api.port}{api.base_path}instances",
+            auth=httpx.BasicAuth("admin", admin_password),
+        )
+        response.raise_for_status()
+        apps_data = response.json()
+
+        installed_apps = []
+        for app in apps_data:
+            app_instance = AppInstance(
+                app_id=app.get("app_id", ""),
+                app_name=app.get("app_name", ""),
+            )
+            installed_apps.append(app_instance)
+
+        return installed_apps
 
 
 async def get_launchpad_outputs(
@@ -73,6 +96,20 @@ async def get_launchpad_outputs(
         )
 
     keycloak_password = helm_values["keycloak"]["auth"]["adminPassword"]
+
+    # getting Launchpad API url
+    api_labels = {**labels, "service": "launchpad"}
+    internal_host, internal_port = await get_service_host_port(match_labels=api_labels)
+    api_http_url = None
+    if internal_host:
+        api_http_url = HttpApi(
+            host=internal_host,
+            port=int(internal_port),
+            base_path="/",
+            protocol="http",
+        )
+    launchpad_admin_password = helm_values.get("LAUNCHPAD_ADMIN_PASSWORD", None)
+
     outputs = LaunchpadAppOutputs(
         app_url=ServiceAPI[WebApp](
             internal_url=internal_web_app_url,
@@ -85,5 +122,11 @@ async def get_launchpad_outputs(
             ),
             auth_admin_password=keycloak_password,
         ),
+        installed_apps=await _get_installed_apps(
+            admin_password=launchpad_admin_password,
+            api=api_http_url,
+        )
+        if api_http_url and launchpad_admin_password
+        else None,
     )
     return outputs.model_dump()

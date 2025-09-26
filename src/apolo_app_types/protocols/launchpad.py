@@ -7,6 +7,7 @@ from apolo_app_types import (
     AppOutputs,
     HuggingFaceModel,
 )
+from apolo_app_types.protocols.apps import AppInstance
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.networking import (
     HttpApi,
@@ -277,3 +278,4 @@ class KeycloakConfig(AbstractAppFieldType):
 
 class LaunchpadAppOutputs(AppOutputs):
     keycloak_config: KeycloakConfig | None = None
+    installed_apps: list[AppInstance] | None = None
