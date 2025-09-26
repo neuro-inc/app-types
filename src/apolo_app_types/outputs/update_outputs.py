@@ -42,7 +42,9 @@ MAX_RETRIES = 5
 RETRY_DELAY = 10  # seconds
 
 
-async def post_outputs(api_url: str, api_token: str, outputs: dict[str, t.Any]) -> None:
+async def post_outputs(
+    api_url: str, api_token: str, outputs: dict[str, t.Any], method: str = "patch"
+) -> None:
     timeout = httpx.Timeout(
         connect=10.0,
         read=30.0,
@@ -65,7 +67,12 @@ async def post_outputs(api_url: str, api_token: str, outputs: dict[str, t.Any]) 
                 logger.debug("Request headers: %s", headers)
                 logger.debug("Request body: %s", payload)
 
-                response = await client.post(api_url, headers=headers, json=payload)
+                if method.lower() == "patch":
+                    response = await client.patch(
+                        api_url, headers=headers, json=payload
+                    )
+                else:
+                    response = await client.post(api_url, headers=headers, json=payload)
 
                 elapsed = time.perf_counter() - start_time
                 logger.info(
