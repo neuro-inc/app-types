@@ -7,7 +7,9 @@ import apolo_sdk
 import pytest
 from apolo_sdk import AppsConfig
 from yarl import URL
-from .constants import DEFAULT_ORG_NAME, DEFAULT_CLUSTER_NAME, DEFAULT_PROJECT_NAME
+
+from .constants import DEFAULT_CLUSTER_NAME, DEFAULT_ORG_NAME, DEFAULT_PROJECT_NAME
+
 
 @pytest.fixture
 async def setup_clients(presets_available):
@@ -107,4 +109,3 @@ async def setup_clients(presets_available):
             apolo_client = await stack.enter_async_context(mock_get())
             yield apolo_client
             await stack.aclose()
-
