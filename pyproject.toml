@@ -38,6 +38,7 @@ license = "Apache 2"
 authors = ["Apolo.us"]
 packages = [
   { include = "apolo_app_types", from = "src" },
+  { include = "apolo_app_types_fixtures", from = "fixtures" },
 ]
 
 [tool.poetry.extras]
@@ -58,9 +59,6 @@ jsonref = "^1.1.0"
 enable = true
 vcs = "git"
 
-include = [
-  { path = "fixtures/apolo_app_types_fixtures", format = "sdist" },
-]
 [tool.poetry.group.dev]
 optional = true
 
