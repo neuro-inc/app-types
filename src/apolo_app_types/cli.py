@@ -174,7 +174,6 @@ def run_preprocessor(
 @click.argument("output_path", type=Path)
 def dump_types_schema(
     app_package_path: Path,
-    expected_app_type_name: str,
     exact_type_name: str,
     output_path: Path,
 ) -> None:
@@ -184,7 +183,6 @@ def dump_types_schema(
     Args:
         app_package_path (Path): The path to the application package,
         absolute or relative to the current working directory.
-            expected_app_type_name (str): The expected application type name.
         exact_type_name (str): The exact type name to dump the schema for.
         output_path (Path): The path to the output file.
 
@@ -196,7 +194,6 @@ def dump_types_schema(
     """
     dump_schema_type(
         app_package_path=app_package_path,
-        expected_app_type_name=expected_app_type_name,
         exact_type_name=exact_type_name,
         output_path=output_path,
     )

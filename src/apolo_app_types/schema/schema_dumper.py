@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 def dump_schema_type(
     app_package_path: Path,
-    expected_app_type_name: str,
     exact_type_name: str,
     output_path: Path,
 ) -> None:
@@ -38,16 +37,14 @@ def dump_schema_type(
     with patch_path_maybe(app_package_path):
         package = importlib.import_module(app_package_path.name)
 
-    app_type = expected_app_type_name
-
     cls = None
     for cls_name, cls in inspect.getmembers(package, inspect.isclass):
         if issubclass(cls, AppInputs | AppOutputs) and cls_name == exact_type_name:
-            msg = f"Found {cls_name} for {app_type}"
+            msg = f"Found {cls_name} for {package}"
             logger.info(msg)
             break
     if not cls:
-        msg = f"No {exact_type_name} found for {app_type}"
+        msg = f"No {exact_type_name} found"
         logger.error(msg)
         raise ValueError(msg)
 
