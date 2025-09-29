@@ -14,7 +14,7 @@ endif
 
 .PHONY: setup
 setup:
-	poetry install --with dev
+	poetry install -E fixtures --with dev
 	poetry run pre-commit install;
 
 .PHONY: lint

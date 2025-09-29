@@ -14,9 +14,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 COPY README.md poetry.lock pyproject.toml ./
-RUN pip --no-cache-dir install poetry && poetry install --no-root --no-cache
+RUN pip --no-cache-dir install poetry && poetry install -E fixtures --no-root --no-cache
 
 COPY src ./src
-RUN poetry install --only-root --no-cache
+COPY fixtures ./fixtures
+RUN poetry install -E fixtures --only-root --no-cache
 
 ENTRYPOINT ["app-types"]
