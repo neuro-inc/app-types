@@ -38,8 +38,10 @@ license = "Apache 2"
 authors = ["Apolo.us"]
 packages = [
   { include = "apolo_app_types", from = "src" },
-  { include = "apolo_app_types_fixtures", from = "fixtures" },
 ]
+
+[tool.poetry.include]
+"apolo_app_types_fixtures/**" = { path = "fixtures" }
 
 [tool.poetry.extras]
 fixtures = ["pytest", "pytest-asyncio"]

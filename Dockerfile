@@ -18,6 +18,6 @@ RUN pip --no-cache-dir install poetry && poetry install --no-root --no-cache
 
 COPY src ./src
 COPY fixtures ./fixtures
-RUN poetry install --only-root --no-cache
+RUN poetry install -E fixtures --only-root --no-cache
 
 ENTRYPOINT ["app-types"]
