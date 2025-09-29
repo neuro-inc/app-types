@@ -432,33 +432,6 @@ class ContainerHTTPServer(AbstractAppFieldType):
     )
 
 
-class JobIntegrationsConfig(AbstractAppFieldType):
-    """Integrations configuration."""
-
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Integrations",
-            description="Integrate your job with applications.",
-            is_advanced_field=True,
-        ).as_json_schema_extra(),
-    )
-
-    mlflow_integration: MLFlowTrackingServerURL = Field(
-        default=MLFlowTrackingServerURL(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="MLFlow Integration",
-            description=(
-                "Preconfigure the job to access the MLflow server. "
-                "If enabled, the job will receive the MLflow tracking server URL"
-                "as the MLFLOW_TRACKING_URI environment variable and will be "
-                "authorized to access it."
-            ),
-            meta_type=SchemaMetaType.INTEGRATION,
-        ).as_json_schema_extra(),
-    )
-
-
 class JobAppInput(AppInputs):
     """Top-level configuration for a generic batch/Job container."""
 
@@ -483,8 +456,18 @@ class JobAppInput(AppInputs):
         default_factory=JobNetworkingConfig,
     )
 
-    integrations: JobIntegrationsConfig = Field(
-        default_factory=JobIntegrationsConfig,
+    mlflow_integration: MLFlowTrackingServerURL = Field(
+        default=MLFlowTrackingServerURL(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="MLFlow Integration",
+            description=(
+                "Preconfigure the job to access the MLflow server. "
+                "If enabled, the job will receive the MLflow tracking server URL"
+                "as the MLFLOW_TRACKING_URI environment variable and will be "
+                "authorized to access it."
+            ),
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
     )
 
     scheduling: JobSchedulingConfig = Field(

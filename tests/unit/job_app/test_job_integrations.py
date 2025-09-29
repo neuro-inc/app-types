@@ -5,7 +5,6 @@ from apolo_app_types.protocols.common import ApoloSecret, Env, Preset, RestAPI
 from apolo_app_types.protocols.job import (
     JobAppInput,
     JobImageConfig,
-    JobIntegrationsConfig,
     JobResourcesConfig,
     JobSchedulingConfig,
 )
@@ -17,10 +16,8 @@ def test_prepare_job_with_mlflow_integration(setup_clients, mock_get_preset_cpu)
         image=JobImageConfig(image="python:3.9"),
         resources=JobResourcesConfig(preset=Preset(name="cpu-small")),
         scheduling=JobSchedulingConfig(max_run_time_minutes=0),
-        integrations=JobIntegrationsConfig(
-            mlflow_integration=MLFlowTrackingServerURL(
-                internal_url=RestAPI(host="mlflow.example.com")
-            )
+        mlflow_integration=MLFlowTrackingServerURL(
+            internal_url=RestAPI(host="mlflow.example.com")
         ),
     )
 
@@ -50,10 +47,8 @@ def test_prepare_job_with_mlflow_integration_conflicts_with_env(
         ),
         resources=JobResourcesConfig(preset=Preset(name="cpu-small")),
         scheduling=JobSchedulingConfig(max_run_time_minutes=0),
-        integrations=JobIntegrationsConfig(
-            mlflow_integration=MLFlowTrackingServerURL(
-                internal_url=RestAPI(host="mlflow.example.com")
-            )
+        mlflow_integration=MLFlowTrackingServerURL(
+            internal_url=RestAPI(host="mlflow.example.com")
         ),
     )
 
@@ -85,10 +80,8 @@ def test_prepare_job_with_mlflow_integration_conflicts_with_secret_env(
         ),
         resources=JobResourcesConfig(preset=Preset(name="cpu-small")),
         scheduling=JobSchedulingConfig(max_run_time_minutes=0),
-        integrations=JobIntegrationsConfig(
-            mlflow_integration=MLFlowTrackingServerURL(
-                internal_url=RestAPI(host="mlflow.example.com")
-            )
+        mlflow_integration=MLFlowTrackingServerURL(
+            internal_url=RestAPI(host="mlflow.example.com")
         ),
     )
 
