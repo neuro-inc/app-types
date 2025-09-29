@@ -1,19 +1,21 @@
-from contextlib import AsyncExitStack
 import base64
 from contextlib import AsyncExitStack
 from datetime import datetime
 from decimal import Decimal
-from unittest.mock import AsyncMock, PropertyMock
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 
 import apolo_sdk
 import pytest
-from apolo_sdk import AppsConfig
-from apolo_sdk import Preset
+from apolo_sdk import AppsConfig, Preset
 from apolo_sdk._server_cfg import NvidiaGPUPreset
 from yarl import URL
 
-from .constants import DEFAULT_CLUSTER_NAME, DEFAULT_ORG_NAME, DEFAULT_PROJECT_NAME, TEST_PRESETS
+from .constants import (
+    DEFAULT_CLUSTER_NAME,
+    DEFAULT_ORG_NAME,
+    DEFAULT_PROJECT_NAME,
+    TEST_PRESETS,
+)
 
 
 @pytest.fixture
@@ -114,7 +116,6 @@ async def setup_clients(presets_available):
             apolo_client = await stack.enter_async_context(mock_get())
             yield apolo_client
             await stack.aclose()
-
 
 
 def encode_b64(value: str) -> str:

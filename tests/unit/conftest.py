@@ -1,12 +1,7 @@
-import base64
 import itertools
 from dataclasses import dataclass
-from decimal import Decimal
-from unittest.mock import MagicMock, patch
 
 import pytest
-from apolo_sdk import Preset
-from apolo_sdk._server_cfg import NvidiaGPUPreset
 
 from tests.unit.constants import (
     CUSTOM_AUTH_MIDDLEWARE,
@@ -14,12 +9,10 @@ from tests.unit.constants import (
     DATABASE_POSTGRES,
     DATABASE_SQLITE,
     DEFAULT_AUTH_MIDDLEWARE,
-    TEST_PRESETS,
 )
 
 
 pytest_plugins = ["apolo_app_types_fixtures"]
-
 
 
 # OpenWebUI Test Case Generation
