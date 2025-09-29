@@ -40,9 +40,6 @@ packages = [
   { include = "apolo_app_types", from = "src" },
 ]
 
-[tool.poetry.include]
-"apolo_app_types_fixtures/**" = { path = "fixtures" }
-
 [tool.poetry.extras]
 fixtures = ["pytest", "pytest-asyncio"]
 
@@ -61,6 +58,9 @@ jsonref = "^1.1.0"
 enable = true
 vcs = "git"
 
+include = [
+  { path = "fixtures/apolo_app_types_fixtures", format = "sdist" },
+]
 [tool.poetry.group.dev]
 optional = true
 
