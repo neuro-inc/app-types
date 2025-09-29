@@ -73,7 +73,7 @@ def prepare_job_run_params(  # noqa: C901
             secret_env_dict[env_var.name] = URL(f"secret://{env_var.value.key}")
 
     # Process job integrations envs
-    mlflow_integration = job_input.integrations.mlflow_integration
+    mlflow_integration = job_input.mlflow_integration
     if mlflow_integration.internal_url:
         if (
             "MLFLOW_TRACKING_URI" in env_dict
