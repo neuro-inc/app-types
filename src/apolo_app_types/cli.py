@@ -169,7 +169,6 @@ def run_preprocessor(
 
 @cli.command("dump-types-schema")
 @click.argument("app_package_path", type=Path)
-@click.argument("expected_app_type_name", type=str)
 @click.argument("exact_type_name", type=str)
 @click.argument("output_path", type=Path)
 def dump_types_schema(
