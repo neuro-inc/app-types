@@ -42,6 +42,13 @@ CPU_PRESETS = {
 
 
 GPU_PRESETS = {
+    "gpu-small": Preset(
+        cpu=2.0,
+        memory=8,
+        nvidia_gpu=NvidiaGPUPreset(count=1, memory=2e9),
+        credits_per_hour=Decimal("0.2"),
+        available_resource_pool_names=("gpu_pool",),
+    ),
     "gpu-large": Preset(
         cpu=4.0,
         memory=16,

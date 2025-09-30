@@ -133,8 +133,8 @@ async def test_values_llm_generation_gpu(setup_clients, mock_get_preset_gpu):
         },
         "preset_name": "gpu-small",
         "resources": {
-            "requests": {"cpu": "1000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
-            "limits": {"cpu": "1000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
+            "requests": {"cpu": "2000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
+            "limits": {"cpu": "2000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
         },
         "tolerations": [
             {
@@ -429,8 +429,8 @@ async def test_values_llm_generation__storage_integrated(
         },
         "preset_name": "gpu-small",
         "resources": {
-            "requests": {"cpu": "1000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
-            "limits": {"cpu": "1000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
+            "requests": {"cpu": "2000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
+            "limits": {"cpu": "2000.0m", "memory": "0M", "nvidia.com/gpu": "1"},
         },
         "tolerations": [
             {
