@@ -217,9 +217,7 @@ async def update_app_outputs(  # noqa: C901
                     helm_outputs, app_instance_id
                 )
             case _:
-                package_name = (
-                    f"{APOLO_APP_PACKAGE_PREFIX}_{app_type.replace('-', '_')}"
-                )
+                package_name = f"{APOLO_APP_PACKAGE_PREFIX}{app_type.replace('-', '_')}"
                 # Try loading application postprocessor defined in the app repo
                 postprocessor = load_app_postprocessor(
                     app_type=app_type,
