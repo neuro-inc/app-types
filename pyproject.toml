@@ -48,7 +48,7 @@ fixtures = ["pytest", "pytest-asyncio"]
 apolo-sdk = "^25.9.0"
 click = "^8.0.3"
 httpx = "^0.28.0"
-kubernetes = "^34.1.0"
+kubernetes = "^33.1.0,!=34.1.0" # pinned due to https://github.com/kubernetes-client/python/issues/2458
 pydantic = "^2.11.9"
 pyyaml = "^6.0.3"
 types-PyYAML = "^6.0.12.20250915"
