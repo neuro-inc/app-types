@@ -365,10 +365,11 @@ class JobMetadataConfig(AbstractAppFieldType):
         str,
         Field(
             default="",
+            pattern=r"^$|^[a-z](?:-?[a-z0-9])*$",
             json_schema_extra=SchemaExtraMetadata(
                 title="Job Name",
-                description="Set a human-readable name for this job. It is also used "
-                "to generate a friendly public domain URL for the job.",
+                description="Job name used for public URL. "
+                "Must be lowercase letters, digits, and hyphens only.",
             ).as_json_schema_extra(),
         ),
     ] = ""
