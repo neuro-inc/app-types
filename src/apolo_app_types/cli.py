@@ -94,6 +94,7 @@ def update_outputs(
 @click.option("--apolo-cluster", type=str, envvar="APOLO_CLUSTER", required=True)
 @click.option("--apolo-project", type=str, envvar="APOLO_PROJECT", required=True)
 @click.option("--package-name", type=str)
+@click.option("--apolo-passed-config", type=str, envvar="APOLO_PASSED_CONFIG")
 def run_preprocessor(
     app_type: str,
     app_id: str,
@@ -111,6 +112,7 @@ def run_preprocessor(
     apolo_cluster: str,
     apolo_project: str,
     package_name: str,
+    apolo_passed_config: str | None,
 ) -> None:
     # template method, expanded by installing extra application modules
     async def _run_preprocessor() -> None:
@@ -153,6 +155,8 @@ def run_preprocessor(
                     app_secrets_name=apps_secret_name,
                     app_id=app_id,
                 )
+                if apolo_passed_config:
+                    extra_vals["APOLO_PASSED_CONFIG"] = apolo_passed_config
                 with helm_values_path.open("w") as f:  # noqa: ASYNC230
                     json.dump(extra_vals, f)
                 with helm_args_path.open("w") as f:  # noqa: ASYNC230
