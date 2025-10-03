@@ -9,7 +9,7 @@ from decimal import Decimal
 import apolo_sdk
 import yaml
 from apolo_sdk import Preset
-from neuro_config_client import NodePool
+from neuro_config_client import ResourcePoolType
 
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.ingress import (
@@ -104,9 +104,10 @@ def preset_to_affinity(preset: apolo_sdk.Preset) -> dict[str, t.Any]:
     return affinity
 
 
-async def get_resource_pools(preset: apolo_sdk.Preset) -> list[NodePool]:
+async def get_resource_pools(preset: apolo_sdk.Preset) -> list[ResourcePoolType]:
     async with apolo_sdk.get() as client:
-        pool_types = await client._clusters._client.list_node_pools(client.cluster_name)
+        cluster = await client._clusters.get_cluster(client.cluster_name)
+        pool_types = cluster.orchestrator.resource_pool_types
         return [p for p in pool_types if p.name in preset.resource_pool_names]
 
 
