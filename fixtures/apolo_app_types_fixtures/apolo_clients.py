@@ -8,7 +8,7 @@ import apolo_sdk
 import pytest
 from apolo_sdk import AppsConfig, Preset
 from apolo_sdk._server_cfg import NvidiaGPUPreset
-from neuro_config_client import NodePool
+from neuro_config_client import ResourcePoolType
 from yarl import URL
 
 from .constants import (
@@ -112,8 +112,8 @@ async def setup_clients(presets_available):
                     "gpu-extra-large": 1,
                 },
             )
-            fake_node_pools = [
-                NodePool(
+            fake_resource_pools = [
+                ResourcePoolType(
                     name="cpu-pool",
                     cpu=2.0,
                     available_cpu=2.0,
@@ -122,7 +122,7 @@ async def setup_clients(presets_available):
                     disk_size=100000,
                     available_disk_size=100000,
                 ),
-                NodePool(
+                ResourcePoolType(
                     name="gpu-small",
                     cpu=2.0,
                     available_cpu=2.0,
@@ -131,7 +131,7 @@ async def setup_clients(presets_available):
                     disk_size=100000,
                     available_disk_size=100000,
                 ),
-                NodePool(
+                ResourcePoolType(
                     name="misc-pool",
                     cpu=2.0,
                     available_cpu=2.0,
@@ -141,8 +141,10 @@ async def setup_clients(presets_available):
                     available_disk_size=100000,
                 ),
             ]
-            mock_apolo_client._clusters._client.list_node_pools = AsyncMock(
-                return_value=fake_node_pools
+            mock_apolo_client._clusters.get_cluster = AsyncMock(
+                return_value=MagicMock(
+                    orchestrator=MagicMock(resource_pool_types=fake_resource_pools)
+                )
             )
             mock_get.return_value.__aenter__.return_value = mock_apolo_client
             apolo_client = await stack.enter_async_context(mock_get())
