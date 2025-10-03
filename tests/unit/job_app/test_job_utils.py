@@ -46,7 +46,7 @@ def test_prepare_job_run_params_minimal(setup_clients, mock_get_preset_cpu):
     )
 
     assert isinstance(result, JobRunParams)
-    assert result.name == "test-app-test-ins"  # truncated to 8 chars
+    assert result.name == "test-app"
     assert result.tags == ["instance_id:test-instance-123"]
     assert result.description is None  # Empty string converted to None
     assert result.org_name == "test-org"
