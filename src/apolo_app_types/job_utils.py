@@ -115,9 +115,9 @@ def prepare_job_run_params(  # noqa: C901
     )
 
     job_name = (
-        job_input.metadata.name
+        job_input.metadata.name.strip()
         if job_input.metadata.name.strip()
-        else f"{app_instance_name}-{app_instance_id[:8]}"
+        else app_instance_name
     )
 
     tags = job_input.metadata.tags + [f"instance_id:{app_instance_id}"]
