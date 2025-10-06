@@ -150,15 +150,8 @@ class JobImageConfig(AbstractAppFieldType):
         default_factory=list,
         json_schema_extra=SchemaExtraMetadata(
             title="Environment Variables",
-            description="List of environment variables to inject into the container.",
-        ).as_json_schema_extra(),
-    )
-
-    secret_env: list[Env] = Field(
-        default_factory=list,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Secret Environment Variables",
-            description="Environment variables whose values come from secrets.",
+            description="List of environment variables to inject into the container. "
+            "Values can be plain strings or secret references.",
         ).as_json_schema_extra(),
     )
 
@@ -515,20 +508,6 @@ class JobAppOutput(AppOutputs):
                 json_schema_extra=SchemaExtraMetadata(
                     title="Job ID",
                     description="Unique identifier assigned to the submitted job.",
-                ).as_json_schema_extra()
-            ),
-        ]
-        | None
-    ) = None
-
-    job_status: (
-        t.Annotated[
-            str,
-            Field(
-                json_schema_extra=SchemaExtraMetadata(
-                    title="Job Status",
-                    description="Current status (e.g., "
-                    "Pending, Running, Succeeded, Failed).",
                 ).as_json_schema_extra()
             ),
         ]

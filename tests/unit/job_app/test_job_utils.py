@@ -99,9 +99,8 @@ def test_prepare_job_run_params_with_env_vars():
             env=[
                 Env(name="ENV_VAR1", value="value1"),
                 Env(name="ENV_VAR2", value="value2"),
-                Env(name="EMPTY_VAR", value=""),  # Should be excluded
+                Env(name="SECRET_VAR", value=ApoloSecret(key="my-secret")),
             ],
-            secret_env=[Env(name="SECRET_VAR", value=ApoloSecret(key="my-secret"))],
         ),
         resources=JobResourcesConfig(preset=Preset(name="cpu-small")),
     )
@@ -255,8 +254,10 @@ def test_prepare_job_run_params_with_all_options(setup_clients, mock_get_preset_
             entrypoint="/bin/bash",
             command="-c 'python train.py'",
             working_dir="/app",
-            env=[Env(name="PYTHONPATH", value="/app/src")],
-            secret_env=[Env(name="API_KEY", value=ApoloSecret(key="api-credentials"))],
+            env=[
+                Env(name="PYTHONPATH", value="/app/src"),
+                Env(name="API_KEY", value=ApoloSecret(key="api-credentials")),
+            ],
         ),
         resources=JobResourcesConfig(preset=Preset(name="gpu-large")),
         metadata=JobMetadataConfig(

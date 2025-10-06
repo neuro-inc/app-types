@@ -60,17 +60,13 @@ def prepare_job_run_params(  # noqa: C901
             )
             secret_files.append(secret_file)
 
-    # Convert env list to dict
     env_dict = {}
-    for env_var in job_input.image.env:
-        if isinstance(env_var.value, str) and env_var.value:
-            env_dict[env_var.name] = env_var.value
-
-    # Convert secret_env list to dict
     secret_env_dict = {}
-    for env_var in job_input.image.secret_env:
+    for env_var in job_input.image.env:
         if isinstance(env_var.value, ApoloSecret):
             secret_env_dict[env_var.name] = URL(f"secret://{env_var.value.key}")
+        elif isinstance(env_var.value, str):
+            env_dict[env_var.name] = env_var.value
 
     # Process job integrations envs
     mlflow_integration = job_input.integrations.mlflow_integration
