@@ -1,7 +1,10 @@
 from pydantic import ConfigDict, Field
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
-from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
+from apolo_app_types.protocols.common.auth import ApoloAuth, CustomAuth, NoAuth
+from apolo_app_types.protocols.common.schema_extra import (
+    SchemaExtraMetadata,
+)
 
 
 INGRESS_GRPC_SCHEMA_EXTRA = SchemaExtraMetadata(
@@ -15,69 +18,52 @@ INGRESS_HTTP_SCHEMA_EXTRA = SchemaExtraMetadata(
 )
 
 
-class IngressGrpc(AbstractAppFieldType):
+class BaseIngress(AbstractAppFieldType):
+    """Base class for ingress configurations with common authentication field."""
+
+    model_config = ConfigDict(protected_namespaces=())
+
+    auth: ApoloAuth | NoAuth | CustomAuth = Field(
+        default_factory=ApoloAuth,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Authentication",
+            description=(
+                "Configure authentication for this ingress. "
+                "Choose Apolo platform authentication, custom middleware, "
+                "or no authentication."
+            ),
+        ).as_json_schema_extra(),
+    )
+
+
+class IngressGrpc(BaseIngress):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=INGRESS_GRPC_SCHEMA_EXTRA.as_json_schema_extra(),
     )
-    auth: bool = Field(
-        default=True,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Enable Authentication and Authorization",
-            description="Require authenticated credentials with appropriate "
-            "permissions for all incoming gRPC requests "
-            "to the application.",
-        ).as_json_schema_extra(),
-    )
 
 
-class IngressHttp(AbstractAppFieldType):
+class IngressHttp(BaseIngress):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=INGRESS_HTTP_SCHEMA_EXTRA.as_json_schema_extra(),
     )
-    auth: bool = Field(
-        default=True,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Enable Authentication and Authorization",
-            description="Require authenticated user credentials"
-            " with appropriate permissions "
-            "for all incoming HTTPS requests to the application.",
-        ).as_json_schema_extra(),
-    )
 
 
-class IngressMiddleware(AbstractAppFieldType):
+class BasicNetworkingConfig(AbstractAppFieldType):
+    """Common networking configuration for applications."""
+
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="Ingress Middleware",
-            description="Configure middleware for ingress traffic.",
+            title="Networking Settings",
+            description="Configure network access and authentication settings.",
         ).as_json_schema_extra(),
     )
-    name: str = Field(
-        ...,
+    ingress_http: IngressHttp = Field(
+        default_factory=IngressHttp,
         json_schema_extra=SchemaExtraMetadata(
-            title="Middleware Name",
-            description="Name of the middleware to apply to ingress traffic.",
-        ).as_json_schema_extra(),
-    )
-
-
-class AuthIngressMiddleware(IngressMiddleware):
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Authentication Ingress Middleware",
-            description="Configure authentication middleware for ingress traffic.",
-        ).as_json_schema_extra(),
-    )
-    name: str = Field(
-        ...,
-        pattern=r"^platform",
-        json_schema_extra=SchemaExtraMetadata(
-            title="Middleware Name",
-            description="Name of the authentication middleware (with namespace) to"
-            " apply to ingress traffic.",
+            title="HTTP Ingress",
+            description="Configure HTTP ingress and authentication settings.",
         ).as_json_schema_extra(),
     )

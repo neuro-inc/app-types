@@ -2,7 +2,11 @@ from pydantic import ConfigDict, Field
 
 from apolo_app_types import AppInputs, AppOutputs
 from apolo_app_types.helm.utils.storage import get_app_data_files_relative_path_url
-from apolo_app_types.protocols.common import AppInputsDeployer, AppOutputsDeployer
+from apolo_app_types.protocols.common import (
+    AppInputsDeployer,
+    AppOutputsDeployer,
+    BasicNetworkingConfig,
+)
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.preset import Preset
 from apolo_app_types.protocols.common.schema_extra import (
@@ -36,23 +40,6 @@ class VSCodeOutputs(AppOutputsDeployer):
     internal_web_app_url: str
 
 
-class Networking(AbstractAppFieldType):
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Networking Settings",
-            description="Network settings",
-        ).as_json_schema_extra(),
-    )
-    http_auth: bool = Field(
-        default=True,
-        json_schema_extra=SchemaExtraMetadata(
-            description="Whether to use HTTP authentication.",
-            title="HTTP Authentication",
-        ).as_json_schema_extra(),
-    )
-
-
 class VSCodeSpecificAppInputs(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
@@ -84,8 +71,8 @@ class VSCodeAppInputs(AppInputs):
             description=("Additional storage mounts for the application."),
         ).as_json_schema_extra(),
     )
-    networking: Networking = Field(
-        default=Networking(http_auth=True),
+    networking: BasicNetworkingConfig = Field(
+        default_factory=BasicNetworkingConfig,
         json_schema_extra=SchemaExtraMetadata(
             title="Networking Settings",
             description=("Network settings for the application."),

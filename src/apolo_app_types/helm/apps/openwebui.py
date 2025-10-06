@@ -11,7 +11,6 @@ from apolo_app_types import (
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps import CustomDeploymentChartValueProcessor
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
-from apolo_app_types.helm.apps.ingress import append_ingress_middleware_annotations
 from apolo_app_types.helm.utils.database import get_postgres_database_url
 from apolo_app_types.helm.utils.storage import get_app_data_files_path_url
 from apolo_app_types.protocols.common import (
@@ -144,11 +143,4 @@ class OpenWebUIChartValueProcessor(BaseChartValueProcessor[OpenWebUIAppInputs]):
             app_type=AppType.OpenWebUI,
         )
 
-        if input_.networking_config.advanced_networking.ingress_middleware:
-            custom_app_vals["ingress"][
-                "annotations"
-            ] = await append_ingress_middleware_annotations(
-                custom_app_vals["ingress"].get("annotations", {}),
-                input_.networking_config.advanced_networking.ingress_middleware.name,
-            )
         return {**custom_app_vals, "labels": {"application": "openwebui"}}

@@ -8,12 +8,13 @@ from apolo_app_types import (
     AppOutputs,
 )
 from apolo_app_types.protocols.common import (
-    IngressHttp,
     Preset,
     SchemaExtraMetadata,
 )
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
-from apolo_app_types.protocols.common.ingress import AuthIngressMiddleware
+from apolo_app_types.protocols.common.ingress import (
+    BasicNetworkingConfig,
+)
 from apolo_app_types.protocols.common.k8s import Env
 from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
@@ -90,39 +91,16 @@ class DataBaseConfig(AbstractAppFieldType):
     )
 
 
-class AdvancedNetworkConfig(AbstractAppFieldType):
-    model_config = ConfigDict(
-        protected_namespaces=(),
+class OpenWebUIAppInputs(AppInputs):
+    preset: Preset
+    networking_config: BasicNetworkingConfig = Field(
+        ...,
         json_schema_extra=SchemaExtraMetadata(
-            title="Advanced Network Configuration",
-            description="Configure advanced networking settings for OpenWebUI.",
+            title="Networking Configuration",
+            description="Networking configuration for the OpenWebUI application.",
             is_advanced_field=True,
         ).as_json_schema_extra(),
     )
-    ingress_middleware: AuthIngressMiddleware | None = None
-
-
-class NetworkConfig(AbstractAppFieldType):
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Network Configuration",
-            description="Configure networking settings for OpenWebUI.",
-        ).as_json_schema_extra(),
-    )
-    ingress_http: IngressHttp = Field(
-        ...,
-        json_schema_extra=SchemaExtraMetadata(
-            title="HTTP Ingress",
-            description="Configure HTTP ingress settings for OpenWebUI.",
-        ).as_json_schema_extra(),
-    )
-    advanced_networking: AdvancedNetworkConfig
-
-
-class OpenWebUIAppInputs(AppInputs):
-    preset: Preset
-    networking_config: NetworkConfig
     database_config: DataBaseConfig
     embeddings_api: OpenAICompatEmbeddingsAPI
     llm_chat_api: OpenAICompatChatAPI

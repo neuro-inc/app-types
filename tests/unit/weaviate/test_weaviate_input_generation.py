@@ -7,7 +7,7 @@ import pytest
 from apolo_app_types import WeaviateInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import _get_match_expressions
-from apolo_app_types.protocols.common import IngressGrpc, IngressHttp, Preset
+from apolo_app_types.protocols.common import ApoloAuth, IngressGrpc, IngressHttp, Preset
 from apolo_app_types.protocols.weaviate import WeaviatePersistence
 
 from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
@@ -23,7 +23,7 @@ async def test_weaviate_middleware_annotations(setup_clients, mock_get_preset_cp
         input_=WeaviateInputs(
             preset=Preset(name="cpu-large"),
             persistence=WeaviatePersistence(size=64, enable_backups=False),
-            ingress_http=IngressHttp(auth=True),
+            ingress_http=IngressHttp(auth=ApoloAuth()),
         ),
         apolo_client=apolo_client,
         app_type=AppType.Weaviate,

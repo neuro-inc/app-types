@@ -5,10 +5,10 @@ from apolo_app_types.protocols.common import (
     AppInputsDeployer,
     AppOutputs,
     AppOutputsDeployer,
+    BasicNetworkingConfig,
     Preset,
     SchemaExtraMetadata,
 )
-from apolo_app_types.protocols.jupyter import Networking
 
 
 class ShellInputs(AppInputsDeployer):
@@ -22,8 +22,8 @@ class ShellOutputs(AppOutputsDeployer):
 
 class ShellAppInputs(AppInputs):
     preset: Preset
-    networking: Networking = Field(
-        default=Networking(http_auth=True),
+    networking: BasicNetworkingConfig = Field(
+        default_factory=BasicNetworkingConfig,
         json_schema_extra=SchemaExtraMetadata(
             title="Networking Settings",
             description="Configure network access, HTTP authentication,"
