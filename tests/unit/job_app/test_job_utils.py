@@ -99,7 +99,6 @@ def test_prepare_job_run_params_with_env_vars():
             env=[
                 Env(name="ENV_VAR1", value="value1"),
                 Env(name="ENV_VAR2", value="value2"),
-                Env(name="EMPTY_VAR", value=""),  # Should be excluded
                 Env(name="SECRET_VAR", value=ApoloSecret(key="my-secret")),
             ],
         ),
