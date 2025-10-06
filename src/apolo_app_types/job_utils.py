@@ -65,7 +65,7 @@ def prepare_job_run_params(  # noqa: C901
     for env_var in job_input.image.env:
         if isinstance(env_var.value, ApoloSecret):
             secret_env_dict[env_var.name] = URL(f"secret://{env_var.value.key}")
-        elif isinstance(env_var.value, str) and env_var.value:
+        elif isinstance(env_var.value, str):
             env_dict[env_var.name] = env_var.value
 
     # Process job integrations envs
