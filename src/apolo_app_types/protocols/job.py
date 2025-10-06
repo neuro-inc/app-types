@@ -514,20 +514,6 @@ class JobAppOutput(AppOutputs):
         | None
     ) = None
 
-    job_status: (
-        t.Annotated[
-            str,
-            Field(
-                json_schema_extra=SchemaExtraMetadata(
-                    title="Job Status",
-                    description="Current status (e.g., "
-                    "Pending, Running, Succeeded, Failed).",
-                ).as_json_schema_extra()
-            ),
-        ]
-        | None
-    ) = None
-
     job_uri: (
         t.Annotated[
             str,
