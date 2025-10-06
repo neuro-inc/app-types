@@ -79,9 +79,7 @@ def test_prepare_job_with_mlflow_integration_conflicts_with_secret_env(
     job_input = JobAppInput(
         image=JobImageConfig(
             image="python:3.9",
-            secret_env=[
-                Env(name="MLFLOW_TRACKING_URI", value=ApoloSecret(key="somethinbg"))
-            ],
+            env=[Env(name="MLFLOW_TRACKING_URI", value=ApoloSecret(key="somethinbg"))],
         ),
         resources=JobResourcesConfig(preset=Preset(name="cpu-small")),
         scheduling=JobSchedulingConfig(max_run_time_minutes=0),

@@ -150,15 +150,8 @@ class JobImageConfig(AbstractAppFieldType):
         default_factory=list,
         json_schema_extra=SchemaExtraMetadata(
             title="Environment Variables",
-            description="List of environment variables to inject into the container.",
-        ).as_json_schema_extra(),
-    )
-
-    secret_env: list[Env] = Field(
-        default_factory=list,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Secret Environment Variables",
-            description="Environment variables whose values come from secrets.",
+            description="List of environment variables to inject into the container. "
+            "Values can be plain strings or secret references.",
         ).as_json_schema_extra(),
     )
 
