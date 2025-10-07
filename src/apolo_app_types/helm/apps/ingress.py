@@ -204,7 +204,9 @@ async def append_ingress_middleware_annotations(
 ) -> dict[str, t.Any]:
     curr_annot = deepcopy(current_annotations)
 
-    middleware_annot = f"{middleware_name}@kubernetescrd"
+    middleware_annot = middleware_name
+    if not middleware_name.endswith("@kubernetescrd"):
+        middleware_annot = f"{middleware_name}@kubernetescrd"
 
     if MIDDLEWARE_ANNOTATION_KEY in curr_annot:
         curr_annot[MIDDLEWARE_ANNOTATION_KEY] += f",{middleware_annot}"
