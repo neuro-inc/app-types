@@ -69,11 +69,40 @@ async def get_services_by_label(label_selectors: str) -> dict[str, typing.Any]:
         raise e
 
 
+async def get_middleware_by_label(label_selectors: str) -> dict[str, typing.Any]:
+    try:
+        config.load_incluster_config()
+
+        api = client.CustomObjectsApi()
+        namespace = "platform"
+        middlewares = api.list_namespaced_custom_object(
+            group="traefik.io",
+            version="v1alpha1",
+            namespace=namespace,
+            plural="middlewares",
+            label_selector=label_selectors,
+        )
+
+        return client.ApiClient().sanitize_for_serialization(middlewares)
+
+    except ApiException as e:
+        err_msg = f"Exception when calling fetching middleware list: {e}"
+        logger.error(err_msg)
+        raise e
+
+
 async def get_services(match_labels: dict[str, str]) -> list[dict[str, typing.Any]]:
     label_selectors = ",".join(f"{k}={v}" for k, v in match_labels.items())
     get_svc_stdout = await get_services_by_label(label_selectors)
 
     return get_svc_stdout["items"]
+
+
+async def get_middlewares(match_labels: dict[str, str]) -> list[dict[str, typing.Any]]:
+    label_selectors = ",".join(f"{k}={v}" for k, v in match_labels.items())
+    get_middleware_stdout = await get_middleware_by_label(label_selectors)
+
+    return get_middleware_stdout["items"]
 
 
 async def get_service_host_port(match_labels: dict[str, str]) -> tuple[str, str]:
