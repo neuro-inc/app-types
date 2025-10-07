@@ -4,14 +4,20 @@ from .abc_ import (
     AppOutputsDeployer,
 )
 from .apis import OpenAICompatibleEmbeddingsRestAPI
-from .auth import BasicAuth
+from .auth import ApoloAuth, BasicAuth, CustomAuth, NoAuth
 from .autoscaling import AutoscalingHPA
 from .base import AppInputs, AppOutputs
 from .buckets import Bucket
 from .containers import ContainerImage
 from .hugging_face import HuggingFaceCache, HuggingFaceModel
-from .ingress import IngressGrpc, IngressHttp
+from .ingress import (
+    BaseIngress,
+    BasicNetworkingConfig,
+    IngressGrpc,
+    IngressHttp,
+)
 from .k8s import Container, DeploymentName, Env
+from .middleware import AuthIngressMiddleware
 from .networking import GraphQLAPI, GrpcAPI, HttpApi, RestAPI, ServiceAPI
 from .openai_compat import OpenAICompatChatAPI, OpenAICompatEmbeddingsAPI
 from .postgres import Postgres
@@ -34,6 +40,10 @@ __all__ = [
     "AppOutputs",
     "IngressHttp",
     "IngressGrpc",
+    "BaseIngress",
+    "ApoloAuth",
+    "CustomAuth",
+    "NoAuth",
     "Postgres",
     "Redis",
     "RedisMaster",
@@ -68,4 +78,6 @@ __all__ = [
     "OpenAICompatibleEmbeddingsRestAPI",
     "OpenAICompatChatAPI",
     "OpenAICompatEmbeddingsAPI",
+    "AuthIngressMiddleware",
+    "BasicNetworkingConfig",
 ]

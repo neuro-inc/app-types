@@ -15,7 +15,6 @@ from apolo_app_types.protocols.common.health_check import (
     HealthCheckProbesConfig,
     HTTPHealthCheckConfig,
 )
-from apolo_app_types.protocols.common.ingress import IngressHttp
 from apolo_app_types.protocols.common.k8s import Port
 from apolo_app_types.protocols.common.storage import (
     ApoloFilesMount,
@@ -172,7 +171,7 @@ class JupyterChartValueProcessor(BaseChartValueProcessor[JupyterAppInputs]):
             container=container,
             networking=NetworkingConfig(
                 service_enabled=True,
-                ingress_http=IngressHttp(auth=input_.networking.http_auth),
+                ingress_http=input_.networking.ingress_http,
                 ports=[
                     Port(name="http", port=self._jupyter_port),
                 ],

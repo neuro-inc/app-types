@@ -20,6 +20,7 @@ from apolo_app_types.protocols.common import (
     ApoloFilesPath,
     HuggingFaceCache,
     IngressHttp,
+    NoAuth,
     Preset,
 )
 from apolo_app_types.protocols.common.autoscaling import AutoscalingKedaHTTP
@@ -132,7 +133,7 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
         return LLMInputs(
             hugging_face_model=hf_model,
             tokenizer_hf_name=hf_model.model_hf_name,
-            ingress_http=IngressHttp(auth=False),
+            ingress_http=IngressHttp(auth=NoAuth()),
             preset=preset_chosen,
             cache_config=HuggingFaceCache(
                 files_path=ApoloFilesPath(path=self._get_storage_path())

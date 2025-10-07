@@ -3,16 +3,23 @@ import pytest
 from apolo_app_types import HuggingFaceModel
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
-from apolo_app_types.protocols.common import IngressHttp, Preset
-from apolo_app_types.protocols.common.ingress import AuthIngressMiddleware
+from apolo_app_types.protocols.common import (
+    ApoloAuth,
+    CustomAuth,
+    IngressHttp,
+    NoAuth,
+    Preset,
+)
+from apolo_app_types.protocols.common.ingress import (
+    BasicNetworkingConfig,
+)
+from apolo_app_types.protocols.common.middleware import AuthIngressMiddleware
 from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
 )
 from apolo_app_types.protocols.openwebui import (
-    AdvancedNetworkConfig,
     DataBaseConfig,
-    NetworkConfig,
     OpenWebUIAppInputs,
     PostgresDatabase,
     SQLiteDatabase,
@@ -86,15 +93,18 @@ def create_openwebui_inputs(
     database_type: str = "postgres",
 ):
     """Factory for creating OpenWebUIAppInputs with specified configurations."""
-    middleware = None
+    # Determine auth type based on parameters
     if middleware_name:
-        middleware = AuthIngressMiddleware(name=middleware_name)
+        auth = CustomAuth(middleware=AuthIngressMiddleware(name=middleware_name))
+    elif auth_enabled:
+        auth = ApoloAuth()
+    else:
+        auth = NoAuth()
 
     return OpenWebUIAppInputs(
         preset=Preset(name="cpu-small"),
-        networking_config=NetworkConfig(
-            ingress_http=IngressHttp(auth=auth_enabled),
-            advanced_networking=AdvancedNetworkConfig(ingress_middleware=middleware),
+        networking_config=BasicNetworkingConfig(
+            ingress_http=IngressHttp(auth=auth),
         ),
         llm_chat_api=LLM_API_CONFIG,
         database_config=create_database_config(database_type),

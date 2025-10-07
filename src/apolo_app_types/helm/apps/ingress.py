@@ -6,6 +6,7 @@ import apolo_sdk
 
 from apolo_app_types.app_types import AppType
 from apolo_app_types.protocols.common import IngressGrpc, IngressHttp
+from apolo_app_types.protocols.common.auth import ApoloAuth, CustomAuth
 from apolo_app_types.protocols.common.k8s import Port
 
 
@@ -31,7 +32,7 @@ DEV_API_URL_DOMAIN = "api.dev.apolo.us"
 MIDDLEWARE_ANNOTATION_KEY = "traefik.ingress.kubernetes.io/router.middlewares"
 
 
-def _get_middlewares_annotation_value(app_type: AppType, *, is_production: bool) -> str:
+def _get_apolo_auth_middleware_name(app_type: AppType, *, is_production: bool) -> str:
     """Generate middleware string based on app type and cluster environment."""
     auth_middleware = PROD_AUTH_MIDDLEWARE if is_production else DEV_AUTH_MIDDLEWARE
 
@@ -129,14 +130,25 @@ async def get_http_ingress_values(
         **http_ingress_config,  # Merge the generated config directly
     }
 
-    # Handle auth based on its presence in the input object
-    if ingress_http.auth:
+    # Handle auth based on its type
+    if isinstance(ingress_http.auth, ApoloAuth):
         ingress_vals.setdefault("annotations", {})  # Ensure annotations key exists
         is_prod = is_production_cluster(apolo_client)
-        middleware_string = _get_middlewares_annotation_value(
+        middleware_string = _get_apolo_auth_middleware_name(
             app_type, is_production=is_prod
         )
-        ingress_vals["annotations"][MIDDLEWARE_ANNOTATION_KEY] = middleware_string
+        ingress_vals["annotations"] = await append_ingress_middleware_annotations(
+            ingress_vals.get("annotations", {}),
+            middleware_string,
+        )
+
+    elif isinstance(ingress_http.auth, CustomAuth):
+        ingress_vals.setdefault("annotations", {})
+        ingress_vals["annotations"] = await append_ingress_middleware_annotations(
+            ingress_vals.get("annotations", {}),
+            ingress_http.auth.middleware.name,
+        )
+    # If NoAuth, don't add any middleware annotations
 
     return ingress_vals
 
@@ -166,13 +178,23 @@ async def get_grpc_ingress_values(
         },
     }
 
-    if ingress_grpc.auth:
+    # Handle auth based on its type
+    if isinstance(ingress_grpc.auth, ApoloAuth):
         grpc_vals.setdefault("annotations", {})
         is_prod = is_production_cluster(apolo_client)
-        middleware_string = _get_middlewares_annotation_value(
+        middleware_string = _get_apolo_auth_middleware_name(
             app_type, is_production=is_prod
         )
-        grpc_vals["annotations"][MIDDLEWARE_ANNOTATION_KEY] = middleware_string
+        grpc_vals["annotations"] = await append_ingress_middleware_annotations(
+            grpc_vals.get("annotations", {}), middleware_string
+        )
+    elif isinstance(ingress_grpc.auth, CustomAuth):
+        grpc_vals.setdefault("annotations", {})
+        grpc_vals["annotations"] = await append_ingress_middleware_annotations(
+            grpc_vals.get("annotations", {}),
+            ingress_grpc.auth.middleware.name,
+        )
+    # If NoAuth, don't add any middleware annotations
 
     return grpc_vals
 
@@ -182,7 +204,9 @@ async def append_ingress_middleware_annotations(
 ) -> dict[str, t.Any]:
     curr_annot = deepcopy(current_annotations)
 
-    middleware_annot = f"{middleware_name}@kubernetescrd"
+    middleware_annot = middleware_name
+    if not middleware_name.endswith("@kubernetescrd"):
+        middleware_annot = f"{middleware_name}@kubernetescrd"
 
     if MIDDLEWARE_ANNOTATION_KEY in curr_annot:
         curr_annot[MIDDLEWARE_ANNOTATION_KEY] += f",{middleware_annot}"

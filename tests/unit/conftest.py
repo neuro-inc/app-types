@@ -30,10 +30,11 @@ class OpenWebUITestCase:
     def expected_middleware(self) -> list[str]:
         """Compute expected middleware based on configuration."""
         middleware = []
-        if self.auth_enabled:
-            middleware.append(DEFAULT_AUTH_MIDDLEWARE)
+        # Custom middleware replaces platform auth middleware
         if self.middleware_name:
             middleware.append(self.middleware_name)
+        elif self.auth_enabled:
+            middleware.append(DEFAULT_AUTH_MIDDLEWARE)
         return middleware
 
     @property

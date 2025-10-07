@@ -8,6 +8,7 @@ from apolo_app_types.helm.utils.storage import get_app_data_files_relative_path_
 from apolo_app_types.protocols.common import (
     AppInputs,
     AppOutputsDeployer,
+    BasicNetworkingConfig,
     Preset,
     SchemaExtraMetadata,
 )
@@ -89,21 +90,6 @@ class JupyterOutputs(AppOutputsDeployer):
     internal_web_app_url: str
 
 
-class Networking(AbstractAppFieldType):
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Networking Settings",
-            description="Network settings",
-        ).as_json_schema_extra(),
-    )
-    http_auth: bool = Field(
-        default=True,
-        description="Whether to use HTTP authentication.",
-        title="HTTP Authentication",
-    )
-
-
 class DefaultContainer(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
@@ -159,8 +145,8 @@ class JupyterAppInputs(AppInputs):
         ).as_json_schema_extra(),
     )
 
-    networking: Networking = Field(
-        default=Networking(http_auth=True),
+    networking: BasicNetworkingConfig = Field(
+        default_factory=BasicNetworkingConfig,
         json_schema_extra=SchemaExtraMetadata(
             title="Networking Settings",
             description="Configure network access, HTTP authentication,"
