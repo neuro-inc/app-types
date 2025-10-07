@@ -1,7 +1,10 @@
 from pydantic import ConfigDict, Field
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
-from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
+from apolo_app_types.protocols.common.schema_extra import (
+    SchemaExtraMetadata,
+    SchemaMetaType,
+)
 
 
 class IngressMiddleware(AbstractAppFieldType):
@@ -10,6 +13,7 @@ class IngressMiddleware(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Ingress Middleware",
             description="Configure middleware for ingress traffic.",
+            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     name: str = Field(
@@ -27,6 +31,7 @@ class AuthIngressMiddleware(IngressMiddleware):
         json_schema_extra=SchemaExtraMetadata(
             title="Authentication Ingress Middleware",
             description="Configure authentication middleware for ingress traffic.",
+            meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
     name: str = Field(
