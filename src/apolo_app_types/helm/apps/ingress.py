@@ -32,7 +32,7 @@ DEV_API_URL_DOMAIN = "api.dev.apolo.us"
 MIDDLEWARE_ANNOTATION_KEY = "traefik.ingress.kubernetes.io/router.middlewares"
 
 
-def _get_middlewares_annotation_value(app_type: AppType, *, is_production: bool) -> str:
+def _get_apolo_auth_middleware_name(app_type: AppType, *, is_production: bool) -> str:
     """Generate middleware string based on app type and cluster environment."""
     auth_middleware = PROD_AUTH_MIDDLEWARE if is_production else DEV_AUTH_MIDDLEWARE
 
@@ -134,10 +134,14 @@ async def get_http_ingress_values(
     if isinstance(ingress_http.auth, ApoloAuth):
         ingress_vals.setdefault("annotations", {})  # Ensure annotations key exists
         is_prod = is_production_cluster(apolo_client)
-        middleware_string = _get_middlewares_annotation_value(
+        middleware_string = _get_apolo_auth_middleware_name(
             app_type, is_production=is_prod
         )
-        ingress_vals["annotations"][MIDDLEWARE_ANNOTATION_KEY] = middleware_string
+        ingress_vals["annotations"] = await append_ingress_middleware_annotations(
+            ingress_vals.get("annotations", {}),
+            middleware_string,
+        )
+
     elif isinstance(ingress_http.auth, CustomAuth):
         ingress_vals.setdefault("annotations", {})
         ingress_vals["annotations"] = await append_ingress_middleware_annotations(
@@ -178,10 +182,12 @@ async def get_grpc_ingress_values(
     if isinstance(ingress_grpc.auth, ApoloAuth):
         grpc_vals.setdefault("annotations", {})
         is_prod = is_production_cluster(apolo_client)
-        middleware_string = _get_middlewares_annotation_value(
+        middleware_string = _get_apolo_auth_middleware_name(
             app_type, is_production=is_prod
         )
-        grpc_vals["annotations"][MIDDLEWARE_ANNOTATION_KEY] = middleware_string
+        grpc_vals["annotations"] = await append_ingress_middleware_annotations(
+            grpc_vals.get("annotations", {}), middleware_string
+        )
     elif isinstance(ingress_grpc.auth, CustomAuth):
         grpc_vals.setdefault("annotations", {})
         grpc_vals["annotations"] = await append_ingress_middleware_annotations(
