@@ -69,12 +69,14 @@ async def get_services_by_label(label_selectors: str) -> dict[str, typing.Any]:
         raise e
 
 
-async def get_middleware_by_label(label_selectors: str) -> dict[str, typing.Any]:
+async def get_middleware_by_label(
+    label_selectors: str, namespace: str | None = None
+) -> dict[str, typing.Any]:
     try:
         config.load_incluster_config()
 
         api = client.CustomObjectsApi()
-        namespace = "platform"
+        namespace = namespace or get_current_namespace()
         middlewares = api.list_namespaced_custom_object(
             group="traefik.io",
             version="v1alpha1",
@@ -98,9 +100,11 @@ async def get_services(match_labels: dict[str, str]) -> list[dict[str, typing.An
     return get_svc_stdout["items"]
 
 
-async def get_middlewares(match_labels: dict[str, str]) -> list[dict[str, typing.Any]]:
+async def get_middlewares(
+    match_labels: dict[str, str], namespace: str | None = None
+) -> list[dict[str, typing.Any]]:
     label_selectors = ",".join(f"{k}={v}" for k, v in match_labels.items())
-    get_middleware_stdout = await get_middleware_by_label(label_selectors)
+    get_middleware_stdout = await get_middleware_by_label(label_selectors, namespace)
 
     return get_middleware_stdout["items"]
 
