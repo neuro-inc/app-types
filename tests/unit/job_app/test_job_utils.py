@@ -54,19 +54,18 @@ def test_prepare_job_run_params_minimal(setup_clients, mock_get_preset_cpu):
     assert result.priority == apolo_sdk.JobPriority.NORMAL
     assert result.restart_policy == apolo_sdk.JobRestartPolicy.NEVER
     assert result.life_span is None  # 0 minutes means unlimited
+    assert result.preset_name == "cpu-small"
 
-    container = result.container
-    assert container.image.name == "python:3.9"
-    assert container.resources.cpu == 2.0
-    assert container.resources.memory == 8
-    assert container.resources.shm is True
-    assert container.env == {}
-    assert container.secret_env == {}
-    assert container.volumes == []
-    assert container.secret_files == []
-    assert container.entrypoint is None  # Empty string converted to None
-    assert container.command is None  # Empty string converted to None
-    assert container.working_dir is None  # Empty string converted to None
+    assert result.image.name == "python:3.9"
+    assert result.env == {}
+    assert result.secret_env == {}
+    assert result.volumes == []
+    assert result.secret_files == []
+    assert result.entrypoint is None  # Empty string converted to None
+    assert result.command is None  # Empty string converted to None
+    assert result.working_dir is None  # Empty string converted to None
+    assert result.tty is True
+    assert result.shm is True
 
 
 def test_prepare_job_run_params_with_custom_name(setup_clients, mock_get_preset_cpu):
@@ -126,9 +125,9 @@ def test_prepare_job_run_params_with_env_vars():
             client=client,
         )
 
-    container = result.container
-    assert container.env == {"ENV_VAR1": "value1", "ENV_VAR2": "value2"}
-    assert container.secret_env == {
+    assert result.preset_name == "cpu-small"
+    assert result.env == {"ENV_VAR1": "value1", "ENV_VAR2": "value2"}
+    assert result.secret_env == {
         "SECRET_VAR": URL("secret://cluster/test-org/test-project/my-secret")
     }
 
@@ -181,17 +180,17 @@ def test_prepare_job_run_params_with_storage_mounts():
             client=client,
         )
 
-    container = result.container
-    assert len(container.volumes) == 2
+    assert result.preset_name == "cpu-small"
+    assert len(result.volumes) == 2
 
     # Check first volume (read-write)
-    vol1 = container.volumes[0]
+    vol1 = result.volumes[0]
     assert str(vol1.storage_uri) == "storage://cluster/org/project/data"
     assert vol1.container_path == "/data"
     assert vol1.read_only is False
 
     # Check second volume (read-only)
-    vol2 = container.volumes[1]
+    vol2 = result.volumes[1]
     assert str(vol2.storage_uri) == "storage://cluster/org/project/config"
     assert vol2.container_path == "/config"
     assert vol2.read_only is True
@@ -237,16 +236,16 @@ def test_prepare_job_run_params_with_secret_volumes():
             client=client,
         )
 
-    container = result.container
-    assert len(container.secret_files) == 2
+    assert result.preset_name == "cpu-small"
+    assert len(result.secret_files) == 2
 
     # Check first secret file
-    sf1 = container.secret_files[0]
+    sf1 = result.secret_files[0]
     assert str(sf1.secret_uri) == "secret://cluster/test-org/test-project/app-secret"
     assert sf1.container_path == "/secrets/app-secret"
 
     # Check second secret file
-    sf2 = container.secret_files[1]
+    sf2 = result.secret_files[1]
     assert (
         str(sf2.secret_uri) == "secret://cluster/test-org/test-project/db-credentials"
     )
@@ -302,7 +301,7 @@ def test_prepare_job_run_params_with_all_options(setup_clients, mock_get_preset_
     assert result.name == "full-featured-job"
     assert result.description == "A job with all features enabled"
     assert result.tags == ["ml", "training", "instance_id:test-instance-123"]
-    assert result.scheduler_enabled is True
+    assert result.preset_name == "gpu-large"
     assert result.pass_config is True
     assert result.wait_for_jobs_quota is True
     assert result.schedule_timeout == 60.0
@@ -310,16 +309,13 @@ def test_prepare_job_run_params_with_all_options(setup_clients, mock_get_preset_
     assert result.life_span == 7200  # 120 minutes * 60 seconds
     assert result.priority == apolo_sdk.JobPriority.HIGH
 
-    container = result.container
-    assert container.entrypoint == "/bin/bash"
-    assert container.command == "-c 'python train.py'"
-    assert container.working_dir == "/app"
-    assert container.env == {"PYTHONPATH": "/app/src"}
-    assert container.secret_env == {
+    assert result.entrypoint == "/bin/bash"
+    assert result.command == "-c 'python train.py'"
+    assert result.working_dir == "/app"
+    assert result.env == {"PYTHONPATH": "/app/src"}
+    assert result.secret_env == {
         "API_KEY": URL("secret://cluster/test-org/test-project/api-credentials")
     }
-    assert container.resources.cpu == 4.0
-    assert container.resources.memory == 16
 
 
 def test_prepare_job_run_params_no_image_raises_error():
