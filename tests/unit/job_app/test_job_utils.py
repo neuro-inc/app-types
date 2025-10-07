@@ -1,5 +1,5 @@
 from decimal import Decimal
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import apolo_sdk
 import pytest
@@ -106,6 +106,7 @@ def test_prepare_job_run_params_with_env_vars():
     )
 
     client = MagicMock()
+    type(client).cluster_name = PropertyMock(return_value="cluster")
 
     with patch("apolo_app_types.helm.apps.common.get_preset") as mock_get_preset:
         mock_preset = apolo_sdk.Preset(
@@ -127,7 +128,9 @@ def test_prepare_job_run_params_with_env_vars():
 
     container = result.container
     assert container.env == {"ENV_VAR1": "value1", "ENV_VAR2": "value2"}
-    assert container.secret_env == {"SECRET_VAR": URL("secret://my-secret")}
+    assert container.secret_env == {
+        "SECRET_VAR": URL("secret://cluster/test-org/test-project/my-secret")
+    }
 
 
 def test_prepare_job_run_params_with_storage_mounts():
@@ -158,6 +161,7 @@ def test_prepare_job_run_params_with_storage_mounts():
     )
 
     client = MagicMock()
+    type(client).cluster_name = PropertyMock(return_value="cluster")
 
     with patch("apolo_app_types.helm.apps.common.get_preset") as mock_get_preset:
         mock_preset = apolo_sdk.Preset(
@@ -213,6 +217,7 @@ def test_prepare_job_run_params_with_secret_volumes():
     )
 
     client = MagicMock()
+    type(client).cluster_name = PropertyMock(return_value="cluster")
 
     with patch("apolo_app_types.helm.apps.common.get_preset") as mock_get_preset:
         mock_preset = apolo_sdk.Preset(
@@ -237,12 +242,14 @@ def test_prepare_job_run_params_with_secret_volumes():
 
     # Check first secret file
     sf1 = container.secret_files[0]
-    assert str(sf1.secret_uri) == "secret://app-secret"
+    assert str(sf1.secret_uri) == "secret://cluster/test-org/test-project/app-secret"
     assert sf1.container_path == "/secrets/app-secret"
 
     # Check second secret file
     sf2 = container.secret_files[1]
-    assert str(sf2.secret_uri) == "secret://db-credentials"
+    assert (
+        str(sf2.secret_uri) == "secret://cluster/test-org/test-project/db-credentials"
+    )
     assert sf2.container_path == "/secrets/db-credentials"
 
 
@@ -308,7 +315,9 @@ def test_prepare_job_run_params_with_all_options(setup_clients, mock_get_preset_
     assert container.command == "-c 'python train.py'"
     assert container.working_dir == "/app"
     assert container.env == {"PYTHONPATH": "/app/src"}
-    assert container.secret_env == {"API_KEY": URL("secret://api-credentials")}
+    assert container.secret_env == {
+        "API_KEY": URL("secret://cluster/test-org/test-project/api-credentials")
+    }
     assert container.resources.cpu == 4.0
     assert container.resources.memory == 16
 
@@ -342,6 +351,7 @@ def test_prepare_job_run_params_unlimited_runtime():
     )
 
     client = MagicMock()
+    type(client).cluster_name = PropertyMock(return_value="cluster")
 
     with patch("apolo_app_types.helm.apps.common.get_preset") as mock_get_preset:
         mock_preset = apolo_sdk.Preset(

@@ -55,7 +55,9 @@ def prepare_job_run_params(  # noqa: C901
     if job_input.resources.secret_volumes:
         for secret_volume in job_input.resources.secret_volumes:
             secret_file = apolo_sdk.SecretFile(
-                secret_uri=URL(f"secret://{secret_volume.src_secret_uri.key}"),
+                secret_uri=URL(
+                    f"secret://{client.cluster_name}/{org_name}/{project_name}/{secret_volume.src_secret_uri.key}"
+                ),
                 container_path=secret_volume.dst_path,
             )
             secret_files.append(secret_file)
@@ -64,7 +66,9 @@ def prepare_job_run_params(  # noqa: C901
     secret_env_dict = {}
     for env_var in job_input.image.env:
         if isinstance(env_var.value, ApoloSecret):
-            secret_env_dict[env_var.name] = URL(f"secret://{env_var.value.key}")
+            secret_env_dict[env_var.name] = URL(
+                f"secret://{client.cluster_name}/{org_name}/{project_name}/{env_var.value.key}"
+            )
         elif isinstance(env_var.value, str):
             env_dict[env_var.name] = env_var.value
 

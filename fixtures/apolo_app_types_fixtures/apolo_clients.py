@@ -38,6 +38,10 @@ async def setup_clients(presets_available):
             mock_apolo_client.config.org_name = DEFAULT_ORG_NAME
             mock_apolo_client.config.project_name = DEFAULT_PROJECT_NAME
 
+            type(mock_apolo_client).cluster_name = PropertyMock(
+                return_value=DEFAULT_CLUSTER_NAME
+            )
+
             mock_apolo_client.config.presets = presets_available
 
             mock_apolo_client.config.get_cluster = MagicMock(return_value=mock_cluster)
