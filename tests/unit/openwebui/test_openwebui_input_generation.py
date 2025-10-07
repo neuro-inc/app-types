@@ -11,9 +11,9 @@ from apolo_app_types.protocols.common import (
     Preset,
 )
 from apolo_app_types.protocols.common.ingress import (
-    AuthIngressMiddleware,
     BasicNetworkingConfig,
 )
+from apolo_app_types.protocols.common.middleware import AuthIngressMiddleware
 from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
