@@ -35,9 +35,7 @@ def test_prepare_job_with_mlflow_integration(setup_clients, mock_get_preset_cpu)
         client=client,
     )
 
-    assert (
-        result.container.env["MLFLOW_TRACKING_URI"] == "http://mlflow.example.com:80/"
-    )
+    assert result.env["MLFLOW_TRACKING_URI"] == "http://mlflow.example.com:80/"
 
 
 def test_prepare_job_with_mlflow_integration_conflicts_with_env(
