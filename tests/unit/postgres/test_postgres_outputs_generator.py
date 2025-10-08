@@ -49,4 +49,5 @@ async def test_postgres_outputs(setup_clients, mock_kubernetes_client, app_insta
         version="v1beta1",
         namespace="default-namespace",
         plural="postgresclusters",
+        label_selector=None,
     )
