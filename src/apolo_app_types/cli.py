@@ -43,7 +43,7 @@ def cli() -> None:
 )
 @click.option("--apolo-apps-token", type=str, envvar="APOLO_APPS_TOKEN")
 @click.option("--apolo-app-type", type=str, envvar="APOLO_APP_TYPE")
-@click.option("--package-name", type=str)
+@click.option("--package-name", type=str, envvar="APOLO_APP_PACKAGE_NAME")
 def update_outputs(
     helm_outputs_json: str,
     app_output_processor_type: str | None,
