@@ -139,7 +139,7 @@ async def update_app_outputs(  # noqa: C901
     apolo_app_outputs_endpoint: str | None = None,
     apolo_apps_token: str | None = None,
     apolo_app_type: str | None = None,
-) -> bool:
+) -> None:
     app_type = apolo_app_type or helm_outputs["PLATFORM_APPS_APP_TYPE"]
     apolo_app_outputs_endpoint = (
         apolo_app_outputs_endpoint or helm_outputs["PLATFORM_APPS_URL"]
@@ -149,7 +149,28 @@ async def update_app_outputs(  # noqa: C901
     if app_instance_id is None:
         err = "K8S_INSTANCE_ID environment variable is not set."
         raise ValueError(err)
-    try:
+
+    package_name = f"{APOLO_APP_PACKAGE_PREFIX}{app_type.replace('-', '_')}"
+    # Try loading application postprocessor defined in the app repo
+    postprocessor = load_app_postprocessor(
+        app_type=app_type,
+        package_name=package_name,
+        exact_type_name=app_output_processor_type,
+    )
+
+    conv_outputs = None
+    if postprocessor:
+        conv_outputs = await postprocessor().generate_outputs(
+            helm_outputs, app_instance_id
+        )
+    else:
+        err_msg = (
+            f"Not found postprocessor for app type: {app_type} "
+            f"({app_output_processor_type})"
+        )
+        logger.warning(err_msg)
+
+    if not conv_outputs:
         match app_type:
             case (
                 AppType.LLMInference
@@ -212,30 +233,13 @@ async def update_app_outputs(  # noqa: C901
                     helm_outputs, app_instance_id
                 )
             case _:
-                package_name = f"{APOLO_APP_PACKAGE_PREFIX}{app_type.replace('-', '_')}"
-                # Try loading application postprocessor defined in the app repo
-                postprocessor = load_app_postprocessor(
-                    app_type=app_type,
-                    package_name=package_name,
-                    exact_type_name=app_output_processor_type,
-                )
-                if not postprocessor:
-                    err_msg = (
-                        f"Unsupported app type: {app_type} "
-                        f"({app_output_processor_type}) for posting outputs"
-                    )
-                    raise ValueError(err_msg)
-                conv_outputs = await postprocessor().generate_outputs(
-                    helm_outputs, app_instance_id
-                )
-        logger.info("Outputs: %s", conv_outputs)
+                err_msg = f"Unsupported app type: {app_type} for posting outputs"
+                raise ValueError(err_msg)
 
-        await post_outputs(
-            apolo_app_outputs_endpoint,
-            platform_apps_token,
-            conv_outputs,
-        )
-    except Exception as e:
-        logger.error("An error occurred: %s", e)
-        return False
-    return True
+    logger.info("Outputs: %s", conv_outputs)
+
+    await post_outputs(
+        apolo_app_outputs_endpoint,
+        platform_apps_token,
+        conv_outputs,
+    )

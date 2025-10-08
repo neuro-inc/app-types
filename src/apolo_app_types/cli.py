@@ -57,7 +57,7 @@ def update_outputs(
             helm_outputs_json = helm_outputs_json[1:-1]
         helm_outputs_dict = json.loads(helm_outputs_json)
         logger.info("Helm outputs: %s", helm_outputs_dict)
-        result = asyncio.run(
+        asyncio.run(
             update_app_outputs(
                 helm_outputs_dict,
                 app_output_processor_type=app_output_processor_type,
@@ -66,9 +66,6 @@ def update_outputs(
                 apolo_app_type=apolo_app_type,
             )
         )
-        if not result:
-            m = "Failed to run update_app_outputs"
-            raise Exception(m)
     except json.JSONDecodeError as e:
         logger.error("Failed to parse JSON input: %s", e)
         sys.exit(1)
