@@ -148,6 +148,7 @@ def get_crd_objects(
     api_group: str,
     api_version: str,
     crd_plural_name: str,
+    label_selector: str | None = None,
 ) -> dict[str, typing.Any]:
     config.load_incluster_config()
 
@@ -158,4 +159,5 @@ def get_crd_objects(
         version=api_version,
         namespace=namespace,
         plural=crd_plural_name,
+        label_selector=label_selector,
     )
