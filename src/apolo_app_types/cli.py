@@ -43,12 +43,14 @@ def cli() -> None:
 )
 @click.option("--apolo-apps-token", type=str, envvar="APOLO_APPS_TOKEN")
 @click.option("--apolo-app-type", type=str, envvar="APOLO_APP_TYPE")
+@click.option("--package-name", type=str)
 def update_outputs(
     helm_outputs_json: str,
     app_output_processor_type: str | None,
     apolo_app_outputs_endpoint: str | None,
     apolo_apps_token: str | None,
     apolo_app_type: str | None,
+    package_name: str | None,
 ) -> None:
     try:
         logger.info("Helm input: %s", helm_outputs_json)
@@ -64,6 +66,7 @@ def update_outputs(
                 apolo_app_outputs_endpoint=apolo_app_outputs_endpoint,
                 apolo_apps_token=apolo_apps_token,
                 apolo_app_type=apolo_app_type,
+                app_package_name=package_name,
             )
         )
     except json.JSONDecodeError as e:

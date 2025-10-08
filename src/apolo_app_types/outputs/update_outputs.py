@@ -139,6 +139,7 @@ async def update_app_outputs(  # noqa: C901
     apolo_app_outputs_endpoint: str | None = None,
     apolo_apps_token: str | None = None,
     apolo_app_type: str | None = None,
+    app_package_name: str | None = None,
 ) -> None:
     app_type = apolo_app_type or helm_outputs["PLATFORM_APPS_APP_TYPE"]
     apolo_app_outputs_endpoint = (
@@ -150,11 +151,12 @@ async def update_app_outputs(  # noqa: C901
         err = "K8S_INSTANCE_ID environment variable is not set."
         raise ValueError(err)
 
-    package_name = f"{APOLO_APP_PACKAGE_PREFIX}{app_type.replace('-', '_')}"
+    if not app_package_name:
+        app_package_name = f"{APOLO_APP_PACKAGE_PREFIX}{app_type.replace('-', '_')}"
     # Try loading application postprocessor defined in the app repo
     postprocessor = load_app_postprocessor(
         app_type=app_type,
-        package_name=package_name,
+        package_name=app_package_name,
         exact_type_name=app_output_processor_type,
     )
 
