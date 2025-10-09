@@ -86,6 +86,7 @@ def update_outputs(
 @click.argument("helm_values_path", type=Path)
 @click.argument("helm_args_path", type=Path)
 @click.argument("apps_secret_name", type=str)
+@click.option("--inputs-json-path", type=Path, envvar="APOLO_APP_INPUTS_JSON_PATH")
 @click.option("--inputs-type", type=str, envvar="APOLO_APP_INPUTS_TYPE")
 @click.option("--preprocessor-type", type=str, envvar="APOLO_APP_PREPROCESSOR_TYPE")
 @click.option("--apolo-api-url", type=str, envvar="APOLO_API_URL", required=True)
@@ -104,6 +105,7 @@ def run_preprocessor(
     helm_values_path: Path,
     helm_args_path: Path,
     apps_secret_name: str,
+    inputs_json_path: Path | None,
     inputs_type: str | None,
     preprocessor_type: str | None,
     apolo_api_url: str,
@@ -118,7 +120,11 @@ def run_preprocessor(
     async def _run_preprocessor() -> None:
         logging.basicConfig(level=logging.DEBUG)
         try:
-            inputs_dict = json.loads(inputs_json)
+            if inputs_json_path:
+                inputs_dict = json.loads(inputs_json_path.read_text())
+            else:
+                # for backwards compatibility
+                inputs_dict = json.loads(inputs_json)
             inputs_class = load_app_inputs(app_type, package_name, inputs_type)
             if not inputs_class:
                 err_msg = f"Unable to find inputs type for {app_type=}, {inputs_type=}"
