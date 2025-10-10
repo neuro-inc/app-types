@@ -55,6 +55,7 @@ async def _get_ingress_name_template(client: apolo_sdk.Client) -> str:
     cluster = client.config.get_cluster(client.config.cluster_name)
     apps_config = cluster.apps
 
+    template = f"{APP_NAME_F_STRING_EXPRESSION}.apps.{client.cluster_name}.org.neu.ro"
     if apps_config.hostname_templates:
         # multi-domain clusters are not supported on the backend yet
         template = apps_config.hostname_templates[0]
@@ -62,9 +63,13 @@ async def _get_ingress_name_template(client: apolo_sdk.Client) -> str:
             "Invalid template"
         )
 
-        return re.sub(F_STRING_EXPRESSION_RE, APP_NAME_F_STRING_EXPRESSION, template)
+        template = re.sub(
+            F_STRING_EXPRESSION_RE, APP_NAME_F_STRING_EXPRESSION, template
+        )
 
-    return f"{APP_NAME_F_STRING_EXPRESSION}.apps.{client.cluster_name}.org.neu.ro"
+    if template.endswith("."):
+        template = template[:-1]
+    return template
 
 
 async def _generate_ingress_config(
@@ -78,9 +83,6 @@ async def _generate_ingress_config(
     hostname = ingress_hostname.format(
         **{APP_NAME_PLACEHOLDER: f"{app_type.value}--{app_id}{namespace_suffix}"}
     )
-
-    if hostname.endswith("."):
-        hostname = hostname[:-1]
 
     if any(
         len(hostname_part) > DOMAIN_SECTION_MAX_LENGTH
