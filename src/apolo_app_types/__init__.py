@@ -91,13 +91,13 @@ from apolo_app_types.protocols.lightrag import (
 )
 from apolo_app_types.protocols.llm import (
     LLMInputs,
+    LLMModelConfig,
     OpenAICompatibleAPI,
     OpenAICompatibleChatAPI,
     OpenAICompatibleCompletionsAPI,
     OpenAICompatibleEmbeddingsAPI,
     VLLMOutputs,
     VLLMOutputsV2,
-    LLMModelConfig,
 )
 from apolo_app_types.protocols.mlflow import (
     MLFlowAppInputs,
