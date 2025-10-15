@@ -28,15 +28,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.labels['app.kubernetes.io/instance']
-        {{- $hf := index .Values.env "HUGGING_FACE_HUB_TOKEN" -}}
-        {{- if $hf }}
-        {{- if kindIs "string" $hf }}
-        {{- printf "- name: HUGGING_FACE_HUB_TOKEN\n  value: %s" ($hf | quote) | nindent 8 }}
-        {{- else }}
-        {{- printf "- name: HUGGING_FACE_HUB_TOKEN\n" | nindent 8 -}}
-        {{ toYaml $hf | nindent 10 }}
-        {{- end }}
-        {{- end }}
         {{- if .Values.postProcessorEnvs }}
         {{- toYaml .Values.postProcessorEnvs | nindent 8 }}
         {{- end }}
