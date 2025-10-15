@@ -1,4 +1,4 @@
-from pydantic import Field, model_validator
+from pydantic import Field, model_validator, ConfigDict
 
 from apolo_app_types.protocols.common import (
     AbstractAppFieldType,
@@ -47,6 +47,97 @@ class Proxy(AbstractAppFieldType):
 class Web(AbstractAppFieldType):
     replicas: int = Field(default=1, gt=0)
     preset_name: str
+
+
+class LLMModelConfig(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="LLM Model Configuration",
+            description="Metadata extracted from Hugging Face configs and deployment settings "
+                        "to describe an LLM's context limits.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra()
+    )
+
+    context_max_tokens: int | None = Field(
+        default=None,
+        gt=0,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Effective Context Size (tokens)",
+            description=(
+                "Maximum total tokens (prompt + output) accepted in one request. "
+                "If vLLM is started with --max-model-len, that value is used. "
+                "Otherwise it is derived from the model config (after RoPE scaling) "
+                "and capped by the tokenizer's model_max_length when present. "
+                "Used to compute max generated tokens as: context_max_tokens − prompt_tokens."
+            ),
+        ).as_json_schema_extra(),
+    )
+
+    base_from_config: int | None = Field(
+        default=None,
+        gt=0,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Base Context (from config.json)",
+            description=(
+                "Unscaled context length read directly from the model's config.json. "
+                "Common fields include max_position_embeddings (Llama/Mistral/NeoX/etc.), "
+                "n_positions (GPT-2/J), or max_seq_len (MPT). This is BEFORE applying RoPE scaling."
+            ),
+        ).as_json_schema_extra(),
+    )
+
+    after_rope_scaling: int | None = Field(
+        default=None,
+        gt=0,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Context After RoPE Scaling",
+            description=(
+                "Context length after applying rope_scaling.factor when applicable. "
+                "If the config already bakes scaling into max_position_embeddings "
+                "(e.g., original_max_position_embeddings × factor), the value equals the base "
+                "and is not multiplied again."
+            ),
+        ).as_json_schema_extra(),
+    )
+
+    tokenizer_model_max_length: int | None = Field(
+        default=None,
+        gt=0,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Tokenizer Model Max Length",
+            description=(
+                "Optional upper bound from tokenizer_config.json:model_max_length. "
+                "Some tokenizers use very large sentinel values (e.g., 1e30) which should be ignored. "
+                "When present and reasonable, the effective context is min(after_rope_scaling, this value)."
+            ),
+        ).as_json_schema_extra(),
+    )
+
+    sliding_window_tokens: int | None = Field(
+        default=None,
+        gt=0,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Sliding Attention Window (tokens)",
+            description=(
+                "Size of the model's attention look-back window (if defined), e.g., Mistral/DeepSeek. "
+                "At each generation step the model attends only to the last W tokens. "
+                "Informational only—does not change context_max_tokens, but impacts long-context recall."
+            ),
+        ).as_json_schema_extra(),
+    )
+
+    raw_config_has_rope_scaling: bool = Field(
+        default=False,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Has RoPE Scaling",
+            description=(
+                "True if the model's config.json includes a rope_scaling section. "
+                "Indicates that the context window may be extended via RoPE scaling."
+            ),
+        ).as_json_schema_extra(),
+    )
 
 
 class LLMInputs(AppInputs):

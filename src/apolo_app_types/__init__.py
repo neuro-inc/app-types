@@ -97,6 +97,7 @@ from apolo_app_types.protocols.llm import (
     OpenAICompatibleEmbeddingsAPI,
     VLLMOutputs,
     VLLMOutputsV2,
+    LLMModelConfig,
 )
 from apolo_app_types.protocols.mlflow import (
     MLFlowAppInputs,
@@ -261,4 +262,5 @@ __all__ = [
     "MistralInputs",
     "MistralInputs",
     "GptOssInputs",
+    "LLMModelConfig",
 ]
