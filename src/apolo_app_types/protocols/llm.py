@@ -1,4 +1,4 @@
-from pydantic import Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
 
 from apolo_app_types.protocols.common import (
     AbstractAppFieldType,
@@ -47,6 +47,35 @@ class Proxy(AbstractAppFieldType):
 class Web(AbstractAppFieldType):
     replicas: int = Field(default=1, gt=0)
     preset_name: str
+
+
+class LLMModelConfig(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="LLM Model Configuration",
+            description="Metadata extracted from Hugging Face"
+            " configs and deployment settings "
+            "to describe an LLM's context limits.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+
+    context_max_tokens: int | None = Field(
+        default=None,
+        gt=0,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Effective Context Size (tokens)",
+            description=(
+                "Maximum total tokens (prompt + output) accepted in one request. "
+                "If vLLM is started with --max-model-len, that value is used. "
+                "Otherwise it is derived from the model config (after RoPE scaling) "
+                "and capped by the tokenizer's model_max_length when present. "
+                "Used to compute max generated tokens as: context_max_tokens − "
+                "prompt_tokens."
+            ),
+        ).as_json_schema_extra(),
+    )
 
 
 class LLMInputs(AppInputs):
