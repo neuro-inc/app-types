@@ -102,7 +102,7 @@ def prepare_job_run_params(  # noqa: C901
     tags = job_input.metadata.tags + [f"instance_id:{app_instance_id}"]
 
     return JobRunParams(
-        image=apolo_sdk.RemoteImage.new_external_image(name=job_input.image.image),
+        image=client.parse.remote_image(job_input.image.image),
         preset_name=job_input.resources.preset.name,
         entrypoint=job_input.image.entrypoint
         if job_input.image.entrypoint.strip()
