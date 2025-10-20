@@ -49,6 +49,17 @@ class IngressHttp(BaseIngress):
         json_schema_extra=INGRESS_HTTP_SCHEMA_EXTRA.as_json_schema_extra(),
     )
 
+    annotations: dict[str, str] = Field(
+        default_factory=dict,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Ingress Annotations",
+            description=(
+                "Optional ingress annotations. "
+                "Configure Traefik or other ingress controllers."
+            ),
+        ).as_json_schema_extra(),
+    )
+
 
 class BasicNetworkingConfig(AbstractAppFieldType):
     """Common networking configuration for applications."""

@@ -238,6 +238,39 @@ async def test_custom_deployment_values_generation_with_multiport_exposure(
 
 
 @pytest.mark.asyncio
+async def test_custom_deployment_ingress_annotations_propagation(setup_clients):
+    """Ensure Traefik ingress annotations are correctly included in Helm values."""
+    traefik_annotations = {
+        "traefik.ingress.kubernetes.io/service.sticky": "true",
+        "traefik.ingress.kubernetes.io/request-buffering": "false",
+        "traefik.ingress.kubernetes.io/response-buffering": "false",
+    }
+
+    custom_deploy_inputs = CustomDeploymentInputs(
+        preset=Preset(name="cpu-small"),
+        image=ContainerImage(repository="multiport", tag="latest"),
+        networking=NetworkingConfig(
+            service_enabled=True,
+            ingress_http=IngressHttp(annotations=traefik_annotations),
+        ),
+    )
+
+    _, helm_params = await app_type_to_vals(
+        input_=custom_deploy_inputs,
+        apolo_client=setup_clients,
+        app_type=AppType.CustomDeployment,
+        app_name="custom-app",
+        namespace="default-namespace",
+        app_id=APP_ID,
+        app_secrets_name=APP_SECRETS_NAME,
+    )
+
+    assert "annotations" in helm_params["ingress"]
+    for k, v in traefik_annotations.items():
+        assert helm_params["ingress"]["annotations"][k] == v
+
+
+@pytest.mark.asyncio
 async def test_custom_deployment_values_generation_path_port_not_supplied(
     setup_clients,
 ):
