@@ -72,6 +72,16 @@ class CustomDeploymentChartValueProcessor(
             app_id=app_id,
             app_type=app_type,
         )
+
+        if (
+            input_.networking
+            and input_.networking.ingress_http
+            and input_.networking.ingress_http.annotations
+        ):
+            annotations = input_.networking.ingress_http.annotations
+            extra_values.setdefault("ingress", {})
+            extra_values["ingress"].setdefault("annotations", {}).update(annotations)
+
         image_docker_url = await get_image_docker_url(
             client=self.client,
             image=input_.image.repository,
