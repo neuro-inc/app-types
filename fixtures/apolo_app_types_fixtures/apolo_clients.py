@@ -46,8 +46,8 @@ async def setup_clients(presets_available):
 
             mock_apolo_client.config.get_cluster = MagicMock(return_value=mock_cluster)
             mock_apolo_client.parse.remote_image = MagicMock(
-                side_effect=lambda image, cluster_name=None: apolo_sdk.RemoteImage(
-                    name=image,
+                side_effect=lambda *args, **kwargs: apolo_sdk.RemoteImage(
+                    name=kwargs.get("image") or (args[1] if len(args) > 1 else args[0])
                 )
             )
 
