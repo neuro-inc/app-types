@@ -23,17 +23,14 @@ HF_TOKEN_SCHEMA_EXTRA = SchemaExtraMetadata(
     " files from the Hugging Face Hub, including "
     "gated or private repositories where applicable.",
     title="Hugging Face Token",
+    meta_type=SchemaMetaType.INTEGRATION,
 )
 
 
 class HuggingFaceToken(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Hugging Face Token",
-            description="Hugging Face API token for accessing models.",
-            meta_type=SchemaMetaType.INTEGRATION,
-        ).as_json_schema_extra(),
+        json_schema_extra=HF_TOKEN_SCHEMA_EXTRA.as_json_schema_extra(),
     )
     token_name: str = Field(  # noqa: N814
         ...,

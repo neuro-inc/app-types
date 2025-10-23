@@ -106,15 +106,15 @@ class LLMChartValueProcessor(BaseChartValueProcessor[LLMInputs]):
         self, input_: LLMInputs, app_secrets_name: str
     ) -> dict[str, t.Any]:
         # Start with base environment variables
-        if not input_.hugging_face_model.hf_token:
-            err = "Hugging Face token must be provided."
-            raise ValueError(err)
-        env_vars = {
-            "HUGGING_FACE_HUB_TOKEN": serialize_optional_secret(
-                input_.hugging_face_model.hf_token.token, secret_name=app_secrets_name
-            )
-        }
-
+        if input_.hugging_face_model.hf_token:
+            env_vars = {
+                "HUGGING_FACE_HUB_TOKEN": serialize_optional_secret(
+                    input_.hugging_face_model.hf_token.token,
+                    secret_name=app_secrets_name,
+                )
+            }
+        else:
+            env_vars = {}
         # Add extra environment variables with priority over base ones
         # User-provided extra_env_vars override any existing env vars with the same name
         for env_var in input_.extra_env_vars:

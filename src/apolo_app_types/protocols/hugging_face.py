@@ -1,7 +1,10 @@
 from pydantic import Field
 
 from apolo_app_types.protocols.common import AppInputs, AppOutputs, HuggingFaceCache
-from apolo_app_types.protocols.common.hugging_face import HuggingFaceToken
+from apolo_app_types.protocols.common.hugging_face import (
+    HF_TOKEN_SCHEMA_EXTRA,
+    HuggingFaceToken,
+)
 from apolo_app_types.protocols.common.schema_extra import (
     SchemaExtraMetadata,
     SchemaMetaType,
@@ -18,10 +21,10 @@ class HuggingFaceAppInputs(AppInputs):
     )
     token: HuggingFaceToken = Field(
         ...,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Hugging Face Token",
-            description="Hugging Face API token for accessing models.",
-            meta_type=SchemaMetaType.INLINE,
+        json_schema_extra=HF_TOKEN_SCHEMA_EXTRA.model_copy(
+            update={
+                "meta_type": SchemaMetaType.INLINE,
+            }
         ).as_json_schema_extra(),
     )
 

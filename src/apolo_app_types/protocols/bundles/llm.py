@@ -9,7 +9,6 @@ from apolo_app_types.protocols.common import (
     SchemaExtraMetadata,
 )
 from apolo_app_types.protocols.common.hugging_face import (
-    HF_TOKEN_SCHEMA_EXTRA,
     HuggingFaceToken,
 )
 
@@ -48,10 +47,7 @@ class LLMBundleInputs(AppInputs, typing.Generic[TSize]):
     This class can be extended by specific LLM bundle input classes.
     """
 
-    hf_token: HuggingFaceToken = Field(  # noqa: N815
-        ...,
-        json_schema_extra=HF_TOKEN_SCHEMA_EXTRA.as_json_schema_extra(),
-    )
+    hf_token: HuggingFaceToken
     autoscaling_enabled: bool = Field(  # noqa: N815
         default=False,
         json_schema_extra=SchemaExtraMetadata(
