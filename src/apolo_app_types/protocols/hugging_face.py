@@ -28,4 +28,4 @@ class HuggingFaceAppInputs(AppInputs):
 
 class HuggingFaceAppOutputs(AppOutputs):
     cache_config: HuggingFaceCache
-    tokens: list[HuggingFaceToken]
+    tokens: HuggingFaceToken
