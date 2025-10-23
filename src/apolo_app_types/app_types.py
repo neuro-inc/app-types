@@ -19,6 +19,7 @@ class AppType(enum.StrEnum):
     ApoloDeploy = "apolo-deploy"
     DockerHub = "dockerhub"
     HuggingFaceCache = "huggingface-cache"
+    HuggingFace = "huggingface"
     CustomDeployment = "custom-deployment"
     ServiceDeployment = "service-deployment"
     SparkJob = "spark-job"
