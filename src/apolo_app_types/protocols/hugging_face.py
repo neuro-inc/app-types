@@ -16,11 +16,11 @@ class HuggingFaceAppInputs(AppInputs):
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra()
     )
-    tokens: list[HuggingFaceToken] = Field(
+    token: HuggingFaceToken = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
-            title="Hugging Face Tokens",
-            description="List of Hugging Face API tokens for accessing models.",
+            title="Hugging Face Token",
+            description="Hugging Face API token for accessing models.",
             meta_type=SchemaMetaType.INLINE,
         ).as_json_schema_extra(),
     )
