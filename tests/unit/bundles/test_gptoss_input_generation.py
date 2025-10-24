@@ -1,5 +1,6 @@
 from dirty_equals import IsStr
 
+from apolo_app_types import HuggingFaceToken
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.bundles.llm import (
     GPTOSSValueProcessor,
@@ -28,7 +29,9 @@ async def test_values_llm_generation_gpu_default_preset(
     helm_args, helm_params = await app_type_to_vals(
         input_=GptOssInputs(
             size=model_to_test,
-            hf_token=ApoloSecret(key="FakeSecret"),
+            hf_token=HuggingFaceToken(
+                token_name="test-token-name", token=ApoloSecret(key="FakeSecret")
+            ),
         ),
         apolo_client=apolo_client,
         app_type=AppType.GptOss,

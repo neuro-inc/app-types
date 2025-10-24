@@ -5,7 +5,6 @@ from apolo_app_types.protocols.common import (
     AppInputs,
     AppOutputs,
     AppOutputsDeployer,
-    HuggingFaceCache,
     HuggingFaceModel,
     IngressHttp,
     Preset,
@@ -123,12 +122,6 @@ class LLMInputs(AppInputs):
             ),
         ).as_json_schema_extra(),
     )
-    cache_config: HuggingFaceCache | None = Field(
-        default=None,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Cache Config", description="Configure Hugging Face cache."
-        ).as_json_schema_extra(),
-    )
     http_autoscaling: AutoscalingKedaHTTP | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
@@ -143,8 +136,11 @@ class LLMInputs(AppInputs):
 
     @model_validator(mode="after")
     def check_autoscaling_requires_cache(self) -> "LLMInputs":
-        if self.http_autoscaling and not self.cache_config:
-            msg = "If HTTP autoscaling is enabled, cache_config must also be set."
+        if self.http_autoscaling and not self.hugging_face_model.hf_cache:
+            msg = (
+                "If HTTP autoscaling is enabled, "
+                "hugging_face_model.hf_cache must also be set."
+            )
             raise ValueError(msg)
         return self
 

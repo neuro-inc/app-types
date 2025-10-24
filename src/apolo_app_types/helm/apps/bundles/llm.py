@@ -127,6 +127,9 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
         hf_model = HuggingFaceModel(
             model_hf_name=self.model_map[input_.size].model_hf_name,
             hf_token=input_.hf_token,
+            hf_cache=HuggingFaceCache(
+                files_path=ApoloFilesPath(path=self._get_storage_path())
+            ),
         )
         preset_chosen = await self._get_preset(input_)
         logger.info("Preset chosen: %s", preset_chosen.name)
@@ -135,9 +138,6 @@ class BaseLLMBundleMixin(BaseChartValueProcessor[T]):
             tokenizer_hf_name=hf_model.model_hf_name,
             ingress_http=IngressHttp(auth=NoAuth()),
             preset=preset_chosen,
-            cache_config=HuggingFaceCache(
-                files_path=ApoloFilesPath(path=self._get_storage_path())
-            ),
             http_autoscaling=AutoscalingKedaHTTP(scaledown_period=300)
             if input_.autoscaling_enabled
             else None,

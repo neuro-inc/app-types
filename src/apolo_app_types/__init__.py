@@ -18,6 +18,7 @@ from apolo_app_types.protocols.common import (
     Env,
     HttpApi,
     HuggingFaceModel,
+    HuggingFaceToken,
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
     OptionalSecret,
@@ -48,7 +49,9 @@ from apolo_app_types.protocols.fooocus import (
     FooocusInputs,
     FooocusOutputs,
 )
-from apolo_app_types.protocols.huggingface_cache import (
+from apolo_app_types.protocols.hugging_face import (
+    HuggingFaceAppInputs,
+    HuggingFaceAppOutputs,
     HuggingFaceCacheInputs,
     HuggingFaceCacheOutputs,
 )
@@ -209,6 +212,7 @@ __all__ = [
     "ServiceAPI",
     "StableDiffusionOutputs",
     "HuggingFaceModel",
+    "HuggingFaceToken",
     "VLLMOutputsV2",
     "AppInputsDeployer",
     "PGBouncer",
@@ -217,8 +221,8 @@ __all__ = [
     "DockerHubOutputs",
     "DockerConfigModel",
     "ApoloFilesMount",
-    "HuggingFaceCacheInputs",
-    "HuggingFaceCacheOutputs",
+    "HuggingFaceAppInputs",
+    "HuggingFaceAppOutputs",
     "CustomDeploymentInputs",
     "CustomDeploymentOutputs",
     "ContainerImage",
@@ -263,4 +267,6 @@ __all__ = [
     "MistralInputs",
     "GptOssInputs",
     "LLMModelConfig",
+    "HuggingFaceCacheInputs",
+    "HuggingFaceCacheOutputs",
 ]

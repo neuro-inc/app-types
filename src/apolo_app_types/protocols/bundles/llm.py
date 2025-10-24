@@ -5,11 +5,12 @@ from typing import Literal
 from pydantic import Field
 
 from apolo_app_types.protocols.common import (
-    ApoloSecret,
     AppInputs,
     SchemaExtraMetadata,
 )
-from apolo_app_types.protocols.common.hugging_face import HF_TOKEN_SCHEMA_EXTRA
+from apolo_app_types.protocols.common.hugging_face import (
+    HuggingFaceToken,
+)
 
 
 TSize = typing.TypeVar("TSize")
@@ -46,10 +47,7 @@ class LLMBundleInputs(AppInputs, typing.Generic[TSize]):
     This class can be extended by specific LLM bundle input classes.
     """
 
-    hf_token: ApoloSecret = Field(  # noqa: N815
-        ...,
-        json_schema_extra=HF_TOKEN_SCHEMA_EXTRA.as_json_schema_extra(),
-    )
+    hf_token: HuggingFaceToken
     autoscaling_enabled: bool = Field(  # noqa: N815
         default=False,
         json_schema_extra=SchemaExtraMetadata(
