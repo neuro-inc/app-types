@@ -52,6 +52,8 @@ from apolo_app_types.protocols.fooocus import (
 from apolo_app_types.protocols.hugging_face import (
     HuggingFaceAppInputs,
     HuggingFaceAppOutputs,
+    HuggingFaceCacheInputs,
+    HuggingFaceCacheOutputs,
 )
 from apolo_app_types.protocols.job import (
     ContainerHTTPServer,
@@ -265,4 +267,6 @@ __all__ = [
     "MistralInputs",
     "GptOssInputs",
     "LLMModelConfig",
+    "HuggingFaceCacheInputs",
+    "HuggingFaceCacheOutputs",
 ]
