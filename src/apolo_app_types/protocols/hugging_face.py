@@ -32,7 +32,7 @@ class HuggingFaceAppInputs(AppInputs):
 
 class HuggingFaceAppOutputs(AppOutputs):
     cache_config: HuggingFaceCache
-    tokens: HuggingFaceToken
+    token: HuggingFaceToken
 
 
 @deprecated("HuggingFaceCacheInputs is deprecated; use HuggingFaceAppInputs.")
