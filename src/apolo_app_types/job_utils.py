@@ -82,6 +82,13 @@ def prepare_job_run_params(  # noqa: C901
         elif isinstance(env_var.value, str):
             env_dict[env_var.name] = env_var.value
 
+    http = None
+    if job_input.networking.http:
+        http = apolo_sdk.HTTPPort(
+            port=job_input.networking.http.port,
+            requires_auth=job_input.networking.http.requires_auth,
+        )
+
     # Process job integrations envs
     mlflow_integration = job_input.integrations.mlflow_integration
     if mlflow_integration.internal_url:
@@ -111,7 +118,7 @@ def prepare_job_run_params(  # noqa: C901
         working_dir=job_input.image.working_dir
         if job_input.image.working_dir.strip()
         else None,
-        http=None,
+        http=http,
         env=env_dict,
         volumes=volumes,
         secret_env=secret_env_dict,
