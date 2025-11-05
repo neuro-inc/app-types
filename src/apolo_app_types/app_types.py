@@ -26,6 +26,7 @@ class AppType(enum.StrEnum):
     Superset = "superset"
     OpenWebUI = "openwebui"
     Launchpad = "launchpad"
+    N8n = "n8n"
 
     # bundles
     Llama4 = "llama4"
