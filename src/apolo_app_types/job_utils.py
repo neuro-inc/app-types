@@ -72,6 +72,17 @@ def prepare_job_run_params(  # noqa: C901
             )
             secret_files.append(secret_file)
 
+    disk_volumes = []
+    for raw_volume in job_input.resources.disk_volumes or []:
+        disk_volume = apolo_sdk.DiskVolume(
+            disk_uri=URL(
+                f"disk://{client.cluster_name}/{org_name}/{project_name}{raw_volume.src_disk_uri}"
+            ),
+            container_path=raw_volume.dst_path,
+            read_only=raw_volume.read_only,
+        )
+        disk_volumes.append(disk_volume)
+
     env_dict = {}
     secret_env_dict = {}
     for env_var in job_input.image.env:
@@ -123,7 +134,7 @@ def prepare_job_run_params(  # noqa: C901
         volumes=volumes,
         secret_env=secret_env_dict,
         secret_files=secret_files,
-        disk_volumes=[],
+        disk_volumes=disk_volumes,
         tty=True,
         shm=True,
         name=job_name,
