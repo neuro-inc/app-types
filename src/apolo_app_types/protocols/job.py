@@ -79,7 +79,7 @@ class DiskVolume(AbstractAppFieldType):
         Field(
             json_schema_extra=SchemaExtraMetadata(
                 title="Source Disk URI",
-                description="Reference to a disk (e.g., storage://cluster/org/proj/disk).",
+                description="Reference to a disk (e.g., /disk-name).",
             ).as_json_schema_extra()
         ),
     ]
