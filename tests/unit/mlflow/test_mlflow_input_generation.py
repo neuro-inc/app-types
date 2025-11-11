@@ -4,6 +4,7 @@ from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import (
     ApoloFilesPath,
+    ApoloSecret,
     IngressHttp,
     Preset,
 )
@@ -11,10 +12,15 @@ from apolo_app_types.protocols.mlflow import (
     MLFlowAppInputs,
     MLFlowMetadataPostgres,
     MLFlowMetadataSQLite,
-    PostgresURI,
 )
+from apolo_app_types.protocols.postgres import PostgresURI
 
-from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
+from tests.unit.constants import (
+    APP_ID,
+    APP_SECRETS_NAME,
+    DEFAULT_NAMESPACE,
+    DEFAULT_POSTGRES_CREDS,
+)
 
 
 @pytest.mark.asyncio
@@ -130,16 +136,22 @@ async def test_values_mlflow_generation_postgres_uri(
     setup_clients, mock_get_preset_cpu
 ):
     """
-    Test that MLFlow config uses a user-supplied Postgres URI
+    Test that MLFlow config uses Postgres credentials
     when provided.
     """
+    # Create credentials with URI populated
+    postgres_creds = DEFAULT_POSTGRES_CREDS.model_copy(
+        update={
+            "pgbouncer_uri": ApoloSecret(key="mlflow-pgbouncer-uri"),
+            "postgres_uri": PostgresURI(uri=ApoloSecret(key="mlflow-postgres-uri")),
+        }
+    )
+
     input_data = MLFlowAppInputs(
         preset=Preset(name="cpu-small"),
         ingress_http=IngressHttp(clusterName="test-cluster"),
         metadata_storage=MLFlowMetadataPostgres(
-            postgres_uri=PostgresURI(
-                uri="postgresql://user:pass@custom-host:5432/mlflow"
-            ),
+            postgres_credentials=postgres_creds,
         ),
         artifact_store=ApoloFilesPath(
             path="storage://test-cluster/myorg/proj/mlflow-artifacts"
@@ -156,13 +168,20 @@ async def test_values_mlflow_generation_postgres_uri(
         app_id=APP_ID,
     )
 
-    # Check environment var for PG URI
+    # Check environment var for PG URI - should be an ApoloSecret reference
     env_vars = helm_params["container"]["env"]
     tracking_env = next(
         (e for e in env_vars if e["name"] == "MLFLOW_TRACKING_URI"), None
     )
     assert tracking_env is not None
-    assert tracking_env["value"] == "postgresql://user:pass@custom-host:5432/mlflow"
+    # Should be a secret reference dict pointing to pgbouncer_uri (prioritized)
+    assert isinstance(tracking_env["value"], dict)
+    assert "valueFrom" in tracking_env["value"]
+    assert "secretKeyRef" in tracking_env["value"]["valueFrom"]
+    assert (
+        tracking_env["value"]["valueFrom"]["secretKeyRef"]["key"]
+        == "mlflow-pgbouncer-uri"
+    )
 
     # No PVC volumes
     assert "volumes" not in helm_params

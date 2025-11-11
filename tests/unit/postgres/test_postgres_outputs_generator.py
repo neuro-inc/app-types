@@ -8,18 +8,36 @@ async def test_postgres_outputs(setup_clients, mock_kubernetes_client, app_insta
             "__type__": "CrunchyPostgresUserCredentials",
             "dbname": "mydatabase",
             "user": "admin",
-            "password": "supersecret",
+            "password": {
+                "__type__": "ApoloSecret",
+                "key": f"postgres-admin-password-{app_instance_id}",
+            },
             "host": "db.example.com",
             "port": 5432,
             "pgbouncer_host": "pgbouncer.example.com",
             "pgbouncer_port": 6432,
-            "jdbc_uri": "jdbc:postgresql://db.example.com:5432/mydatabase",
-            "pgbouncer_jdbc_uri": "jdbc:postgresql://pgbouncer.example.com:6432/mydatabase",
-            "pgbouncer_uri": "postgres://pgbouncer.example.com:6432/mydatabase",
-            "uri": "postgres://db.example.com:5432/mydatabase",
+            "jdbc_uri": {
+                "__type__": "ApoloSecret",
+                "key": f"postgres-admin-jdbc-uri-{app_instance_id}",
+            },
+            "pgbouncer_jdbc_uri": {
+                "__type__": "ApoloSecret",
+                "key": f"postgres-admin-pgbouncer-jdbc-uri-{app_instance_id}",
+            },
+            "pgbouncer_uri": {
+                "__type__": "ApoloSecret",
+                "key": f"postgres-admin-pgbouncer-uri-{app_instance_id}",
+            },
+            "uri": {
+                "__type__": "ApoloSecret",
+                "key": f"postgres-admin-uri-{app_instance_id}",
+            },
             "postgres_uri": {
                 "__type__": "PostgresURI",
-                "uri": "postgresql://admin:supersecret@pgbouncer.example.com:6432/mydatabase",
+                "uri": {
+                    "__type__": "ApoloSecret",
+                    "key": f"postgres-admin-connection-uri-{app_instance_id}",
+                },
             },
             "user_type": "user",
         },
@@ -27,18 +45,40 @@ async def test_postgres_outputs(setup_clients, mock_kubernetes_client, app_insta
             "__type__": "CrunchyPostgresUserCredentials",
             "dbname": "otherdatabase",
             "user": "admin",
-            "password": "supersecret",
+            "password": {
+                "__type__": "ApoloSecret",
+                "key": f"postgres-admin-password-{app_instance_id}",
+            },
             "host": "db.example.com",
             "port": 5432,
             "pgbouncer_host": "pgbouncer.example.com",
             "pgbouncer_port": 6432,
-            "jdbc_uri": "jdbc:postgresql://db.example.com:5432/otherdatabase",
-            "pgbouncer_jdbc_uri": "jdbc:postgresql://pgbouncer.example.com:6432/otherdatabase",
-            "pgbouncer_uri": "postgres://pgbouncer.example.com:6432/otherdatabase",
-            "uri": "postgres://db.example.com:5432/otherdatabase",
+            "jdbc_uri": {
+                "__type__": "ApoloSecret",
+                "key": f"postgres-admin-otherdatabase-jdbc-uri-{app_instance_id}",
+            },
+            "pgbouncer_jdbc_uri": {
+                "__type__": "ApoloSecret",
+                "key": (
+                    f"postgres-admin-otherdatabase-pgbouncer-jdbc-uri-{app_instance_id}"
+                ),
+            },
+            "pgbouncer_uri": {
+                "__type__": "ApoloSecret",
+                "key": f"postgres-admin-otherdatabase-pgbouncer-uri-{app_instance_id}",
+            },
+            "uri": {
+                "__type__": "ApoloSecret",
+                "key": f"postgres-admin-otherdatabase-uri-{app_instance_id}",
+            },
             "postgres_uri": {
                 "__type__": "PostgresURI",
-                "uri": "postgresql://admin:supersecret@pgbouncer.example.com:6432/otherdatabase",
+                "uri": {
+                    "__type__": "ApoloSecret",
+                    "key": (
+                        f"postgres-admin-otherdatabase-connection-uri-{app_instance_id}"
+                    ),
+                },
             },
             "user_type": "user",
         },

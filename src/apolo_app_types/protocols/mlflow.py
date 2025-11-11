@@ -18,7 +18,7 @@ from apolo_app_types.protocols.common import (
 )
 from apolo_app_types.protocols.common.networking import ServiceAPI
 from apolo_app_types.protocols.common.schema_extra import SchemaMetaType
-from apolo_app_types.protocols.postgres import PostgresURI
+from apolo_app_types.protocols.postgres import CrunchyPostgresUserCredentials
 
 
 class MLFlowMetadataPostgres(AbstractAppFieldType):
@@ -37,15 +37,7 @@ class MLFlowMetadataPostgres(AbstractAppFieldType):
             description="Storage type for MLFlow metadata.",
         ).as_json_schema_extra(),
     )
-    postgres_uri: t.Annotated[
-        PostgresURI,
-        Field(
-            json_schema_extra=SchemaExtraMetadata(
-                title="Postgres URI",
-                description="Connection URI to the PostgreSQL metadata database.",
-            ).as_json_schema_extra()
-        ),
-    ]
+    postgres_credentials: CrunchyPostgresUserCredentials
 
 
 class MLFlowMetadataSQLite(AbstractAppFieldType):

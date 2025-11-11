@@ -38,7 +38,7 @@ async def test_lightrag_openai_llm_provider(setup_clients, mock_get_preset_cpu):
             ingress_http=IngressHttp(),
             pgvector_user=CrunchyPostgresUserCredentials(
                 user="test_user",
-                password="test_password",
+                password=ApoloSecret(key="test_password"),
                 host="postgres_host",
                 port=5432,
                 pgbouncer_host="pgbouncer_host",
@@ -90,7 +90,7 @@ async def test_lightrag_anthropic_llm_provider(setup_clients, mock_get_preset_cp
             ingress_http=IngressHttp(),
             pgvector_user=CrunchyPostgresUserCredentials(
                 user="test_user",
-                password="test_password",
+                password=ApoloSecret(key="test_password"),
                 host="postgres_host",
                 port=5432,
                 pgbouncer_host="pgbouncer_host",
@@ -132,7 +132,7 @@ async def test_lightrag_ollama_providers(setup_clients, mock_get_preset_cpu):
             ingress_http=IngressHttp(),
             pgvector_user=CrunchyPostgresUserCredentials(
                 user="test_user",
-                password="test_password",
+                password=ApoloSecret(key="test_password"),
                 host="postgres_host",
                 port=5432,
                 pgbouncer_host="pgbouncer_host",
@@ -189,7 +189,7 @@ async def test_lightrag_gemini_llm_provider(setup_clients, mock_get_preset_cpu):
             ingress_http=IngressHttp(),
             pgvector_user=CrunchyPostgresUserCredentials(
                 user="test_user",
-                password="test_password",
+                password=ApoloSecret(key="test_password"),
                 host="postgres_host",
                 port=5432,
                 pgbouncer_host="pgbouncer_host",
@@ -233,7 +233,7 @@ async def test_lightrag_openai_compatible_providers(setup_clients, mock_get_pres
             ingress_http=IngressHttp(),
             pgvector_user=CrunchyPostgresUserCredentials(
                 user="test_user",
-                password="test_password",
+                password=ApoloSecret(key="test_password"),
                 host="postgres_host",
                 port=5432,
                 pgbouncer_host="pgbouncer_host",
@@ -303,7 +303,7 @@ async def test_lightrag_secret_handling(setup_clients, mock_get_preset_cpu):
             ingress_http=IngressHttp(),
             pgvector_user=CrunchyPostgresUserCredentials(
                 user="test_user",
-                password="test_password",
+                password=ApoloSecret(key="test_password"),
                 host="postgres_host",
                 port=5432,
                 pgbouncer_host="pgbouncer_host",
@@ -345,7 +345,7 @@ async def test_lightrag_persistence_configuration(setup_clients, mock_get_preset
             ingress_http=IngressHttp(),
             pgvector_user=CrunchyPostgresUserCredentials(
                 user="test_user",
-                password="test_password",
+                password=ApoloSecret(key="test_password"),
                 host="postgres_host",
                 port=5432,
                 pgbouncer_host="pgbouncer_host",
@@ -386,7 +386,7 @@ async def test_lightrag_postgres_configuration(setup_clients, mock_get_preset_cp
             ingress_http=IngressHttp(),
             pgvector_user=CrunchyPostgresUserCredentials(
                 user="lightrag_user",
-                password="lightrag_password",
+                password=ApoloSecret(key="lightrag_password"),
                 host="postgres.example.com",
                 port=5432,
                 pgbouncer_host="pgbouncer.example.com",
@@ -414,7 +414,9 @@ async def test_lightrag_postgres_configuration(setup_clients, mock_get_preset_cp
     assert helm_params["env"]["POSTGRES_HOST"] == "pgbouncer.example.com"
     assert helm_params["env"]["POSTGRES_PORT"] == 6432
     assert helm_params["env"]["POSTGRES_USER"] == "lightrag_user"
-    assert helm_params["env"]["POSTGRES_PASSWORD"] == "lightrag_password"
+    assert helm_params["env"]["POSTGRES_PASSWORD"] == ApoloSecret(
+        key="lightrag_password"
+    )
     assert helm_params["env"]["POSTGRES_DATABASE"] == "lightrag_db"
     assert helm_params["env"]["POSTGRES_WORKSPACE"] == "default"
 
@@ -429,7 +431,7 @@ async def test_lightrag_storage_configuration(setup_clients, mock_get_preset_cpu
             ingress_http=IngressHttp(),
             pgvector_user=CrunchyPostgresUserCredentials(
                 user="test_user",
-                password="test_password",
+                password=ApoloSecret(key="test_password"),
                 host="postgres_host",
                 port=5432,
                 pgbouncer_host="pgbouncer_host",
@@ -470,7 +472,7 @@ async def test_lightrag_web_ui_configuration(setup_clients, mock_get_preset_cpu)
             ingress_http=IngressHttp(),
             pgvector_user=CrunchyPostgresUserCredentials(
                 user="test_user",
-                password="test_password",
+                password=ApoloSecret(key="test_password"),
                 host="postgres_host",
                 port=5432,
                 pgbouncer_host="pgbouncer_host",
@@ -514,7 +516,7 @@ async def test_lightrag_basic_chart_values(setup_clients, mock_get_preset_cpu):
             ingress_http=IngressHttp(),
             pgvector_user=CrunchyPostgresUserCredentials(
                 user="test_user",
-                password="test_password",
+                password=ApoloSecret(key="test_password"),
                 host="postgres_host",
                 port=5432,
                 pgbouncer_host="pgbouncer_host",
@@ -560,7 +562,7 @@ async def test_lightrag_embedding_dimensions(setup_clients, mock_get_preset_cpu)
             ingress_http=IngressHttp(),
             pgvector_user=CrunchyPostgresUserCredentials(
                 user="test_user",
-                password="test_password",
+                password=ApoloSecret(key="test_password"),
                 host="postgres_host",
                 port=5432,
                 pgbouncer_host="pgbouncer_host",
@@ -598,7 +600,7 @@ async def test_lightrag_ollama_embedding_dimensions(setup_clients, mock_get_pres
             ingress_http=IngressHttp(),
             pgvector_user=CrunchyPostgresUserCredentials(
                 user="test_user",
-                password="test_password",
+                password=ApoloSecret(key="test_password"),
                 host="postgres_host",
                 port=5432,
                 pgbouncer_host="pgbouncer_host",
@@ -642,7 +644,7 @@ async def test_lightrag_error_handling_missing_hf_model(
                 ingress_http=IngressHttp(),
                 pgvector_user=CrunchyPostgresUserCredentials(
                     user="test_user",
-                    password="test_password",
+                    password=ApoloSecret(key="test_password"),
                     host="postgres_host",
                     port=5432,
                     pgbouncer_host="pgbouncer_host",
@@ -685,7 +687,7 @@ async def test_lightrag_error_handling_missing_embedding_hf_model(
                 ingress_http=IngressHttp(),
                 pgvector_user=CrunchyPostgresUserCredentials(
                     user="test_user",
-                    password="test_password",
+                    password=ApoloSecret(key="test_password"),
                     host="postgres_host",
                     port=5432,
                     pgbouncer_host="pgbouncer_host",

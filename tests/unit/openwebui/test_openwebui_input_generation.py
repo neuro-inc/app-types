@@ -192,7 +192,9 @@ def assert_database_env_vars(
         )
         if database_url is not None:
             # SQLite should use local file, not external database URL
-            assert not database_url["value"].startswith("postgresql://")
+            value = database_url["value"]
+            if isinstance(value, str):
+                assert not value.startswith("postgresql://")
 
         # VECTOR_DB and PGVECTOR_DB_URL should not be set for SQLite
         vector_db = next((env for env in env_vars if env["name"] == "VECTOR_DB"), None)
@@ -210,8 +212,14 @@ def assert_database_env_vars(
             (env for env in env_vars if env["name"] == "DATABASE_URL"), None
         )
         assert database_url is not None
-        if expected_db_url:
-            assert database_url["value"] == expected_db_url
+        # Database URL should now be a secretKeyRef structure
+        assert isinstance(database_url["value"], dict)
+        assert "valueFrom" in database_url["value"]
+        assert "secretKeyRef" in database_url["value"]["valueFrom"]
+        assert (
+            database_url["value"]["valueFrom"]["secretKeyRef"]["key"]
+            == "pgvector_pgbouncer_uri"
+        )
 
         # Check vector database configuration for PostgreSQL
         vector_db = next((env for env in env_vars if env["name"] == "VECTOR_DB"), None)
@@ -222,8 +230,14 @@ def assert_database_env_vars(
             (env for env in env_vars if env["name"] == "PGVECTOR_DB_URL"), None
         )
         assert pgvector_url is not None
-        if expected_db_url:
-            assert pgvector_url["value"] == expected_db_url
+        # PGVECTOR_DB_URL should also be a secretKeyRef structure
+        assert isinstance(pgvector_url["value"], dict)
+        assert "valueFrom" in pgvector_url["value"]
+        assert "secretKeyRef" in pgvector_url["value"]["valueFrom"]
+        assert (
+            pgvector_url["value"]["valueFrom"]["secretKeyRef"]["key"]
+            == "pgvector_pgbouncer_uri"
+        )
 
 
 @pytest.mark.asyncio

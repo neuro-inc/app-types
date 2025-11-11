@@ -1,6 +1,6 @@
 import pytest
 
-from apolo_app_types import CrunchyPostgresUserCredentials, HuggingFaceModel
+from apolo_app_types import HuggingFaceModel
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.common import IngressHttp, Preset
@@ -16,6 +16,7 @@ from apolo_app_types.protocols.private_gpt import (
 from tests.unit.constants import (
     APP_ID,
     APP_SECRETS_NAME,
+    DEFAULT_POSTGRES_CREDS,
 )
 
 
@@ -35,15 +36,7 @@ async def test_privategpt_values_generation(setup_clients):
                     tokenizer_hf_name="llm-tokenizer",
                 ),
             ),
-            pgvector_user=CrunchyPostgresUserCredentials(
-                user="pgvector_user",
-                password="pgvector_password",
-                host="pgvector_host",
-                port=5432,
-                pgbouncer_host="pgbouncer_host",
-                pgbouncer_port=4321,
-                dbname="db_name",
-            ),
+            pgvector_user=DEFAULT_POSTGRES_CREDS,
             embeddings_api=OpenAICompatEmbeddingsAPI(
                 host="text-embeddings-inference-host",
                 port=3000,
@@ -91,7 +84,14 @@ async def test_privategpt_values_generation(setup_clients):
         {"name": "POSTGRES_PORT", "value": "4321"},
         {"name": "POSTGRES_DB", "value": "db_name"},
         {"name": "POSTGRES_USER", "value": "pgvector_user"},
-        {"name": "POSTGRES_PASSWORD", "value": "pgvector_password"},
+        {
+            "name": "POSTGRES_PASSWORD",
+            "value": {
+                "valueFrom": {
+                    "secretKeyRef": {"name": "apps-secrets", "key": "pgvector_password"}
+                }
+            },
+        },
         {"name": "HUGGINGFACE_TOKEN", "value": ""},
     ]
 
@@ -120,14 +120,7 @@ async def test_privategpt_values_generation_custom_temperature(setup_clients):
                     tokenizer_hf_name="llm-tokenizer",
                 ),
             ),
-            pgvector_user=CrunchyPostgresUserCredentials(
-                user="pgvector_user",
-                password="pgvector_password",
-                host="pgvector_host",
-                port=5432,
-                pgbouncer_host="pgbouncer_host",
-                pgbouncer_port=4321,
-            ),
+            pgvector_user=DEFAULT_POSTGRES_CREDS,
             embeddings_api=OpenAICompatEmbeddingsAPI(
                 host="text-embeddings-inference-host",
                 port=3000,
@@ -175,8 +168,15 @@ async def test_privategpt_values_generation_custom_temperature(setup_clients):
         {"name": "EMBEDDING_DIM", "value": "768"},
         {"name": "POSTGRES_HOST", "value": "pgbouncer_host"},
         {"name": "POSTGRES_PORT", "value": "4321"},
-        {"name": "POSTGRES_DB", "value": "postgres"},
+        {"name": "POSTGRES_DB", "value": "db_name"},
         {"name": "POSTGRES_USER", "value": "pgvector_user"},
-        {"name": "POSTGRES_PASSWORD", "value": "pgvector_password"},
+        {
+            "name": "POSTGRES_PASSWORD",
+            "value": {
+                "valueFrom": {
+                    "secretKeyRef": {"name": "apps-secrets", "key": "pgvector_password"}
+                }
+            },
+        },
         {"name": "HUGGINGFACE_TOKEN", "value": ""},
     ]
