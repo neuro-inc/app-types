@@ -17,7 +17,6 @@ from apolo_app_types.outputs.lightrag import get_lightrag_outputs
 from apolo_app_types.outputs.llm import get_llm_inference_outputs
 from apolo_app_types.outputs.mlflow import get_mlflow_outputs
 from apolo_app_types.outputs.openwebui import get_openwebui_outputs
-from apolo_app_types.outputs.postgres import get_postgres_outputs
 from apolo_app_types.outputs.privategpt import get_privategpt_outputs
 from apolo_app_types.outputs.shell import get_shell_outputs
 from apolo_app_types.outputs.spark_job import get_spark_job_outputs
@@ -191,8 +190,6 @@ async def update_app_outputs(  # noqa: C901
                 conv_outputs = await get_dockerhub_outputs(
                     helm_outputs, app_instance_id
                 )
-            case AppType.PostgreSQL:
-                conv_outputs = await get_postgres_outputs(helm_outputs, app_instance_id)
             case AppType.CustomDeployment:
                 conv_outputs = await get_custom_deployment_outputs(
                     helm_outputs, app_instance_id
