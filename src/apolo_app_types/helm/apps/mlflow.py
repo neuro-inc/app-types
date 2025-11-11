@@ -6,9 +6,11 @@ from apolo_app_types.helm.apps.common import gen_extra_values
 from apolo_app_types.helm.apps.custom_deployment import (
     CustomDeploymentChartValueProcessor,
 )
+from apolo_app_types.helm.utils.database import get_postgres_database_url
 from apolo_app_types.protocols.common import (
     ApoloFilesMount,
     ApoloMountMode,
+    ApoloSecret,
     Container,
     ContainerImage,
     Env,
@@ -117,7 +119,7 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         )
 
         envs: list[Env] = []
-        backend_uri = ""
+        backend_uri: str | ApoloSecret = ""
         pvc_name = f"mlflow-sqlite-storage-{app_id}"
         if len(pvc_name) > 63:
             pvc_name = pvc_name[:63]
@@ -125,10 +127,9 @@ class MLFlowChartValueProcessor(BaseChartValueProcessor[MLFlowAppInputs]):
         use_sqlite = True
 
         if isinstance(input_.metadata_storage, MLFlowMetadataPostgres):
-            if not input_.metadata_storage.postgres_uri.uri:
-                error_msg = "Postgres chosen but 'postgres_uri' not provided"
-                raise ValueError(error_msg)
-            backend_uri = input_.metadata_storage.postgres_uri.uri
+            backend_uri = get_postgres_database_url(
+                credentials=input_.metadata_storage.postgres_credentials
+            )
             use_sqlite = False
 
         if use_sqlite:

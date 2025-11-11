@@ -49,7 +49,7 @@ class OpenWebUIChartValueProcessor(BaseChartValueProcessor[OpenWebUIAppInputs]):
             err_msg = "embeddings_api.hf_model is required"
             raise ValueError(err_msg)
 
-        env = {
+        env: dict[str, str | ApoloSecret] = {
             "OPENAI_API_BASE_URL": str(URL(input_.llm_chat_api.complete_url) / "v1"),
             "RAG_EMBEDDING_ENGINE": "openai",
             "RAG_OPENAI_API_BASE_URL": str(
@@ -61,7 +61,7 @@ class OpenWebUIChartValueProcessor(BaseChartValueProcessor[OpenWebUIAppInputs]):
             database_url = get_postgres_database_url(
                 credentials=input_.database_config.database.credentials
             )
-            extra_env = {
+            extra_env: dict[str, str | ApoloSecret] = {
                 "DATABASE_URL": database_url,
                 "VECTOR_DB": "pgvector",
                 "PGVECTOR_DB_URL": database_url,

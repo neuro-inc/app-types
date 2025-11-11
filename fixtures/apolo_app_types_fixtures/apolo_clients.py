@@ -116,6 +116,14 @@ async def setup_clients(presets_available):
                     "gpu-extra-large": 1,
                 },
             )
+            # Mock secrets.add() to return an ApoloSecret
+            from apolo_app_types.protocols.common import ApoloSecret
+
+            async def mock_secrets_add(key, value):
+                return ApoloSecret(key=key)
+
+            mock_apolo_client.secrets = MagicMock()
+            mock_apolo_client.secrets.add = AsyncMock(side_effect=mock_secrets_add)
             fake_resource_pools = [
                 ResourcePoolType(
                     name="cpu-pool",

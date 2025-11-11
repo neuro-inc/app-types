@@ -3,10 +3,9 @@ from unittest.mock import AsyncMock, patch
 import apolo_sdk
 import pytest
 
-from apolo_app_types import CrunchyPostgresUserCredentials
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
-from apolo_app_types.protocols.common import IngressHttp, Preset
+from apolo_app_types.protocols.common import ApoloSecret, IngressHttp, Preset
 from apolo_app_types.protocols.dify import (
     DifyAppApi,
     DifyAppInputs,
@@ -16,7 +15,12 @@ from apolo_app_types.protocols.dify import (
     DifyAppWorker,
 )
 
-from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
+from tests.unit.constants import (
+    APP_ID,
+    APP_SECRETS_NAME,
+    DEFAULT_NAMESPACE,
+    DEFAULT_POSTGRES_CREDS,
+)
 
 
 @pytest.mark.asyncio
@@ -55,24 +59,8 @@ async def test_dify_values_generation(setup_clients):
                 proxy=DifyAppProxy(preset=Preset(name="cpu-small")),
                 web=DifyAppWeb(preset=Preset(name="cpu-small")),
                 redis=DifyAppRedis(master_preset=Preset(name="cpu-small")),
-                external_postgres=CrunchyPostgresUserCredentials(
-                    user="pgvector_user",
-                    password="pgvector_password",
-                    host="pgvector_host",
-                    port=5432,
-                    pgbouncer_host="pgbouncer_host",
-                    pgbouncer_port=4321,
-                    dbname="db_name",
-                ),
-                external_pgvector=CrunchyPostgresUserCredentials(
-                    user="pgvector_user",
-                    password="pgvector_password",
-                    host="pgvector_host",
-                    port=5432,
-                    pgbouncer_host="pgbouncer_host",
-                    pgbouncer_port=4321,
-                    dbname="db_name",
-                ),
+                external_postgres=DEFAULT_POSTGRES_CREDS,
+                external_pgvector=DEFAULT_POSTGRES_CREDS,
             ),
             apolo_client=setup_clients,
             app_type=AppType.Dify,
@@ -103,14 +91,14 @@ async def test_dify_values_generation(setup_clients):
         }
         assert helm_params["externalPostgres"] == {
             "username": "pgvector_user",
-            "password": "pgvector_password",
+            "password": ApoloSecret(key="pgvector_password"),
             "address": "pgbouncer_host",
             "port": 4321,
             "dbName": "db_name",
         }
         assert helm_params["externalPgvector"] == {
             "username": "pgvector_user",
-            "password": "pgvector_password",
+            "password": ApoloSecret(key="pgvector_password"),
             "address": "pgbouncer_host",
             "port": 4321,
             "dbName": "db_name",

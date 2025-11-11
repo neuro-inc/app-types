@@ -64,7 +64,14 @@ def preset_to_resources(preset: apolo_sdk.Preset) -> dict[str, t.Any]:
     return {"requests": requests, "limits": requests.copy()}
 
 
-async def get_component_values(preset: Preset, preset_name: str) -> dict[str, t.Any]:
+class ComponentValues(t.TypedDict):
+    labels: dict[str, str]
+    resources: dict[str, t.Any]
+    tolerations: list[dict[str, t.Any]]
+    affinity: dict[str, t.Any]
+
+
+async def get_component_values(preset: Preset, preset_name: str) -> ComponentValues:
     return {
         "labels": {
             "platform.apolo.us/component": "app",

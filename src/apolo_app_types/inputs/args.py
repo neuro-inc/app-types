@@ -33,7 +33,6 @@ from apolo_app_types.helm.apps.jupyter import JupyterChartValueProcessor
 from apolo_app_types.helm.apps.lightrag import LightRAGChartValueProcessor
 from apolo_app_types.helm.apps.mlflow import MLFlowChartValueProcessor
 from apolo_app_types.helm.apps.openwebui import OpenWebUIChartValueProcessor
-from apolo_app_types.helm.apps.postgres import PostgresValueProcessor
 from apolo_app_types.helm.apps.privategpt import PrivateGptChartValueProcessor
 from apolo_app_types.helm.apps.shell import ShellChartValueProcessor
 from apolo_app_types.helm.apps.spark_job import SparkJobValueProcessor
@@ -75,7 +74,6 @@ async def app_type_to_vals(
         AppType.StableDiffusion: StableDiffusionChartValueProcessor,
         AppType.Weaviate: WeaviateChartValueProcessor,
         AppType.DockerHub: DockerHubModelChartValueProcessor,
-        AppType.PostgreSQL: PostgresValueProcessor,
         AppType.CustomDeployment: CustomDeploymentChartValueProcessor,
         AppType.SparkJob: SparkJobValueProcessor,
         AppType.Fooocus: FooocusChartValueProcessor,

@@ -1,8 +1,7 @@
 import pytest
 
-from apolo_app_types import CrunchyPostgresUserCredentials
 from apolo_app_types.app_types import AppType
-from apolo_app_types.protocols.common import IngressHttp, Preset
+from apolo_app_types.protocols.common import ApoloSecret, IngressHttp, Preset
 from apolo_app_types.protocols.superset import (
     SupersetInputs,
     SupersetPostgresConfig,
@@ -11,7 +10,12 @@ from apolo_app_types.protocols.superset import (
     WorkerConfig,
 )
 
-from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
+from tests.unit.constants import (
+    APP_ID,
+    APP_SECRETS_NAME,
+    DEFAULT_NAMESPACE,
+    DEFAULT_POSTGRES_CREDS,
+)
 
 
 @pytest.mark.asyncio
@@ -263,15 +267,7 @@ async def test_superset_values_generation_with_postgres_integration(
             worker_config=WorkerConfig(preset=Preset(name="cpu-large")),
             web_config=WebConfig(preset=Preset(name="cpu-large")),
             ingress_http=IngressHttp(),
-            postgres_config=CrunchyPostgresUserCredentials(
-                user="pgvector_user",
-                password="pgvector_password",
-                host="pgvector_host",
-                port=5432,
-                pgbouncer_host="pgbouncer_host",
-                pgbouncer_port=4321,
-                dbname="db_name",
-            ),
+            postgres_config=DEFAULT_POSTGRES_CREDS,
             redis_preset=Preset(name="cpu-large"),
         ),
         apolo_client=apolo_client,
@@ -285,7 +281,7 @@ async def test_superset_values_generation_with_postgres_integration(
     assert helm_params["supersetNode"]["connections"] == {
         "db_host": "pgbouncer_host",
         "db_name": "db_name",
-        "db_pass": "pgvector_password",
+        "db_pass": ApoloSecret(key="pgvector_password"),
         "db_port": 4321,
         "db_user": "pgvector_user",
     }

@@ -8,6 +8,7 @@ from pydantic import ConfigDict, Field, constr, model_validator
 
 from apolo_app_types.protocols.common import (
     AbstractAppFieldType,
+    ApoloSecret,
     AppInputs,
     AppOutputs,
     AppOutputsDeployer,
@@ -31,7 +32,7 @@ class PostgresURI(AbstractAppFieldType):
             description="Full Postgres connection URI configuration.",
         ).as_json_schema_extra(),
     )
-    uri: str = Field(
+    uri: ApoloSecret = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
             title="URI",
@@ -216,7 +217,7 @@ class BasePostgresUserCredentials(AbstractAppFieldType):
             title="Postgres User",
         ).as_json_schema_extra(),
     )
-    password: str = Field(
+    password: ApoloSecret = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
             description="Password for the Postgres user.",
@@ -265,35 +266,11 @@ class CrunchyPostgresUserCredentials(BasePostgresUserCredentials):
         ).as_json_schema_extra(),
     )
     dbname: str | None = None
-    jdbc_uri: str | None = None
-    pgbouncer_jdbc_uri: str | None = None
-    pgbouncer_uri: str | None = None
-    uri: str | None = None
+    jdbc_uri: ApoloSecret | None = None
+    pgbouncer_jdbc_uri: ApoloSecret | None = None
+    pgbouncer_uri: ApoloSecret | None = None
+    uri: ApoloSecret | None = None
     postgres_uri: PostgresURI | None = None
-
-    def with_database(self, database: str) -> CrunchyPostgresUserCredentials:
-        updates: dict[str, t.Any] = {
-            "dbname": database,
-        }
-        if self.jdbc_uri:
-            updates["jdbc_uri"] = self.jdbc_uri.replace(
-                f"/{self.dbname}", f"/{database}"
-            )
-        if self.pgbouncer_jdbc_uri:
-            updates["pgbouncer_jdbc_uri"] = self.pgbouncer_jdbc_uri.replace(
-                f"/{self.dbname}", f"/{database}"
-            )
-        if self.pgbouncer_uri:
-            updates["pgbouncer_uri"] = self.pgbouncer_uri.replace(
-                f"/{self.dbname}", f"/{database}"
-            )
-        if self.uri:
-            updates["uri"] = self.uri.replace(f"/{self.dbname}", f"/{database}")
-        if self.postgres_uri:
-            uri = self.postgres_uri.uri or ""
-            uri = uri.replace(f"/{self.dbname}", f"/{database}")
-            updates["postgres_uri"] = PostgresURI(uri=uri)
-        return self.model_copy(update=updates)
 
     user_type: t.Literal["user"] = "user"
 
