@@ -5,6 +5,7 @@ from .app_models import (
     DynamicAppListResponse,
 )
 
+
 __all__ = [
     "DynamicAppIdResponse",
     "DynamicAppListResponse",
