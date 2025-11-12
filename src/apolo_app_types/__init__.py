@@ -43,6 +43,12 @@ from apolo_app_types.protocols.dockerhub import (
     DockerHubInputs,
     DockerHubOutputs,
 )
+from apolo_app_types.protocols.dynamic_outputs import (
+    DynamicAppBasicResponse,
+    DynamicAppFilterParams,
+    DynamicAppIdResponse,
+    DynamicAppListResponse,
+)
 from apolo_app_types.protocols.fooocus import (
     FooocusAppInputs,
     FooocusAppOutputs,
@@ -269,4 +275,8 @@ __all__ = [
     "LLMModelConfig",
     "HuggingFaceCacheInputs",
     "HuggingFaceCacheOutputs",
+    "DynamicAppIdResponse",
+    "DynamicAppListResponse",
+    "DynamicAppBasicResponse",
+    "DynamicAppFilterParams",
 ]
