@@ -1,4 +1,4 @@
-from .app_models import (
+from .outputs import (
     DynamicAppBasicResponse,
     DynamicAppFilterParams,
     DynamicAppIdResponse,

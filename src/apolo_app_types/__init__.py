@@ -43,7 +43,7 @@ from apolo_app_types.protocols.dockerhub import (
     DockerHubInputs,
     DockerHubOutputs,
 )
-from apolo_app_types.protocols.dynamic_outputs import (
+from apolo_app_types.dynamic_outputs import (
     DynamicAppBasicResponse,
     DynamicAppFilterParams,
     DynamicAppIdResponse,
