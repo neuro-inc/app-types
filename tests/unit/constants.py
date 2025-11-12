@@ -5,7 +5,6 @@ from neuro_config_client import NvidiaGPUPreset
 
 from apolo_app_types import CrunchyPostgresUserCredentials
 from apolo_app_types.protocols.common import ApoloSecret
-from apolo_app_types.protocols.postgres import PostgresURI
 
 
 CPU_POOL = "cpu_pool"
@@ -109,5 +108,5 @@ DEFAULT_POSTGRES_CREDS = CrunchyPostgresUserCredentials(
     pgbouncer_port=4321,
     dbname="db_name",
     pgbouncer_uri=ApoloSecret(key="pgvector_pgbouncer_uri"),
-    postgres_uri=PostgresURI(uri=ApoloSecret(key="pgvector_postgres_uri")),
+    postgres_uri=ApoloSecret(key="pgvector_postgres_uri"),
 )

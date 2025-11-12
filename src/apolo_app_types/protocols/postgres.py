@@ -3,7 +3,9 @@ from __future__ import annotations
 import enum
 import typing as t
 from typing import Literal
+from urllib.parse import quote
 
+import apolo_sdk
 from pydantic import ConfigDict, Field, constr, model_validator
 
 from apolo_app_types.protocols.common import (
@@ -20,27 +22,6 @@ from apolo_app_types.protocols.common import (
 
 
 POSTGRES_ADMIN_DEFAULT_USER_NAME = "postgres"
-
-
-class PostgresURI(AbstractAppFieldType):
-    """Configuration for the Postgres connection URI."""
-
-    model_config = ConfigDict(
-        protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Postgres URI",
-            description="Full Postgres connection URI configuration.",
-        ).as_json_schema_extra(),
-    )
-    uri: ApoloSecret = Field(
-        ...,
-        json_schema_extra=SchemaExtraMetadata(
-            title="URI",
-            description=(
-                "Specify full Postgres connection URI. E.g. 'postgresql://user:pass@host:5432/db'"
-            ),
-        ).as_json_schema_extra(),
-    )
 
 
 class PGBouncer(AbstractAppFieldType):
@@ -266,13 +247,58 @@ class CrunchyPostgresUserCredentials(BasePostgresUserCredentials):
         ).as_json_schema_extra(),
     )
     dbname: str | None = None
-    jdbc_uri: ApoloSecret | None = None
-    pgbouncer_jdbc_uri: ApoloSecret | None = None
     pgbouncer_uri: ApoloSecret | None = None
-    uri: ApoloSecret | None = None
-    postgres_uri: PostgresURI | None = None
+    postgres_uri: ApoloSecret | None = None
 
     user_type: t.Literal["user"] = "user"
+
+    async def get_jdbc_uri(self) -> str | None:
+        """Get JDBC URI with credentials as query parameters.
+
+        Fetches the password from Apolo secrets and constructs a JDBC URI with
+        user and password as query parameters:
+        jdbc:postgresql://host:port/database?user=username&password=password
+        """
+        if not self.dbname:
+            return None
+
+        # Fetch the actual password value from secrets
+        async with apolo_sdk.get() as client:
+            password_secret = await client.secrets.get(key=self.password.key)
+            password_value = password_secret.decode()
+
+        # URL-encode username and password to handle special characters
+        user_encoded = quote(self.user, safe="")
+        password_encoded = quote(password_value, safe="")
+
+        return (
+            f"jdbc:postgresql://{self.host}:{self.port}/{self.dbname}"
+            f"?user={user_encoded}&password={password_encoded}"
+        )
+
+    async def get_pgbouncer_jdbc_uri(self) -> str | None:
+        """Get PGBouncer JDBC URI with credentials as query parameters.
+
+        Fetches the password from Apolo secrets and constructs a JDBC URI with
+        user and password as query parameters:
+        jdbc:postgresql://host:port/database?user=username&password=password
+        """
+        if not self.dbname:
+            return None
+
+        # Fetch the actual password value from secrets
+        async with apolo_sdk.get() as client:
+            password_secret = await client.secrets.get(key=self.password.key)
+            password_value = password_secret.decode()
+
+        # URL-encode username and password to handle special characters
+        user_encoded = quote(self.user, safe="")
+        password_encoded = quote(password_value, safe="")
+
+        return (
+            f"jdbc:postgresql://{self.pgbouncer_host}:{self.pgbouncer_port}/{self.dbname}"
+            f"?user={user_encoded}&password={password_encoded}"
+        )
 
 
 class PostgresAdminUser(BasePostgresUserCredentials):

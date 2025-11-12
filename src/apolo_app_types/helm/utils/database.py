@@ -16,8 +16,8 @@ def get_postgres_database_url(
         return credentials.pgbouncer_uri
 
     # Fall back to direct postgres_uri
-    if credentials.postgres_uri and credentials.postgres_uri.uri:
-        return credentials.postgres_uri.uri
+    if credentials.postgres_uri:
+        return credentials.postgres_uri
 
     # If no URI is available, we cannot build a connection string
     # because password is an ApoloSecret and cannot be interpolated into a string
