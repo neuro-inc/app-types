@@ -13,7 +13,6 @@ from apolo_app_types.protocols.mlflow import (
     MLFlowMetadataPostgres,
     MLFlowMetadataSQLite,
 )
-from apolo_app_types.protocols.postgres import PostgresURI
 
 from tests.unit.constants import (
     APP_ID,
@@ -143,7 +142,7 @@ async def test_values_mlflow_generation_postgres_uri(
     postgres_creds = DEFAULT_POSTGRES_CREDS.model_copy(
         update={
             "pgbouncer_uri": ApoloSecret(key="mlflow-pgbouncer-uri"),
-            "postgres_uri": PostgresURI(uri=ApoloSecret(key="mlflow-postgres-uri")),
+            "postgres_uri": ApoloSecret(key="mlflow-postgres-uri"),
         }
     )
 
