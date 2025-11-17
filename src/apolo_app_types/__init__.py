@@ -109,7 +109,6 @@ from apolo_app_types.protocols.llm import (
     VLLMOutputsV2,
 )
 from apolo_app_types.protocols.mlflow import (
-    MLFlowAppInputs,
     MLFlowAppOutputs,
     MLFlowTrackingServerURL,
 )
@@ -175,7 +174,6 @@ __all__ = [
     "JupyterOutputs",
     "LLMInputs",
     "VLLMOutputs",
-    "MLFlowAppInputs",
     "MLFlowAppOutputs",
     "MLFlowTrackingServerURL",
     "PostgresInputs",
