@@ -2,8 +2,7 @@ import itertools
 from dataclasses import dataclass
 
 import pytest
-
-from tests.unit.constants import (
+from apolo_app_types_fixtures.constants import (
     CUSTOM_AUTH_MIDDLEWARE,
     CUSTOM_RATE_LIMITING_MIDDLEWARE,
     DATABASE_POSTGRES,

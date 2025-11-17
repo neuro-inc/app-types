@@ -1,12 +1,16 @@
 import pytest
+from apolo_app_types_fixtures.constants import (
+    APP_ID,
+    APP_SECRETS_NAME,
+    CPU_POOL,
+    DEFAULT_NAMESPACE,
+)
 
 from apolo_app_types import HuggingFaceModel, HuggingFaceToken, StableDiffusionInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import _get_match_expressions
 from apolo_app_types.protocols.common import ApoloSecret, IngressHttp, Preset
 from apolo_app_types.protocols.stable_diffusion import StableDiffusionParams
-
-from tests.unit.constants import APP_ID, APP_SECRETS_NAME, CPU_POOL, DEFAULT_NAMESPACE
 
 
 @pytest.mark.asyncio

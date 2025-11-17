@@ -1,6 +1,13 @@
 import json
 
 import pytest
+from apolo_app_types_fixtures.constants import (
+    APP_ID,
+    APP_SECRETS_NAME,
+    DEFAULT_CLUSTER_NAME,
+    DEFAULT_ORG_NAME,
+    DEFAULT_PROJECT_NAME,
+)
 
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
@@ -15,14 +22,6 @@ from apolo_app_types.protocols.common.storage import (
 from apolo_app_types.protocols.vscode import (
     VSCodeAppInputs,
     VSCodeSpecificAppInputs,
-)
-
-from tests.unit.constants import (
-    APP_ID,
-    APP_SECRETS_NAME,
-    DEFAULT_CLUSTER_NAME,
-    DEFAULT_ORG_NAME,
-    DEFAULT_PROJECT_NAME,
 )
 
 

@@ -1,4 +1,5 @@
 import pytest
+from apolo_app_types_fixtures.constants import APP_ID, APP_SECRETS_NAME
 
 from apolo_app_types import (
     ContainerImage,
@@ -21,8 +22,6 @@ from apolo_app_types.protocols.spark_job import (
     SparkDependencies,
     SparkJobInputs,
 )
-
-from tests.unit.constants import APP_ID, APP_SECRETS_NAME
 
 
 @pytest.mark.asyncio

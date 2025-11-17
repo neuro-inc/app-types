@@ -2,6 +2,12 @@ from unittest.mock import AsyncMock, patch
 
 import apolo_sdk
 import pytest
+from apolo_app_types_fixtures.constants import (
+    APP_ID,
+    APP_SECRETS_NAME,
+    DEFAULT_NAMESPACE,
+    DEFAULT_POSTGRES_CREDS,
+)
 
 from apolo_app_types.app_types import AppType
 from apolo_app_types.inputs.args import app_type_to_vals
@@ -13,13 +19,6 @@ from apolo_app_types.protocols.dify import (
     DifyAppRedis,
     DifyAppWeb,
     DifyAppWorker,
-)
-
-from tests.unit.constants import (
-    APP_ID,
-    APP_SECRETS_NAME,
-    DEFAULT_NAMESPACE,
-    DEFAULT_POSTGRES_CREDS,
 )
 
 

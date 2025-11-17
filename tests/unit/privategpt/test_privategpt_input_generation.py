@@ -1,4 +1,9 @@
 import pytest
+from apolo_app_types_fixtures.constants import (
+    APP_ID,
+    APP_SECRETS_NAME,
+    DEFAULT_POSTGRES_CREDS,
+)
 
 from apolo_app_types import HuggingFaceModel
 from apolo_app_types.app_types import AppType
@@ -11,12 +16,6 @@ from apolo_app_types.protocols.common.openai_compat import (
 from apolo_app_types.protocols.private_gpt import (
     PrivateGPTAppInputs,
     PrivateGptSpecific,
-)
-
-from tests.unit.constants import (
-    APP_ID,
-    APP_SECRETS_NAME,
-    DEFAULT_POSTGRES_CREDS,
 )
 
 

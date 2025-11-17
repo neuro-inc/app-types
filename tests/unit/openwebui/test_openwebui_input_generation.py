@@ -1,4 +1,10 @@
 import pytest
+from apolo_app_types_fixtures.constants import (
+    APP_ID,
+    APP_SECRETS_NAME,
+    DEFAULT_AUTH_MIDDLEWARE,
+    DEFAULT_POSTGRES_CREDS,
+)
 
 from apolo_app_types import HuggingFaceModel
 from apolo_app_types.app_types import AppType
@@ -27,12 +33,6 @@ from apolo_app_types.protocols.openwebui import (
 
 from tests.unit.conftest import (
     OpenWebUITestCase,
-)
-from tests.unit.constants import (
-    APP_ID,
-    APP_SECRETS_NAME,
-    DEFAULT_AUTH_MIDDLEWARE,
-    DEFAULT_POSTGRES_CREDS,
 )
 
 

@@ -2,10 +2,9 @@ import base64
 import json
 
 import pytest
+from apolo_app_types_fixtures.constants import DEFAULT_NAMESPACE
 
 from apolo_app_types.outputs.dockerhub import get_dockerhub_outputs
-
-from tests.unit.constants import DEFAULT_NAMESPACE
 
 
 @pytest.mark.asyncio

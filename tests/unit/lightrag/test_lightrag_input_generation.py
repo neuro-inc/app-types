@@ -1,4 +1,9 @@
 import pytest
+from apolo_app_types_fixtures.constants import (
+    APP_ID,
+    APP_SECRETS_NAME,
+    DEFAULT_NAMESPACE,
+)
 from dirty_equals import IsStr
 
 from apolo_app_types import (
@@ -24,8 +29,6 @@ from apolo_app_types.protocols.lightrag import (
     OpenAIEmbeddingProvider,
     OpenAILLMProvider,
 )
-
-from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
 
 @pytest.mark.asyncio
