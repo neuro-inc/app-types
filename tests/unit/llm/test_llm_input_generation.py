@@ -1,3 +1,9 @@
+from apolo_app_types_fixtures.constants import (
+    APP_ID,
+    APP_SECRETS_NAME,
+    CPU_POOL,
+    DEFAULT_NAMESPACE,
+)
 from dirty_equals import IsStr
 
 from apolo_app_types import HuggingFaceModel, HuggingFaceToken, LLMInputs
@@ -19,8 +25,6 @@ from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 from apolo_app_types.protocols.hugging_face import (
     HuggingFaceCache,
 )
-
-from tests.unit.constants import APP_ID, APP_SECRETS_NAME, CPU_POOL, DEFAULT_NAMESPACE
 
 
 async def test_values_llm_generation_cpu(setup_clients, mock_get_preset_cpu):

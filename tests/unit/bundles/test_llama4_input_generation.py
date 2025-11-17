@@ -1,4 +1,11 @@
 import pytest
+from apolo_app_types_fixtures.constants import (
+    APP_ID,
+    APP_SECRETS_NAME,
+    CPU_PRESETS,
+    DEFAULT_NAMESPACE,
+    TEST_PRESETS_WITH_EXTRA_LARGE_GPU,
+)
 from dirty_equals import IsStr
 
 from apolo_app_types import LLama4Inputs
@@ -12,14 +19,6 @@ from apolo_app_types.helm.apps.common import (
 from apolo_app_types.inputs.args import app_type_to_vals
 from apolo_app_types.protocols.bundles.llm import Llama4Size
 from apolo_app_types.protocols.common import ApoloSecret, HuggingFaceToken
-
-from tests.unit.constants import (
-    APP_ID,
-    APP_SECRETS_NAME,
-    CPU_PRESETS,
-    DEFAULT_NAMESPACE,
-    TEST_PRESETS_WITH_EXTRA_LARGE_GPU,
-)
 
 
 @pytest.mark.parametrize("presets_available", [CPU_PRESETS], indirect=True)

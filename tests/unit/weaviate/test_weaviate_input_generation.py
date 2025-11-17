@@ -3,14 +3,17 @@ from unittest.mock import AsyncMock
 
 import apolo_sdk
 import pytest
+from apolo_app_types_fixtures.constants import (
+    APP_ID,
+    APP_SECRETS_NAME,
+    DEFAULT_NAMESPACE,
+)
 
 from apolo_app_types import WeaviateInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import _get_match_expressions
 from apolo_app_types.protocols.common import ApoloAuth, IngressGrpc, IngressHttp, Preset
 from apolo_app_types.protocols.weaviate import WeaviatePersistence
-
-from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
 
 @pytest.mark.asyncio

@@ -1,4 +1,10 @@
 import pytest
+from apolo_app_types_fixtures.constants import (
+    APP_ID,
+    APP_SECRETS_NAME,
+    DEFAULT_NAMESPACE,
+    DEFAULT_POSTGRES_CREDS,
+)
 
 from apolo_app_types.app_types import AppType
 from apolo_app_types.protocols.common import ApoloSecret, IngressHttp, Preset
@@ -8,13 +14,6 @@ from apolo_app_types.protocols.superset import (
     SupersetUserConfig,
     WebConfig,
     WorkerConfig,
-)
-
-from tests.unit.constants import (
-    APP_ID,
-    APP_SECRETS_NAME,
-    DEFAULT_NAMESPACE,
-    DEFAULT_POSTGRES_CREDS,
 )
 
 

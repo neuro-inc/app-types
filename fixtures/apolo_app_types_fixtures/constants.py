@@ -114,4 +114,6 @@ DEFAULT_POSTGRES_CREDS = CrunchyPostgresUserCredentials(
     pgbouncer_host="pgbouncer_host",
     pgbouncer_port=4321,
     dbname="db_name",
+    pgbouncer_uri=ApoloSecret(key="pgvector_pgbouncer_uri"),
+    postgres_uri=ApoloSecret(key="pgvector_postgres_uri"),
 )

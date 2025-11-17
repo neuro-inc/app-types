@@ -1,12 +1,11 @@
 from enum import StrEnum
 
 import pytest
+from apolo_app_types_fixtures.constants import TEST_PRESETS_WITH_EXTRA_LARGE_GPU
 
 from apolo_app_types.helm.apps.bundles.llm import BaseLLMBundleMixin, ModelSettings
 from apolo_app_types.protocols.bundles.llm import LLMBundleInputs
 from apolo_app_types.protocols.common import ApoloSecret, HuggingFaceToken
-
-from tests.unit.constants import TEST_PRESETS_WITH_EXTRA_LARGE_GPU
 
 
 class LLMSize(StrEnum):

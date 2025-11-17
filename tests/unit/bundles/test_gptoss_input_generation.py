@@ -1,3 +1,8 @@
+from apolo_app_types_fixtures.constants import (
+    APP_ID,
+    APP_SECRETS_NAME,
+    DEFAULT_NAMESPACE,
+)
 from dirty_equals import IsStr
 
 from apolo_app_types import HuggingFaceToken
@@ -16,8 +21,6 @@ from apolo_app_types.protocols.bundles.llm import (
     GptOssSize,
 )
 from apolo_app_types.protocols.common import ApoloSecret
-
-from tests.unit.constants import APP_ID, APP_SECRETS_NAME, DEFAULT_NAMESPACE
 
 
 async def test_values_llm_generation_gpu_default_preset(

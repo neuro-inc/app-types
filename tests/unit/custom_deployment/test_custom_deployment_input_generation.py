@@ -1,6 +1,7 @@
 import json
 
 import pytest
+from apolo_app_types_fixtures.constants import APP_ID, APP_SECRETS_NAME
 
 from apolo_app_types import (
     Container,
@@ -31,8 +32,6 @@ from apolo_app_types.protocols.custom_deployment import (
     NetworkingConfig,
     StorageMounts,
 )
-
-from tests.unit.constants import APP_ID, APP_SECRETS_NAME
 
 
 @pytest.mark.asyncio
