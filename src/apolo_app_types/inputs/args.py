@@ -31,7 +31,6 @@ from apolo_app_types.helm.apps.dockerhub import DockerHubModelChartValueProcesso
 from apolo_app_types.helm.apps.fooocus import FooocusChartValueProcessor
 from apolo_app_types.helm.apps.jupyter import JupyterChartValueProcessor
 from apolo_app_types.helm.apps.lightrag import LightRAGChartValueProcessor
-from apolo_app_types.helm.apps.mlflow import MLFlowChartValueProcessor
 from apolo_app_types.helm.apps.openwebui import OpenWebUIChartValueProcessor
 from apolo_app_types.helm.apps.privategpt import PrivateGptChartValueProcessor
 from apolo_app_types.helm.apps.shell import ShellChartValueProcessor
@@ -50,7 +49,6 @@ from apolo_app_types.protocols.custom_deployment import CustomDeploymentInputs
 from apolo_app_types.protocols.dify import DifyAppInputs
 from apolo_app_types.protocols.dockerhub import DockerHubInputs
 from apolo_app_types.protocols.jupyter import JupyterAppInputs
-from apolo_app_types.protocols.mlflow import MLFlowAppInputs
 from apolo_app_types.protocols.openwebui import OpenWebUIAppInputs
 from apolo_app_types.protocols.private_gpt import PrivateGPTAppInputs
 from apolo_app_types.protocols.spark_job import SparkJobInputs
@@ -78,7 +76,6 @@ async def app_type_to_vals(
         AppType.SparkJob: SparkJobValueProcessor,
         AppType.Fooocus: FooocusChartValueProcessor,
         AppType.LightRAG: LightRAGChartValueProcessor,
-        AppType.MLFlow: MLFlowChartValueProcessor,
         AppType.Jupyter: JupyterChartValueProcessor,
         AppType.TextEmbeddingsInference: TextEmbeddingsChartValueProcessor,
         AppType.PrivateGPT: PrivateGptChartValueProcessor,
@@ -141,7 +138,6 @@ async def get_installation_vals(
         AppType.SparkJob: SparkJobInputs,
         AppType.Fooocus: FooocusAppInputs,
         AppType.LightRAG: LightRAGAppInputs,
-        AppType.MLFlow: MLFlowAppInputs,
         AppType.Jupyter: JupyterAppInputs,
         AppType.TextEmbeddingsInference: TextEmbeddingsInferenceAppInputs,
         AppType.PrivateGPT: PrivateGPTAppInputs,
