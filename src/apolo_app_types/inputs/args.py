@@ -26,7 +26,6 @@ from apolo_app_types.helm.apps.bundles.llm import (
     Llama4ValueProcessor,
     MistralValueProcessor,
 )
-from apolo_app_types.helm.apps.dify import DifyChartValueProcessor
 from apolo_app_types.helm.apps.dockerhub import DockerHubModelChartValueProcessor
 from apolo_app_types.helm.apps.fooocus import FooocusChartValueProcessor
 from apolo_app_types.helm.apps.jupyter import JupyterChartValueProcessor
@@ -46,7 +45,6 @@ from apolo_app_types.protocols.bundles.llm import (
 )
 from apolo_app_types.protocols.common import AppInputs
 from apolo_app_types.protocols.custom_deployment import CustomDeploymentInputs
-from apolo_app_types.protocols.dify import DifyAppInputs
 from apolo_app_types.protocols.dockerhub import DockerHubInputs
 from apolo_app_types.protocols.jupyter import JupyterAppInputs
 from apolo_app_types.protocols.openwebui import OpenWebUIAppInputs
@@ -81,7 +79,6 @@ async def app_type_to_vals(
         AppType.PrivateGPT: PrivateGptChartValueProcessor,
         AppType.VSCode: VSCodeChartValueProcessor,
         AppType.Shell: ShellChartValueProcessor,
-        AppType.Dify: DifyChartValueProcessor,
         AppType.Superset: SupersetChartValueProcessor,
         AppType.OpenWebUI: OpenWebUIChartValueProcessor,
         AppType.Llama4: Llama4ValueProcessor,
@@ -141,7 +138,6 @@ async def get_installation_vals(
         AppType.Jupyter: JupyterAppInputs,
         AppType.TextEmbeddingsInference: TextEmbeddingsInferenceAppInputs,
         AppType.PrivateGPT: PrivateGPTAppInputs,
-        AppType.Dify: DifyAppInputs,
         AppType.VSCode: VSCodeAppInputs,
         AppType.Shell: ShellAppInputs,
         AppType.Superset: SupersetInputs,

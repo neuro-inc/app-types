@@ -36,14 +36,6 @@ from apolo_app_types.protocols.custom_deployment import (
     CustomDeploymentInputs,
     CustomDeploymentOutputs,
 )
-from apolo_app_types.protocols.dify import (
-    DifyApi,
-    DifyInputs,
-    DifyOutputs,
-    DifyProxy,
-    DifyWeb,
-    DifyWorker,
-)
 from apolo_app_types.protocols.dockerhub import (
     DockerConfigModel,
     DockerHubInputs,
@@ -156,12 +148,6 @@ from apolo_app_types.protocols.weaviate import WeaviateInputs, WeaviateOutputs
 __all__ = [
     "AppInputs",
     "AppOutputs",
-    "DifyApi",
-    "DifyInputs",
-    "DifyOutputs",
-    "DifyProxy",
-    "DifyWeb",
-    "DifyWorker",
     "PycharmInputs",
     "PycharmOutputs",
     "VSCodeInputs",
