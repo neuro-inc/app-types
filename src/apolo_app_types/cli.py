@@ -10,8 +10,12 @@ import click
 from yarl import URL
 
 from apolo_app_types.outputs.update_outputs import update_app_outputs
+from apolo_app_types.outputs.utils.cleanup import (
+    cleanup_secrets as apolo_cleanup_secrets,
+)
 from apolo_app_types.outputs.utils.discovery import (
     load_app_inputs,
+    load_app_outputs,
     load_app_preprocessor,
 )
 from apolo_app_types.schema.schema_dumper import dump_schema_type
@@ -206,6 +210,54 @@ def dump_types_schema(
         exact_type_name=exact_type_name,
         output_path=output_path,
     )
+
+
+@cli.command("cleanup-secrets", context_settings={"ignore_unknown_options": True})
+@click.argument("app_type", type=str)
+@click.argument("app_id", type=str)
+@click.option("--output-type", type=str, envvar="APOLO_APP_OUTPUT_TYPE")
+@click.option("--apolo-api-token", type=str, envvar="APOLO_API_TOKEN", required=True)
+@click.option("--package-name", type=str)
+@click.option("--apolo-passed-config", type=str, envvar="APOLO_PASSED_CONFIG")
+def cleanup_secrets(
+    app_type: str,
+    app_id: str,
+    output_type: str | None,
+    apolo_api_url: str,
+    apolo_org: str,
+    apolo_cluster: str,
+    apolo_project: str,
+    package_name: str,
+    apolo_passed_config: str,
+) -> None:
+    # template method, expanded by installing extra application modules
+    async def _cleanup_secrets() -> None:
+        logging.basicConfig(level=logging.DEBUG)
+        try:
+            output_class = load_app_outputs(app_type, package_name, output_type)
+            if not output_class:
+                err_msg = (
+                    f"Unable to find Output Type {app_type=}, {output_type=},"
+                    f" Package: {package_name}"
+                )
+                raise ValueError(err_msg)
+
+            await apolo_sdk.login_with_token(
+                token=apolo_passed_config,
+                url=URL(apolo_api_url),
+            )
+            async with apolo_sdk.get() as client:
+                await client.config.switch_org(apolo_org)
+                await client.config.switch_cluster(apolo_cluster)
+                await client.config.switch_project(apolo_project)
+                await apolo_cleanup_secrets(
+                    app_id=app_id, output_class=output_class, client=client
+                )
+        except Exception as e:
+            logger.error("An error occurred: %s", e)
+            sys.exit(1)
+
+    asyncio.run(_cleanup_secrets())
 
 
 if __name__ == "__main__":
