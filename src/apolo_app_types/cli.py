@@ -10,9 +10,7 @@ import click
 from yarl import URL
 
 from apolo_app_types.outputs.update_outputs import update_app_outputs
-from apolo_app_types.outputs.utils.cleanup import (
-    cleanup_secrets as apolo_cleanup_secrets,
-)
+from apolo_app_types.outputs.utils.cleanup import cleanup_secrets
 from apolo_app_types.outputs.utils.discovery import (
     load_app_inputs,
     load_app_outputs,
@@ -213,7 +211,7 @@ def dump_types_schema(
     )
 
 
-@cli.command("cleanup-secrets", context_settings={"ignore_unknown_options": True})
+@cli.command("cleanup", context_settings={"ignore_unknown_options": True})
 @click.argument("app_type", type=str)
 @click.argument("app_id", type=str)
 @click.option("--output-type", type=str, envvar="APOLO_APP_OUTPUT_TYPE")
@@ -224,7 +222,7 @@ def dump_types_schema(
 @click.option("--apolo-project", type=str, envvar="APOLO_PROJECT")
 @click.option("--package-name", type=str, default="apolo_app_types")
 @click.option("--apolo-passed-config", type=str, envvar="APOLO_PASSED_CONFIG")
-def cleanup_secrets(
+def cleanup(
     app_type: str,
     app_id: str,
     output_type: str,
@@ -259,7 +257,7 @@ def cleanup_secrets(
                     await client.config.switch_cluster(apolo_cluster)
                 if apolo_project:
                     await client.config.switch_project(apolo_project)
-                await apolo_cleanup_secrets(
+                await cleanup_secrets(
                     app_id=app_id, output_class=output_class, client=client
                 )
         except Exception as e:
