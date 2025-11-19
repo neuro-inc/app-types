@@ -21,8 +21,12 @@ spec:
         imagePullPolicy: {{ .Values.appTypesImage.pullPolicy }}
         args:
           - "cleanup"
-          - {{ .Values.cleanupArgs.app_type }}
-          - {{ .Values.cleanupArgs.app_id }}
+          - "{{ .Values.cleanupArgs.app_type }}"
+          - "{{ .Values.cleanupArgs.app_id }}"
+          - "--output-type"
+          - "{{ .Values.cleanupArgs.output_type_name }}"
+          - "--package-name"
+          - "{{ .Values.cleanupArgs.package_name }}"
         env:
         - name: APOLO_PASSED_CONFIG
           value: {{ .Values.APOLO_PASSED_CONFIG | quote }}
