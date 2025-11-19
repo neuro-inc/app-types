@@ -44,6 +44,10 @@ async def cleanup_secrets(
     app_outputs = await get_app_outputs(
         app_id=app_id, output_class=output_class, client=client
     )
+    if not app_outputs:
+        logger.info("No app outputs retrieved")
+        return
+
     secrets = find_instances_recursive_simple(obj=app_outputs, target_type=ApoloSecret)
 
     for secret in secrets:

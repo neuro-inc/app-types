@@ -216,7 +216,11 @@ def dump_types_schema(
 @click.argument("app_type", type=str)
 @click.argument("app_id", type=str)
 @click.option("--output-type", type=str, envvar="APOLO_APP_OUTPUT_TYPE")
+@click.option("--apolo-api-url", type=str, envvar="APOLO_API_URL", required=True)
 @click.option("--apolo-api-token", type=str, envvar="APOLO_API_TOKEN", required=True)
+@click.option("--apolo-org", type=str, envvar="APOLO_ORG", required=True)
+@click.option("--apolo-cluster", type=str, envvar="APOLO_CLUSTER", required=True)
+@click.option("--apolo-project", type=str, envvar="APOLO_PROJECT", required=True)
 @click.option("--package-name", type=str)
 @click.option("--apolo-passed-config", type=str, envvar="APOLO_PASSED_CONFIG")
 def cleanup_secrets(
@@ -224,11 +228,12 @@ def cleanup_secrets(
     app_id: str,
     output_type: str | None,
     apolo_api_url: str,
+    apolo_api_token: str,
     apolo_org: str,
     apolo_cluster: str,
     apolo_project: str,
-    package_name: str,
-    apolo_passed_config: str,
+    package_name: str | None,
+    apolo_passed_config: str | None,
 ) -> None:
     # template method, expanded by installing extra application modules
     async def _cleanup_secrets() -> None:
