@@ -9,7 +9,6 @@ import httpx
 
 from apolo_app_types.app_types import AppType
 from apolo_app_types.outputs.custom_deployment import get_custom_deployment_outputs
-from apolo_app_types.outputs.dify import get_dify_outputs
 from apolo_app_types.outputs.dockerhub import get_dockerhub_outputs
 from apolo_app_types.outputs.fooocus import get_fooocus_outputs
 from apolo_app_types.outputs.jupyter import get_jupyter_outputs
@@ -214,8 +213,6 @@ async def update_app_outputs(  # noqa: C901
                 )
             case AppType.Shell:
                 conv_outputs = await get_shell_outputs(helm_outputs, app_instance_id)
-            case AppType.Dify:
-                conv_outputs = await get_dify_outputs(helm_outputs, app_instance_id)
             case AppType.Superset:
                 conv_outputs = await get_superset_outputs(helm_outputs, app_instance_id)
             case AppType.LightRAG:
