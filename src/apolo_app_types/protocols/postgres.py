@@ -104,6 +104,7 @@ class PostgresConfig(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             description="Set version of the Postgres server to use.",
             title="Postgres version",
+            is_configurable=False,
         ).as_json_schema_extra(),
     )
     instance_replicas: int = Field(
