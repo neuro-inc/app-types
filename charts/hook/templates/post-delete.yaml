@@ -20,20 +20,25 @@ spec:
       - name: cleanup
         image: {{ .Values.appTypesImage.repository }}:{{ .Values.appTypesImage.tag }}
         imagePullPolicy: {{ .Values.appTypesImage.pullPolicy }}
-        command: ["/bin/sh", "/scripts/cleanup.sh"]
+        command:
+        - /bin/sh
+        - -c
+        - |
+          set -e
+          if app-types cleanup --help >/dev/null 2>&1; then
+            echo "Running cleanup command..."
+            app-types cleanup \
+              "{{ .Values.cleanupArgs.app_type }}" \
+              "{{ .Values.cleanupArgs.app_id }}" \
+              --output-type "{{ .Values.cleanupArgs.output_type_name }}" \
+              --package-name "{{ .Values.cleanupArgs.package_name }}"
+          else
+            echo "'app-types cleanup' command does not exist, skipping cleanup"
+          fi
         env:
         - name: APOLO_PASSED_CONFIG
           value: {{ .Values.APOLO_PASSED_CONFIG | quote }}
         {{- if .Values.cleanupEnvs }}
         {{- toYaml .Values.cleanupEnvs | nindent 8 }}
         {{- end }}
-        volumeMounts:
-        - name: cleanup-script
-          mountPath: /scripts
-          readOnly: true
-      volumes:
-      - name: cleanup-script
-        configMap:
-          name: {{ include "app.fullname" . }}-cleanup-script
-          defaultMode: 0755
 {{- end }}
