@@ -14,6 +14,7 @@ spec:
       labels:
         {{- include "app.labels" . | nindent 8 }}
         job-name: {{ include "app.fullname" . }}-cleanup
+        apolo.us/platform-hook: "true"
     spec:
       restartPolicy: Never
       containers:
