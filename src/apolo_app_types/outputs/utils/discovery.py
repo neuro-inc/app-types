@@ -4,7 +4,7 @@ import logging
 import pkgutil
 import typing as t
 
-from apolo_app_types import AppInputs
+from apolo_app_types import AppInputs, AppOutputs
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.outputs.base import BaseAppOutputsProcessor
 
@@ -80,3 +80,11 @@ def load_app_inputs(
     exact_type_name: str | None = None,
 ) -> type[AppInputs] | None:
     return load_app_component(app_type, package_name, AppInputs, exact_type_name)
+
+
+def load_app_outputs(
+    app_type: str,
+    package_name: str,
+    exact_type_name: str | None = None,
+) -> type[AppOutputs] | None:
+    return load_app_component(app_type, package_name, AppOutputs, exact_type_name)

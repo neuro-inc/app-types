@@ -10,11 +10,14 @@ import click
 from yarl import URL
 
 from apolo_app_types.outputs.update_outputs import update_app_outputs
+from apolo_app_types.outputs.utils.cleanup import cleanup_secrets
 from apolo_app_types.outputs.utils.discovery import (
     load_app_inputs,
+    load_app_outputs,
     load_app_preprocessor,
 )
 from apolo_app_types.schema.schema_dumper import dump_schema_type
+from apolo_app_types.utils.auth_validator import validate_auth_params
 
 
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
@@ -206,6 +209,62 @@ def dump_types_schema(
         exact_type_name=exact_type_name,
         output_path=output_path,
     )
+
+
+@cli.command("cleanup", context_settings={"ignore_unknown_options": True})
+@click.argument("app_type", type=str)
+@click.argument("app_id", type=str)
+@click.option("--output-type", type=str, envvar="APOLO_APP_OUTPUT_TYPE")
+@click.option("--apolo-api-url", type=str, envvar="APOLO_API_URL")
+@click.option("--apolo-api-token", type=str, envvar="APOLO_API_TOKEN")
+@click.option("--apolo-org", type=str, envvar="APOLO_ORG")
+@click.option("--apolo-cluster", type=str, envvar="APOLO_CLUSTER")
+@click.option("--apolo-project", type=str, envvar="APOLO_PROJECT")
+@click.option("--package-name", type=str, default="apolo_app_types")
+@click.option("--apolo-passed-config", type=str, envvar="APOLO_PASSED_CONFIG")
+def cleanup(
+    app_type: str,
+    app_id: str,
+    output_type: str,
+    apolo_api_url: str,
+    apolo_api_token: str,
+    apolo_org: str,
+    apolo_cluster: str,
+    apolo_project: str,
+    package_name: str,
+    apolo_passed_config: str | None,
+) -> None:
+    async def _cleanup_secrets() -> None:
+        await validate_auth_params(apolo_api_token, apolo_api_url, apolo_passed_config)
+        logging.basicConfig(level=logging.DEBUG)
+        try:
+            output_class = load_app_outputs(app_type, package_name, output_type)
+            if not output_class:
+                err_msg = (
+                    f"Unable to find Output Type {app_type=}, {output_type=},"
+                    f" Package: {package_name}"
+                )
+                raise ValueError(err_msg)
+            if apolo_api_token:
+                await apolo_sdk.login_with_token(
+                    token=apolo_api_token,
+                    url=URL(apolo_api_url),
+                )
+            async with apolo_sdk.get() as client:
+                if apolo_org:
+                    await client.config.switch_org(apolo_org)
+                if apolo_cluster:
+                    await client.config.switch_cluster(apolo_cluster)
+                if apolo_project:
+                    await client.config.switch_project(apolo_project)
+                await cleanup_secrets(
+                    app_id=app_id, output_class=output_class, client=client
+                )
+        except Exception as e:
+            logger.error("An error occurred: %s", e)
+            sys.exit(1)
+
+    asyncio.run(_cleanup_secrets())
 
 
 if __name__ == "__main__":

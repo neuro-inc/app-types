@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "app.fullname" . }}-cleanup
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/hook: PostDelete
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    metadata:
+      labels:
+        {{- include "app.labels" . | nindent 8 }}
+        job-name: {{ include "app.fullname" . }}-cleanup
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: cleanup
+        image: {{ .Values.appTypesImage.repository }}:{{ .Values.appTypesImage.tag }}
+        imagePullPolicy: {{ .Values.appTypesImage.pullPolicy }}
+        command: ["/bin/sh", "/scripts/cleanup.sh"]
+        env:
+        - name: APOLO_PASSED_CONFIG
+          value: {{ .Values.APOLO_PASSED_CONFIG | quote }}
+        {{- if .Values.cleanupEnvs }}
+        {{- toYaml .Values.cleanupEnvs | nindent 8 }}
+        {{- end }}
+        volumeMounts:
+        - name: cleanup-script
+          mountPath: /scripts
+          readOnly: true
+      volumes:
+      - name: cleanup-script
+        configMap:
+          name: {{ include "app.fullname" . }}-cleanup-script
+          defaultMode: 0755
