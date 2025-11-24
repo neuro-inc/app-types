@@ -1,3 +1,4 @@
+{{- if .Values.cleanupArgs }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -35,3 +36,4 @@ spec:
         configMap:
           name: {{ include "app.fullname" . }}-cleanup-script
           defaultMode: 0755
+{{- end }}
