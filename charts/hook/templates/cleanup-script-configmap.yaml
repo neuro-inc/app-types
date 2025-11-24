@@ -1,3 +1,4 @@
+{{- if .Values.cleanupArgs }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -19,3 +20,4 @@ data:
     else
       echo "'app-types cleanup' command does not exist, skipping cleanup"
     fi
+{{- end }}
