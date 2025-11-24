@@ -10,6 +10,7 @@ spec:
   podSelector:
     matchLabels:
       apolo.us/platform-hook: "true"
+      app.kubernetes.io/instance: {{ .Release.Name }}
   policyTypes:
     - Egress
   egress:
