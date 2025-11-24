@@ -1,15 +1,18 @@
-{{- if .Values.networkPolicy.enable }}
+{{- if and .Values.cleanupArgs .Values.networkPolicy.enable }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ include "app.fullname" . | trunc 50 }}-ae
+  name: {{ include "app.fullname" . | trunc 50 }}-cleanup-ae
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "app.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/hook: PostDelete
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   podSelector:
     matchLabels:
-      job-name: {{ include "app.fullname" . }}
+      job-name: {{ include "app.fullname" . }}-cleanup
   policyTypes:
     - Egress
   egress:
