@@ -9,7 +9,8 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      job-name: {{ include "app.fullname" . }}
+      apolo.us/platform-hook: "true"
+      app.kubernetes.io/instance: {{ .Release.Name }}
   policyTypes:
     - Egress
   egress:
