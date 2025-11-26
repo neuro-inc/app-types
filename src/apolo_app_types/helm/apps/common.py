@@ -33,6 +33,7 @@ APOLO_PROJECT_LABEL = "platform.apolo.us/project"
 KEDA_HTTP_PROXY_SERVICE = (
     "keda-add-ons-http-interceptor-proxy.platform.svc.cluster.local"
 )
+NVIDIA_MIG_KEY_PREFIX = "nvidia.com/mig-"
 
 
 def get_preset(client: apolo_sdk.Client, preset_name: str) -> apolo_sdk.Preset:
@@ -58,6 +59,11 @@ def preset_to_resources(preset: apolo_sdk.Preset) -> dict[str, t.Any]:
     }
     if preset.nvidia_gpu and preset.nvidia_gpu.count > 0:
         requests["nvidia.com/gpu"] = str(preset.nvidia_gpu.count)
+
+    if preset.nvidia_migs:
+        for key, value in preset.nvidia_migs.items():
+            requests[NVIDIA_MIG_KEY_PREFIX + key] = str(value.count)
+
     if preset.amd_gpu and preset.amd_gpu.count > 0:
         requests["amd.com/gpu"] = str(preset.amd_gpu.count)
 
