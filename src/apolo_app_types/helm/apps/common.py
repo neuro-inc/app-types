@@ -141,7 +141,7 @@ async def preset_to_tolerations(preset: apolo_sdk.Preset) -> list[dict[str, t.An
         tolerations.append(
             {"effect": "NoSchedule", "key": "amd.com/gpu", "operator": "Exists"}
         )
-    if preset.nvidia_gpu and preset.nvidia_gpu.count:
+    if (preset.nvidia_gpu and preset.nvidia_gpu.count) or preset.nvidia_migs:
         tolerations.append(
             {"effect": "NoSchedule", "key": "nvidia.com/gpu", "operator": "Exists"}
         )
