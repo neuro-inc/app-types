@@ -25,6 +25,7 @@ from typing import Any, TypeVar
 
 from pydantic import BaseModel
 
+
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
@@ -68,16 +69,14 @@ def parse_filter_string(filter_string: str) -> list[FilterCondition]:
             try:
                 operator = FilterOperator(op.lower())
                 conditions.append(
-                    FilterCondition(
-                        field=field.lower(), operator=operator, value=value
-                    )
+                    FilterCondition(field=field.lower(), operator=operator, value=value)
                 )
             except ValueError:
-                logger.warning(f"Unknown filter operator: {op}")
+                err_msg = f"Unknown filter operator: {op}"
+                logger.warning(err_msg)
         else:
-            logger.warning(
-                f"Invalid filter format: {part}. Expected field:operator:value"
-            )
+            err_msg = f"Invalid filter format: {part}. Expected field:operator:value"
+            logger.warning(err_msg)
     return conditions
 
 
@@ -164,9 +163,9 @@ class BaseModelFilter(ABC):
         result = models
         for condition in self.conditions:
             result = [m for m in result if self._matches(m, condition)]
-
+        debug_msg = f"Filter applied: {len(models)} -> {len(result)} models"
         logger.debug(
-            f"Filter applied: {len(models)} -> {len(result)} models",
+            debug_msg,
             extra={"conditions": len(self.conditions)},
         )
         return result
