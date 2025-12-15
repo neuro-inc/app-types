@@ -1,8 +1,14 @@
 from apolo_app_types.dynamic_outputs import (
+    BaseModelFilter,
     DynamicAppBasicResponse,
     DynamicAppFilterParams,
     DynamicAppIdResponse,
     DynamicAppListResponse,
+    FilterCondition,
+    FilterOperator,
+    compare_equal,
+    compare_like,
+    parse_filter_string,
 )
 from apolo_app_types.job_utils import JobRunParams, prepare_job_run_params
 from apolo_app_types.protocols.apolo_deploy import ApoloDeployInputs, ApoloDeployOutputs
@@ -263,4 +269,10 @@ __all__ = [
     "DynamicAppListResponse",
     "DynamicAppBasicResponse",
     "DynamicAppFilterParams",
+    "FilterOperator",
+    "FilterCondition",
+    "BaseModelFilter",
+    "parse_filter_string",
+    "compare_equal",
+    "compare_like",
 ]
