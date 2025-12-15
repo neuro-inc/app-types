@@ -22,14 +22,14 @@ jobs:
         with:
           python-version: 3.12
       - name: Cache pre-commit hooks
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/pre-commit
           key: pre-commit|py3.12|${{ hashFiles('.pre-commit-config.yaml') }}
       - name: Install Poetry
         run: pip install poetry
       - name: Setup Python dependencies cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/pypoetry
           key: poetry-${{ hashFiles('**/poetry.lock') }}
@@ -57,7 +57,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Setup Python dependencies cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/pypoetry
           key: poetry-${{ hashFiles('**/poetry.lock') }}
