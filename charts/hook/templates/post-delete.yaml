@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "app.fullname" . }}-cleanup
+  name: {{ include "cleanupJobName" . }}
   labels:
     {{- include "app.labels" . | nindent 4 }}
   annotations:
@@ -13,7 +13,7 @@ spec:
     metadata:
       labels:
         {{- include "app.labels" . | nindent 8 }}
-        job-name: {{ include "app.fullname" . }}-cleanup
+        job-name: {{ include "cleanupJobName" . }}
         apolo.us/platform-hook: "true"
     spec:
       restartPolicy: Never
