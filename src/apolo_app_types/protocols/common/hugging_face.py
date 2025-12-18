@@ -108,18 +108,7 @@ class HuggingFaceModelDetailDynamic(AbstractAppFieldType):
         | None
     ) = None
 
-    files_path: (
-        t.Annotated[
-            ApoloFilesPath,
-            Field(
-                json_schema_extra=SchemaExtraMetadata(
-                    title="Files Path",
-                    description="Path to the cached model files in Apolo storage.",
-                ).as_json_schema_extra()
-            ),
-        ]
-        | None
-    ) = None
+    files_path: ApoloFilesPath | None = None
 
 
 class HuggingFaceToken(AbstractAppFieldType):
