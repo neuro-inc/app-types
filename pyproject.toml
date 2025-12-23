@@ -23,7 +23,7 @@ classifiers = [
     "Topic :: Utilities"
 ]
 dynamic = ["version"]
-requires-python = ">=3.9.0,<4.0"
+requires-python = ">=3.10.0,<4.0"
 
 
 [project.scripts]
@@ -45,6 +45,7 @@ packages = [
 fixtures = ["pytest", "pytest-asyncio"]
 
 [tool.poetry.dependencies]
+python = ">=3.10,<4.0"
 apolo-sdk = "^25.11.1"
 click = "^8.0.3"
 httpx = "^0.28.0"
