@@ -29,6 +29,29 @@ HF_TOKEN_SCHEMA_EXTRA = SchemaExtraMetadata(
 )
 
 
+
+class HuggingFaceToken(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=HF_TOKEN_SCHEMA_EXTRA.as_json_schema_extra(),
+    )
+    token_name: str = Field(  # noqa: N814
+        ...,
+        min_length=0,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Token Name",
+            description="The name of the Hugging Face token.",
+        ).as_json_schema_extra(),
+    )
+    token: ApoloSecret = Field(  # noqa: N814
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Hugging Face Token",
+            description="The Hugging Face API token used to access models.",
+        ).as_json_schema_extra(),
+    )
+
+
 class HuggingFaceModelDetailDynamic(AbstractAppFieldType):
     """Detailed HuggingFace model information."""
 
@@ -110,27 +133,11 @@ class HuggingFaceModelDetailDynamic(AbstractAppFieldType):
 
     files_path: ApoloFilesPath | None = None
 
-
-class HuggingFaceToken(AbstractAppFieldType):
-    model_config = ConfigDict(
-        protected_namespaces=(),
+    hf_token: HuggingFaceToken | None = Field(
+        default=None,
         json_schema_extra=HF_TOKEN_SCHEMA_EXTRA.as_json_schema_extra(),
     )
-    token_name: str = Field(  # noqa: N814
-        ...,
-        min_length=0,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Token Name",
-            description="The name of the Hugging Face token.",
-        ).as_json_schema_extra(),
-    )
-    token: ApoloSecret = Field(  # noqa: N814
-        ...,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Hugging Face Token",
-            description="The Hugging Face API token used to access models.",
-        ).as_json_schema_extra(),
-    )
+
 
 
 class HuggingFaceCache(AbstractAppFieldType):
