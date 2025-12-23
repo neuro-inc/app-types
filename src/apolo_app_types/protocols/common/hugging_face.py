@@ -29,7 +29,6 @@ HF_TOKEN_SCHEMA_EXTRA = SchemaExtraMetadata(
 )
 
 
-
 class HuggingFaceToken(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
@@ -137,7 +136,6 @@ class HuggingFaceModelDetailDynamic(AbstractAppFieldType):
         default=None,
         json_schema_extra=HF_TOKEN_SCHEMA_EXTRA.as_json_schema_extra(),
     )
-
 
 
 class HuggingFaceCache(AbstractAppFieldType):
