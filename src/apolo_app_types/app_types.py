@@ -33,6 +33,7 @@ class AppType(enum.StrEnum):
     DeepSeek = "deepseek"
     Mistral = "mistral"
     GptOss = "gpt-oss"
+    Kimi2 = "kimi2"
 
     def __repr__(self) -> str:
         return str(self)
