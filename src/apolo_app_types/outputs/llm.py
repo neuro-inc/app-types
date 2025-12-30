@@ -9,6 +9,7 @@ from apolo_app_types.clients.kube import get_service_host_port
 from apolo_app_types.outputs.common import INSTANCE_LABEL
 from apolo_app_types.outputs.utils.ingress import get_ingress_host_port
 from apolo_app_types.outputs.utils.parsing import parse_cli_args
+from apolo_app_types.protocols.common import ServiceAPI
 from apolo_app_types.protocols.common.openai_compat import (
     OpenAICompatChatAPI,
     OpenAICompatEmbeddingsAPI,
@@ -72,10 +73,14 @@ async def get_llm_inference_outputs(
         )
 
     vllm_outputs = VLLMOutputsV2(
-        chat_internal_api=chat_internal_api,
-        chat_external_api=chat_external_api,
-        embeddings_internal_api=embeddings_internal_api,
-        embeddings_external_api=embeddings_external_api,
+        chat_api=ServiceAPI[OpenAICompatChatAPI](
+            internal_url=chat_internal_api,
+            external_url=chat_external_api,
+        ),
+        embeddings_api=ServiceAPI[OpenAICompatEmbeddingsAPI](
+            internal_url=embeddings_internal_api,
+            external_url=embeddings_external_api,
+        ),
         hugging_face_model=hf_model,
         tokenizer_hf_name=tokenizer_name,
         server_extra_args=server_extra_args,
