@@ -10,6 +10,7 @@ from apolo_app_types.protocols.common import (
     Preset,
     SchemaExtraMetadata,
     SchemaMetaType,
+    ServiceAPI,
 )
 from apolo_app_types.protocols.common.autoscaling import AutoscalingKedaHTTP
 from apolo_app_types.protocols.common.hugging_face import HF_SCHEMA_EXTRA
@@ -180,37 +181,22 @@ class VLLMOutputs(AppOutputsDeployer):
 
 
 class VLLMOutputsV2(AppOutputs):
-    chat_internal_api: OpenAICompatChatAPI | None = Field(
+    chat_api: ServiceAPI[OpenAICompatChatAPI] | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="Internal Chat API",
-            description="Internal Chat API compatible with "
+            title="Chat API",
+            description="Chat API compatible with "
             "OpenAI standard for seamless integration.",
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
-    chat_external_api: OpenAICompatChatAPI | None = Field(
+
+    embeddings_api: ServiceAPI[OpenAICompatEmbeddingsAPI] | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="External Chat API",
-            description="External Chat API compatible with OpenAI standard.",
-            meta_type=SchemaMetaType.INTEGRATION,
-        ).as_json_schema_extra(),
-    )
-    embeddings_internal_api: OpenAICompatEmbeddingsAPI | None = Field(
-        default=None,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Internal Embeddings API",
-            description="Internal Embeddings API compatible with OpenAI "
+            title="Embeddings API",
+            description="Embeddings API compatible with OpenAI "
             "standard for seamless integration.",
-            meta_type=SchemaMetaType.INTEGRATION,
-        ).as_json_schema_extra(),
-    )
-    embeddings_external_api: OpenAICompatEmbeddingsAPI | None = Field(
-        default=None,
-        json_schema_extra=SchemaExtraMetadata(
-            title="External Embeddings API",
-            description="External Embeddings API compatible with OpenAI standard.",
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )
