@@ -47,7 +47,7 @@ fixtures = ["pytest", "pytest-asyncio"]
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
 apolo-sdk = "^25.12.2"
-click = "^8.0.3"
+click = "^8.3.1"
 httpx = "^0.28.0"
 kubernetes = "^34.1.0" # pinned due to https://github.com/kubernetes-client/python/issues/2458
 pydantic = "^2.12.5"
