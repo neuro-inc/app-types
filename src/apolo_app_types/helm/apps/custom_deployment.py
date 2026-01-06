@@ -8,7 +8,7 @@ from apolo_app_types.helm.apps.common import (
     gen_extra_values,
 )
 from apolo_app_types.helm.utils.images import (
-    get_apolo_registry_secrets_value,
+    create_apolo_registry_sa_dockerconfig,
     get_image_docker_url,
 )
 from apolo_app_types.helm.utils.pods import get_custom_deployment_health_check_values
@@ -135,7 +135,7 @@ class CustomDeploymentChartValueProcessor(
 
         if input_.image.repository.startswith("image:"):
             sa_name = f"custom-deployment-{app_name}"
-            dockerconfig = await get_apolo_registry_secrets_value(
+            dockerconfig = await create_apolo_registry_sa_dockerconfig(
                 client=self.client, sa_name=sa_name
             )
 
