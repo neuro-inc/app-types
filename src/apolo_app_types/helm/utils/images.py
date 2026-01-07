@@ -10,7 +10,7 @@ from apolo_app_types.protocols.common.containers import DockerConfigModel
 
 async def create_apolo_registry_service_account(
     client: apolo_sdk.Client,
-    sa_name: str | None = None,
+    sa_name: str,
     sa_permission: apolo_sdk.Action = apolo_sdk.Action.READ,
 ) -> str:
     try:
@@ -42,7 +42,7 @@ async def create_apolo_registry_service_account(
 
 async def create_apolo_registry_sa_dockerconfig(
     client: apolo_sdk.Client,
-    sa_name: str | None = None,
+    sa_name: str,
 ) -> DockerConfigModel:
     """
     Create a Docker config for the Apolo registry.
