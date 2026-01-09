@@ -68,17 +68,8 @@ class HuggingFaceModelDetailDynamic(AbstractAppFieldType):
         Field(
             json_schema_extra=SchemaExtraMetadata(
                 title="Repository ID",
-                description="The HuggingFace repository identifier.",
-            ).as_json_schema_extra()
-        ),
-    ]
-
-    name: t.Annotated[
-        str,
-        Field(
-            json_schema_extra=SchemaExtraMetadata(
-                title="Model Name",
-                description="The model name.",
+                description="The HuggingFace repository identifier. "
+                "E.g., 'username/repo_name'.",
             ).as_json_schema_extra()
         ),
     ]
