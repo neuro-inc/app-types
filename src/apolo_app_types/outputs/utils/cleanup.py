@@ -41,9 +41,13 @@ async def get_app_outputs(
 async def cleanup_secrets(
     app_id: str, output_class: type[AppOutputs], client: apolo_sdk.Client
 ) -> None:
-    app_outputs = await get_app_outputs(
-        app_id=app_id, output_class=output_class, client=client
-    )
+    app_outputs = None
+    try:
+        app_outputs = await get_app_outputs(
+            app_id=app_id, output_class=output_class, client=client
+        )
+    except apolo_sdk.ResourceNotFound:
+        pass
     if not app_outputs:
         logger.info("No app outputs retrieved")
         return
