@@ -57,7 +57,7 @@ class HuggingFaceModelDetailDynamic(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=SchemaExtraMetadata(
-            title="HuggingFace Model Detail",
+            title="HuggingFace Model",
             description="Detailed information about a HuggingFace model.",
             meta_type=SchemaMetaType.DYNAMIC,
         ).as_json_schema_extra(),
