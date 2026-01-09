@@ -63,29 +63,23 @@ class HuggingFaceModelDetailDynamic(AbstractAppFieldType):
         ).as_json_schema_extra(),
     )
 
-    id: t.Annotated[
-        str,
-        Field(
-            json_schema_extra=SchemaExtraMetadata(
-                title="Repository ID",
-                description="The HuggingFace repository identifier. "
-                "E.g., 'username/repo_name'.",
-            ).as_json_schema_extra()
-        ),
-    ]
-
-    visibility: t.Annotated[
-        str,
-        Field(
-            json_schema_extra=SchemaExtraMetadata(
-                title="Visibility",
-                description="Repository visibility (public or private).",
-            ).as_json_schema_extra()
-        ),
-    ]
+    id: str = Field(
+        json_schema_extra=SchemaExtraMetadata(
+            title="Repository ID",
+            description="The HuggingFace repository identifier. "
+            "E.g., 'username/repo_name'.",
+        ).as_json_schema_extra()
+    )
+    visibility: str = Field(
+        default="private",
+        json_schema_extra=SchemaExtraMetadata(
+            title="Visibility",
+            description="Repository visibility (public or private).",
+        ).as_json_schema_extra(),
+    )
 
     gated: bool = Field(
-        default=False,
+        default=True,
         json_schema_extra=SchemaExtraMetadata(
             title="Gated",
             description="Whether the model requires access approval.",
