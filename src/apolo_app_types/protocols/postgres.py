@@ -221,14 +221,14 @@ class BasePostgresUserCredentials(AbstractAppFieldType):
             title="Postgres Port",
         ).as_json_schema_extra(),
     )
-    pgbouncer_host: str = Field(
+    pgbouncer_host: str | None = Field(
         ...,
         json_schema_extra=SchemaExtraMetadata(
             description="Host of the PGBouncer instance.",
             title="PGBouncer Host",
         ).as_json_schema_extra(),
     )
-    pgbouncer_port: int = Field(
+    pgbouncer_port: int | None = Field(
         default=...,
         gt=0,
         json_schema_extra=SchemaExtraMetadata(
@@ -285,6 +285,8 @@ class CrunchyPostgresUserCredentials(BasePostgresUserCredentials):
         jdbc:postgresql://host:port/database?user=username&password=password
         """
         if not self.dbname:
+            return None
+        if not self.pgbouncer_host:
             return None
 
         # Fetch the actual password value from secrets
