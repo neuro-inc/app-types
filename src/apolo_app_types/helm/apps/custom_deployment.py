@@ -96,6 +96,26 @@ class CustomDeploymentChartValueProcessor(
                     for env in input_.container.env
                 ],
             }
+        if input_.init_container:
+            values["initContainers"] = [
+                {
+                    "name": "init-container",
+                    "image": (
+                        f"{input_.init_container.image.repository}:"
+                        f"{input_.init_container.image.tag or 'latest'}"
+                    ),
+                    "command": input_.init_container.command,
+                    "args": input_.init_container.args,
+                    "env": [
+                        {
+                            "name": env.name,
+                            "value": env.deserialize_value(app_secrets_name),
+                        }
+                        for env in input_.init_container.env
+                    ],
+                    "imagePullPolicy": input_.init_container.image.pull_policy.value,
+                }
+            ]
         if input_.networking and input_.networking.service_enabled:
             values["service"] = {
                 "enabled": True,

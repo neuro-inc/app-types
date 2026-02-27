@@ -6,6 +6,7 @@ from apolo_app_types.protocols.common import (
     Container,
     ContainerImage,
     IngressHttp,
+    InitContainer,
     Preset,
     SchemaExtraMetadata,
     StorageMounts,
@@ -127,6 +128,14 @@ class CustomDeploymentInputs(AppInputs):
         json_schema_extra=SchemaExtraMetadata(
             title="Container",
             description="Enable Container configuration.",
+            is_advanced_field=True,
+        ).as_json_schema_extra(),
+    )
+    init_container: InitContainer | None = Field(
+        default=None,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Init Container",
+            description="Optional init container configuration.",
             is_advanced_field=True,
         ).as_json_schema_extra(),
     )
