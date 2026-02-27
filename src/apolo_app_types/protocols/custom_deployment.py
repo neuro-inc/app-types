@@ -131,11 +131,11 @@ class CustomDeploymentInputs(AppInputs):
             is_advanced_field=True,
         ).as_json_schema_extra(),
     )
-    init_container: InitContainer | None = Field(
+    init_container: list[InitContainer] | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="Init Container",
-            description="Optional init container configuration.",
+            title="Init Container(s)",
+            description="Optional init container configurations.",
             is_advanced_field=True,
         ).as_json_schema_extra(),
     )

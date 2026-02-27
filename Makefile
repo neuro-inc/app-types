@@ -12,6 +12,10 @@ else
 	poetry run pre-commit run --all-files
 endif
 
+.PHONY: lock
+lock:
+	poetry lock
+
 .PHONY: setup
 setup:
 	poetry install -E fixtures --with dev
