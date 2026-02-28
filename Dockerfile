@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-LABEL org.opencontainers.image.source = "https://github.com/neuro-inc/app-types"
+LABEL org.opencontainers.image.source="https://github.com/neuro-inc/app-types"
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 COPY README.md poetry.lock pyproject.toml ./
-RUN pip --no-cache-dir install poetry && poetry install -E fixtures --no-root --no-cache
+RUN pip --no-cache-dir install "poetry==2.2.1" && poetry install -E fixtures --no-root --no-cache
 
 COPY src ./src
 COPY fixtures ./fixtures
