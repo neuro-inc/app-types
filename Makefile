@@ -2,6 +2,8 @@
 IMAGE_REPO ?= ghcr.io/neuro-inc
 IMAGE_NAME ?= post-deployment-app-hook
 IMAGE_TAG ?= latest
+PYTHON_VERSION ?= 3.12
+POETRY_VERSION ?= 2.2.1
 IMAGE_REF = $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)
 
 .PHONY: format fmt
@@ -28,6 +30,8 @@ lint: fmt ### Reformat files, run linters and mypy checks
 .PHONY: build-hook-image
 build-hook-image:
 	docker build \
+		--build-arg PYTHON_VERSION=$(PYTHON_VERSION) \
+		--build-arg POETRY_VERSION=$(POETRY_VERSION) \
 		-t $(IMAGE_NAME):latest \
 		.;
 
