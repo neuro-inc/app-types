@@ -116,20 +116,9 @@ jobs:
       - name: Checkout commit
         uses: actions/checkout@v6
       - name: Install python
-        uses: actions/setup-python@v6
-        with:
-          python-version-file: .python-version
-          cache: pip
-      - name: Setup Python dependencies cache
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/pypoetry
-          key: poetry-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            poetry-
+        uses: ./.github/actions/setup-python-poetry
       - name: Install dependencies
         run: |
-          pip install poetry
           make setup
       - name: Build apolo-app-types package
         run: |

@@ -1,0 +1,56 @@
+name: Setup Python And Poetry
+description: Setup Python, validate/install pinned Poetry, and warm Poetry cache
+inputs:
+  python-version-file:
+    description: Path to .python-version file
+    required: false
+    default: ""
+  python-version:
+    description: Explicit Python version
+    required: false
+    default: ""
+runs:
+  using: composite
+  steps:
+    - name: Setup Python (explicit version)
+      if: ${{ inputs.python-version != '' }}
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: pip
+    - name: Setup Python (version file)
+      if: ${{ inputs.python-version == '' }}
+      uses: actions/setup-python@v6
+      with:
+        python-version-file: ${{ inputs.python-version-file || '.python-version' }}
+        cache: pip
+    - name: Check Poetry pin sync
+      shell: bash
+      run: |
+        python - <<'PY'
+        import pathlib
+        import tomllib
+
+        pyproject = tomllib.loads(pathlib.Path("pyproject.toml").read_text())
+        requires = pyproject["tool"]["poetry"]["requires-poetry"]
+        version = pathlib.Path(".poetry-version").read_text().strip()
+        expected = f"=={version}"
+        if requires != expected:
+            raise SystemExit(
+                f"Poetry pin mismatch: pyproject has {requires!r}, "
+                f"but .poetry-version implies {expected!r}"
+            )
+        print(f"Poetry pin OK: {expected}")
+        PY
+    - name: Install Poetry
+      shell: bash
+      run: |
+        POETRY_VERSION="$(cat .poetry-version)"
+        pip install "poetry==${POETRY_VERSION}"
+    - name: Setup Python dependencies cache
+      uses: actions/cache@v5
+      with:
+        path: ~/.cache/pypoetry
+        key: poetry-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          poetry-
