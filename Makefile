@@ -2,8 +2,8 @@
 IMAGE_REPO ?= ghcr.io/neuro-inc
 IMAGE_NAME ?= post-deployment-app-hook
 IMAGE_TAG ?= latest
-PYTHON_VERSION ?= 3.12
-POETRY_VERSION ?= 2.2.1
+PYTHON_VERSION ?= $(strip $(shell cat .python-version 2>/dev/null || echo 3.12))
+POETRY_VERSION ?= $(strip $(shell cat .poetry-version 2>/dev/null || echo 2.2.1))
 IMAGE_REF = $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)
 
 .PHONY: format fmt
