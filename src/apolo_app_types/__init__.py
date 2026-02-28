@@ -41,6 +41,7 @@ from apolo_app_types.protocols.custom_deployment import (
     ContainerImage,
     CustomDeploymentInputs,
     CustomDeploymentOutputs,
+    InitContainer,
 )
 from apolo_app_types.protocols.dockerhub import (
     DockerConfigModel,
@@ -221,6 +222,7 @@ __all__ = [
     "HuggingFaceAppOutputs",
     "CustomDeploymentInputs",
     "CustomDeploymentOutputs",
+    "InitContainer",
     "ContainerImage",
     "Container",
     "Env",
