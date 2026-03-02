@@ -18,7 +18,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Setup Python
-        uses: ./.github/actions/setup-python-poetry
+        uses: neuro-inc/reuse/.github/actions/setup-python-poetry@master
       - name: Cache pre-commit hooks
         uses: actions/cache@v5
         with:
@@ -39,7 +39,7 @@ jobs:
       - name: Checkout commit
         uses: actions/checkout@v6
       - name: Setup Python
-        uses: ./.github/actions/setup-python-poetry
+        uses: neuro-inc/reuse/.github/actions/setup-python-poetry@master
       - name: Install dependencies
         run: make setup
       - name: Run unit tests
