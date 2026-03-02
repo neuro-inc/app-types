@@ -4,6 +4,7 @@ from enum import StrEnum
 from pydantic import ConfigDict, Field
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
+from apolo_app_types.protocols.common.containers import ContainerImage
 from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
 from apolo_app_types.protocols.common.secrets_ import (
     ApoloSecret,
@@ -114,6 +115,24 @@ class Container(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Environment Variables",
             description="Define environment variables to inject into the container.",
+        ).as_json_schema_extra(),
+    )
+
+
+class InitContainer(Container):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="Init Container",
+            description="Run an init container before the main application starts.",
+            is_advanced_field=True,
+        ).as_json_schema_extra(),
+    )
+    image: ContainerImage = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Init Container Image",
+            description="Container image used for init container execution.",
         ).as_json_schema_extra(),
     )
 

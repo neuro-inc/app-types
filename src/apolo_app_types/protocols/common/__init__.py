@@ -16,7 +16,7 @@ from .ingress import (
     IngressGrpc,
     IngressHttp,
 )
-from .k8s import Container, DeploymentName, Env
+from .k8s import Container, DeploymentName, Env, InitContainer
 from .middleware import AuthIngressMiddleware
 from .networking import GraphQLAPI, GrpcAPI, HttpApi, RestAPI, ServiceAPI
 from .openai_compat import OpenAICompatChatAPI, OpenAICompatEmbeddingsAPI
@@ -76,6 +76,7 @@ __all__ = [
     "DeploymentName",
     "Env",
     "Container",
+    "InitContainer",
     "OpenAICompatibleEmbeddingsRestAPI",
     "OpenAICompatChatAPI",
     "OpenAICompatEmbeddingsAPI",

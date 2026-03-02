@@ -29,6 +29,7 @@ from apolo_app_types.protocols.custom_deployment import (
     ConfigMap,
     ConfigMapKeyValue,
     CustomDeploymentInputs,
+    InitContainer,
     NetworkingConfig,
     StorageMounts,
 )
@@ -85,6 +86,106 @@ async def test_custom_deployment_values_generation(setup_clients):
         ]
         == "platform-platform-control-plane-ingress-auth@kubernetescrd"
     )
+
+
+@pytest.mark.asyncio
+async def test_custom_deployment_values_generation_with_init_container(setup_clients):
+    helm_args, helm_params = await app_type_to_vals(
+        input_=CustomDeploymentInputs(
+            preset=Preset(name="cpu-small"),
+            image=ContainerImage(repository="myrepo/custom-deployment", tag="v1.2.3"),
+            init_container=[
+                InitContainer(
+                    image=ContainerImage(repository="busybox", tag="1.36"),
+                    command=["sh", "-c"],
+                    args=["echo init"],
+                    env=[Env(name="INIT_VAR", value="init")],
+                )
+            ],
+            networking=NetworkingConfig(
+                service_enabled=True,
+                ports=[
+                    Port(name="http", port=8080),
+                ],
+                ingress_http=IngressHttp(),
+            ),
+        ),
+        apolo_client=setup_clients,
+        app_type=AppType.CustomDeployment,
+        app_name="custom-app",
+        namespace="default-namespace",
+        app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
+    )
+
+    assert helm_params["initContainers"] == [
+        {
+            "name": "init-container-1",
+            "image": "busybox:1.36",
+            "command": ["sh", "-c"],
+            "args": ["echo init"],
+            "env": [{"name": "INIT_VAR", "value": "init"}],
+            "imagePullPolicy": "IfNotPresent",
+        }
+    ]
+
+
+@pytest.mark.asyncio
+async def test_custom_deployment_values_generation_with_multiple_init_containers(
+    setup_clients,
+):
+    helm_args, helm_params = await app_type_to_vals(
+        input_=CustomDeploymentInputs(
+            preset=Preset(name="cpu-small"),
+            image=ContainerImage(repository="myrepo/custom-deployment", tag="v1.2.3"),
+            init_container=[
+                InitContainer(
+                    image=ContainerImage(repository="busybox", tag="1.36"),
+                    command=["sh", "-c"],
+                    args=["echo init 1"],
+                    env=[Env(name="INIT_VAR_1", value="init1")],
+                ),
+                InitContainer(
+                    image=ContainerImage(repository="alpine", tag="3.20"),
+                    command=["sh", "-c"],
+                    args=["echo init 2"],
+                    env=[Env(name="INIT_VAR_2", value="init2")],
+                ),
+            ],
+            networking=NetworkingConfig(
+                service_enabled=True,
+                ports=[
+                    Port(name="http", port=8080),
+                ],
+                ingress_http=IngressHttp(),
+            ),
+        ),
+        apolo_client=setup_clients,
+        app_type=AppType.CustomDeployment,
+        app_name="custom-app",
+        namespace="default-namespace",
+        app_secrets_name=APP_SECRETS_NAME,
+        app_id=APP_ID,
+    )
+
+    assert helm_params["initContainers"] == [
+        {
+            "name": "init-container-1",
+            "image": "busybox:1.36",
+            "command": ["sh", "-c"],
+            "args": ["echo init 1"],
+            "env": [{"name": "INIT_VAR_1", "value": "init1"}],
+            "imagePullPolicy": "IfNotPresent",
+        },
+        {
+            "name": "init-container-2",
+            "image": "alpine:3.20",
+            "command": ["sh", "-c"],
+            "args": ["echo init 2"],
+            "env": [{"name": "INIT_VAR_2", "value": "init2"}],
+            "imagePullPolicy": "IfNotPresent",
+        },
+    ]
 
 
 @pytest.mark.asyncio
