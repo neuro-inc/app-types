@@ -47,4 +47,38 @@ spec:
           port: 8000
         - protocol: TCP
           port: 6443
+    {{- if .Values.networkPolicy.allowPlatformIngress }}
+    # Keep this rule scoped to the platform ingress pods to allow dev hairpin routing
+    # (request from the hook pod 'https://api.dev.apolo.us' -> GCP LB -> in-cluster ingress private path) on 443.
+    # without that egress to the APP namespace is blocked by the
+    # general namespace app NetworkPolicy (https://github.com/neuro-inc/apolo-kube-client/blob/master/apolo_kube_client/apolo.py#L134):
+    # egress:
+    #- to:
+    #  - namespaceSelector:
+    #      matchLabels:
+    #        platform.apolo.us/org: tubesupply-dev
+    #        platform.apolo.us/project: nextjs
+    #    podSelector: {}
+    #- to:
+    #  - ipBlock:
+    #      cidr: 0.0.0.0/0
+    #      except:
+    #      - 10.0.0.0/8
+    #      - 172.16.0.0/12
+    #      - 192.168.0.0/16
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: platform
+          podSelector:
+            matchLabels:
+              platform.apolo.us/component: ingress-gateway
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 8000
+    {{- end }}
 {{- end }}
