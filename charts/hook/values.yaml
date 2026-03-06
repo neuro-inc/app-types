@@ -10,3 +10,4 @@ postProcessorEnvs: []
 
 networkPolicy:
   enable: true
+  allowPlatformIngress: false
