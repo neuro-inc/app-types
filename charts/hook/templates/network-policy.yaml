@@ -48,37 +48,32 @@ spec:
         - protocol: TCP
           port: 6443
     {{- if .Values.networkPolicy.allowPlatformIngress }}
-    # Keep this rule scoped to the platform ingress pods to allow dev hairpin routing
-    # (request from the hook pod 'https://api.dev.apolo.us' -> GCP LB -> in-cluster ingress private path) on 443.
-    # without that egress to the APP namespace is blocked by the
-    # general namespace app NetworkPolicy (https://github.com/neuro-inc/apolo-kube-client/blob/master/apolo_kube_client/apolo.py#L134):
-    # egress:
-    #- to:
-    #  - namespaceSelector:
-    #      matchLabels:
-    #        platform.apolo.us/org: tubesupply-dev
-    #        platform.apolo.us/project: nextjs
-    #    podSelector: {}
-    #- to:
-    #  - ipBlock:
-    #      cidr: 0.0.0.0/0
-    #      except:
-    #      - 10.0.0.0/8
-    #      - 172.16.0.0/12
-    #      - 192.168.0.0/16
+    # Allow hook pods to reach platform Traefik directly for dev hairpin flows
+    # (api.dev.apolo.us -> LB -> back into cluster -> Traefik).
+    #
+    # Traefik Service exposes 443 but forwards to targetPort 8443. When hairpin
+    # routing occurs, some CNIs evaluate egress after DNAT, so the connection
+    # may be seen as podIP:8443 instead of LB:443.
+    #
+    # To avoid relying on ipBlock behavior, we explicitly allow traffic to Traefik pods via label selectors.
+    # For egress, ipBlock IPs may or may not be subject to ipBlock-based policies:
+    # https://kubernetes.io/docs/concepts/services-networking/network-policies/#behavior-of-to-and-from-selectors
     - to:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: platform
           podSelector:
             matchLabels:
-              platform.apolo.us/component: ingress-gateway
+              app.kubernetes.io/instance: traefik
+              app.kubernetes.io/name: traefik
       ports:
+        # Verify Service -> backend port mapping:
+        # kubectl -n platform get svc traefik -o yaml | rg -n "name:|port:|targetPort:"
+        # Verify Traefik entrypoint port:
+        # kubectl -n platform get deploy traefik -o yaml | rg -n "websecure"
         - protocol: TCP
-          port: 443
+          port: 8443
         - protocol: TCP
-          port: 80
-        - protocol: TCP
-          port: 8000
+          port: 443 #keep this port for another possible CNI implementation
     {{- end }}
 {{- end }}
