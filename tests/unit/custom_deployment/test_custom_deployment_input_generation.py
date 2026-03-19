@@ -78,6 +78,11 @@ async def test_custom_deployment_values_generation(setup_clients):
     assert helm_params["ingress"]["enabled"] == True  # noqa: E712
     assert helm_params["ingress"]["className"] == "traefik"
     assert helm_params["preset_name"] == "cpu-small"
+    assert helm_params["securityContext"] == {
+        "allowPrivilegeEscalation": False,
+        "capabilities": {"drop": ["ALL"]},
+        "seccompProfile": {"type": "RuntimeDefault"},
+    }
 
     # Verify Custom Deployment gets ONLY auth middleware (no strip headers)
     assert (
@@ -274,6 +279,11 @@ async def test_custom_deployment_values_generation_with_storage_mounts(setup_cli
 
     pod_labels = helm_params.get("podLabels", {})
     assert pod_labels.get("platform.apolo.us/inject-storage") == "true"
+    assert helm_params["securityContext"] == {
+        "allowPrivilegeEscalation": False,
+        "capabilities": {"drop": ["ALL"]},
+        "seccompProfile": {"type": "RuntimeDefault"},
+    }
 
 
 @pytest.mark.asyncio

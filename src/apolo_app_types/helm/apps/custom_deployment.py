@@ -48,7 +48,19 @@ class CustomDeploymentChartValueProcessor(
             client=self.client, inject_storage=True
         )
 
-    async def gen_extra_values(
+    def _configure_storage_security_context(
+        self, input_: CustomDeploymentInputs
+    ) -> dict[str, t.Any]:
+        """
+        Always disable privilege escalation for custom deployments.
+        """
+        return {
+            "allowPrivilegeEscalation": False,
+            "capabilities": {"drop": ["ALL"]},
+            "seccompProfile": {"type": "RuntimeDefault"},
+        }
+
+    async def gen_extra_values(  # noqa: C901
         self,
         input_: CustomDeploymentInputs,
         app_name: str,
@@ -152,6 +164,10 @@ class CustomDeploymentChartValueProcessor(
         storage_labels = self._configure_storage_labels(input_)
         if storage_labels:
             values["podLabels"] = storage_labels
+
+        storage_security_context = self._configure_storage_security_context(input_)
+        if storage_security_context:
+            values["securityContext"] = storage_security_context
 
         dockerconfig: DockerConfigModel | None = input_.image.dockerconfigjson
 
