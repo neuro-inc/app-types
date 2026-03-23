@@ -54,7 +54,7 @@ kubernetes = "^35.0.0" # pinned due to https://github.com/kubernetes-client/pyth
 pydantic = "^2.12.5"
 pyyaml = "^6.0.3"
 types-PyYAML = "^6.0.12.20250915"
-yarl = "^1.22.0"
+yarl = "^1.23.0"
 jsonref = "^1.1.0"
 tenacity = "^9.1.2"
 
