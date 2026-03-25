@@ -1,75 +1,57 @@
-"""RESPApi model
-
-Lightweight representation of a Redis/RESP API endpoint used by the
-Valkey app output processor.
-
-Notes:
-- `ApoloSecret` in this codebase is a small runtime model (a Pydantic
-  model subclass) used to reference secret keys. Do not attempt to
-  serialize or reveal secret values from a secret reference.
-
-This module contains a small data model and a helper property for
-generating a connection URI string. The helper intentionally avoids
-including raw secret values when the password is provided as an
-`ApoloSecret` instance — a placeholder is used instead.
-"""
-
 from urllib.parse import quote
 
+import apolo_sdk
 from apolo_app_types.protocols.common import AbstractAppFieldType, ApoloSecret
 
 
 class RESPApi(AbstractAppFieldType):
-    """Model for a RESP (Redis-like) API endpoint.
-
-    Attributes:
-        scheme: URL scheme (defaults to redis://)
-        host: hostname or service name
-        port: TCP port number
-        base_path: optional path appended to the URI
-        user: optional username for credentials
-        password: an ApoloSecret (typing-only); see module docstring above
-    """
-
     scheme: str = "redis://"
     host: str
     port: int
     base_path: str = ""
     user: str = ""
-    # password may be a plain string or an ApoloSecret reference; when an
-    # ApoloSecret is provided we will NOT embed the secret value in the
-    # generated URI (a placeholder referencing the secret key will be used).
     password: str | ApoloSecret | None = None
 
-    @property
-    def resp_uri(self) -> str:
-        """Build a redis:// style URI including credentials.
-
-        This uses the `user` and `password` fields to produce a textual
-        credentials portion. If `password` is a dict-like TypedDict it will
-        be formatted into the string representation by Python; ensure caller
-        provides a sensible value (e.g. cast(ApoloSecret, {"name":..., "value":...})).
-        """
-        creds_part = ""
-
-        # Determine password text. If password is an ApoloSecret we avoid
-        # revealing the actual secret and use a small placeholder that
-        # indicates which secret key would be used.
+    async def _get_password_text(self, client: apolo_sdk.Client | None) -> str:
         if isinstance(self.password, ApoloSecret):
-            pw_text = f"<secret:{self.password.key}>"
-        elif self.password is None:
-            pw_text = ""
-        else:
-            pw_text = str(self.password)
+            if client is None:
+                msg = "client is required to resolve ApoloSecret password"
+                raise ValueError(msg)
+            try:
+                pw_result = await client.secrets.get(key=self.password.key)
+            except apolo_sdk.ResourceNotFound as e:
+                msg = f"secret not found: {self.password.key}"
+                raise ValueError(msg) from e
 
-        # Normalize scheme to ensure it ends with '://'
+            if pw_result is None:
+                msg = f"secret value for key {self.password.key} is empty"
+                raise ValueError(msg)
+
+            if isinstance(pw_result, bytes):
+                try:
+                    return pw_result.decode()
+                except UnicodeDecodeError:
+                    return str(pw_result)
+            if isinstance(pw_result, str):
+                return pw_result
+            return str(pw_result)
+
+        if self.password is None:
+            return ""
+
+        return str(self.password)
+
+    def _normalize_scheme(self) -> str:
         scheme = self.scheme or ""
         if not scheme.endswith("://"):
             scheme = scheme.rstrip(":/") + "://"
+        return scheme
 
+    async def resp_uri(self, client: apolo_sdk.Client | None = None) -> str:
+        pw_text = await self._get_password_text(client)
+
+        creds_part = ""
         if self.user or pw_text:
-            # URL-encode user and password text to avoid invalid URI
-            # characters in the userinfo component.
             if self.user:
                 user_enc = quote(self.user, safe="")
                 pw_enc = quote(pw_text, safe="") if pw_text else ""
@@ -78,6 +60,8 @@ class RESPApi(AbstractAppFieldType):
                 pw_enc = quote(pw_text, safe="")
                 creds = f":{pw_enc}"
             creds_part = f"{creds}@"
+
+        scheme = self._normalize_scheme()
 
         base = self.base_path or ""
         if base and not base.startswith("/"):
