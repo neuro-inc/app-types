@@ -27,6 +27,7 @@ class AppType(enum.StrEnum):
     OpenWebUI = "openwebui"
     Launchpad = "launchpad"
     N8n = "n8n"
+    Valkey = "valkey"
 
     # bundles
     Llama4 = "llama4"
