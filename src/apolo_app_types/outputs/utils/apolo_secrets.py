@@ -18,9 +18,9 @@ async def create_apolo_secret(
         async with apolo_sdk.get() as client:
             bytes_value = value.encode("utf-8")
             await client.secrets.add(key=secret_key, value=bytes_value)
-    except Exception as e:
-        logger.error("Failed to create Apolo Secret")
-        raise (e)
+    except Exception:
+        logger.exception("Failed to create Apolo Secret")
+        raise
     return ApoloSecret(key=secret_key)
 
 
@@ -31,13 +31,13 @@ async def delete_apolo_secret(
     try:
         async with apolo_sdk.get() as client:
             await client.secrets.rm(key=secret_key)
-    except apolo_sdk.ResourceNotFound as e:
+    except apolo_sdk.ResourceNotFound:
         logger.info("Secret not found")
         if raise_not_found:
-            raise e
-    except Exception as e:
-        logger.error("Failed to delete Apolo Secret")
-        raise (e)
+            raise
+    except Exception:
+        logger.exception("Failed to delete Apolo Secret")
+        raise
 
 
 async def get_apolo_secret(app_instance_id: str, key: str) -> str:
@@ -45,6 +45,6 @@ async def get_apolo_secret(app_instance_id: str, key: str) -> str:
     try:
         async with apolo_sdk.get() as client:
             return (await client.secrets.get(key=secret_key)).decode()
-    except Exception as e:
-        logger.error("Failed to get Apolo Secret")
-        raise (e)
+    except Exception:
+        logger.exception("Failed to get Apolo Secret")
+        raise
