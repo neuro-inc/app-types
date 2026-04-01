@@ -1,7 +1,12 @@
 import logging
 
 import apolo_sdk
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import (
+    retry,
+    retry_if_not_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from apolo_app_types.outputs.utils.type_search import find_instances_recursive_simple
 from apolo_app_types.protocols.common import ApoloSecret, AppOutputs
@@ -28,6 +33,7 @@ async def delete_secret_with_retry(secret_key: str, client: apolo_sdk.Client) ->
 @retry(
     stop=stop_after_attempt(5),
     wait=wait_exponential(exp_base=2, multiplier=2),
+    retry=retry_if_not_exception_type(apolo_sdk.ResourceNotFound),
 )
 async def get_app_outputs(
     app_id: str, output_class: type[AppOutputs], client: apolo_sdk.Client
