@@ -16,7 +16,7 @@ async def create_apolo_registry_service_account(
     try:
         service_account, _, auth_token = await get_service_account(client, name=sa_name)
     except apolo_sdk.IllegalArgumentError as e:
-        if "already exists" in str(e):
+        if "service account with such name exists" in str(e).lower():
             # if we reconfigure the app, we need to create a new service account
             # since we cannot fetch token for the old one
             await client.service_accounts.rm(sa_name)
