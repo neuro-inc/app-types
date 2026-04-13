@@ -1,13 +1,18 @@
+from __future__ import annotations
+
+import asyncio
 import logging
 
 import apolo_sdk
-
 from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 
 
 logger = logging.getLogger(__name__)
 
 SECRET_KEY_TEMPLATE = "{key}-{app_instance_id}"
+
+DEFAULT_MAX_ATTEMPTS = 5
+DEFAULT_BASE_DELAY_SECONDS = 2
 
 
 async def create_apolo_secret(
@@ -22,6 +27,50 @@ async def create_apolo_secret(
         logger.exception("Failed to create Apolo Secret")
         raise
     return ApoloSecret(key=secret_key)
+
+
+async def create_apolo_secret_with_retry(
+    app_instance_id: str,
+    key: str,
+    value: str,
+    max_attempts: int = DEFAULT_MAX_ATTEMPTS,
+    base_delay_seconds: float = DEFAULT_BASE_DELAY_SECONDS,
+) -> ApoloSecret:
+    attempt = 0
+    while True:
+        try:
+            logger.info(
+                'Creating secret "%s-%s" (attempt %d)',
+                key,
+                app_instance_id,
+                attempt + 1,
+            )
+            result = await create_apolo_secret(
+                app_instance_id=app_instance_id, key=key, value=value
+            )
+            logger.info('Successfully created secret "%s-%s"', key, app_instance_id)
+            return result
+        except Exception as exc:
+            attempt += 1
+            if attempt >= max_attempts:
+                logger.exception(
+                    'All %d attempts failed to create secret "%s-%s"',
+                    max_attempts,
+                    key,
+                    app_instance_id,
+                )
+                raise
+            delay = base_delay_seconds * (2 ** (attempt - 1))
+            logger.warning(
+                'Attempt %d failed to create secret "%s-%s": %s. '
+                "Retrying in %s seconds",
+                attempt,
+                key,
+                app_instance_id,
+                exc,
+                delay,
+            )
+            await asyncio.sleep(delay)
 
 
 async def delete_apolo_secret(
