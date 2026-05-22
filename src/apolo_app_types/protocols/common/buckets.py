@@ -16,7 +16,7 @@ class CredentialsType(str, enum.Enum):
 
 
 class BucketCredentials(AbstractAppFieldType):
-    name: str = Field(
+    bucket_name: str = Field(
         ...,
         description="The name of the bucket.",
         title="Bucket name",
@@ -33,29 +33,6 @@ class GCPBucketCredentials(BucketCredentials):
         ...,
         description="The key data of the bucket.",
         title="Bucket key data",
-    )
-
-
-class MinioBucketCredentials(BucketCredentials):
-    access_key_id: str = Field(
-        ...,
-        description="The access key ID of the bucket.",
-        title="Bucket access key ID",
-    )
-    secret_access_key: ApoloSecret = Field(
-        ...,
-        description="The secret access key of the bucket.",
-        title="Bucket secret access key",
-    )
-    endpoint_url: str = Field(
-        ...,
-        description="The endpoint URL of the bucket.",
-        title="Bucket endpoint URL",
-    )
-    region_name: str = Field(
-        ...,
-        description="The region name of the bucket.",
-        title="Bucket region name",
     )
 
 
@@ -114,9 +91,7 @@ class Bucket(AbstractAppFieldType):
         description="The details of the bucket.",
         title="Bucket details",
     )
-    credentials: list[
-        S3BucketCredentials | MinioBucketCredentials | GCPBucketCredentials
-    ] = Field(
+    credentials: list[S3BucketCredentials | GCPBucketCredentials] = Field(
         default_factory=list,
         description="The credentials of the bucket.",
         title="Bucket credentials",
