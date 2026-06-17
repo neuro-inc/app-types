@@ -2,7 +2,7 @@ ARG PYTHON_VERSION=3.12
 FROM python:${PYTHON_VERSION}-slim
 
 LABEL org.opencontainers.image.source="https://github.com/neuro-inc/app-types"
-ARG POETRY_VERSION=2.2.1
+ARG POETRY_VERSION=2.4.1
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
