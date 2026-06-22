@@ -10,12 +10,16 @@ X_LOGO_URL_FIELD_NAME = "x-logo-url"
 X_META_TYPE_FIELD_NAME = "x-meta-type"
 X_IS_CONFIGURABLE_FIELD_NAME = "x-is-configurable"
 X_IS_ADVANCED_FIELD_NAME = "x-is-advanced-field"
+X_CUSTOM_VALIDATORS_FIELD_NAME = "x-custom-validators"
 
 
 class SchemaMetaType(enum.StrEnum):
     INLINE = "inline"
     INTEGRATION = "integration"
     DYNAMIC = "dynamic"
+
+
+CustomValidatorSpec = dict[str, Any]
 
 
 class SchemaExtraMetadata(BaseModel):
@@ -28,6 +32,9 @@ class SchemaExtraMetadata(BaseModel):
     # If field can be collapsed in UI (more advanced setup)
     is_advanced_field: bool = Field(default=False, alias=X_IS_ADVANCED_FIELD_NAME)
     is_configurable: bool = Field(default=True, alias=X_IS_CONFIGURABLE_FIELD_NAME)
+    custom_validators: list[CustomValidatorSpec] | None = Field(
+        default=None, alias=X_CUSTOM_VALIDATORS_FIELD_NAME
+    )
     model_config = {"populate_by_name": True}
 
     def as_json_schema_extra(self) -> dict[str, Any]:
