@@ -12,6 +12,7 @@ class Preset(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Resource Preset",
             description="Select the resource preset used per service replica.",
+            custom_validators=[],
         ).as_json_schema_extra(),
     )
     name: str = Field(

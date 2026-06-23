@@ -9,6 +9,7 @@ from .autoscaling import AutoscalingHPA
 from .base import AppInputs, AppOutputs
 from .buckets import Bucket
 from .containers import ContainerImage
+from .custom_validators import PRESET_VALIDATOR_NAME
 from .hugging_face import HuggingFaceCache, HuggingFaceModel, HuggingFaceToken
 from .ingress import (
     BaseIngress,
@@ -23,7 +24,11 @@ from .openai_compat import OpenAICompatChatAPI, OpenAICompatEmbeddingsAPI
 from .postgres import Postgres
 from .preset import Preset
 from .redis import Redis, RedisMaster
-from .schema_extra import SchemaExtraMetadata, SchemaMetaType
+from .schema_extra import (
+    X_CUSTOM_VALIDATORS_FIELD_NAME,
+    SchemaExtraMetadata,
+    SchemaMetaType,
+)
 from .secrets_ import ApoloSecret, OptionalSecret
 from .storage import (
     ApoloFilesFile,
@@ -69,6 +74,8 @@ __all__ = [
     "AppInputs",
     "SchemaExtraMetadata",
     "SchemaMetaType",
+    "X_CUSTOM_VALIDATORS_FIELD_NAME",
+    "PRESET_VALIDATOR_NAME",
     "AbstractAppFieldType",
     "ContainerImage",
     "AutoscalingHPA",
