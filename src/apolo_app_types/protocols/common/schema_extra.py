@@ -3,6 +3,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from apolo_app_types.protocols.common.custom_validators import CustomValidatorSpec
+
 
 X_TITLE_FIELD_NAME = "x-title"
 X_DESCRIPTION_FIELD_NAME = "x-description"
@@ -17,9 +19,6 @@ class SchemaMetaType(enum.StrEnum):
     INLINE = "inline"
     INTEGRATION = "integration"
     DYNAMIC = "dynamic"
-
-
-CustomValidatorSpec = dict[str, Any]
 
 
 class SchemaExtraMetadata(BaseModel):

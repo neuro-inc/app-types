@@ -1,3 +1,4 @@
+from apolo_app_types.protocols.common.custom_validators import preset_validator
 from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
 
 
@@ -23,3 +24,12 @@ def test_schema_extra_metadata_serializes_custom_validators() -> None:
             }
         }
     ]
+
+
+def test_preset_validator_builder_serializes_expected_shape() -> None:
+    assert preset_validator(exists=True, min_vram_gb=10) == {
+        "preset_validator": {
+            "exists": True,
+            "min_vram_gb": 10,
+        }
+    }

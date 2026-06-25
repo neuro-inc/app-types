@@ -9,7 +9,12 @@ from .autoscaling import AutoscalingHPA
 from .base import AppInputs, AppOutputs
 from .buckets import Bucket
 from .containers import ContainerImage
-from .custom_validators import PRESET_VALIDATOR_NAME
+from .custom_validators import (
+    PRESET_VALIDATOR_NAME,
+    CustomValidatorSpec,
+    PresetValidatorConfig,
+    preset_validator,
+)
 from .hugging_face import HuggingFaceCache, HuggingFaceModel, HuggingFaceToken
 from .ingress import (
     BaseIngress,
@@ -76,6 +81,9 @@ __all__ = [
     "SchemaMetaType",
     "X_CUSTOM_VALIDATORS_FIELD_NAME",
     "PRESET_VALIDATOR_NAME",
+    "PresetValidatorConfig",
+    "CustomValidatorSpec",
+    "preset_validator",
     "AbstractAppFieldType",
     "ContainerImage",
     "AutoscalingHPA",
