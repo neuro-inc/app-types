@@ -158,6 +158,23 @@ async def setup_clients(presets_available):
                     orchestrator=MagicMock(resource_pool_types=fake_resource_pools)
                 )
             )
+            mock_apolo_client.config.resource_pools = {
+                "cpu_pool": apolo_sdk.ResourcePool(
+                    min_size=5,
+                    max_size=5,
+                    cpu=2.0,
+                    memory=8192,
+                    disk_size=100000,
+                ),
+                "gpu_pool": apolo_sdk.ResourcePool(
+                    min_size=5,
+                    max_size=5,
+                    cpu=2.0,
+                    memory=8192,
+                    disk_size=100000,
+                    nvidia_gpu=apolo_sdk._NvidiaGPU(count=1, memory=16, model="T4"),
+                ),
+            }
             mock_get.return_value.__aenter__.return_value = mock_apolo_client
             apolo_client = await stack.enter_async_context(mock_get())
             yield apolo_client
