@@ -1,9 +1,10 @@
 from decimal import Decimal
 
-from apolo_app_types import CrunchyPostgresUserCredentials
-from apolo_app_types.protocols.common import ApoloSecret
 from apolo_sdk import Preset
 from neuro_config_client import NvidiaGPUPreset
+
+from apolo_app_types import CrunchyPostgresUserCredentials
+from apolo_app_types.protocols.common import ApoloSecret
 
 
 CPU_POOL = "cpu_pool"

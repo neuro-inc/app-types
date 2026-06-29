@@ -1,9 +1,9 @@
 import base64
 import json
 
+import apolo_sdk
 from yarl import URL
 
-import apolo_sdk
 from apolo_app_types.helm.utils.credentials import get_service_account
 from apolo_app_types.protocols.common.containers import DockerConfigModel
 

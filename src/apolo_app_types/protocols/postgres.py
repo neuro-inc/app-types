@@ -5,9 +5,9 @@ import typing as t
 from typing import Literal
 from urllib.parse import quote
 
+import apolo_sdk
 from pydantic import ConfigDict, Field, constr, model_validator
 
-import apolo_sdk
 from apolo_app_types.protocols.common import (
     AbstractAppFieldType,
     ApoloSecret,

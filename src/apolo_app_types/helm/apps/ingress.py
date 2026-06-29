@@ -3,6 +3,7 @@ import typing as t
 from copy import deepcopy
 
 import apolo_sdk
+
 from apolo_app_types.app_types import AppType
 from apolo_app_types.protocols.common import IngressGrpc, IngressHttp
 from apolo_app_types.protocols.common.auth import ApoloAuth, CustomAuth
