@@ -2,6 +2,7 @@ from decimal import Decimal
 from unittest.mock import MagicMock
 
 import pytest
+from apolo_sdk._server_cfg import NvidiaGPUPreset
 
 from apolo_app_types.helm.apps.common import (
     NVIDIA_MIG_KEY_PREFIX,
@@ -9,7 +10,6 @@ from apolo_app_types.helm.apps.common import (
     preset_to_resources,
 )
 from apolo_sdk import Preset
-from apolo_sdk._server_cfg import NvidiaGPUPreset
 
 
 def test_get_preset_raises_value_error_when_preset_not_found():
