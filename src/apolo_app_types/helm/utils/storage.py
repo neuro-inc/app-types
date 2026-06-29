@@ -1,6 +1,5 @@
-from yarl import URL
-
 import apolo_sdk
+from yarl import URL
 
 
 def get_app_data_files_path_url(

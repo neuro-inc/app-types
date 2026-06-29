@@ -3,9 +3,8 @@
 import logging
 import os
 
-import click
-
 import apolo_sdk
+import click
 
 
 logger = logging.getLogger(__name__)

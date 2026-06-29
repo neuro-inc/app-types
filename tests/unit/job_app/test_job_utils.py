@@ -1,10 +1,10 @@
 from decimal import Decimal
 from unittest.mock import MagicMock, PropertyMock, patch
 
+import apolo_sdk
 import pytest
 from yarl import URL
 
-import apolo_sdk
 from apolo_app_types.job_utils import JobRunParams, prepare_job_run_params
 from apolo_app_types.protocols.common import ApoloSecret, Env, Preset
 from apolo_app_types.protocols.common.storage import (

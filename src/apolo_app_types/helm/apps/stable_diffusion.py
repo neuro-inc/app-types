@@ -1,5 +1,7 @@
 import typing as t
 
+from apolo_sdk import Preset
+
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import (
@@ -11,7 +13,6 @@ from apolo_app_types.helm.apps.common import (
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
 from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
 from apolo_app_types.protocols.stable_diffusion import StableDiffusionInputs
-from apolo_sdk import Preset
 
 
 class StableDiffusionChartValueProcessor(

@@ -1,8 +1,8 @@
 import enum
 
+import apolo_sdk
 from pydantic import ConfigDict, Field, field_validator
 
-import apolo_sdk
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.schema_extra import (
     SchemaExtraMetadata,

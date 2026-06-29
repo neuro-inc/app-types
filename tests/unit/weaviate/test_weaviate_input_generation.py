@@ -1,6 +1,7 @@
 from datetime import datetime
 from unittest.mock import AsyncMock
 
+import apolo_sdk
 import pytest
 from apolo_app_types_fixtures.constants import (
     APP_ID,
@@ -8,7 +9,6 @@ from apolo_app_types_fixtures.constants import (
     DEFAULT_NAMESPACE,
 )
 
-import apolo_sdk
 from apolo_app_types import WeaviateInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.common import _get_match_expressions
