@@ -1,7 +1,6 @@
-from collections.abc import Mapping
-from typing import Any, Awaitable, Callable, TypedDict
-
-import jsonschema.exceptions  # type: ignore[import-untyped]
+from collections.abc import Awaitable, Callable, Mapping
+from numbers import Real
+from typing import Any, TypedDict
 
 
 PRESET_VALIDATOR_NAME = "preset_validator"
@@ -16,6 +15,14 @@ class PresetValidatorConfig(TypedDict, total=False):
 
 class CustomValidatorSpec(TypedDict, total=False):
     preset_validator: PresetValidatorConfig
+
+
+class CustomValidationError(Exception):
+    def __init__(self, message: str, path: list[str | int], validator: str):
+        self.message = message
+        self.path = path
+        self.validator = validator
+        super().__init__(message)
 
 
 def preset_validator(
@@ -72,12 +79,8 @@ def _get_preset_ram_bytes(preset: Any) -> int | None:
 
 def _build_custom_validation_error(
     message: str, path: list[str | int], validator: str
-) -> jsonschema.exceptions.ValidationError:
-    return jsonschema.exceptions.ValidationError(
-        message=message,
-        path=path,
-        validator=validator,
-    )
+) -> CustomValidationError:
+    return CustomValidationError(message=message, path=path, validator=validator)
 
 
 async def validate_preset_custom_validator(
@@ -87,14 +90,14 @@ async def validate_preset_custom_validator(
     cluster_name: str,
     path: list[str | int],
     apolo_client: Any,
-) -> list[jsonschema.exceptions.ValidationError]:
+) -> list[CustomValidationError]:
     preset_name = _get_preset_name(value)
     if preset_name is None:
         return []
 
     presets = apolo_client.config.presets
     preset = presets.get(preset_name)
-    errors: list[jsonschema.exceptions.ValidationError] = []
+    errors: list[CustomValidationError] = []
     if validator_config.get("exists") is True and preset is None:
         errors.append(
             _build_custom_validation_error(
@@ -109,7 +112,7 @@ async def validate_preset_custom_validator(
         return errors
 
     min_cpu_cores = validator_config.get("min_cpu_cores")
-    if isinstance(min_cpu_cores, (int, float)) and preset is not None:
+    if isinstance(min_cpu_cores, Real) and preset is not None:
         if getattr(preset, "cpu", None) is None or float(preset.cpu) < float(
             min_cpu_cores
         ):
@@ -163,5 +166,5 @@ async def validate_preset_custom_validator(
 
 CustomSchemaValidator = Callable[
     ...,
-    Awaitable[list[jsonschema.exceptions.ValidationError]],
+    Awaitable[list[CustomValidationError]],
 ]
