@@ -4,12 +4,13 @@ from datetime import datetime
 from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 
-import apolo_sdk
 import pytest
+from yarl import URL
+
+import apolo_sdk
 from apolo_sdk import AppsConfig, Preset
 from apolo_sdk._server_cfg import NvidiaGPUPreset
 from neuro_config_client import ResourcePoolType
-from yarl import URL
 
 from .constants import (
     DEFAULT_CLUSTER_NAME,

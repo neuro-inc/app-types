@@ -1,7 +1,6 @@
 from urllib.parse import quote
 
 import apolo_sdk
-
 from apolo_app_types.protocols.common import AbstractAppFieldType, ApoloSecret
 
 

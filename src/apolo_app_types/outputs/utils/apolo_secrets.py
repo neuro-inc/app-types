@@ -4,7 +4,6 @@ import asyncio
 import logging
 
 import apolo_sdk
-
 from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 
 

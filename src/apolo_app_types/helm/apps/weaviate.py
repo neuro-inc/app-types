@@ -3,7 +3,6 @@ import secrets
 import typing as t
 
 import apolo_sdk
-
 from apolo_app_types import BasicAuth, WeaviateInputs
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor

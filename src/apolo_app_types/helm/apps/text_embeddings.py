@@ -2,7 +2,6 @@ import logging
 import typing as t
 
 import apolo_sdk
-
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.base import BaseChartValueProcessor
 from apolo_app_types.helm.apps.common import gen_extra_values, get_preset

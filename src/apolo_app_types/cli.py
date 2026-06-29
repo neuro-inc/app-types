@@ -5,10 +5,10 @@ import os
 import sys
 from pathlib import Path
 
-import apolo_sdk
 import click
 from yarl import URL
 
+import apolo_sdk
 from apolo_app_types.outputs.update_outputs import update_app_outputs
 from apolo_app_types.outputs.utils.cleanup import cleanup_secrets
 from apolo_app_types.outputs.utils.discovery import (
