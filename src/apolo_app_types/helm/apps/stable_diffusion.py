@@ -8,6 +8,7 @@ from apolo_app_types.helm.apps.common import (
     gen_extra_values,
     get_component_values,
     get_preset,
+    get_resource_pools_for_preset,
 )
 from apolo_app_types.helm.utils.deep_merging import merge_list_of_dicts
 from apolo_app_types.protocols.common.secrets_ import serialize_optional_secret
@@ -70,8 +71,8 @@ class StableDiffusionChartValueProcessor(
         )
 
         preset = get_preset(self.client, preset_name)
-
-        component_vals = await get_component_values(preset, preset_name)
+        resource_pools = get_resource_pools_for_preset(self.client, preset_name)
+        component_vals = await get_component_values(preset, preset_name, resource_pools)
         api_vars = self._get_env_vars(input_, preset, app_secrets_name)
         img_repository = self._get_image_repository(preset)
 
