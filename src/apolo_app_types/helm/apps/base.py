@@ -3,7 +3,6 @@ import logging
 import typing as t
 
 import apolo_sdk
-
 from apolo_app_types.protocols.common.base import AppInputs
 
 

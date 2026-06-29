@@ -6,8 +6,6 @@ from apolo_app_types_fixtures.constants import (
     APP_ID,
     APP_SECRETS_NAME,
 )
-from apolo_sdk import Preset as ApoloPreset
-from apolo_sdk._server_cfg import AMDGPUPreset, NvidiaGPUPreset
 
 from apolo_app_types import HuggingFaceModel, HuggingFaceToken
 from apolo_app_types.app_types import AppType
@@ -22,6 +20,8 @@ from apolo_app_types.protocols.text_embeddings import (
     TextEmbeddingsInferenceAppInputs,
     TextEmbeddingsInferenceArchitecture as TEIArch,
 )
+from apolo_sdk import Preset as ApoloPreset
+from apolo_sdk._server_cfg import AMDGPUPreset, NvidiaGPUPreset
 
 
 @pytest.mark.asyncio

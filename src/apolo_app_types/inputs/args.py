@@ -2,7 +2,6 @@ import typing as t
 from importlib.metadata import version
 
 import apolo_sdk
-
 from apolo_app_types import (
     FooocusAppInputs,
     LightRAGAppInputs,

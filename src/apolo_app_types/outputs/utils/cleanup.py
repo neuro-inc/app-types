@@ -1,6 +1,5 @@
 import logging
 
-import apolo_sdk
 from tenacity import (
     retry,
     retry_if_not_exception_type,
@@ -8,6 +7,7 @@ from tenacity import (
     wait_exponential,
 )
 
+import apolo_sdk
 from apolo_app_types.outputs.utils.type_search import find_instances_recursive_simple
 from apolo_app_types.protocols.common import ApoloSecret, AppOutputs
 

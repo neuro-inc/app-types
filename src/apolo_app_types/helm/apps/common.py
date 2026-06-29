@@ -6,9 +6,9 @@ import typing as t
 from copy import deepcopy
 from decimal import Decimal
 
-import apolo_sdk
 import yaml
 
+import apolo_sdk
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.ingress import (
     get_grpc_ingress_values,

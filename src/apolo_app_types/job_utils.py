@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
-import apolo_sdk
 from yarl import URL
 
+import apolo_sdk
 from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 from apolo_app_types.protocols.job import JobAppInput
 
