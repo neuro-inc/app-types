@@ -35,3 +35,7 @@ def test_preset_validator_builder_serializes_expected_shape() -> None:
             "min_vram_gib": 10,
         }
     }
+
+
+def test_preset_validator_builder_defaults_to_empty_config() -> None:
+    assert preset_validator() == {"preset_validator": {}}
