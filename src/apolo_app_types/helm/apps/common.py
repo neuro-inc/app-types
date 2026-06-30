@@ -8,7 +8,6 @@ from decimal import Decimal
 
 import apolo_sdk
 import yaml
-from apolo_sdk import Preset
 
 from apolo_app_types.app_types import AppType
 from apolo_app_types.helm.apps.ingress import (
@@ -38,7 +37,7 @@ NVIDIA_MIG_KEY_PREFIX = "nvidia.com/mig-"
 
 def get_preset(client: apolo_sdk.Client, preset_name: str) -> apolo_sdk.Preset:
     if os.environ.get("ENV") == "local":
-        return Preset(
+        return apolo_sdk.Preset(
             credits_per_hour=Decimal(1.0),
             cpu=1,
             memory=1024,
@@ -50,6 +49,24 @@ def get_preset(client: apolo_sdk.Client, preset_name: str) -> apolo_sdk.Preset:
         msg = f"Preset {preset_name} not exist in cluster {client.config.cluster_name}"
         raise ValueError(msg)
     return preset
+
+
+def get_resource_pools_for_preset(
+    client: apolo_sdk.Client, preset_name: str
+) -> list[apolo_sdk.ResourcePool]:
+    preset = get_preset(client, preset_name)
+    result = []
+    for resource_pool_name in (
+        *preset.resource_pool_names,
+        *preset.available_resource_pool_names,
+    ):
+        resource_pool = client.config.resource_pools.get(resource_pool_name)
+        if not resource_pool:
+            msg = f"Resource pool {resource_pool_name} not exist in cluster {client.config.cluster_name}"  # noqa: E501
+            logger.warning(msg)
+        else:
+            result.append(resource_pool)
+    return result
 
 
 def preset_to_resources(preset: apolo_sdk.Preset) -> dict[str, t.Any]:
@@ -77,14 +94,18 @@ class ComponentValues(t.TypedDict):
     affinity: dict[str, t.Any]
 
 
-async def get_component_values(preset: Preset, preset_name: str) -> ComponentValues:
+async def get_component_values(
+    preset: apolo_sdk.Preset,
+    preset_name: str,
+    resource_pools: list[apolo_sdk.ResourcePool],
+) -> ComponentValues:
     return {
         "labels": {
             "platform.apolo.us/component": "app",
             "platform.apolo.us/preset": preset_name,
         },
         "resources": preset_to_resources(preset),
-        "tolerations": await preset_to_tolerations(preset),
+        "tolerations": await preset_to_tolerations(preset, resource_pools),
         "affinity": preset_to_affinity(preset),
     }
 
@@ -116,7 +137,9 @@ def preset_to_affinity(preset: apolo_sdk.Preset) -> dict[str, t.Any]:
     return affinity
 
 
-async def preset_to_tolerations(preset: apolo_sdk.Preset) -> list[dict[str, t.Any]]:
+async def preset_to_tolerations(
+    preset: apolo_sdk.Preset, resource_pools: list[apolo_sdk.ResourcePool]
+) -> list[dict[str, t.Any]]:
     tolerations: list[dict[str, t.Any]] = [
         {
             "effect": "NoSchedule",
@@ -137,11 +160,26 @@ async def preset_to_tolerations(preset: apolo_sdk.Preset) -> list[dict[str, t.An
         },
     ]
 
+    has_amd_gpu = has_nvidia_gpu = False
+
     if preset.amd_gpu and preset.amd_gpu.count:
+        has_amd_gpu = True
+    if (preset.nvidia_gpu and preset.nvidia_gpu.count) or preset.nvidia_migs:
+        has_nvidia_gpu = True
+
+    for resource_pool in resource_pools:
+        if resource_pool.amd_gpu and resource_pool.amd_gpu.count:
+            has_amd_gpu = True
+        if (
+            resource_pool.nvidia_gpu and resource_pool.nvidia_gpu.count
+        ) or resource_pool.nvidia_migs:
+            has_nvidia_gpu = True
+
+    if has_amd_gpu:
         tolerations.append(
             {"effect": "NoSchedule", "key": "amd.com/gpu", "operator": "Exists"}
         )
-    if (preset.nvidia_gpu and preset.nvidia_gpu.count) or preset.nvidia_migs:
+    if has_nvidia_gpu:
         tolerations.append(
             {"effect": "NoSchedule", "key": "nvidia.com/gpu", "operator": "Exists"}
         )
@@ -289,7 +327,8 @@ async def gen_extra_values(
         return {}
 
     preset = get_preset(apolo_client, preset_name)
-    tolerations_vals = await preset_to_tolerations(preset)
+    resource_pools = get_resource_pools_for_preset(apolo_client, preset_name)
+    tolerations_vals = await preset_to_tolerations(preset, resource_pools)
     affinity_vals = preset_to_affinity(preset)
     resources_vals = preset_to_resources(preset)
     ingress_vals: dict[str, t.Any] = {}
