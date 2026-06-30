@@ -7,12 +7,7 @@ def test_schema_extra_metadata_serializes_custom_validators() -> None:
         title="Preset",
         description="Preset requirements",
         custom_validators=[
-            {
-                "preset_validator": {
-                    "exists": True,
-                    "min_vram_gb": 10,
-                }
-            }
+            preset_validator(exists=True, min_vram_gib=10),
         ],
     )
 
@@ -20,16 +15,23 @@ def test_schema_extra_metadata_serializes_custom_validators() -> None:
         {
             "preset_validator": {
                 "exists": True,
-                "min_vram_gb": 10,
+                "min_vram_gib": 10,
             }
         }
     ]
 
 
 def test_preset_validator_builder_serializes_expected_shape() -> None:
-    assert preset_validator(exists=True, min_vram_gb=10) == {
+    assert preset_validator(
+        exists=True,
+        min_cpu_cores=2.5,
+        min_ram_gib=16,
+        min_vram_gib=10,
+    ) == {
         "preset_validator": {
             "exists": True,
-            "min_vram_gb": 10,
+            "min_cpu_cores": 2.5,
+            "min_ram_gib": 16,
+            "min_vram_gib": 10,
         }
     }
