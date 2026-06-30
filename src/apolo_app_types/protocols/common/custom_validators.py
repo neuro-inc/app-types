@@ -56,7 +56,11 @@ def _get_preset_name(value: Any) -> str | None:
 
 def _get_preset_max_vram_bytes(preset: Any) -> int | None:
     vram_candidates: list[int] = []
-    for gpu in (preset.nvidia_gpu, preset.amd_gpu, preset.intel_gpu):
+    for gpu in (
+        getattr(preset, "nvidia_gpu", None),
+        getattr(preset, "amd_gpu", None),
+        getattr(preset, "intel_gpu", None),
+    ):
         memory = getattr(gpu, "memory", None)
         if isinstance(memory, int):
             vram_candidates.append(memory)
