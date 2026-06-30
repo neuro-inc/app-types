@@ -22,12 +22,12 @@ def _gpu_preset(*, memory: int | None = None) -> SimpleNamespace:
 
 def test_validate_preset_custom_validator_reports_missing_preset() -> None:
     errors = asyncio.run(
-            validate_preset_custom_validator(
-                {"name": "preset-a"},
-                {"exists": True},
-                cluster_name="test-cluster",
-                path=["preset"],
-                apolo_client=_make_client(None),
+        validate_preset_custom_validator(
+            {"name": "preset-a"},
+            {"exists": True},
+            cluster_name="test-cluster",
+            path=["preset"],
+            apolo_client=_make_client(None),
         )
     )
 
@@ -72,26 +72,26 @@ def test_validate_preset_custom_validator_reports_missing_preset() -> None:
                 intel_gpu=None,
                 nvidia_migs={},
             ),
-                {
-                    "min_vram_gib": 10,
-                    "exists": True,
-                },
-                "GPU memory",
-            ),
-        ],
-    )
+            {
+                "min_vram_gib": 10,
+                "exists": True,
+            },
+            "GPU memory",
+        ),
+    ],
+)
 def test_validate_preset_custom_validator_reports_resource_mismatch(
     preset: object,
     validator_config: dict[str, object],
     expected_message_part: str,
 ) -> None:
     errors = asyncio.run(
-            validate_preset_custom_validator(
-                {"name": "preset-a"},
-                validator_config,
-                cluster_name="test-cluster",
-                path=["preset"],
-                apolo_client=_make_client(preset),
+        validate_preset_custom_validator(
+            {"name": "preset-a"},
+            validator_config,
+            cluster_name="test-cluster",
+            path=["preset"],
+            apolo_client=_make_client(preset),
         )
     )
 
@@ -101,7 +101,7 @@ def test_validate_preset_custom_validator_reports_resource_mismatch(
 
 def test_validate_preset_custom_validator_accepts_matching_preset() -> None:
     errors = asyncio.run(
-            validate_preset_custom_validator(
+        validate_preset_custom_validator(
             {"name": "preset-a"},
             {
                 "exists": True,
