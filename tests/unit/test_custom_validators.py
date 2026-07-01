@@ -129,7 +129,6 @@ def test_validate_preset_custom_validator_accepts_matching_preset() -> None:
     assert errors == []
 
 
-
 def test_custom_validators_registry_exposes_preset_validator() -> None:
     assert CUSTOM_VALIDATORS == {
         PRESET_VALIDATOR_NAME: validate_preset_custom_validator,
