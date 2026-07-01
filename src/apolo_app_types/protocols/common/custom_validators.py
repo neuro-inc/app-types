@@ -2,9 +2,6 @@ from collections.abc import Awaitable, Callable, Mapping
 from numbers import Real
 from typing import Any, TypedDict
 
-from jsonschema.exceptions import ValidationError as JSONSchemaValidationError
-
-
 PRESET_VALIDATOR_NAME = "preset_validator"
 
 
@@ -19,12 +16,12 @@ class CustomValidatorSpec(TypedDict, total=False):
     preset_validator: PresetValidatorConfig
 
 
-class CustomValidationError(JSONSchemaValidationError):
+class CustomValidationError(Exception):
     def __init__(self, message: str, path: list[str | int], validator: str):
-        super().__init__(message)
         self.message = message
         self.path = list(path)
         self.validator = validator
+        super().__init__(message)
 
 
 def preset_validator(
