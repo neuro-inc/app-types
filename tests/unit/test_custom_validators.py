@@ -5,6 +5,8 @@ from unittest.mock import MagicMock
 import pytest
 
 from apolo_app_types.protocols.common.custom_validators import (
+    CUSTOM_VALIDATORS,
+    PRESET_VALIDATOR_NAME,
     CustomValidationError,
     validate_preset_custom_validator,
 )
@@ -125,3 +127,10 @@ def test_validate_preset_custom_validator_accepts_matching_preset() -> None:
     )
 
     assert errors == []
+
+
+
+def test_custom_validators_registry_exposes_preset_validator() -> None:
+    assert CUSTOM_VALIDATORS == {
+        PRESET_VALIDATOR_NAME: validate_preset_custom_validator,
+    }

@@ -10,7 +10,9 @@ from .base import AppInputs, AppOutputs
 from .buckets import Bucket
 from .containers import ContainerImage
 from .custom_validators import (
+    CUSTOM_VALIDATORS,
     PRESET_VALIDATOR_NAME,
+    CustomSchemaValidator,
     CustomValidatorSpec,
     PresetValidatorConfig,
     preset_validator,
@@ -80,7 +82,9 @@ __all__ = [
     "SchemaExtraMetadata",
     "SchemaMetaType",
     "X_CUSTOM_VALIDATORS_FIELD_NAME",
+    "CUSTOM_VALIDATORS",
     "PRESET_VALIDATOR_NAME",
+    "CustomSchemaValidator",
     "PresetValidatorConfig",
     "CustomValidatorSpec",
     "preset_validator",
