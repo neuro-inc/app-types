@@ -222,14 +222,14 @@ class BasePostgresUserCredentials(AbstractAppFieldType):
         ).as_json_schema_extra(),
     )
     pgbouncer_host: str | None = Field(
-        ...,
+        default=None,
         json_schema_extra=SchemaExtraMetadata(
             description="Host of the PGBouncer instance.",
             title="PGBouncer Host",
         ).as_json_schema_extra(),
     )
     pgbouncer_port: int | None = Field(
-        default=...,
+        default=None,
         gt=0,
         json_schema_extra=SchemaExtraMetadata(
             description="Port of the PGBouncer instance.",
