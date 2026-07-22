@@ -27,10 +27,13 @@ GITHUB_IMAGE_REGISTRY_AUTH_SCHEMA_EXTRA = SchemaExtraMetadata(
 )
 
 
-class GithubAuth(AbstractAppFieldType):
+class GithubCredentials(AbstractAppFieldType):
     model_config = ConfigDict(
         protected_namespaces=(),
-        json_schema_extra=GITHUB_AUTH_SCHEMA_EXTRA.as_json_schema_extra(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="GitHub Credentials",
+            description="GitHub username and personal access token.",
+        ).as_json_schema_extra(),
     )
 
     username: str = Field(
@@ -48,6 +51,14 @@ class GithubAuth(AbstractAppFieldType):
             "For pulling container images it needs the read:packages scope.",
         ).as_json_schema_extra(),
     )
+
+
+class GithubAuth(GithubCredentials):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=GITHUB_AUTH_SCHEMA_EXTRA.as_json_schema_extra(),
+    )
+
     api_url: str = Field(
         default="https://api.github.com",
         json_schema_extra=SchemaExtraMetadata(
@@ -58,7 +69,7 @@ class GithubAuth(AbstractAppFieldType):
     )
 
 
-class GithubImageRegistryAuth(AbstractAppFieldType):
+class GithubImageRegistryAuth(GithubCredentials):
     model_config = ConfigDict(
         protected_namespaces=(),
         json_schema_extra=(
@@ -72,21 +83,6 @@ class GithubImageRegistryAuth(AbstractAppFieldType):
             title="Registry Host",
             description="Container registry host. Use ghcr.io for github.com "
             "or containers.HOSTNAME for GitHub Enterprise Server.",
-        ).as_json_schema_extra(),
-    )
-    username: str = Field(
-        ...,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Username",
-            description="GitHub account username the personal access token belongs to.",
-        ).as_json_schema_extra(),
-    )
-    token: ApoloSecret = Field(
-        ...,
-        json_schema_extra=SchemaExtraMetadata(
-            title="GitHub Personal Access Token",
-            description="GitHub personal access token (classic) "
-            "with the read:packages scope.",
         ).as_json_schema_extra(),
     )
 

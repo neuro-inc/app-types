@@ -40,6 +40,22 @@ async def create_apolo_registry_service_account(
     return auth_token
 
 
+def build_registry_dockerconfig(
+    registry_host: str,
+    username: str,
+    password: str,
+) -> DockerConfigModel:
+    """
+    Build a base64-encoded dockerconfig.json for a container registry.
+    """
+    b64_auth = base64.b64encode(f"{username}:{password}".encode()).decode("utf-8")
+    contents = {"auths": {registry_host: {"auth": b64_auth}}}
+    json_contents = json.dumps(contents)
+    return DockerConfigModel(
+        filecontents=base64.b64encode(json_contents.encode("utf-8")).decode("utf-8")
+    )
+
+
 async def create_apolo_registry_sa_dockerconfig(
     client: apolo_sdk.Client,
     sa_name: str,
@@ -49,11 +65,10 @@ async def create_apolo_registry_sa_dockerconfig(
     """
     token = await create_apolo_registry_service_account(client, sa_name=sa_name)
     assert client.config.registry_url.host
-    b64_token = base64.b64encode(f"token:{token}".encode()).decode("utf-8")
-    contents = {"auths": {client.config.registry_url.host: {"auth": b64_token}}}
-    json_contents = json.dumps(contents)
-    return DockerConfigModel(
-        filecontents=base64.b64encode(json_contents.encode("utf-8")).decode("utf-8")
+    return build_registry_dockerconfig(
+        registry_host=client.config.registry_url.host,
+        username="token",
+        password=token,
     )
 
 
