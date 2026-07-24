@@ -54,6 +54,12 @@ from apolo_app_types.protocols.fooocus import (
     FooocusInputs,
     FooocusOutputs,
 )
+from apolo_app_types.protocols.github import (
+    GithubAppInputs,
+    GithubAppOutputs,
+    GithubAuth,
+    GithubImageRegistryAuth,
+)
 from apolo_app_types.protocols.hugging_face import (
     HuggingFaceAppInputs,
     HuggingFaceAppOutputs,
@@ -218,6 +224,10 @@ __all__ = [
     "DockerHubOutputs",
     "DockerConfigModel",
     "ApoloFilesMount",
+    "GithubAppInputs",
+    "GithubAppOutputs",
+    "GithubAuth",
+    "GithubImageRegistryAuth",
     "HuggingFaceAppInputs",
     "HuggingFaceAppOutputs",
     "CustomDeploymentInputs",

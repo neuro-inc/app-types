@@ -30,10 +30,12 @@ class ApoloBaseModel(BaseModel):
     def __init_subclass__(cls, **kwargs) -> None:  # type: ignore[no-untyped-def]
         """Automatically add x-type to json_schema_extra."""
         x_type: JsonDict = {"x-type": cls.__name__}
-        if "json_schema_extra" in cls.model_config and isinstance(
-            cls.model_config["json_schema_extra"], dict
-        ):
-            cls.model_config["json_schema_extra"].update(x_type)
+        existing = cls.model_config.get("json_schema_extra")
+        if isinstance(existing, dict):
+            # Copy instead of updating in place: a subclass that does not
+            # declare its own model_config shares this dict with its parent,
+            # and mutating it would rewrite the parent's x-type as well.
+            cls.model_config["json_schema_extra"] = {**existing, **x_type}
         else:
             cls.model_config["json_schema_extra"] = x_type
         return super().__init_subclass__(**kwargs)
