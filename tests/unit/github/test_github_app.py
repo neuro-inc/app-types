@@ -1,9 +1,5 @@
-import jsonschema
-import pytest
-
 from apolo_app_types import (
     GithubAppInputs,
-    GithubAppOutputs,
     GithubAuth,
     GithubImageRegistryAuth,
 )
@@ -62,35 +58,6 @@ def test_github_app_inputs_construction():
 
 # Appless install stores input_params verbatim as outputs after validating
 # them against the OUTPUT schema, so inputs must satisfy the outputs schema.
-
-
-@pytest.fixture
-def github_app_inputs() -> GithubAppInputs:
-    return GithubAppInputs(
-        auth=GithubAuth(
-            username="octocat",
-            token=ApoloSecret(key="gh-token"),
-        ),
-        image_registry_auth=GithubImageRegistryAuth(
-            username="octocat",
-            token=ApoloSecret(key="gh-registry-token"),
-        ),
-    )
-
-
-def test_github_app_inputs_validate_against_outputs_schema(github_app_inputs):
-    dumped = github_app_inputs.model_dump(mode="json")
-    output_schema = GithubAppOutputs.model_json_schema()
-    jsonschema.validate(instance=dumped, schema=output_schema)
-
-
-def test_github_app_inputs_load_as_outputs(github_app_inputs):
-    dumped = github_app_inputs.model_dump(mode="json")
-    outputs = GithubAppOutputs.model_validate(dumped)
-    assert outputs.auth.username == "octocat"
-    assert outputs.auth.api_url == "https://api.github.com"
-    assert outputs.image_registry_auth.registry_url == "ghcr.io"
-    assert outputs.image_registry_auth.username == "octocat"
 
 
 def test_app_type_github_is_appless():

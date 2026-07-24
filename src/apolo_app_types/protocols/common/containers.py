@@ -1,6 +1,7 @@
 from enum import StrEnum
 
 from pydantic import ConfigDict, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.schema_extra import (
@@ -8,6 +9,7 @@ from apolo_app_types.protocols.common.schema_extra import (
     SchemaMetaType,
 )
 from apolo_app_types.protocols.dockerhub import DockerConfigModel
+from apolo_app_types.protocols.github import GithubImageRegistryAuth
 
 
 class ContainerImagePullPolicy(StrEnum):
@@ -38,11 +40,16 @@ class ContainerImage(AbstractAppFieldType):
             description="Choose a tag for the container image.",
         ).as_json_schema_extra(),
     )
-    dockerconfigjson: DockerConfigModel | None = Field(
+    # Hidden legacy field; superseded by imagepullsecret but still accepted
+    # in stored payloads.
+    dockerconfigjson: SkipJsonSchema[DockerConfigModel | None] = None
+    imagepullsecret: DockerConfigModel | GithubImageRegistryAuth | None = Field(
         default=None,
         json_schema_extra=SchemaExtraMetadata(
-            title="ImagePullSecrets for DockerHub",
-            description="ImagePullSecrets for DockerHub",
+            title="Image Pull Secret",
+            description="Credentials used to pull the container image from a "
+            "private registry: either a Docker config (e.g. from the DockerHub "
+            "app) or a GitHub Container Registry auth (from the GitHub app).",
             meta_type=SchemaMetaType.INTEGRATION,
         ).as_json_schema_extra(),
     )

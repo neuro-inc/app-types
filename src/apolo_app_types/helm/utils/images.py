@@ -1,11 +1,21 @@
+import asyncio
 import base64
 import json
+import logging
 
 import apolo_sdk
 from yarl import URL
 
 from apolo_app_types.helm.utils.credentials import get_service_account
 from apolo_app_types.protocols.common.containers import DockerConfigModel
+from apolo_app_types.protocols.common.secrets_ import ApoloSecret
+from apolo_app_types.protocols.github import GithubImageRegistryAuth
+
+
+logger = logging.getLogger(__name__)
+
+_SECRET_GET_ATTEMPTS = 3
+_SECRET_GET_BASE_DELAY_SECONDS = 2
 
 
 async def create_apolo_registry_service_account(
@@ -68,6 +78,44 @@ async def create_apolo_registry_sa_dockerconfig(
     return build_registry_dockerconfig(
         registry_host=client.config.registry_url.host,
         username="token",
+        password=token,
+    )
+
+
+async def get_apolo_secret_value(client: apolo_sdk.Client, secret: ApoloSecret) -> str:
+    last_exc: Exception | None = None
+    for attempt in range(1, _SECRET_GET_ATTEMPTS + 1):
+        try:
+            value = await client.secrets.get(key=secret.key)
+        except Exception as exc:  # noqa: BLE001
+            last_exc = exc
+            logger.warning(
+                "Attempt %d/%d to read Apolo secret %r failed: %s",
+                attempt,
+                _SECRET_GET_ATTEMPTS,
+                secret.key,
+                exc,
+            )
+            if attempt < _SECRET_GET_ATTEMPTS:
+                await asyncio.sleep(_SECRET_GET_BASE_DELAY_SECONDS * 2 ** (attempt - 1))
+        else:
+            return value.decode().strip()
+    msg = (
+        f"Failed to read Apolo secret {secret.key!r}. Ensure the secret "
+        "exists in the same cluster, organization and project as this "
+        "app installation."
+    )
+    raise RuntimeError(msg) from last_exc
+
+
+async def create_github_registry_dockerconfig(
+    client: apolo_sdk.Client,
+    auth: GithubImageRegistryAuth,
+) -> DockerConfigModel:
+    token = await get_apolo_secret_value(client, auth.token)
+    return build_registry_dockerconfig(
+        registry_host=auth.registry_url,
+        username=auth.username,
         password=token,
     )
 

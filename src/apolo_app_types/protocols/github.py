@@ -1,10 +1,9 @@
 from pydantic import ConfigDict, Field
 
-from apolo_app_types.protocols.common import (
-    AbstractAppFieldType,
-    AppInputs,
-    AppOutputs,
-)
+# Import from submodules directly: protocols.common.containers imports this
+# module, so going through protocols.common.__init__ would be circular.
+from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
+from apolo_app_types.protocols.common.base import AppInputs, AppOutputs
 from apolo_app_types.protocols.common.schema_extra import (
     SchemaExtraMetadata,
     SchemaMetaType,
@@ -48,7 +47,8 @@ class GithubCredentials(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="GitHub Personal Access Token",
             description="GitHub personal access token (classic). "
-            "For pulling container images it needs the read:packages scope.",
+            "For pulling container images it needs the read:packages scope, "
+            "see https://docs.github.com/en/packages/learn-github-packages/about-permissions-for-github-packages#about-scopes-and-permissions-for-package-registries",
         ).as_json_schema_extra(),
     )
 
