@@ -18,6 +18,7 @@ class AppType(enum.StrEnum):
     Shell = "shell"
     ApoloDeploy = "apolo-deploy"
     DockerHub = "dockerhub"
+    Github = "github"
     HuggingFaceCache = "huggingface-cache"
     HuggingFace = "huggingface"
     CustomDeployment = "custom-deployment"
@@ -42,4 +43,5 @@ class AppType(enum.StrEnum):
     def is_appless(self) -> bool:
         return self in {
             AppType.HuggingFaceCache,
+            AppType.Github,
         }
