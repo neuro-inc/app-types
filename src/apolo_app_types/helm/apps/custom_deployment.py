@@ -8,15 +8,11 @@ from apolo_app_types.helm.apps.common import (
     gen_extra_values,
 )
 from apolo_app_types.helm.utils.images import (
-    create_apolo_registry_sa_dockerconfig,
-    create_github_registry_dockerconfig,
     get_image_docker_url,
+    resolve_image_dockerconfig,
 )
 from apolo_app_types.helm.utils.pods import get_custom_deployment_health_check_values
-from apolo_app_types.protocols.common.containers import ContainerImage
 from apolo_app_types.protocols.custom_deployment import CustomDeploymentInputs
-from apolo_app_types.protocols.dockerhub import DockerConfigModel
-from apolo_app_types.protocols.github import GithubImageRegistryAuth
 
 
 class CustomDeploymentChartValueProcessor(
@@ -50,23 +46,6 @@ class CustomDeploymentChartValueProcessor(
         return gen_apolo_storage_integration_labels(
             client=self.client, inject_storage=True
         )
-
-    async def _resolve_dockerconfig(
-        self, image: ContainerImage, app_name: str
-    ) -> DockerConfigModel | None:
-        # Precedence: Apolo registry SA > imagepullsecret > legacy field
-        if image.repository.startswith("image:"):
-            sa_name = f"custom-deployment-{app_name}"
-            return await create_apolo_registry_sa_dockerconfig(
-                client=self.client, sa_name=sa_name
-            )
-        if isinstance(image.imagepullsecret, DockerConfigModel):
-            return image.imagepullsecret
-        if isinstance(image.imagepullsecret, GithubImageRegistryAuth):
-            return await create_github_registry_dockerconfig(
-                client=self.client, auth=image.imagepullsecret
-            )
-        return image.dockerconfigjson
 
     async def gen_extra_values(
         self,
@@ -173,7 +152,11 @@ class CustomDeploymentChartValueProcessor(
         if storage_labels:
             values["podLabels"] = storage_labels
 
-        dockerconfig = await self._resolve_dockerconfig(input_.image, app_name)
+        dockerconfig = await resolve_image_dockerconfig(
+            client=self.client,
+            image=input_.image,
+            sa_name=f"custom-deployment-{app_name}",
+        )
         if dockerconfig:
             values["dockerconfigjson"] = dockerconfig.filecontents
 

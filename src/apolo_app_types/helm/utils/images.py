@@ -7,7 +7,10 @@ import apolo_sdk
 from yarl import URL
 
 from apolo_app_types.helm.utils.credentials import get_service_account
-from apolo_app_types.protocols.common.containers import DockerConfigModel
+from apolo_app_types.protocols.common.containers import (
+    ContainerImage,
+    DockerConfigModel,
+)
 from apolo_app_types.protocols.common.secrets_ import ApoloSecret
 from apolo_app_types.protocols.github import GithubImageRegistryAuth
 
@@ -118,6 +121,25 @@ async def create_github_registry_dockerconfig(
         username=auth.username,
         password=token,
     )
+
+
+async def resolve_image_dockerconfig(
+    client: apolo_sdk.Client,
+    image: ContainerImage,
+    sa_name: str,
+) -> DockerConfigModel | None:
+    # Precedence: Apolo registry SA > imagepullsecret > legacy field
+    if image.repository.startswith("image:"):
+        return await create_apolo_registry_sa_dockerconfig(
+            client=client, sa_name=sa_name
+        )
+    if isinstance(image.imagepullsecret, DockerConfigModel):
+        return image.imagepullsecret
+    if isinstance(image.imagepullsecret, GithubImageRegistryAuth):
+        return await create_github_registry_dockerconfig(
+            client=client, auth=image.imagepullsecret
+        )
+    return image.dockerconfigjson
 
 
 async def get_image_docker_url(
