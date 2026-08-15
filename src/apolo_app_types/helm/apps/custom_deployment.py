@@ -8,12 +8,11 @@ from apolo_app_types.helm.apps.common import (
     gen_extra_values,
 )
 from apolo_app_types.helm.utils.images import (
-    create_apolo_registry_sa_dockerconfig,
     get_image_docker_url,
+    resolve_image_dockerconfig,
 )
 from apolo_app_types.helm.utils.pods import get_custom_deployment_health_check_values
 from apolo_app_types.protocols.custom_deployment import CustomDeploymentInputs
-from apolo_app_types.protocols.dockerhub import DockerConfigModel
 
 
 class CustomDeploymentChartValueProcessor(
@@ -153,14 +152,11 @@ class CustomDeploymentChartValueProcessor(
         if storage_labels:
             values["podLabels"] = storage_labels
 
-        dockerconfig: DockerConfigModel | None = input_.image.dockerconfigjson
-
-        if input_.image.repository.startswith("image:"):
-            sa_name = f"custom-deployment-{app_name}"
-            dockerconfig = await create_apolo_registry_sa_dockerconfig(
-                client=self.client, sa_name=sa_name
-            )
-
+        dockerconfig = await resolve_image_dockerconfig(
+            client=self.client,
+            image=input_.image,
+            sa_name=f"custom-deployment-{app_name}",
+        )
         if dockerconfig:
             values["dockerconfigjson"] = dockerconfig.filecontents
 

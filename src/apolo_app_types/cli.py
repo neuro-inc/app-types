@@ -2,7 +2,9 @@ import asyncio
 import json
 import logging
 import os
+import re
 import sys
+import typing as t
 from pathlib import Path
 
 import apolo_sdk
@@ -30,6 +32,31 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+_SENSITIVE_RE = re.compile(
+    r"token|password|secret|api[_-]?key|credential|authorization", re.IGNORECASE
+)
+_REDACTED = "***REDACTED***"
+
+
+def _redact(obj: t.Any) -> t.Any:
+    """Recursively mask sensitive values so tokens/passwords never reach logs."""
+    if isinstance(obj, dict):
+        # env-var entries: {"name": "APOLO_API_TOKEN", "value": "<token>"}
+        name = obj.get("name")
+        if isinstance(name, str) and "value" in obj and _SENSITIVE_RE.search(name):
+            return {**obj, "value": _REDACTED}
+        return {
+            k: (
+                _REDACTED
+                if isinstance(k, str) and _SENSITIVE_RE.search(k)
+                else _redact(v)
+            )
+            for k, v in obj.items()
+        }
+    if isinstance(obj, list):
+        return [_redact(item) for item in obj]
+    return obj
+
 
 @click.group()
 def cli() -> None:
@@ -56,12 +83,11 @@ def update_outputs(
     package_name: str | None,
 ) -> None:
     try:
-        logger.info("Helm input: %s", helm_outputs_json)
         if helm_outputs_json.startswith("'") and helm_outputs_json.endswith("'"):
             logger.info("Single quotes detected, removing them")
             helm_outputs_json = helm_outputs_json[1:-1]
         helm_outputs_dict = json.loads(helm_outputs_json)
-        logger.info("Helm outputs: %s", helm_outputs_dict)
+        logger.info("Helm input: %s", _redact(helm_outputs_dict))
         asyncio.run(
             update_app_outputs(
                 helm_outputs_dict,
@@ -134,7 +160,7 @@ def run_preprocessor(
                 raise ValueError(err_msg)
 
             loaded_inputs = inputs_class.model_validate(inputs_dict)
-            logger.info("Loaded inputs: %s", loaded_inputs)
+            logger.info("Loaded inputs: %s", _redact(loaded_inputs.model_dump()))
 
             preprocessor_class = load_app_preprocessor(
                 app_type, package_name, preprocessor_type

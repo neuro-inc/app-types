@@ -1,7 +1,8 @@
+import re
 import typing
 from enum import StrEnum
 
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, model_validator
 
 from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.containers import ContainerImage
@@ -143,6 +144,11 @@ class IngressPathTypeEnum(StrEnum):
     IMPLEMENTATION_SPECIFIC = "ImplementationSpecific"
 
 
+# Literal URL path: starts with '/', allows unreserved chars and percent-encoding.
+# Applied to 'Prefix'/'Exact' path types (not 'ImplementationSpecific').
+_LITERAL_PATH_PATTERN = r"/(?:[a-zA-Z0-9\-._~/]|%[0-9A-Fa-f]{2})*"
+
+
 class Port(AbstractAppFieldType):
     name: str = Field(
         default="http",
@@ -178,8 +184,35 @@ class Port(AbstractAppFieldType):
 
     path: str = Field(
         default="/",
+        min_length=1,
+        pattern=r"^\S+$",  # universal guard: non-empty, no whitespace/control chars
         json_schema_extra=SchemaExtraMetadata(
             title="Path",
-            description="Set the URL path for routing traffic to this port.",
+            description="Set the URL path for routing traffic to this port. "
+            "For 'Prefix' and 'Exact' path types this must be a literal URL path: "
+            "it has to start with '/' and may only contain letters, digits, "
+            "the characters '-', '.', '_', '~', '/', or percent-encoded octets "
+            "(e.g. '%20'). For 'ImplementationSpecific' the path is interpreted by "
+            "the ingress controller (e.g. a Go/RE2 regular expression in Traefik) "
+            "and only needs to be a valid regular expression.",
         ).as_json_schema_extra(),
     )
+
+    @model_validator(mode="after")
+    def _validate_path(self) -> "Port":
+        if self.path_type is IngressPathTypeEnum.IMPLEMENTATION_SPECIFIC:
+            # The path is controller-specific and typically a regular expression
+            # (Traefik uses Go/RE2). Best-effort check that it compiles.
+            try:
+                re.compile(self.path)
+            except re.error as exc:
+                msg = f"Invalid regular expression for path {self.path!r}: {exc}"
+                raise ValueError(msg) from exc
+        elif not re.fullmatch(_LITERAL_PATH_PATTERN, self.path):
+            msg = (
+                f"Invalid path {self.path!r}: must start with '/' and may only "
+                "contain letters, digits, '-', '.', '_', '~', '/', or "
+                "percent-encoded octets (e.g. '%20')."
+            )
+            raise ValueError(msg)
+        return self
