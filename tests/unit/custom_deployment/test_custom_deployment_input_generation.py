@@ -613,17 +613,17 @@ async def test_custom_deployment_values_configmap_checks(
     assert "configMap" in helm_params
     assert helm_params["configMap"] == {
         "enabled": True,
-        "name": "app-configmap",
+        "name": "custom-app-configmap",
         "data": {"config_key": "config_value", "config_key_2": "config_value_2"},
     }
     assert {
-        "name": "app-configmap",
+        "name": "custom-app-configmap",
         "configMap": {
-            "name": "app-configmap",
+            "name": "custom-app-configmap",
         },
     } in helm_params["volumes"]
     assert {
-        "name": "app-configmap",
+        "name": "custom-app-configmap",
         "mountPath": "/config",
     } in helm_params["volumeMounts"]
 
