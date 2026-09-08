@@ -116,7 +116,7 @@ jobs:
       - name: Checkout commit
         uses: actions/checkout@v7
       - name: Install python
-        uses: neuro-inc/reuse/.github/actions/setup-python-poetry@v26.6.1
+        uses: neuro-inc/reuse/.github/actions/setup-python-poetry@v26.8.0
       - name: Install dependencies
         run: |
           make setup
