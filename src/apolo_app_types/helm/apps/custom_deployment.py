@@ -163,8 +163,10 @@ class CustomDeploymentChartValueProcessor(
         health_checks = get_custom_deployment_health_check_values(input_.health_checks)
         values |= health_checks
 
-        configmap_name = "app-configmap"
         if input_.config_map:
+            configmap_suffix = "-configmap"
+            name_prefix = app_name[: 63 - len(configmap_suffix)].rstrip("-")
+            configmap_name = f"{name_prefix}{configmap_suffix}"
             values["configMap"] = {
                 "enabled": True,
                 "name": configmap_name,
