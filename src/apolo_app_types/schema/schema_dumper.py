@@ -48,6 +48,7 @@ def dump_schema_type(
         logger.error(msg)
         raise ValueError(msg)
 
+    assert issubclass(cls, AppInputs | AppOutputs)
     schema = cls.model_json_schema()
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(schema, indent=2) + "\n")
