@@ -35,6 +35,14 @@ from apolo_app_types.protocols.custom_deployment import (
 )
 
 
+def test_custom_deployment_routing_input_contract() -> None:
+    schema = CustomDeploymentInputs.model_json_schema()
+    assert schema["x-routing-inputs"] == ["networking"]
+    assert schema["x-title"] == "Custom Deployment"
+    assert schema["x-description"] == "Configuration for Custom Deployment."
+    assert set(schema["x-routing-inputs"]) <= schema["properties"].keys()
+
+
 @pytest.mark.asyncio
 async def test_custom_deployment_values_generation(setup_clients):
     helm_args, helm_params = await app_type_to_vals(

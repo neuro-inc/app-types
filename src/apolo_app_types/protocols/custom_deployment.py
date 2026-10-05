@@ -108,10 +108,13 @@ class ConfigMap(AbstractAppFieldType):
 class CustomDeploymentInputs(AppInputs):
     model_config = ConfigDict(
         protected_namespaces=(),
-        json_schema_extra=SchemaExtraMetadata(
-            title="Custom Deployment",
-            description="Configuration for Custom Deployment.",
-        ).as_json_schema_extra(),
+        json_schema_extra={
+            **SchemaExtraMetadata(
+                title="Custom Deployment",
+                description="Configuration for Custom Deployment.",
+            ).as_json_schema_extra(),
+            "x-routing-inputs": ["networking"],
+        },
     )
     preset: Preset
     image: ContainerImage
