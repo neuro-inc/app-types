@@ -29,6 +29,7 @@ class AppType(enum.StrEnum):
     Launchpad = "launchpad"
     N8n = "n8n"
     Valkey = "valkey"
+    Bifrost = "bifrost"
 
     # bundles
     Llama4 = "llama4"
