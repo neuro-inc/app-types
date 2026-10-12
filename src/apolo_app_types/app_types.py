@@ -30,6 +30,7 @@ class AppType(enum.StrEnum):
     N8n = "n8n"
     Valkey = "valkey"
     Bifrost = "bifrost"
+    PgAdmin = "pgadmin"
 
     # bundles
     Llama4 = "llama4"
