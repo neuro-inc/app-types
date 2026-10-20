@@ -1,7 +1,9 @@
+from enum import StrEnum
 from typing import Literal
 
 from pydantic import ConfigDict, Field
 
+from apolo_app_types.protocols.common.abc_ import AbstractAppFieldType
 from apolo_app_types.protocols.common.hugging_face import (
     HF_SCHEMA_EXTRA,
     HuggingFaceModel,
@@ -53,5 +55,70 @@ class OpenAICompatEmbeddingsAPI(RestAPI):
     )
 
 
-def get_api_base_url(api: OpenAICompatChatAPI | OpenAICompatEmbeddingsAPI) -> str:
+class OpenAICompatCapability(StrEnum):
+    CHAT = "chat"
+    COMPLETIONS = "completions"
+    RESPONSES = "responses"
+    EMBEDDINGS = "embeddings"
+
+
+class OpenAICompatModel(AbstractAppFieldType):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="OpenAI Compatible Model",
+            description="A model served by an OpenAI compatible API.",
+        ).as_json_schema_extra(),
+    )
+    name: str = Field(
+        ...,
+        min_length=1,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Model Name",
+            description="Name to request the model by.",
+        ).as_json_schema_extra(),
+    )
+    capabilities: list[str] = Field(
+        ...,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Capabilities",
+            description="Endpoints that serve the model, such as chat, "
+            "completions, responses or embeddings. Other values can appear.",
+        ).as_json_schema_extra(),
+    )
+
+
+class OpenAICompatAPI(RestAPI):
+    model_config = ConfigDict(
+        protected_namespaces=(),
+        json_schema_extra=SchemaExtraMetadata(
+            title="OpenAI Compatible API",
+            description="OpenAI compatible API that serves several models.",
+            meta_type=SchemaMetaType.INTEGRATION,
+        ).as_json_schema_extra(),
+    )
+    api_base_path: str = "/v1"
+    models: list[OpenAICompatModel] = Field(
+        default_factory=list,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Models",
+            description="Models the API serves, with the endpoints of each.",
+        ).as_json_schema_extra(),
+    )
+    model_prefixes: list[str] = Field(
+        default_factory=list,
+        json_schema_extra=SchemaExtraMetadata(
+            title="Model Prefixes",
+            description="Prefixes such as openai/: any model name that starts "
+            "with one is served too.",
+        ).as_json_schema_extra(),
+    )
+
+    def get_model_names(self, capability: str) -> list[str]:
+        return [model.name for model in self.models if capability in model.capabilities]
+
+
+def get_api_base_url(
+    api: OpenAICompatChatAPI | OpenAICompatEmbeddingsAPI | OpenAICompatAPI,
+) -> str:
     return f"{api.protocol}://{api.host}:{api.port}{api.api_base_path}"
