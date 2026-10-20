@@ -60,6 +60,10 @@ class OpenAICompatCapability(StrEnum):
     COMPLETIONS = "completions"
     RESPONSES = "responses"
     EMBEDDINGS = "embeddings"
+    RERANK = "rerank"
+    SPEECH = "speech"
+    TRANSCRIPTION = "transcription"
+    IMAGE_GENERATION = "image_generation"
 
 
 class OpenAICompatModel(AbstractAppFieldType):
@@ -83,7 +87,7 @@ class OpenAICompatModel(AbstractAppFieldType):
         json_schema_extra=SchemaExtraMetadata(
             title="Capabilities",
             description="Endpoints that serve the model, such as chat, "
-            "completions, responses or embeddings. Other values can appear.",
+            "embeddings, rerank or speech. Other values can appear.",
         ).as_json_schema_extra(),
     )
 
@@ -103,14 +107,6 @@ class OpenAICompatAPI(RestAPI):
         json_schema_extra=SchemaExtraMetadata(
             title="Models",
             description="Models the API serves, with the endpoints of each.",
-        ).as_json_schema_extra(),
-    )
-    model_prefixes: list[str] = Field(
-        default_factory=list,
-        json_schema_extra=SchemaExtraMetadata(
-            title="Model Prefixes",
-            description="Prefixes such as openai/: any model name that starts "
-            "with one is served too.",
         ).as_json_schema_extra(),
     )
 

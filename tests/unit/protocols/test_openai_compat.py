@@ -38,7 +38,6 @@ def gateway_api() -> OpenAICompatAPI:
                 capabilities=[OpenAICompatCapability.EMBEDDINGS],
             ),
         ],
-        model_prefixes=["openai/"],
     )
 
 
@@ -68,7 +67,6 @@ SERIALIZED_SERVICE = {
                 "__type__": "OpenAICompatModel",
             },
         ],
-        "model_prefixes": ["openai/"],
         "__type__": "OpenAICompatAPI",
     },
     "external_url": None,
@@ -116,7 +114,6 @@ def test_defaults() -> None:
     api = OpenAICompatAPI(host="gateway")
 
     assert api.models == []
-    assert api.model_prefixes == []
     assert get_api_base_url(api) == "http://gateway:80/v1"
 
 
