@@ -27,7 +27,13 @@ from .ingress import (
 from .k8s import Container, DeploymentName, Env, InitContainer
 from .middleware import AuthIngressMiddleware
 from .networking import GraphQLAPI, GrpcAPI, HttpApi, RestAPI, ServiceAPI
-from .openai_compat import OpenAICompatChatAPI, OpenAICompatEmbeddingsAPI
+from .openai_compat import (
+    OpenAICompatAPI,
+    OpenAICompatCapability,
+    OpenAICompatChatAPI,
+    OpenAICompatEmbeddingsAPI,
+    OpenAICompatModel,
+)
 from .postgres import Postgres
 from .preset import Preset
 from .redis import Redis, RedisMaster
@@ -99,6 +105,9 @@ __all__ = [
     "OpenAICompatibleEmbeddingsRestAPI",
     "OpenAICompatChatAPI",
     "OpenAICompatEmbeddingsAPI",
+    "OpenAICompatAPI",
+    "OpenAICompatModel",
+    "OpenAICompatCapability",
     "AuthIngressMiddleware",
     "BasicNetworkingConfig",
 ]
