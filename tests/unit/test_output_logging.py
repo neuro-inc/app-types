@@ -1,6 +1,5 @@
 import logging
 from typing import Any
-from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -8,11 +7,19 @@ from apolo_app_types import AppOutputs
 from apolo_app_types.outputs.base import BaseAppOutputsProcessor
 
 
-class OutputProcessor(BaseAppOutputsProcessor[AppOutputs]):
+class ProcessorOutputs(AppOutputs):
+    result: str
+
+
+class OutputProcessor(BaseAppOutputsProcessor[ProcessorOutputs]):
+    def __init__(self) -> None:
+        self.calls: list[tuple[dict[str, Any], str]] = []
+
     async def _generate_outputs(
         self, helm_values: dict[str, Any], app_instance_id: str
-    ) -> AppOutputs:
-        return AppOutputs()
+    ) -> ProcessorOutputs:
+        self.calls.append((helm_values, app_instance_id))
+        return ProcessorOutputs(result="generated-output")
 
 
 async def test_output_logging_excludes_helm_secrets(
@@ -21,15 +28,10 @@ async def test_output_logging_excludes_helm_secrets(
     secret = "synthetic-session-secret"
     values = {"frontend": {"sessionSecret": secret}, "password": "synthetic-password"}
     processor = OutputProcessor()
-    with (
-        caplog.at_level(logging.INFO),
-        patch.object(
-            processor, "_generate_outputs", new=AsyncMock(return_value=AppOutputs())
-        ) as generate,
-    ):
+    with caplog.at_level(logging.DEBUG, logger="apolo_app_types.outputs.base"):
         outputs = await processor.generate_outputs(values, "test-instance")
-    generate.assert_awaited_once_with(values, "test-instance")
-    assert outputs == AppOutputs().model_dump()
+    assert processor.calls == [(values, "test-instance")]
+    assert outputs == {"app_url": None, "result": "generated-output"}
     assert "test-instance" in caplog.text
     assert secret not in caplog.text
     assert "synthetic-password" not in caplog.text
