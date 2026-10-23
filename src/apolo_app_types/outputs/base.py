@@ -16,8 +16,7 @@ class BaseAppOutputsProcessor(abc.ABC, t.Generic[AppOutputsT]):
         helm_values: dict[str, t.Any],
         app_instance_id: str,
     ) -> dict[str, t.Any]:
-        msg = f"Generating outputs for {helm_values}"
-        logger.info(msg)
+        logger.info("Generating outputs for App instance %s", app_instance_id)
         return (await self._generate_outputs(helm_values, app_instance_id)).model_dump()
 
     @abc.abstractmethod
