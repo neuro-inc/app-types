@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.12
+ARG PYTHON_VERSION=3.12.16
 FROM python:${PYTHON_VERSION}-slim
 
 LABEL org.opencontainers.image.source="https://github.com/neuro-inc/app-types"
@@ -16,7 +16,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 COPY README.md poetry.lock pyproject.toml ./
-RUN pip --no-cache-dir install "poetry==${POETRY_VERSION}" && poetry install -E fixtures --no-root --no-cache
+RUN pip install -U pip && \
+    pip --no-cache-dir install "poetry==${POETRY_VERSION}" && poetry install -E fixtures --no-root --no-cache
 
 COPY src ./src
 COPY fixtures ./fixtures
