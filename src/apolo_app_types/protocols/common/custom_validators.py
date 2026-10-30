@@ -1,6 +1,8 @@
 from collections.abc import Awaitable, Callable, Mapping
 from numbers import Real
-from typing import Any, TypedDict
+from typing import Any
+
+from typing_extensions import TypedDict
 
 
 PRESET_VALIDATOR_NAME = "preset_validator"
