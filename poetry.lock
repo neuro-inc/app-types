@@ -3191,4 +3191,4 @@ fixtures = []
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<4.0"
-content-hash = "b044d457fecc789ae546af888bdcc27cffe60c9e6a7ea7635ac1301aad963369"
+content-hash = "ba1af12c58a011f10ca02b0ee100ab77011f0f147eefb02a3fb6a8de9b02a9e0"

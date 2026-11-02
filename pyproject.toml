@@ -48,6 +48,7 @@ fixtures = ["pytest", "pytest-asyncio"]
 [tool.poetry.dependencies]
 python = ">=3.11,<4.0"
 apolo-sdk = "^26.3.0"
+certifi = ">=2026.10.18"
 click = "^8.3.2"
 httpx = "^0.28.0"
 kubernetes = ">=35,<37" # 35.x only: >=35 for kubernetes-client/python#2458; <36 because v36 breaks in-cluster SA auth (requests sent as system:anonymous) — see IT-130
