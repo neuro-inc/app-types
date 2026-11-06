@@ -344,14 +344,14 @@ trio = ["trio (>=0.32.0)"]
 
 [[package]]
 name = "apolo-sdk"
-version = "26.10.0"
+version = "26.11.0"
 description = "Apolo SDK"
 optional = false
 python-versions = ">=3.10.0"
 groups = ["main"]
 files = [
-    {file = "apolo_sdk-26.10.0-py3-none-any.whl", hash = "sha256:040bdc9b1465e9f12cbebea5c56281a5c7d0f240f66f6f7a35b18b4d23aa6fc5"},
-    {file = "apolo_sdk-26.10.0.tar.gz", hash = "sha256:622de9d4dd0e005b8aa440123f8058f5d7ff1f44a0298e9046a765a592bd824d"},
+    {file = "apolo_sdk-26.11.0-py3-none-any.whl", hash = "sha256:ebe0267d710a93b39617243897a30cc1fd7596de55372b970cbb80c67df93689"},
+    {file = "apolo_sdk-26.11.0.tar.gz", hash = "sha256:6574cf6ed9c0fe92d32a9f12e92653fc66cb3e96f1610b0ea0a2c7650bfe9619"},
 ]
 
 [package.dependencies]
