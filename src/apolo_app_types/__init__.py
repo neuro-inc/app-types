@@ -152,6 +152,13 @@ from apolo_app_types.protocols.text_embeddings import (
     TextEmbeddingsInferenceAppInputs,
     TextEmbeddingsInferenceAppOutputs,
 )
+from apolo_app_types.protocols.triton import (
+    TritonModelRepository,
+    TritonModelRepositoryAppInputs,
+    TritonModelRepositoryAppOutputs,
+    TritonServerGRPCEndpoint,
+    TritonServerHttpEndpoint,
+)
 from apolo_app_types.protocols.vscode import (
     VSCodeAppInputs,
     VSCodeAppOutputs,
@@ -231,6 +238,11 @@ __all__ = [
     "GithubAppOutputs",
     "GithubAuth",
     "GithubImageRegistryAuth",
+    "TritonModelRepository",
+    "TritonModelRepositoryAppInputs",
+    "TritonModelRepositoryAppOutputs",
+    "TritonServerHttpEndpoint",
+    "TritonServerGRPCEndpoint",
     "HuggingFaceAppInputs",
     "HuggingFaceAppOutputs",
     "CustomDeploymentInputs",
