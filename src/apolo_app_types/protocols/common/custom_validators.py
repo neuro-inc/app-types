@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from collections.abc import Awaitable, Callable, Mapping
 from numbers import Real
 from typing import Any
@@ -7,6 +8,8 @@ from apolo_sdk import ResourceNotFound
 from typing_extensions import TypedDict
 from yarl import URL
 
+
+logger = logging.getLogger(__name__)
 
 PRESET_VALIDATOR_NAME = "preset_validator"
 STORAGE_PATH_VALIDATOR_NAME = "storage_path_validator"
@@ -237,9 +240,11 @@ async def validate_storage_path_custom_validator(
 
     if validator_config.get("same_project") is True:
         config = apolo_client.config
-        if uri.host != config.cluster_name or uri.parts[1:3] != (
-            config.org_name,
-            config.project_name,
+        parts = tuple(uri.path.split("/"))
+        if (
+            uri.host != config.cluster_name
+            or parts[1:3] != (config.org_name, config.project_name)
+            or ".." in parts
         ):
             return [
                 _build_custom_validation_error(
@@ -269,6 +274,7 @@ async def validate_storage_path_custom_validator(
             )
         ]
     except Exception:
+        logger.warning("Failed to stat storage path %s", uri, exc_info=True)
         return [
             _build_custom_validation_error(
                 f"Storage path '{storage_path}' could not be checked, "

@@ -1,5 +1,8 @@
 import asyncio
-from types import SimpleNamespace
+import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+from types import MethodType, SimpleNamespace
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
@@ -12,6 +15,7 @@ from apolo_sdk import (
     FileStatusType,
     ResourceNotFound,
     ServerNotAvailable,
+    Storage,
 )
 from apolo_sdk._url_utils import uri_from_cli
 from yarl import URL
@@ -236,6 +240,9 @@ def test_validate_storage_path_accepts_directory_in_project(
         "storage://cluster/other-org/test-project/models",
         "storage://other-cluster/test-org/test-project/models",
         "storage://cluster/test-org",
+        "storage://cluster/test-org/test-project/../other-project/models",
+        "storage://cluster/test-org/test-project/..%2fother-project/models",
+        "storage://cluster/test-org/test-project/a%2f..%2f..%2f..%2fother-org%2fother-project/models",
     ],
 )
 def test_validate_storage_path_rejects_path_outside_project(storage_path: str) -> None:
@@ -273,6 +280,32 @@ def test_validate_storage_path_reports_non_directory(
     assert errors[0].message == "Storage path 'storage:models' is not a directory."
 
 
+def test_validate_storage_path_checks_directory_without_exists() -> None:
+    client = _make_storage_client(stat_result=_file_status(FileStatusType.FILE))
+
+    errors = _validate_storage_path(
+        {"files_path": {"path": "storage:models"}}, client, {"is_dir": True}
+    )
+
+    assert len(errors) == 1
+    assert errors[0].message == "Storage path 'storage:models' is not a directory."
+
+
+def test_validate_storage_path_allows_other_project_without_same_project() -> None:
+    client = _make_storage_client()
+
+    errors = _validate_storage_path(
+        {"files_path": {"path": "storage:/other-project/models"}},
+        client,
+        {"exists": True, "is_dir": True},
+    )
+
+    assert errors == []
+    client.storage.stat.assert_awaited_once_with(
+        URL("storage://cluster/test-org/other-project/models")
+    )
+
+
 def test_validate_storage_path_allows_file_when_only_existence_required() -> None:
     client = _make_storage_client(stat_result=_file_status(FileStatusType.FILE))
 
@@ -295,11 +328,17 @@ def test_validate_storage_path_allows_file_when_only_existence_required() -> Non
     ],
 )
 def test_validate_storage_path_reports_unchecked_path_on_stat_failure(
-    stat_error: Exception,
+    stat_error: Exception, caplog: pytest.LogCaptureFixture
 ) -> None:
     client = _make_storage_client(stat_error=stat_error)
 
-    errors = _validate_storage_path({"files_path": {"path": "storage:models"}}, client)
+    with caplog.at_level(logging.WARNING):
+        errors = _validate_storage_path(
+            {"files_path": {"path": "storage:models"}}, client
+        )
+
+    assert caplog.records[-1].exc_info is not None
+    assert caplog.records[-1].exc_info[1] is stat_error
 
     assert len(errors) == 1
     assert errors[0].message == (
@@ -369,3 +408,97 @@ def test_validate_storage_path_ignores_values_without_path(value: Any) -> None:
 
     assert _validate_storage_path(value, client) == []
     client.storage.stat.assert_not_awaited()
+
+
+class _StorageTransport:
+    def __init__(self, directories: set[str]) -> None:
+        self.directories = directories
+        self.urls: list[URL] = []
+
+    @asynccontextmanager
+    async def request(
+        self, method: str, url: URL, *, auth: str
+    ) -> AsyncIterator[SimpleNamespace]:
+        self.urls.append(url)
+        storage_path = url.path.removeprefix("/storage")
+        if storage_path not in self.directories:
+            msg = "404: Not Found"
+            raise ResourceNotFound(msg)
+        yield SimpleNamespace(
+            headers={},
+            json=AsyncMock(
+                return_value={
+                    "FileStatus": {
+                        "path": storage_path,
+                        "type": "DIRECTORY",
+                        "length": 0,
+                        "modificationTime": 0,
+                        "permission": "read",
+                    }
+                }
+            ),
+        )
+
+
+def _make_sdk_storage_client(transport: _StorageTransport) -> MagicMock:
+    client = _make_storage_client()
+    config = MagicMock()
+    config.project_name_or_raise = "test-project"
+    config.cluster_name = "cluster"
+    config.org_name = "test-org"
+    config.get_cluster.return_value = SimpleNamespace(
+        storage_url=URL("https://storage.test/storage")
+    )
+    config._api_auth = AsyncMock(return_value="Bearer token")
+    storage = SimpleNamespace(_config=config, _core=transport)
+    storage._set_time_diff = lambda *args: None
+    storage._normalize_uri = MethodType(Storage._normalize_uri, storage)
+    storage._get_storage_url = MethodType(Storage._get_storage_url, storage)
+    storage.stat = MethodType(Storage.stat, storage)
+    client.storage = storage
+    return client
+
+
+@pytest.mark.parametrize(
+    ("storage_path", "expected_url", "expected_errors"),
+    [
+        (
+            "storage:models",
+            "https://storage.test/storage/test-org/test-project/models?op=GETFILESTATUS",
+            [],
+        ),
+        (
+            "storage:missing",
+            "https://storage.test/storage/test-org/test-project/missing?op=GETFILESTATUS",
+            ["Storage path 'storage:missing' does not exist or is not accessible."],
+        ),
+        (
+            "storage://cluster/test-org/test-project/..%2fother-project/models",
+            None,
+            ["must be in project"],
+        ),
+        (
+            "storage://cluster/test-org/test-project/a%2f..%2f..%2f..%2fother-org%2fother-project/models",
+            None,
+            ["must be in project"],
+        ),
+    ],
+)
+def test_validate_storage_path_with_sdk_storage_requests(
+    storage_path: str, expected_url: str | None, expected_errors: list[str]
+) -> None:
+    transport = _StorageTransport(
+        {
+            "/test-org/test-project/models",
+            "/test-org/other-project/models",
+            "/other-org/other-project/models",
+        }
+    )
+    client = _make_sdk_storage_client(transport)
+
+    errors = _validate_storage_path({"files_path": {"path": storage_path}}, client)
+
+    assert len(errors) == len(expected_errors)
+    for error, expected in zip(errors, expected_errors, strict=True):
+        assert expected in error.message
+    assert transport.urls == ([URL(expected_url)] if expected_url else [])
