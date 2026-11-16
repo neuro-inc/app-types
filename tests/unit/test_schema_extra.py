@@ -1,4 +1,7 @@
-from apolo_app_types.protocols.common.custom_validators import preset_validator
+from apolo_app_types.protocols.common.custom_validators import (
+    preset_validator,
+    storage_path_validator,
+)
 from apolo_app_types.protocols.common.schema_extra import SchemaExtraMetadata
 
 
@@ -39,3 +42,17 @@ def test_preset_validator_builder_serializes_expected_shape() -> None:
 
 def test_preset_validator_builder_defaults_to_empty_config() -> None:
     assert preset_validator() == {"preset_validator": {}}
+
+
+def test_storage_path_validator_builder_serializes_expected_shape() -> None:
+    assert storage_path_validator(exists=True, is_dir=True, same_project=True) == {
+        "storage_path_validator": {
+            "exists": True,
+            "is_dir": True,
+            "same_project": True,
+        }
+    }
+
+
+def test_storage_path_validator_builder_defaults_to_empty_config() -> None:
+    assert storage_path_validator() == {"storage_path_validator": {}}

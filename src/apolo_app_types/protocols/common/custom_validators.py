@@ -1,11 +1,16 @@
+import asyncio
 from collections.abc import Awaitable, Callable, Mapping
 from numbers import Real
 from typing import Any
 
+from apolo_sdk import ClientError, ResourceNotFound
 from typing_extensions import TypedDict
+from yarl import URL
 
 
 PRESET_VALIDATOR_NAME = "preset_validator"
+STORAGE_PATH_VALIDATOR_NAME = "storage_path_validator"
+STORAGE_PATH_STAT_TIMEOUT_S = 30
 
 
 class PresetValidatorConfig(TypedDict, total=False):
@@ -15,8 +20,15 @@ class PresetValidatorConfig(TypedDict, total=False):
     min_vram_gib: int
 
 
+class StoragePathValidatorConfig(TypedDict, total=False):
+    exists: bool
+    is_dir: bool
+    same_project: bool
+
+
 class CustomValidatorSpec(TypedDict, total=False):
     preset_validator: PresetValidatorConfig
+    storage_path_validator: StoragePathValidatorConfig
 
 
 class CustomValidationError(Exception):
@@ -44,6 +56,22 @@ def preset_validator(
     if min_vram_gib is not None:
         config["min_vram_gib"] = min_vram_gib
     return {"preset_validator": config}
+
+
+def storage_path_validator(
+    *,
+    exists: bool | None = None,
+    is_dir: bool | None = None,
+    same_project: bool | None = None,
+) -> CustomValidatorSpec:
+    config: StoragePathValidatorConfig = {}
+    if exists is not None:
+        config["exists"] = exists
+    if is_dir is not None:
+        config["is_dir"] = is_dir
+    if same_project is not None:
+        config["same_project"] = same_project
+    return {"storage_path_validator": config}
 
 
 def _get_preset_name(value: Any) -> str | None:
@@ -170,6 +198,96 @@ async def validate_preset_custom_validator(
     return errors
 
 
+def _get_storage_path(value: Any) -> str | None:
+    if not isinstance(value, Mapping):
+        return None
+    files_path = value.get("files_path")
+    if not isinstance(files_path, Mapping):
+        return None
+    path = files_path.get("path")
+    if isinstance(path, str):
+        return path
+    return None
+
+
+async def validate_storage_path_custom_validator(
+    value: Any,
+    validator_config: Mapping[str, Any],
+    *,
+    cluster_name: str,
+    path: list[str | int],
+    apolo_client: Any,
+) -> list[CustomValidationError]:
+    storage_path = _get_storage_path(value)
+    if storage_path is None:
+        return []
+
+    try:
+        uri: URL = apolo_client.parse.str_to_uri(
+            storage_path, allowed_schemes=("storage",)
+        )
+    except ValueError as e:
+        return [
+            _build_custom_validation_error(
+                f"Storage path '{storage_path}' is invalid: {e}",
+                path,
+                STORAGE_PATH_VALIDATOR_NAME,
+            )
+        ]
+
+    if validator_config.get("same_project") is True:
+        config = apolo_client.config
+        if uri.host != config.cluster_name or uri.parts[1:3] != (
+            config.org_name,
+            config.project_name,
+        ):
+            return [
+                _build_custom_validation_error(
+                    (
+                        f"Storage path '{storage_path}' must be in project "
+                        f"'{config.project_name}' of organization "
+                        f"'{config.org_name}' on cluster '{config.cluster_name}'."
+                    ),
+                    path,
+                    STORAGE_PATH_VALIDATOR_NAME,
+                )
+            ]
+
+    is_dir = validator_config.get("is_dir") is True
+    if validator_config.get("exists") is not True and not is_dir:
+        return []
+
+    try:
+        async with asyncio.timeout(STORAGE_PATH_STAT_TIMEOUT_S):
+            status = await apolo_client.storage.stat(uri)
+    except ResourceNotFound:
+        return [
+            _build_custom_validation_error(
+                f"Storage path '{storage_path}' does not exist or is not accessible.",
+                path,
+                STORAGE_PATH_VALIDATOR_NAME,
+            )
+        ]
+    except (ClientError, OSError, RuntimeError, TimeoutError, ValueError):
+        return [
+            _build_custom_validation_error(
+                f"Storage path '{storage_path}' could not be checked, "
+                "please try again later.",
+                path,
+                STORAGE_PATH_VALIDATOR_NAME,
+            )
+        ]
+    if is_dir and not status.is_dir():
+        return [
+            _build_custom_validation_error(
+                f"Storage path '{storage_path}' is not a directory.",
+                path,
+                STORAGE_PATH_VALIDATOR_NAME,
+            )
+        ]
+    return []
+
+
 CustomSchemaValidator = Callable[
     ...,
     Awaitable[list[CustomValidationError]],
@@ -178,4 +296,5 @@ CustomSchemaValidator = Callable[
 
 CUSTOM_VALIDATORS: dict[str, CustomSchemaValidator] = {
     PRESET_VALIDATOR_NAME: validate_preset_custom_validator,
+    STORAGE_PATH_VALIDATOR_NAME: validate_storage_path_custom_validator,
 }
