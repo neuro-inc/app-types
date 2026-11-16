@@ -388,11 +388,21 @@ def test_validate_storage_path_reports_invalid_path(storage_path: str) -> None:
     client.storage.stat.assert_not_awaited()
 
 
-def test_validate_storage_path_skips_stat_without_existence_checks() -> None:
-    client = _make_storage_client()
+@pytest.mark.parametrize(
+    "validator_config",
+    [
+        {"same_project": True},
+        {"exists": False, "same_project": True},
+        {"exists": False, "is_dir": False},
+    ],
+)
+def test_validate_storage_path_skips_stat_without_existence_checks(
+    validator_config: dict[str, bool],
+) -> None:
+    client = _make_storage_client(stat_error=ResourceNotFound("404: Not Found"))
 
     errors = _validate_storage_path(
-        {"files_path": {"path": "storage:models"}}, client, {"same_project": True}
+        {"files_path": {"path": "storage:models"}}, client, validator_config
     )
 
     assert errors == []

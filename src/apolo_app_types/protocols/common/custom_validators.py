@@ -67,6 +67,9 @@ def storage_path_validator(
     is_dir: bool | None = None,
     same_project: bool | None = None,
 ) -> CustomValidatorSpec:
+    if exists is False and is_dir is True:
+        msg = "storage_path_validator cannot require a directory when exists=False."
+        raise ValueError(msg)
     config: StoragePathValidatorConfig = {}
     if exists is not None:
         config["exists"] = exists
