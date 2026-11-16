@@ -12,10 +12,13 @@ from .containers import ContainerImage
 from .custom_validators import (
     CUSTOM_VALIDATORS,
     PRESET_VALIDATOR_NAME,
+    STORAGE_PATH_VALIDATOR_NAME,
     CustomSchemaValidator,
     CustomValidatorSpec,
     PresetValidatorConfig,
+    StoragePathValidatorConfig,
     preset_validator,
+    storage_path_validator,
 )
 from .hugging_face import HuggingFaceCache, HuggingFaceModel, HuggingFaceToken
 from .ingress import (
@@ -90,10 +93,13 @@ __all__ = [
     "X_CUSTOM_VALIDATORS_FIELD_NAME",
     "CUSTOM_VALIDATORS",
     "PRESET_VALIDATOR_NAME",
+    "STORAGE_PATH_VALIDATOR_NAME",
     "CustomSchemaValidator",
     "PresetValidatorConfig",
+    "StoragePathValidatorConfig",
     "CustomValidatorSpec",
     "preset_validator",
+    "storage_path_validator",
     "AbstractAppFieldType",
     "ContainerImage",
     "AutoscalingHPA",

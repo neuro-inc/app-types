@@ -31,6 +31,8 @@ class AppType(enum.StrEnum):
     Valkey = "valkey"
     Bifrost = "bifrost"
     PgAdmin = "pgadmin"
+    Triton = "triton"
+    TritonModelRepository = "triton-model-repository"
 
     # bundles
     Llama4 = "llama4"
@@ -46,4 +48,5 @@ class AppType(enum.StrEnum):
         return self in {
             AppType.HuggingFaceCache,
             AppType.Github,
+            AppType.TritonModelRepository,
         }

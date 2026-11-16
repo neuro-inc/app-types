@@ -77,11 +77,11 @@ async def _generate_ingress_config(
     app_id: str,
     app_type: AppType,
     port_configurations: list[Port] | None = None,
-    namespace_suffix: str = "",
+    app_type_suffix: str = "",
 ) -> dict[str, t.Any]:
     ingress_hostname = await _get_ingress_name_template(apolo_client)
     hostname = ingress_hostname.format(
-        **{APP_NAME_PLACEHOLDER: f"{app_type.value}--{app_id}{namespace_suffix}"}
+        **{APP_NAME_PLACEHOLDER: f"{app_type.value}{app_type_suffix}--{app_id}"}
     )
 
     if any(
@@ -168,7 +168,7 @@ async def get_grpc_ingress_values(
         app_id,
         app_type,
         port_configurations,
-        namespace_suffix="-grpc",
+        app_type_suffix="-grpc",
     )
     grpc_vals: dict[str, t.Any] = {
         "enabled": True,
