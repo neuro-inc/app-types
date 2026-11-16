@@ -3,7 +3,7 @@ from collections.abc import Awaitable, Callable, Mapping
 from numbers import Real
 from typing import Any
 
-from apolo_sdk import ClientError, ResourceNotFound
+from apolo_sdk import ResourceNotFound
 from typing_extensions import TypedDict
 from yarl import URL
 
@@ -268,7 +268,7 @@ async def validate_storage_path_custom_validator(
                 STORAGE_PATH_VALIDATOR_NAME,
             )
         ]
-    except (ClientError, OSError, RuntimeError, TimeoutError, ValueError):
+    except Exception:
         return [
             _build_custom_validation_error(
                 f"Storage path '{storage_path}' could not be checked, "

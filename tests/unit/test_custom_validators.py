@@ -3,6 +3,7 @@ from types import SimpleNamespace
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
+import aiohttp
 import pytest
 from apolo_sdk import (
     Action,
@@ -15,6 +16,7 @@ from apolo_sdk import (
 from apolo_sdk._url_utils import uri_from_cli
 from yarl import URL
 
+from apolo_app_types.protocols.common import custom_validators
 from apolo_app_types.protocols.common.custom_validators import (
     CUSTOM_VALIDATORS,
     PRESET_VALIDATOR_NAME,
@@ -288,6 +290,8 @@ def test_validate_storage_path_allows_file_when_only_existence_required() -> Non
         ServerNotAvailable("503: Service Unavailable"),
         OSError(5, "Input/output error"),
         TimeoutError(),
+        aiohttp.ServerDisconnectedError(),
+        KeyError("FileStatus"),
     ],
 )
 def test_validate_storage_path_reports_unchecked_path_on_stat_failure(
@@ -296,6 +300,37 @@ def test_validate_storage_path_reports_unchecked_path_on_stat_failure(
     client = _make_storage_client(stat_error=stat_error)
 
     errors = _validate_storage_path({"files_path": {"path": "storage:models"}}, client)
+
+    assert len(errors) == 1
+    assert errors[0].message == (
+        "Storage path 'storage:models' could not be checked, please try again later."
+    )
+
+
+def test_validate_storage_path_stops_waiting_for_stat(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(custom_validators, "STORAGE_PATH_STAT_TIMEOUT_S", 0.1)
+
+    async def stat_forever(uri: URL) -> FileStatus:
+        await asyncio.Event().wait()
+        return _file_status(FileStatusType.DIRECTORY)
+
+    client = _make_storage_client()
+    client.storage.stat = stat_forever
+
+    errors = asyncio.run(
+        asyncio.wait_for(
+            validate_storage_path_custom_validator(
+                {"files_path": {"path": "storage:models"}},
+                STORAGE_VALIDATOR_CONFIG,
+                cluster_name="cluster",
+                path=["model_repository"],
+                apolo_client=client,
+            ),
+            timeout=5,
+        )
+    )
 
     assert len(errors) == 1
     assert errors[0].message == (
