@@ -1,9 +1,11 @@
 import asyncio
 import logging
+import re
 import unicodedata
 from collections.abc import Awaitable, Callable, Mapping
 from numbers import Real
 from typing import Any
+from urllib.parse import unquote
 
 from apolo_sdk import ResourceNotFound
 from typing_extensions import TypedDict
@@ -16,6 +18,8 @@ PRESET_VALIDATOR_NAME = "preset_validator"
 STORAGE_PATH_VALIDATOR_NAME = "storage_path_validator"
 STORAGE_PATH_STAT_TIMEOUT_S = 30
 STORAGE_PATH_PREFIX = "storage:"
+ENCODED_SEPARATOR_RE = re.compile(r"%2[EeFf]")
+CLUSTER_LABEL_RE = re.compile(r"[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?")
 
 
 class PresetValidatorConfig(TypedDict, total=False):
@@ -229,17 +233,57 @@ def _has_control_characters(value: str) -> bool:
     return any(unicodedata.category(char) == "Cc" for char in value)
 
 
-def _is_plain_storage_path(storage_path: str, uri: URL) -> bool:
-    if not storage_path.startswith(STORAGE_PATH_PREFIX):
-        return False
-    rest = storage_path.removeprefix(STORAGE_PATH_PREFIX)
-    path = rest[2:].partition("/")[2] if rest.startswith("//") else rest
-    return not (
-        _has_control_characters(rest)
-        or _has_control_characters(uri.path)
-        or ":" in path
-        or ":" in uri.path
+def _is_cluster_name(name: str) -> bool:
+    return all(
+        CLUSTER_LABEL_RE.fullmatch(label) and label[2:4] != "--"
+        for label in name.split(".")
     )
+
+
+def _get_plain_storage_path_error(storage_path: str) -> str | None:
+    if not storage_path.startswith(STORAGE_PATH_PREFIX):
+        return (
+            f"Storage path {storage_path!r} must start with "
+            f"'{STORAGE_PATH_PREFIX}' in lower case, e.g. storage:models."
+        )
+    raw_rest = storage_path.removeprefix(STORAGE_PATH_PREFIX)
+    rest = unquote(raw_rest)
+    if _has_control_characters(rest):
+        return (
+            f"Storage path {storage_path!r} has a control character, such as "
+            "a line break or a tab. Remove it from the path."
+        )
+    if "%" in rest:
+        return (
+            f"Storage path {storage_path!r} has '%' after percent-decoding. "
+            "Encode each character once, or rename the folder that has '%' "
+            "in its name."
+        )
+    if ENCODED_SEPARATOR_RE.search(raw_rest):
+        return (
+            f"Storage path {storage_path!r} has a percent-encoded '/' or '.'. "
+            "Write them as plain characters."
+        )
+    forbidden = "".join(char for char in ":?#" if char in rest)
+    if forbidden:
+        return (
+            f"Storage path {storage_path!r} has {', '.join(map(repr, forbidden))} "
+            f"after '{STORAGE_PATH_PREFIX}', also when percent-encoded. Remove it "
+            "from the path, or rename the folder that has it in its name."
+        )
+    absolute = rest.startswith("//")
+    segments = (rest[2:] if absolute else rest.removeprefix("/")).split("/")
+    if "" in segments[:-1]:
+        return (
+            f"Storage path {storage_path!r} has an empty folder name. "
+            "Remove the extra '/'."
+        )
+    if absolute and not _is_cluster_name(segments[0]):
+        return (
+            f"Storage path {storage_path!r} has an invalid cluster name. "
+            "Use storage://<cluster>/<org>/<project>/<folder> or storage:<folder>."
+        )
+    return None
 
 
 def _get_storage_path_location_error(
@@ -248,16 +292,10 @@ def _get_storage_path_location_error(
     validator_config: Mapping[str, Any],
     config: Any,
 ) -> str | None:
-    if not _is_plain_storage_path(storage_path, uri):
-        return (
-            f"Storage path {storage_path!r} must start with "
-            f"'{STORAGE_PATH_PREFIX}' and have no control characters "
-            "or ':' after it."
-        )
-    parts = tuple(uri.path.split("/"))
+    parts = tuple(part for part in uri.path.split("/") if part not in ("", "."))
     if validator_config.get("same_project") is True and (
         uri.host != config.cluster_name
-        or parts[1:3] != (config.org_name, config.project_name)
+        or parts[:2] != (config.org_name, config.project_name)
         or ".." in parts
     ):
         return (
@@ -265,9 +303,7 @@ def _get_storage_path_location_error(
             f"'{config.project_name}' of organization "
             f"'{config.org_name}' on cluster '{config.cluster_name}'."
         )
-    if validator_config.get("subfolder") is True and not any(
-        part not in ("", ".") for part in parts[3:]
-    ):
+    if validator_config.get("subfolder") is True and len(parts) <= 2:
         return (
             f"Storage path '{storage_path}' is the root of a project. "
             "Choose a subfolder of the project, e.g. storage:models."
@@ -286,6 +322,14 @@ async def validate_storage_path_custom_validator(
     storage_path = _get_storage_path(value)
     if storage_path is None:
         return []
+
+    plain_error = _get_plain_storage_path_error(storage_path)
+    if plain_error is not None:
+        return [
+            _build_custom_validation_error(
+                plain_error, path, STORAGE_PATH_VALIDATOR_NAME
+            )
+        ]
 
     try:
         uri: URL = apolo_client.parse.str_to_uri(

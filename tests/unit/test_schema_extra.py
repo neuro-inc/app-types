@@ -63,7 +63,7 @@ def test_storage_path_validator_builder_defaults_to_empty_config() -> None:
     assert storage_path_validator() == {"storage_path_validator": {}}
 
 
-def test_storage_path_validator_builder_rejects_is_dir_without_exists() -> None:
+def test_storage_path_validator_builder_rejects_is_dir_with_exists_false() -> None:
     with pytest.raises(ValueError, match="cannot require a directory"):
         storage_path_validator(exists=False, is_dir=True)
 

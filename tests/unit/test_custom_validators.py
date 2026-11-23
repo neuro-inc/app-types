@@ -232,6 +232,8 @@ def _validate_storage_path(
         ("storage:a..b", "storage://cluster/test-org/test-project/a..b"),
         ("storage:./models", "storage://cluster/test-org/test-project/models"),
         ("storage:моделі", "storage://cluster/test-org/test-project/моделі"),
+        ("storage:my%20models", "storage://cluster/test-org/test-project/my%20models"),
+        ("storage:user@models", "storage://cluster/test-org/test-project/user@models"),
     ],
 )
 def test_validate_storage_path_accepts_directory_in_project(
@@ -254,8 +256,8 @@ def test_validate_storage_path_accepts_directory_in_project(
         "storage://other-cluster/test-org/test-project/models",
         "storage://cluster/test-org",
         "storage://cluster/test-org/test-project/../other-project/models",
-        "storage://cluster/test-org/test-project/..%2fother-project/models",
-        "storage://cluster/test-org/test-project/a%2f..%2f..%2f..%2fother-org%2fother-project/models",
+        "storage:..",
+        "storage:../other-project/models",
     ],
 )
 def test_validate_storage_path_rejects_path_outside_project(storage_path: str) -> None:
@@ -281,9 +283,9 @@ def test_validate_storage_path_rejects_path_outside_project(storage_path: str) -
         "storage://cluster/test-org/test-project",
         "storage://cluster/test-org/test-project/",
         "storage://cluster/test-org/test-project/.",
-        "storage://cluster/test-org/test-project//",
-        "storage://cluster/test-org/test-project/%2e",
+        "storage://cluster/test-org/test-project/./",
         "storage:models/..",
+        "storage:models/../",
         "storage://cluster/test-org/test-project/models/..",
     ],
 )
@@ -330,43 +332,148 @@ def test_validate_storage_path_rejects_other_project_root_with_subfolder_only() 
     assert "is the root of a project" in errors[0].message
 
 
-@pytest.mark.parametrize(
-    "storage_path",
-    [
-        "storage:models\n",
-        "storage:mod\nels",
-        "storage:mod\tels",
-        "storage:models\r",
-        "storage:models\x00",
-        "storage:models\x7f",
-        "storage:models\x85",
-        "storage:models%0a",
-        "storage:models%00",
-        "storage://cluster/test-org/test-project/a%7Fb",
-        "storage://cluster/test-org/test-project/a%C2%85b",
-        "STORAGE:models",
-        "Storage:models",
-        " storage:models",
-        "storage:STORAGE:models",
-        "storage:storage:models",
-        "storage:storage://cluster/test-org/test-project/models",
-        "storage:models/storage:x",
-        "storage://cluster/test-org/test-project/storage:models",
-        "storage:models%3Ax",
-        "storage:/test-project/storage%3A/other",
-    ],
+PREFIX_ERROR = "must start with 'storage:' in lower case, e.g. storage:models."
+CONTROL_ERROR = (
+    "has a control character, such as a line break or a tab. Remove it from the path."
 )
-def test_validate_storage_path_rejects_unsafe_path(storage_path: str) -> None:
+PERCENT_ERROR = (
+    "has '%' after percent-decoding. Encode each character once, "
+    "or rename the folder that has '%' in its name."
+)
+SEPARATOR_ERROR = "has a percent-encoded '/' or '.'. Write them as plain characters."
+EMPTY_ERROR = "has an empty folder name. Remove the extra '/'."
+CLUSTER_ERROR = (
+    "has an invalid cluster name. "
+    "Use storage://<cluster>/<org>/<project>/<folder> or storage:<folder>."
+)
+
+
+def _character_error(characters: str) -> str:
+    return (
+        f"has {characters} after 'storage:', also when percent-encoded. "
+        "Remove it from the path, or rename the folder that has it in its name."
+    )
+
+
+UNSAFE_STORAGE_PATHS = [
+    *(
+        (storage_path, PREFIX_ERROR)
+        for storage_path in [
+            "",
+            "s3://bucket/models",
+            "STORAGE:models",
+            "Storage:models",
+            " storage:models",
+        ]
+    ),
+    *(
+        (storage_path, CONTROL_ERROR)
+        for storage_path in [
+            "storage:models\n",
+            "storage:mod\nels",
+            "storage:mod\tels",
+            "storage:models\r",
+            "storage:models\x00",
+            "storage:models\x7f",
+            "storage:models\x85",
+            "storage:models%0a",
+            "storage:models%00",
+            "storage://cluster/test-org/test-project/a%7Fb",
+            "storage://cluster/test-org/test-project/a%C2%85b",
+            "storage:%0a/../models",
+            "storage:%00/../models",
+            "storage:models/%C2%85/..",
+        ]
+    ),
+    *(
+        (storage_path, PERCENT_ERROR)
+        for storage_path in [
+            "storage:models%25",
+            "storage:100%",
+            "storage:report%253A2026",
+            "storage://cluster/test-org/test-project/%252e",
+            "storage://cluster/test-org/test-project/%252e%252e/%252e%252e/other",
+        ]
+    ),
+    *(
+        (storage_path, SEPARATOR_ERROR)
+        for storage_path in [
+            "storage:triton%2Fmodels",
+            "storage:%2e%2e/other-project/models",
+            "storage://cluster/test-org/test-project/%2e",
+            "storage://cluster/test-org/test-project%2F.",
+            "storage://cluster/test-org/test-project%2F%2e",
+            "storage://cluster/test-org/test-project/.%2F.",
+            "storage://cluster/test-org/test-project%2F.%2F.",
+            "storage://cluster/test-org/test-project/..%2fother-project/models",
+        ]
+    ),
+    *(
+        (storage_path, _character_error("':'"))
+        for storage_path in [
+            "storage:STORAGE:models",
+            "storage:storage:models",
+            "storage:storage://cluster/test-org/test-project/models",
+            "storage:models/storage:x",
+            "storage:models/v1:latest",
+            "storage://cluster/test-org/test-project/storage:models",
+            "storage:models%3Ax",
+            "storage:/test-project/storage%3A/other",
+            "storage:%3A/../models",
+            "storage:%3a/../models",
+            "storage:report:2026",
+            "storage:report%3A2026",
+            "storage://cluster:1/test-org/test-project/models",
+            "storage://cluster:/test-org/test-project/models",
+            "storage://cluster%3A/test-org/test-project/models",
+        ]
+    ),
+    ("storage:models?x=1", _character_error("'?'")),
+    ("storage:models%3Fx", _character_error("'?'")),
+    ("storage:models#x", _character_error("'#'")),
+    ("storage:models%23x", _character_error("'#'")),
+    ("storage:a:b?c#d", _character_error("':', '?', '#'")),
+    *(
+        (storage_path, EMPTY_ERROR)
+        for storage_path in [
+            "storage://cluster//test-org/test-project/models",
+            "storage:////test-project/models",
+            "storage:///test-org/test-project/models",
+            "storage://cluster/test-org/test-project//",
+            "storage:/test-project//models",
+            "storage:triton//models",
+            "storage://cluster/test-org/test-project/./triton//models/",
+        ]
+    ),
+    *(
+        (storage_path, CLUSTER_ERROR)
+        for storage_path in [
+            "storage://",
+            "storage://[",
+            "storage://[cluster]/test-org/test-project/models",
+            "storage://xn--/test-org/test-project/models",
+            "storage://xn--abc/test-org/test-project/models",
+            "storage://-cluster/test-org/test-project/models",
+            "storage://user@cluster/test-org/test-project/models",
+            "storage://cluster%40x/test-org/test-project/models",
+            "storage://кластер/test-org/test-project/models",
+        ]
+    ),
+]
+
+
+@pytest.mark.parametrize(("storage_path", "expected"), UNSAFE_STORAGE_PATHS)
+def test_validate_storage_path_rejects_unsafe_path(
+    storage_path: str, expected: str
+) -> None:
     client = _make_storage_client()
 
     errors = _validate_storage_path({"files_path": {"path": storage_path}}, client)
 
     assert len(errors) == 1
     assert errors[0].validator == STORAGE_PATH_VALIDATOR_NAME
-    assert errors[0].message == (
-        f"Storage path {storage_path!r} must start with 'storage:' and have no "
-        "control characters or ':' after it."
-    )
+    assert errors[0].path == ["model_repository"]
+    assert errors[0].message == f"Storage path {storage_path!r} {expected}"
     client.storage.stat.assert_not_awaited()
 
 
@@ -384,7 +491,7 @@ def test_validate_storage_path_rejects_unsafe_path_with_any_config(
     )
 
     assert len(errors) == 1
-    assert "no control characters" in errors[0].message
+    assert CONTROL_ERROR in errors[0].message
     client.storage.stat.assert_not_awaited()
 
 
@@ -510,15 +617,7 @@ def test_validate_storage_path_stops_waiting_for_stat(
 
 @pytest.mark.parametrize(
     "storage_path",
-    [
-        "s3://bucket/models",
-        "storage:~/models",
-        "",
-        "storage:models?x=1",
-        "storage:models#x",
-        "storage://user@cluster/test-org/test-project/models",
-        "storage://cluster:1/test-org/test-project/models",
-    ],
+    ["storage:~/models"],
 )
 def test_validate_storage_path_reports_invalid_path(storage_path: str) -> None:
     client = _make_storage_client()
@@ -627,12 +726,12 @@ def _make_sdk_storage_client(transport: _StorageTransport) -> MagicMock:
         (
             "storage://cluster/test-org/test-project/..%2fother-project/models",
             None,
-            ["must be in project"],
+            ["has a percent-encoded '/' or '.'"],
         ),
         (
             "storage://cluster/test-org/test-project/a%2f..%2f..%2f..%2fother-org%2fother-project/models",
             None,
-            ["must be in project"],
+            ["has a percent-encoded '/' or '.'"],
         ),
     ],
 )
