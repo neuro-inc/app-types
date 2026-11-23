@@ -155,7 +155,12 @@ def test_custom_validators_registry_exposes_validators() -> None:
     }
 
 
-STORAGE_VALIDATOR_CONFIG = {"exists": True, "is_dir": True, "same_project": True}
+STORAGE_VALIDATOR_CONFIG = {
+    "exists": True,
+    "is_dir": True,
+    "same_project": True,
+    "subfolder": True,
+}
 
 
 def _file_status(file_type: FileStatusType) -> FileStatus:
@@ -219,6 +224,14 @@ def _validate_storage_path(
             "storage://cluster/test-org/test-project/triton/models",
             "storage://cluster/test-org/test-project/triton/models",
         ),
+        (
+            "storage:/test-project/models",
+            "storage://cluster/test-org/test-project/models",
+        ),
+        ("storage:.models", "storage://cluster/test-org/test-project/.models"),
+        ("storage:a..b", "storage://cluster/test-org/test-project/a..b"),
+        ("storage:./models", "storage://cluster/test-org/test-project/models"),
+        ("storage:моделі", "storage://cluster/test-org/test-project/моделі"),
     ],
 )
 def test_validate_storage_path_accepts_directory_in_project(
@@ -254,6 +267,124 @@ def test_validate_storage_path_rejects_path_outside_project(storage_path: str) -
     assert errors[0].validator == STORAGE_PATH_VALIDATOR_NAME
     assert errors[0].path == ["model_repository"]
     assert "must be in project 'test-project'" in errors[0].message
+    client.storage.stat.assert_not_awaited()
+
+
+@pytest.mark.parametrize(
+    "storage_path",
+    [
+        "storage:",
+        "storage:.",
+        "storage:./",
+        "storage:/test-project",
+        "storage:/test-project/",
+        "storage://cluster/test-org/test-project",
+        "storage://cluster/test-org/test-project/",
+        "storage://cluster/test-org/test-project/.",
+        "storage://cluster/test-org/test-project//",
+        "storage://cluster/test-org/test-project/%2e",
+        "storage:models/..",
+        "storage://cluster/test-org/test-project/models/..",
+    ],
+)
+def test_validate_storage_path_rejects_project_root(storage_path: str) -> None:
+    client = _make_storage_client()
+
+    errors = _validate_storage_path({"files_path": {"path": storage_path}}, client)
+
+    assert len(errors) == 1
+    assert errors[0].validator == STORAGE_PATH_VALIDATOR_NAME
+    assert errors[0].path == ["model_repository"]
+    assert errors[0].message == (
+        f"Storage path '{storage_path}' is the root of a project. "
+        "Choose a subfolder of the project, e.g. storage:models."
+    )
+    client.storage.stat.assert_not_awaited()
+
+
+def test_validate_storage_path_allows_project_root_without_subfolder() -> None:
+    client = _make_storage_client()
+
+    errors = _validate_storage_path(
+        {"files_path": {"path": "storage:"}},
+        client,
+        {"exists": True, "is_dir": True, "same_project": True},
+    )
+
+    assert errors == []
+    client.storage.stat.assert_awaited_once_with(
+        URL("storage://cluster/test-org/test-project")
+    )
+
+
+def test_validate_storage_path_rejects_other_project_root_with_subfolder_only() -> None:
+    client = _make_storage_client()
+
+    errors = _validate_storage_path(
+        {"files_path": {"path": "storage:/other-project"}},
+        client,
+        {"subfolder": True},
+    )
+
+    assert len(errors) == 1
+    assert "is the root of a project" in errors[0].message
+
+
+@pytest.mark.parametrize(
+    "storage_path",
+    [
+        "storage:models\n",
+        "storage:mod\nels",
+        "storage:mod\tels",
+        "storage:models\r",
+        "storage:models\x00",
+        "storage:models\x7f",
+        "storage:models\x85",
+        "storage:models%0a",
+        "storage:models%00",
+        "storage://cluster/test-org/test-project/a%7Fb",
+        "storage://cluster/test-org/test-project/a%C2%85b",
+        "STORAGE:models",
+        "Storage:models",
+        " storage:models",
+        "storage:STORAGE:models",
+        "storage:storage:models",
+        "storage:storage://cluster/test-org/test-project/models",
+        "storage:models/storage:x",
+        "storage://cluster/test-org/test-project/storage:models",
+        "storage:models%3Ax",
+        "storage:/test-project/storage%3A/other",
+    ],
+)
+def test_validate_storage_path_rejects_unsafe_path(storage_path: str) -> None:
+    client = _make_storage_client()
+
+    errors = _validate_storage_path({"files_path": {"path": storage_path}}, client)
+
+    assert len(errors) == 1
+    assert errors[0].validator == STORAGE_PATH_VALIDATOR_NAME
+    assert errors[0].message == (
+        f"Storage path {storage_path!r} must start with 'storage:' and have no "
+        "control characters or ':' after it."
+    )
+    client.storage.stat.assert_not_awaited()
+
+
+@pytest.mark.parametrize(
+    "validator_config",
+    [{}, {"exists": True}, {"same_project": True}],
+)
+def test_validate_storage_path_rejects_unsafe_path_with_any_config(
+    validator_config: dict[str, bool],
+) -> None:
+    client = _make_storage_client()
+
+    errors = _validate_storage_path(
+        {"files_path": {"path": "storage:mod\nels"}}, client, validator_config
+    )
+
+    assert len(errors) == 1
+    assert "no control characters" in errors[0].message
     client.storage.stat.assert_not_awaited()
 
 
@@ -377,7 +508,18 @@ def test_validate_storage_path_stops_waiting_for_stat(
     )
 
 
-@pytest.mark.parametrize("storage_path", ["s3://bucket/models", "storage:~/models"])
+@pytest.mark.parametrize(
+    "storage_path",
+    [
+        "s3://bucket/models",
+        "storage:~/models",
+        "",
+        "storage:models?x=1",
+        "storage:models#x",
+        "storage://user@cluster/test-org/test-project/models",
+        "storage://cluster:1/test-org/test-project/models",
+    ],
+)
 def test_validate_storage_path_reports_invalid_path(storage_path: str) -> None:
     client = _make_storage_client()
 

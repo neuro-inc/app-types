@@ -22,7 +22,9 @@ TRITON_MODEL_REPOSITORY_SCHEMA_EXTRA = SchemaExtraMetadata(
     "model_repository.html#repository-layout",
     meta_type=SchemaMetaType.INTEGRATION,
     custom_validators=[
-        storage_path_validator(exists=True, is_dir=True, same_project=True)
+        storage_path_validator(
+            exists=True, is_dir=True, same_project=True, subfolder=True
+        )
     ],
 )
 
@@ -39,7 +41,8 @@ class TritonModelRepository(AbstractAppFieldType):
             title="Repository Path",
             description="Storage path of an existing directory, "
             "e.g. storage:triton/models. "
-            "It must be in the same project as the Triton app.",
+            "It must be a subfolder of the project of the Triton app, "
+            "not the project root.",
         ).as_json_schema_extra(),
     )
 

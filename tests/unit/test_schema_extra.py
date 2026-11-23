@@ -47,11 +47,14 @@ def test_preset_validator_builder_defaults_to_empty_config() -> None:
 
 
 def test_storage_path_validator_builder_serializes_expected_shape() -> None:
-    assert storage_path_validator(exists=True, is_dir=True, same_project=True) == {
+    assert storage_path_validator(
+        exists=True, is_dir=True, same_project=True, subfolder=True
+    ) == {
         "storage_path_validator": {
             "exists": True,
             "is_dir": True,
             "same_project": True,
+            "subfolder": True,
         }
     }
 
@@ -63,6 +66,14 @@ def test_storage_path_validator_builder_defaults_to_empty_config() -> None:
 def test_storage_path_validator_builder_rejects_is_dir_without_exists() -> None:
     with pytest.raises(ValueError, match="cannot require a directory"):
         storage_path_validator(exists=False, is_dir=True)
+
+
+@pytest.mark.parametrize("same_project", [None, False])
+def test_storage_path_validator_builder_rejects_subfolder_without_same_project(
+    same_project: bool | None,
+) -> None:
+    with pytest.raises(ValueError, match="cannot require a subfolder"):
+        storage_path_validator(subfolder=True, same_project=same_project)
 
 
 @pytest.mark.parametrize(

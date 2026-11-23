@@ -76,6 +76,7 @@ def test_triton_model_repository_schema_has_storage_path_validator():
                 "exists": True,
                 "is_dir": True,
                 "same_project": True,
+                "subfolder": True,
             }
         }
     ]
