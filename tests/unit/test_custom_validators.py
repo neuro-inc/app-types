@@ -340,6 +340,10 @@ PERCENT_ERROR = (
     "has '%' after percent-decoding. Encode each character once, "
     "or rename the folder that has '%' in its name."
 )
+UTF8_ERROR = (
+    "has a percent-encoded sequence that is not UTF-8 text. "
+    "Encode the folder name as UTF-8."
+)
 SEPARATOR_ERROR = "has a percent-encoded '/' or '.'. Write them as plain characters."
 EMPTY_ERROR = "has an empty folder name. Remove the extra '/'."
 CLUSTER_ERROR = (
@@ -386,10 +390,21 @@ UNSAFE_STORAGE_PATHS = [
         ]
     ),
     *(
+        (storage_path, UTF8_ERROR)
+        for storage_path in [
+            "storage:%FF",
+            "storage:%C0%AE%C0%AE",
+            "storage:models/%C0%AE%C0%AE/other",
+            "storage://cluster/test-org/test-project/%FF",
+        ]
+    ),
+    *(
         (storage_path, PERCENT_ERROR)
         for storage_path in [
             "storage:models%25",
             "storage:100%",
+            "storage:50%",
+            "storage:100%25",
             "storage:report%253A2026",
             "storage://cluster/test-org/test-project/%252e",
             "storage://cluster/test-org/test-project/%252e%252e/%252e%252e/other",
@@ -399,6 +414,7 @@ UNSAFE_STORAGE_PATHS = [
         (storage_path, SEPARATOR_ERROR)
         for storage_path in [
             "storage:triton%2Fmodels",
+            "storage:model%2Eonnx",
             "storage:%2e%2e/other-project/models",
             "storage://cluster/test-org/test-project/%2e",
             "storage://cluster/test-org/test-project%2F.",
@@ -442,6 +458,7 @@ UNSAFE_STORAGE_PATHS = [
             "storage://cluster/test-org/test-project//",
             "storage:/test-project//models",
             "storage:triton//models",
+            "storage:triton/models//",
             "storage://cluster/test-org/test-project/./triton//models/",
         ]
     ),
@@ -493,6 +510,21 @@ def test_validate_storage_path_rejects_unsafe_path_with_any_config(
     assert len(errors) == 1
     assert CONTROL_ERROR in errors[0].message
     client.storage.stat.assert_not_awaited()
+
+
+def test_validate_storage_path_accepts_cluster_name_with_double_hyphen() -> None:
+    client = _make_storage_client()
+
+    errors = _validate_storage_path(
+        {"files_path": {"path": "storage://my--cluster/test-org/test-project/models"}},
+        client,
+        {"exists": True},
+    )
+
+    assert errors == []
+    client.storage.stat.assert_awaited_once_with(
+        URL("storage://my--cluster/test-org/test-project/models")
+    )
 
 
 def test_validate_storage_path_reports_missing_path() -> None:

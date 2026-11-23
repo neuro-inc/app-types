@@ -19,6 +19,10 @@ STORAGE_PATH_VALIDATOR_NAME = "storage_path_validator"
 STORAGE_PATH_STAT_TIMEOUT_S = 30
 STORAGE_PATH_PREFIX = "storage:"
 ENCODED_SEPARATOR_RE = re.compile(r"%2[EeFf]")
+CLUSTER_NAME_ERROR = (
+    "has an invalid cluster name. "
+    "Use storage://<cluster>/<org>/<project>/<folder> or storage:<folder>."
+)
 CLUSTER_LABEL_RE = re.compile(r"[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?")
 
 
@@ -234,10 +238,7 @@ def _has_control_characters(value: str) -> bool:
 
 
 def _is_cluster_name(name: str) -> bool:
-    return all(
-        CLUSTER_LABEL_RE.fullmatch(label) and label[2:4] != "--"
-        for label in name.split(".")
-    )
+    return all(CLUSTER_LABEL_RE.fullmatch(label) for label in name.split("."))
 
 
 def _get_plain_storage_path_error(storage_path: str) -> str | None:
@@ -247,7 +248,13 @@ def _get_plain_storage_path_error(storage_path: str) -> str | None:
             f"'{STORAGE_PATH_PREFIX}' in lower case, e.g. storage:models."
         )
     raw_rest = storage_path.removeprefix(STORAGE_PATH_PREFIX)
-    rest = unquote(raw_rest)
+    try:
+        rest = unquote(raw_rest, errors="strict")
+    except UnicodeDecodeError:
+        return (
+            f"Storage path {storage_path!r} has a percent-encoded sequence that "
+            "is not UTF-8 text. Encode the folder name as UTF-8."
+        )
     if _has_control_characters(rest):
         return (
             f"Storage path {storage_path!r} has a control character, such as "
@@ -279,10 +286,7 @@ def _get_plain_storage_path_error(storage_path: str) -> str | None:
             "Remove the extra '/'."
         )
     if absolute and not _is_cluster_name(segments[0]):
-        return (
-            f"Storage path {storage_path!r} has an invalid cluster name. "
-            "Use storage://<cluster>/<org>/<project>/<folder> or storage:<folder>."
-        )
+        return f"Storage path {storage_path!r} {CLUSTER_NAME_ERROR}"
     return None
 
 
@@ -335,6 +339,14 @@ async def validate_storage_path_custom_validator(
         uri: URL = apolo_client.parse.str_to_uri(
             storage_path, allowed_schemes=("storage",)
         )
+    except UnicodeError:
+        return [
+            _build_custom_validation_error(
+                f"Storage path {storage_path!r} {CLUSTER_NAME_ERROR}",
+                path,
+                STORAGE_PATH_VALIDATOR_NAME,
+            )
+        ]
     except ValueError as e:
         return [
             _build_custom_validation_error(
