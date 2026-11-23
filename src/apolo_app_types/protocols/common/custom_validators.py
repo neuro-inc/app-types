@@ -1,8 +1,11 @@
 import asyncio
 import logging
+import re
+import unicodedata
 from collections.abc import Awaitable, Callable, Mapping
 from numbers import Real
 from typing import Any
+from urllib.parse import unquote
 
 from apolo_sdk import ResourceNotFound
 from typing_extensions import TypedDict
@@ -14,6 +17,13 @@ logger = logging.getLogger(__name__)
 PRESET_VALIDATOR_NAME = "preset_validator"
 STORAGE_PATH_VALIDATOR_NAME = "storage_path_validator"
 STORAGE_PATH_STAT_TIMEOUT_S = 30
+STORAGE_PATH_PREFIX = "storage:"
+ENCODED_SEPARATOR_RE = re.compile(r"%2[EeFf]")
+CLUSTER_NAME_ERROR = (
+    "has an invalid cluster name. "
+    "Use storage://<cluster>/<org>/<project>/<folder> or storage:<folder>."
+)
+CLUSTER_LABEL_RE = re.compile(r"[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?")
 
 
 class PresetValidatorConfig(TypedDict, total=False):
@@ -27,6 +37,7 @@ class StoragePathValidatorConfig(TypedDict, total=False):
     exists: bool
     is_dir: bool
     same_project: bool
+    subfolder: bool
 
 
 class CustomValidatorSpec(TypedDict, total=False):
@@ -66,9 +77,13 @@ def storage_path_validator(
     exists: bool | None = None,
     is_dir: bool | None = None,
     same_project: bool | None = None,
+    subfolder: bool | None = None,
 ) -> CustomValidatorSpec:
     if exists is False and is_dir is True:
         msg = "storage_path_validator cannot require a directory when exists=False."
+        raise ValueError(msg)
+    if subfolder is True and same_project is not True:
+        msg = "storage_path_validator cannot require a subfolder without same_project."
         raise ValueError(msg)
     config: StoragePathValidatorConfig = {}
     if exists is not None:
@@ -77,6 +92,8 @@ def storage_path_validator(
         config["is_dir"] = is_dir
     if same_project is not None:
         config["same_project"] = same_project
+    if subfolder is not None:
+        config["subfolder"] = subfolder
     return {"storage_path_validator": config}
 
 
@@ -216,6 +233,88 @@ def _get_storage_path(value: Any) -> str | None:
     return None
 
 
+def _has_control_characters(value: str) -> bool:
+    return any(unicodedata.category(char) == "Cc" for char in value)
+
+
+def _is_cluster_name(name: str) -> bool:
+    return all(CLUSTER_LABEL_RE.fullmatch(label) for label in name.split("."))
+
+
+def _get_plain_storage_path_error(storage_path: str) -> str | None:
+    if not storage_path.startswith(STORAGE_PATH_PREFIX):
+        return (
+            f"Storage path {storage_path!r} must start with "
+            f"'{STORAGE_PATH_PREFIX}' in lower case, e.g. storage:models."
+        )
+    raw_rest = storage_path.removeprefix(STORAGE_PATH_PREFIX)
+    try:
+        rest = unquote(raw_rest, errors="strict")
+    except UnicodeDecodeError:
+        return (
+            f"Storage path {storage_path!r} has a percent-encoded sequence that "
+            "is not UTF-8 text. Encode the folder name as UTF-8."
+        )
+    if _has_control_characters(rest):
+        return (
+            f"Storage path {storage_path!r} has a control character, such as "
+            "a line break or a tab. Remove it from the path."
+        )
+    if "%" in rest:
+        return (
+            f"Storage path {storage_path!r} has '%' after percent-decoding. "
+            "Encode each character once, or rename the folder that has '%' "
+            "in its name."
+        )
+    if ENCODED_SEPARATOR_RE.search(raw_rest):
+        return (
+            f"Storage path {storage_path!r} has a percent-encoded '/' or '.'. "
+            "Write them as plain characters."
+        )
+    forbidden = "".join(char for char in ":?#" if char in rest)
+    if forbidden:
+        return (
+            f"Storage path {storage_path!r} has {', '.join(map(repr, forbidden))} "
+            f"after '{STORAGE_PATH_PREFIX}', also when percent-encoded. Remove it "
+            "from the path, or rename the folder that has it in its name."
+        )
+    absolute = rest.startswith("//")
+    segments = (rest[2:] if absolute else rest.removeprefix("/")).split("/")
+    if "" in segments[:-1]:
+        return (
+            f"Storage path {storage_path!r} has an empty folder name. "
+            "Remove the extra '/'."
+        )
+    if absolute and not _is_cluster_name(segments[0]):
+        return f"Storage path {storage_path!r} {CLUSTER_NAME_ERROR}"
+    return None
+
+
+def _get_storage_path_location_error(
+    storage_path: str,
+    uri: URL,
+    validator_config: Mapping[str, Any],
+    config: Any,
+) -> str | None:
+    parts = tuple(part for part in uri.path.split("/") if part not in ("", "."))
+    if validator_config.get("same_project") is True and (
+        uri.host != config.cluster_name
+        or parts[:2] != (config.org_name, config.project_name)
+        or ".." in parts
+    ):
+        return (
+            f"Storage path '{storage_path}' must be in project "
+            f"'{config.project_name}' of organization "
+            f"'{config.org_name}' on cluster '{config.cluster_name}'."
+        )
+    if validator_config.get("subfolder") is True and len(parts) <= 2:
+        return (
+            f"Storage path '{storage_path}' is the root of a project. "
+            "Choose a subfolder of the project, e.g. storage:models."
+        )
+    return None
+
+
 async def validate_storage_path_custom_validator(
     value: Any,
     validator_config: Mapping[str, Any],
@@ -228,10 +327,26 @@ async def validate_storage_path_custom_validator(
     if storage_path is None:
         return []
 
+    plain_error = _get_plain_storage_path_error(storage_path)
+    if plain_error is not None:
+        return [
+            _build_custom_validation_error(
+                plain_error, path, STORAGE_PATH_VALIDATOR_NAME
+            )
+        ]
+
     try:
         uri: URL = apolo_client.parse.str_to_uri(
             storage_path, allowed_schemes=("storage",)
         )
+    except UnicodeError:
+        return [
+            _build_custom_validation_error(
+                f"Storage path {storage_path!r} {CLUSTER_NAME_ERROR}",
+                path,
+                STORAGE_PATH_VALIDATOR_NAME,
+            )
+        ]
     except ValueError as e:
         return [
             _build_custom_validation_error(
@@ -241,25 +356,15 @@ async def validate_storage_path_custom_validator(
             )
         ]
 
-    if validator_config.get("same_project") is True:
-        config = apolo_client.config
-        parts = tuple(uri.path.split("/"))
-        if (
-            uri.host != config.cluster_name
-            or parts[1:3] != (config.org_name, config.project_name)
-            or ".." in parts
-        ):
-            return [
-                _build_custom_validation_error(
-                    (
-                        f"Storage path '{storage_path}' must be in project "
-                        f"'{config.project_name}' of organization "
-                        f"'{config.org_name}' on cluster '{config.cluster_name}'."
-                    ),
-                    path,
-                    STORAGE_PATH_VALIDATOR_NAME,
-                )
-            ]
+    location_error = _get_storage_path_location_error(
+        storage_path, uri, validator_config, apolo_client.config
+    )
+    if location_error is not None:
+        return [
+            _build_custom_validation_error(
+                location_error, path, STORAGE_PATH_VALIDATOR_NAME
+            )
+        ]
 
     is_dir = validator_config.get("is_dir") is True
     if validator_config.get("exists") is not True and not is_dir:
