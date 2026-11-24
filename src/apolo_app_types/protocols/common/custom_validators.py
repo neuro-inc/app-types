@@ -307,7 +307,10 @@ def _get_storage_path_location_error(
             f"'{config.project_name}' of organization "
             f"'{config.org_name}' on cluster '{config.cluster_name}'."
         )
-    if validator_config.get("subfolder") is True and len(parts) <= 2:
+    subfolder = validator_config.get("subfolder")
+    if subfolder is None:
+        subfolder = validator_config.get("same_project")
+    if subfolder is True and len(parts) <= 2:
         return (
             f"Storage path '{storage_path}' is the root of a project. "
             "Choose a subfolder of the project, e.g. storage:models."

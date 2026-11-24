@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Mapping
 from contextlib import asynccontextmanager
 from types import MethodType, SimpleNamespace
 from typing import Any
@@ -202,7 +202,7 @@ def _make_storage_client(
 def _validate_storage_path(
     value: Any,
     client: MagicMock,
-    validator_config: dict[str, bool] = STORAGE_VALIDATOR_CONFIG,
+    validator_config: Mapping[str, bool | None] = STORAGE_VALIDATOR_CONFIG,
 ) -> list[CustomValidationError]:
     return asyncio.run(
         validate_storage_path_custom_validator(
@@ -289,10 +289,22 @@ def test_validate_storage_path_rejects_path_outside_project(storage_path: str) -
         "storage://cluster/test-org/test-project/models/..",
     ],
 )
-def test_validate_storage_path_rejects_project_root(storage_path: str) -> None:
+@pytest.mark.parametrize(
+    "validator_config",
+    [
+        STORAGE_VALIDATOR_CONFIG,
+        {"exists": True, "is_dir": True, "same_project": True},
+        {"exists": True, "is_dir": True, "same_project": True, "subfolder": None},
+    ],
+)
+def test_validate_storage_path_rejects_project_root(
+    storage_path: str, validator_config: dict[str, bool | None]
+) -> None:
     client = _make_storage_client()
 
-    errors = _validate_storage_path({"files_path": {"path": storage_path}}, client)
+    errors = _validate_storage_path(
+        {"files_path": {"path": storage_path}}, client, validator_config
+    )
 
     assert len(errors) == 1
     assert errors[0].validator == STORAGE_PATH_VALIDATOR_NAME
@@ -304,13 +316,21 @@ def test_validate_storage_path_rejects_project_root(storage_path: str) -> None:
     client.storage.stat.assert_not_awaited()
 
 
-def test_validate_storage_path_allows_project_root_without_subfolder() -> None:
+@pytest.mark.parametrize(
+    "validator_config",
+    [
+        {"exists": True, "is_dir": True, "same_project": True, "subfolder": False},
+        {"exists": True, "is_dir": True},
+        {"exists": True, "is_dir": True, "same_project": False},
+    ],
+)
+def test_validate_storage_path_allows_project_root_without_subfolder(
+    validator_config: dict[str, bool],
+) -> None:
     client = _make_storage_client()
 
     errors = _validate_storage_path(
-        {"files_path": {"path": "storage:"}},
-        client,
-        {"exists": True, "is_dir": True, "same_project": True},
+        {"files_path": {"path": "storage:"}}, client, validator_config
     )
 
     assert errors == []
