@@ -39,7 +39,8 @@ async def test_weaviate_middleware_annotations(setup_clients, mock_get_preset_cp
     # Verify Weaviate gets both auth AND strip headers middleware
     expected_middleware = (
         "platform-platform-control-plane-ingress-auth@kubernetescrd,"
-        "platform-platform-control-plane-strip-headers@kubernetescrd"
+        "platform-platform-control-plane-strip-headers@kubernetescrd,"
+        "platform-platform-control-plane-token-filter@kubernetescrd"
     )
     assert (
         helm_params["ingress"]["annotations"][

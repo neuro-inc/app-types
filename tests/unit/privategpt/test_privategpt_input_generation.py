@@ -99,7 +99,8 @@ async def test_privategpt_values_generation(setup_clients):
         helm_params["ingress"]["annotations"][
             "traefik.ingress.kubernetes.io/router.middlewares"
         ]
-        == "platform-platform-control-plane-ingress-auth@kubernetescrd"
+        == "platform-platform-control-plane-ingress-auth@kubernetescrd,"
+        "platform-platform-control-plane-token-filter@kubernetescrd"
     )
 
 
