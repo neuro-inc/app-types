@@ -250,7 +250,8 @@ async def test_superset_basic_values_generation(setup_clients, mock_get_preset_c
         helm_params["ingress"]["annotations"][
             "traefik.ingress.kubernetes.io/router.middlewares"
         ]
-        == "platform-platform-control-plane-ingress-auth@kubernetescrd"
+        == "platform-platform-control-plane-ingress-auth@kubernetescrd,"
+        "platform-platform-control-plane-token-filter@kubernetescrd"
     )
 
 

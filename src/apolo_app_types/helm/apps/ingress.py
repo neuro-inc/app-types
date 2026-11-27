@@ -23,6 +23,10 @@ PROD_STRIP_HEADERS_MIDDLEWARE = "platform-platform-strip-headers@kubernetescrd"
 DEV_STRIP_HEADERS_MIDDLEWARE = (
     "platform-platform-control-plane-strip-headers@kubernetescrd"
 )
+PROD_TOKEN_FILTER_MIDDLEWARE = "platform-platform-token-filter@kubernetescrd"
+DEV_TOKEN_FILTER_MIDDLEWARE = (
+    "platform-platform-control-plane-token-filter@kubernetescrd"
+)
 
 # App types that require strip headers middleware
 STRIP_HEADERS_APP_TYPES = {AppType.Weaviate}
@@ -45,6 +49,12 @@ def _get_apolo_auth_middleware_name(app_type: AppType, *, is_production: bool) -
         return f"{auth_middleware},{strip_headers_middleware}"
 
     return auth_middleware
+
+
+def _get_token_filter_middleware_name(*, is_production: bool) -> str:
+    return (
+        PROD_TOKEN_FILTER_MIDDLEWARE if is_production else DEV_TOKEN_FILTER_MIDDLEWARE
+    )
 
 
 def is_production_cluster(client: apolo_sdk.Client) -> bool:
@@ -150,7 +160,13 @@ async def get_http_ingress_values(
             ingress_vals.get("annotations", {}),
             ingress_http.auth.middleware.name,
         )
-    # If NoAuth, don't add any middleware annotations
+
+    ingress_vals["annotations"] = await append_ingress_middleware_annotations(
+        ingress_vals.get("annotations", {}),
+        _get_token_filter_middleware_name(
+            is_production=is_production_cluster(apolo_client)
+        ),
+    )
 
     return ingress_vals
 
@@ -196,7 +212,13 @@ async def get_grpc_ingress_values(
             grpc_vals.get("annotations", {}),
             ingress_grpc.auth.middleware.name,
         )
-    # If NoAuth, don't add any middleware annotations
+
+    grpc_vals["annotations"] = await append_ingress_middleware_annotations(
+        grpc_vals["annotations"],
+        _get_token_filter_middleware_name(
+            is_production=is_production_cluster(apolo_client)
+        ),
+    )
 
     return grpc_vals
 
